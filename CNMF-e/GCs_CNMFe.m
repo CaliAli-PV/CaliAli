@@ -123,6 +123,9 @@ m_data=strcat(filepath,'\',name,'.mat');
 if exist(m_data, 'file')
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
+
+    neuron.n_enhanced=m.n_enhanced;
+
     if isfield(m,'Mask')
         neuron.Mask=full(m.Mask);
     else
@@ -137,6 +140,8 @@ else
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
     neuron.Mask=ones(neuron.options.d1,neuron.options.d2);
+    neuron.n_enhanced=0;    
+
 end
 neuron.options.Cn=neuron.Cn;neuron.options.PNR=neuron.PNR;
 neuron.options.Mask=neuron.Mask;
@@ -145,13 +150,12 @@ neuron.options.Mask=neuron.Mask;
 tic
 neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1);
 toc
-% [center, Cn, PNR] =neuron.initComponents_parallel(K, frame_range, 1, 0);
-neuron.show_contours(0.8, [], neuron.Cn, 0); %PNR*CORR
+% neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
 
 
 %% Update components
-for ite=1:2
+for ite=2:2
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
     for loop=1:10
@@ -180,7 +184,7 @@ for ite=1:2
     %% save the workspace for future analysis
     save_workspace(neuron);
 
-    %% Pick up from residuals
+    % Pick up from residuals
     if ite<2
         neuron=update_residual(neuron);
     end
@@ -232,7 +236,7 @@ end
 %   view_traces(neuron);
 
 %% Optional post-process
-% neuron.merge_high_corr(1, [0.3, 0.9, -inf]);
+% neuron.merge_high_corr(1, [0.1, 0.3, -inf]);
 
 
 % ix=postprocessing_app(neuron)

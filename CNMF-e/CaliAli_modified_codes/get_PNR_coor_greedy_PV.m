@@ -1,6 +1,10 @@
-function [cn_all,cn,pnr]=get_PNR_coor_greedy_PV(Y,gSig,F,Ysig)
-if ~exist('F','var')
+function [cn_all,cn,pnr]=get_PNR_coor_greedy_PV(Y,gSig,F,Ysig,n_enhanced)
+if ~exist('F','var')||isempty(F)
     F=size(Y,3);
+end
+
+if ~exist('n_enhanced','var')
+    n_enhanced=0;
 end
 
 Y=single(Y);
@@ -8,7 +12,7 @@ Y=single(Y);
 
 %% preprocessing data
 % create a spatial filter for removing background
-if gSig>0
+if n_enhanced==0 && gSig>0
         psf = fspecial('gaussian', ceil(gSig*4+1), gSig);
         ind_nonzero = (psf(:)>=max(psf(:,1)));
         psf = psf-mean(psf(ind_nonzero));
@@ -37,7 +41,7 @@ else
 end
 %% Caculate PNR
 Y_max = max(movmedian(Y,10,2), [], 2); %% median prevents outlier 
-if ~exist('Ysig ','var')
+if ~exist('Ysig ','var')||isempty(Ysig)
     Ysig = GetSn(Y);
 end
 

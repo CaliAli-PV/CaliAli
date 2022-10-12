@@ -14,6 +14,9 @@ options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',200,'max_shi
 
 tic; [~,shifts,~] = normcorre_batch(VF(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc % register filtered dat
 
-options_r = NoRMCorreSetParms('d1',d1,'d2',d2,'bin_width',200,'max_shift',20,'iter',1,'correct_bidir',false);
+% options_r = NoRMCorreSetParms('d1',d1,'d2',d2,'bin_width',200,'max_shift',20,'iter',1,'correct_bidir',false);
 
-Mr = apply_shifts(V,shifts,options_r);
+
+parfor i=1:size(V,3)
+Mr(:,:,i) = imtranslate(V(:,:,i),flip(squeeze(shifts(i).shifts)'));
+end

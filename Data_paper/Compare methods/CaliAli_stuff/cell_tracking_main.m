@@ -35,10 +35,6 @@ for i=1:size(in,1)
     SCo=align_shapes_con(GT,SCo);
     [SCo.m,SCo.s]=calculate_best_matching_score2(GT.a,SCo.a,GT.c,SCo.c);
     SCo.t=get_errors_2(SCo.m,size(GT.c,1));
-    %% Get Scout optimal
-    S_T=get_optimal_scout(Ce(4:end),link(i,:));
-    [~,f1,opti]=get_t_score_SCOUT(GT,S_T);
-
 
     %    show_neuron_tracking_exp(id,GT,CR)
     %     T1=cell2table({CR.s,CR.t,SC.s,SC.t,PC.s,PC.t,SCo.s,SCo.t},'VariableNames',{'CellReg Reconstruction','CellReg errors','SessCon Reconstruction','CellCon errors','GT Reconstruction','GT errors','SCOUT Reconstruction','SCOUT errors'});

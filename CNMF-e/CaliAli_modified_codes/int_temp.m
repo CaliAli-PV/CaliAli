@@ -7,6 +7,7 @@ Ymean={double(median(Y,3))};
 d1=neuron.options.d1;
 d2=neuron.options.d2;
 gSig=neuron.options.gSig;
+n_enhanced=neuron.n_enhanced;
 gSiz=gSig*4;
 
 if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
@@ -21,7 +22,7 @@ end
 
 %% preprocessing data
 % create a spatial filter for removing background
-if gSig>0
+if n_enhanced==0
     if neuron.options.center_psf
         psf = fspecial('gaussian', ceil(gSiz+1), gSig);
         ind_nonzero = (psf(:)>=max(psf(:,1)));
@@ -42,10 +43,10 @@ else
     HY = imfilter(reshape(single(Y), d1,d2,[]), psf, 'replicate');
 end
 
-HY = reshape(HY, d1*d2, []);
+HY = reshape(single(HY), d1*d2, []);
 
 %% PV Remove media in each session
-if size(F,1)>1
+if length(F)>1
     t=0;
     for i=1:size(F,1)
         HY(:,t+1:t+F(i)) = HY(:,t+1:t+F(i))-median(HY(:,t+1:t+F(i)),2);
@@ -64,7 +65,7 @@ if ~isempty(neuron.Cn)
     Cn=neuron.Cn;
     PNR=neuron.PNR;
 else
-    [~,Cn,PNR]=get_PNR_coor_greedy_PV(reshape(HY,d1,d2,[]),gSig);
+    [~,Cn,PNR]=get_PNR_coor_greedy_PV(reshape(HY,d1,d2,[]),gSig,n_enhanced);
 end
 %%
 % screen seeding pixels as center of the neuron
@@ -96,11 +97,12 @@ end
 [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
 %% Filter a
 af=a;
+if n_enhanced==0
 parfor k=1:size(a,2)
  temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
  af{1,k}=temp(:);
 end
- 
+end
 a=expand_A(a,ind_nhood,d1*d2);
 af=expand_A(af,ind_nhood,d1*d2);
 af(af<0)=0;

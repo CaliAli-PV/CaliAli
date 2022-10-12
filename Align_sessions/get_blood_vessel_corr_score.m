@@ -6,8 +6,8 @@ t=linspace(0.1,1,100);
 for i=1:100
     G = graph(v>t(i));
     A= conncomp(G);
-    s(i)=length(find(histc(A(:), min(A(:)):max(A(:)))==1) + min(A(:))-1);
-    if s(i)>0
+    s(i)=length(unique(A));
+    if s(i)>1
         break
     end
 end

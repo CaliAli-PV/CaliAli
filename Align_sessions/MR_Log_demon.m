@@ -32,9 +32,7 @@ for k=nlevel:-1:1
     [sx(:,:,:,it),sy(:,:,:,it)] = expfield(vx,vy);
     
     for i=1:size(X1,3)
-        X2(:,:,i)     = uint8(imwarp(double(X2(:,:,i)),cat(3,sy(:,:,:,it),sx(:,:,:,it)),'FillValues',nan));
-        
-%         uint8(iminterpolate(double(X2(:,:,i)),sx(:,:,:,it),sy(:,:,:,it)));
+        X2(:,:,i)     = uint8(imwarp(double(X2(:,:,i)),cat(3,sy(:,:,:,it),sx(:,:,:,it)),'FillValues',0));
     end
 %     implay(cat(3,X1(:,:,3) ,X2(:,:,3) ));
     

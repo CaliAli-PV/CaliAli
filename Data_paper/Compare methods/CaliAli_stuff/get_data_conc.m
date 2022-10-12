@@ -10,9 +10,9 @@ c1r=neuron.C_raw(:,1:end/2);
 c2r=neuron.C_raw(:,end/2+1:end);
 
 c=[c1,c2];
-n=max(c,[],2);
-c=c./n;
+% n=max(c,[],2);
+% c=c./n;
 c_raw=[c1r,c2r];
-c_raw=c_raw./n;
+% c_raw=c_raw./n;
 end
 

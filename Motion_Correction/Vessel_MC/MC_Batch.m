@@ -11,9 +11,14 @@ for k=1:length(theFiles)
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
         [V,~]=motion_correct_PV(V); %% Rigid MC
-        Mr=MC_NR(V);
+        %Mr=MC_NR(V);
+        Mr=MC_NR_not_used_testing(V);
+        Mr=square_borders(Mr,0);
         %     
         %% save MC video as .h5
         saveash5(Mr,out);
     end
 end
+
+
+% V2=remove_borders(V,0);

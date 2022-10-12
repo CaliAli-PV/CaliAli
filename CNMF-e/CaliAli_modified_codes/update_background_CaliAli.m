@@ -5,7 +5,7 @@ batch=round(linspace(0,size(obj.C_raw,2),div+1));
 
 b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);
 f=cellfun(@(x) x.*0,obj.f,'UniformOutput',false);
-b0=cellfun(@(x) x*inf,obj.b0,'UniformOutput',false);
+b0=cellfun(@(x) abs(x*inf),obj.b0,'UniformOutput',false);
 W=cellfun(@(x) x.*0,obj.W,'UniformOutput',false);
 
 b0_new=inf(size(obj.b0_new,1),size(obj.b0_new,2));

@@ -7,7 +7,7 @@ function [out,Mot,outpath,file_name,A]=Simulate_Ca_video_main(varargin)
 inp = inputParser;
 valid_v = @(x) isnumeric(x);
 addParameter(inp,'outpath',[])
-addParameter(inp,'min_dist',12,valid_v)
+addParameter(inp,'min_dist',8,valid_v)
 addParameter(inp,'Nneu',50,valid_v)
 addParameter(inp,'SNR',2,valid_v)
 addParameter(inp,'d1',220,valid_v)

@@ -1,13 +1,14 @@
 function move_dependencies_to_folder(fList,outPath,NonExist_only)
 
-% move_dependencies_to_folder(fList3,'H:\My Drive\GitHub\CaliAli\Data_paper\Compare methods\Scout_stuff',1);
+% move_dependencies_to_folder(fList,'H:\My Drive\GitHub\CaliAli\Motion_Correction\Vessel_MC\Min1Pipe_required_codes',1);
 %% STEPS to move scripts from one path to another avoiding duplication:
 
 
 % 1) remove your current path, then add the path including all inputs scripts:
 
 % 2) use this function to get dependencies:
-% [fList,pList] = matlab.codetools.requiredFilesAndProducts('cell_tracking_main');fList=fList';
+% [fList,pList] = matlab.codetools.requiredFilesAndProducts('get_BS_neuron_enhance');
+% fList=fList';
 
 %3)  set path to default, then add the destination path :
 

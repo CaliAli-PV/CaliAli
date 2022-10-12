@@ -42,9 +42,7 @@ else
     out=strcat(outpath,'\',name,'_ds','.h5');
 end
 
-upd = textprogressbar(nFrames,'updatestep',30);
-for i=1:nFrames
-    upd(i);
+for i=progress(1:nFrames)
     f=inputMovieIsx.get_frame_data(i-1);
     vid(:,:,i)=imresize(f,1/ds_f,'bilinear');
 end

@@ -11,12 +11,17 @@ D=get_alignments(VF,win);
 %% Applying Shifts
 
 v = squeeze(num2cell(in,[1 2]));
-ppm = ParforProgressbar(size(v,1),'title', 'Applying Shifts');
+fprintf('Applying shift...\n')
+b2 = ProgressBar(size(v,1), ...
+    'IsParallel', true, ...
+    'UpdateRate', 1,...
+    'WorkerDirectory', pwd());
+b2.setup([], [], []);
 parfor i=1:size(v,1)
-out(:,:,i) = imwarp(v{i},D(:,:,:,i));
-ppm.increment();
+    out(:,:,i) = imwarp(v{i},D(:,:,:,i));
+    updateParallel([], pwd);
 end
-delete(ppm);
+b2.release();
 %  implay(cat(1,in,out));
 end
 
@@ -28,49 +33,60 @@ end
 function D=get_alignments(VF,win)
 
 %% distribute video in 20-frames batches
-disp('Distributing video in small batches...')
+fprintf('Distributing video in small batches...\n')
 x=round(linspace(1,size(VF,3),size(VF,3)/win));
 x(1)=0;
-for i=1:size(x,2)-1    
-  G{i}=VF(:,:,x(i)+1:x(i+1)); 
+for i=1:size(x,2)-1
+    G{i}=VF(:,:,x(i)+1:x(i+1));
 end
 %%================================ Intra-batch registration
-ppm = ParforProgressbar(size(x,2)-1,'title', 'Intra-batch Registration');
-parfor k=1:size(x,2)-1   
-[O{k},D{k}]=batch_register(G{k})
-ppm.increment();
+fprintf('Running Intra-batch Registration...\n')
+b2 = ProgressBar(size(x,2)-1, ...
+    'IsParallel', true, ...
+    'UpdateRate', 1,...
+    'WorkerDirectory', pwd());
+b2.setup([], [], []);
+parfor k=1:size(x,2)-1
+    [O{k},D{k}]=batch_register(G{k})
+    updateParallel([], pwd);
 end
-delete(ppm);
+b2.release();
 
 %%================================ Inter-batch registration
-for i=1:size(G,2)    
-  M(:,:,i)=median(O{i},3);
+for i=1:size(G,2)
+    M(:,:,i)=median(O{i},3);
 end
 
-ppm = ParforProgressbar(size(M,3)-1,'title', 'Inter-batch Registration');
+
 Dm=zeros(size(M,1),size(M,2),2,size(M,4));
 opt = struct('niter',25, 'sigma_fluid',2,...
     'sigma_diffusion',2, 'sigma_i',1,...
     'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
 
 
+fprintf('Running Inter-batch Registration...\n')
+b2 = ProgressBar(size(M,3), ...
+    'IsParallel', true, ...
+    'UpdateRate', 1,...
+    'WorkerDirectory', pwd());
+b2.setup([], [], []);
 parfor i=2:size(M,3)
     [~,Dm(:,:,:,i)] =register(M(:,:,1),M(:,:,i),opt);
-    ppm.increment();
+    updateParallel([], pwd);
 end
-delete(ppm);
+b2.release();
 
 
 %%================================ Shifts redistribution
 disp('Distributing shifts...')
 Dm=Dm-mean(Dm,4);
-% 
- parfor i=1:size(M,3)
- oM(:,:,i) = imwarp(M(:,:,i),Dm(:,:,:,i));
- end
+%
+parfor i=1:size(M,3)
+    oM(:,:,i) = imwarp(M(:,:,i),Dm(:,:,:,i));
+end
 
-for i=1:size(D,2)    
-  D{i}=D{i}+Dm(:,:,:,i);
+for i=1:size(D,2)
+    D{i}=D{i}+Dm(:,:,:,i);
 end
 D=cat(4,D{:});
 
@@ -90,6 +106,3 @@ for i=2:size(in,3)
 end
 
 end
-
-
-

@@ -14,14 +14,20 @@ end
 out=zeros(size(in,1),size(in,2),size(in,3));
 
 if use_parallel
-    ppm = ParforProgressbar(size(in,3),'title', 'Applying Vesselness filter');
+    b2 = ProgressBar(size(in,3), ...
+    'IsParallel', true, ...
+    'UpdateRate', 1,...
+    'WorkerDirectory', pwd(), ...
+    'Title', 'Appling filter' ...
+    );
+    b2.setup([], [], []);
     parfor i=1:size(in,3)
         temp=double(in(:,:,i));
         temp=apply_vesselness_filter(temp,sz,norm);
         out(:,:,i)=temp;
-        ppm.increment();
+         updateParallel([], pwd);
     end
-    delete(ppm);
+    b2.release();
 else
     for i=1:size(in,3)
         temp=double(in(:,:,i));

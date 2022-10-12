@@ -20,7 +20,7 @@ end
 
 
 function [A,C_raw,C,S] = update_residual_inside(neuron);
-
+n_enhanced=neuron.n_enhanced;
 Y = neuron.load_patch_data();
 
 d1=neuron.options.d1;
@@ -50,7 +50,7 @@ end
 
 %% preprocessing data
 % create a spatial filter for removing background
-if gSig>0
+if n_enhanced==0
     if neuron.options.center_psf
         psf = fspecial('gaussian', ceil(gSiz+1), gSig);
         ind_nonzero = (psf(:)>=max(psf(:,1)));
@@ -71,7 +71,7 @@ else
     HY = imfilter(reshape(single(Y), d1,d2,[]), psf, 'replicate');
 end
 
-HY = reshape(HY, d1*d2, []);
+HY = reshape(single(HY), d1*d2, []);
 %% PV Remove media in each session
 if size(F,1)>1
     t=0;
@@ -88,7 +88,7 @@ else
     Sn=GetSn(HY);
 end
 
-[~,Cn,PNR]=get_PNR_coor_greedy_PV(reshape(HY, d1,d2,[]),0,F,Sn);
+[~,Cn,PNR]=get_PNR_coor_greedy_PV(reshape(HY, d1,d2,[]),0,F,Sn,n_enhanced);
 Cn=mat2gray(Cn);
 %%
 if ~isempty(neuron.Mask)
@@ -141,11 +141,12 @@ while true
     [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
     %% Filter a
     af=a;
-    parfor k=1:size(a,2)
-        temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
-        af{1,k}=temp(:);
+    if n_enhanced==0
+        parfor k=1:size(a,2)
+            temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
+            af{1,k}=temp(:);
+        end
     end
-    
     a=expand_A(a,ind_nhood,d1*d2);
     af=expand_A(af,ind_nhood,d1*d2);
     af(af<0)=0;

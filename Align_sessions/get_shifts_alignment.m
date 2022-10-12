@@ -1,14 +1,13 @@
 function [Shifts,P,Scor]=get_shifts_alignment(P)
 Mb=v2uint8(cell2mat(P{1,1}));
 Vf=v2uint8(cell2mat(P{1,2}));
+Cn=v2uint8(cell2mat(P{1,3}));
 X=v2uint8(cell2mat(P{1,5}));
 [d1,d2,d3]=size(Vf);
 Shifts=zeros(d1,d2,2,1);
 % [D,ans] = imregdemons(Vf(:,:,i),Vf(:,:,i-1));
 parfor i=1:d3
-    elem=1:d3;
-%     elem(i)=[];
-    t_shifts(:,:,:,i)=get_shift_in(i,Vf,X,Mb);
+    t_shifts(:,:,:,i)=get_shift_in(i,Vf,X,Cn,Mb);
 end
 
 for k=1:size(P,2)
@@ -39,9 +38,9 @@ Scor=[pre,post];
 
 end
 
-function out=get_shift_in(elem,Vf,X,Mb)
+function out=get_shift_in(elem,Vf,X,Cn,Mb)
 
- M1=cat(3,X(:,:,elem),X(:,:,elem),Vf(:,:,elem),Vf(:,:,elem));
+ M1=cat(3,Cn(:,:,elem),X(:,:,elem),Vf(:,:,elem),Vf(:,:,elem));
 
 opt = struct('niter',100, 'sigma_fluid',1,...
     'sigma_diffusion',2, 'sigma_i',1,...
@@ -52,7 +51,8 @@ t_shifts=zeros(d1,d2,2,d3);
 for k=1:d3
     M2=cat(3,X(:,:,k),X(:,:,k),Vf(:,:,k),Vf(:,:,k));
     [t1,t2,t_shifts(:,:,:,k)]=MR_Log_demon(M1,M2,opt);
-    loc_c=get_local_corr_Vf(cat(3,double(t1(:,:,1)),double(t2(:,:,1))),double(cat(3,Mb(:,:,elem),Mb(:,:,k))));
+    loc_c=get_local_corr_Vf(cat(3,double(t1(:,:,end)),double(t2(:,:,end))), ...
+        double(cat(3,Mb(:,:,elem),Mb(:,:,k))));
     t1v=t1(:,:,end);
     t2v=t2(:,:,end);
     glob_c(k)= 1-pdist([double(t1v(:)');double(t2v(:)')],'correlation');
@@ -60,28 +60,16 @@ for k=1:d3
 end
 glob_c=glob_c./sum(glob_c);
 for i=1:size(W,3)
-    W(:,:,i) = imgaussian(W(:,:,i),opt.sigma_diffusion*3).*glob_c(i);  % smooth weights.
+    W(:,:,i) = W(:,:,i).*glob_c(i);  % smooth weights.
 end 
 
 W=W./sum(W,3);
 for i=1:size(W,3)
     W(:,:,i) = regionfill(W(:,:,i),isnan(W(:,:,i)));
 end 
-W=reshape(W,[d1,d2,1,length(elem)]);
+W=reshape(W,[d1,d2,1,d3]);
 W=cat(3,W,W);
 out=sum(-t_shifts.*W,4,'omitnan');
 
 end
 
-function I = imgaussian(I,sigma)
-    if sigma==0; return; end; % no smoothing
-    
-    % Create Gaussian kernel
-    radius = ceil(3*sigma);
-    [x,y]  = ndgrid(-radius:radius,-radius:radius); % kernel coordinates
-    h      = exp(-(x.^2 + y.^2)/(2*sigma^2));
-    h      = h / sum(h(:));
-    
-    % Filter image
-    I = imfilter(I,h);
-end
