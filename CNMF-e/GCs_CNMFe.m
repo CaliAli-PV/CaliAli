@@ -148,7 +148,7 @@ neuron.options.Mask=neuron.Mask;
 
 %% initialize neurons from the video data within a selected temporal range
 tic
-neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1);
+neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1,0);
 toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
@@ -193,9 +193,9 @@ end
 
 %% Optional post-process
 scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.Fs/10,neuron.C_raw);
+neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw);
 justdeconv(neuron,'thresholded','ar2',0);
-denoise_thresholded(neuron,0);
+denoise_thresholded(neuron,3);
 
 
 %% Save results

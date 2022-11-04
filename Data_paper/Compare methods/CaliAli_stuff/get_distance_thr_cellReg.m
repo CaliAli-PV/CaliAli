@@ -24,4 +24,5 @@ D2=sort(D2,2);
 
 c=[D1(:,3);D2(:,3)];
  
-thr=prctile(c,99);
+% thr=prctile(c,99);
+thr=mean(c);

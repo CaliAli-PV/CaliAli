@@ -1,4 +1,4 @@
-function [a,c,c_raw,d]=get_data_conc(s)
+function [a,c,c_raw,d,s]=get_data_conc(s)
 load(s,'neuron');
 d1=neuron.options.d1;
 d2=neuron.options.d2;
@@ -13,6 +13,7 @@ c=[c1,c2];
 % n=max(c,[],2);
 % c=c./n;
 c_raw=[c1r,c2r];
+s=neuron.S;
 % c_raw=c_raw./n;
 end
 

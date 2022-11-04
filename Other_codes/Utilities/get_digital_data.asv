@@ -1,0 +1,20 @@
+function get_digital_data()
+theFiles = uipickfiles('FilterSpec','*.gpio');
+T=[];
+A=[];
+for i=1:size(theFiles,2)
+    fname = theFiles{1,i};
+    [filepath,name,~] = fileparts(fname);
+    inf=h5info([filepath,'\',name,'_ds.h5']);
+    d=inf.Datasets.Dataspace.Size;
+    fid = fopen(fname);
+    raw = downsample(fread(fid,[52 inf],'uint8=>uint8')',100);
+    downsample(raw,d(3)/size(raw,1));
+    A=[A;a];
+end
+T=T(logical(A>0));
+
+A=(A>0).*(cumsum([0;diff(A)]>0)+1);
+A(A==0)=[];
+save([filepath,'\',name,'_time.mat'],'T','A');
+

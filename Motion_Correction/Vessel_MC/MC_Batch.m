@@ -13,6 +13,7 @@ for k=1:length(theFiles)
         [V,~]=motion_correct_PV(V); %% Rigid MC
         %Mr=MC_NR(V);
         Mr=MC_NR_not_used_testing(V);
+        Mr=interpolate_dropped_frames(Mr);
         Mr=square_borders(Mr,0);
         %     
         %% save MC video as .h5
