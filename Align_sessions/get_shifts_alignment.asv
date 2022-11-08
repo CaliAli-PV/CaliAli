@@ -72,7 +72,7 @@ W=cat(3,W,W);
 if d3>2
     out=sum(-t_shifts.*W,4,'omitnan');
 else
-    out=mean(-t_shifts,4,'omitnan');
+    out=sum(-t_shifts,4,'omitnan');
 end
 
 end
