@@ -14,7 +14,6 @@ for k=1:length(theFiles)
     fullFileName = theFiles{k};
     fprintf(1, 'Now reading %s\n', fullFileName);
     temp=load_avi(fullFileName);
-    upd = textprogressbar(size(temp,3),'updatestep',30);
     
     [filepath,name]=fileparts(fullFileName);
     if isempty(outpath)
@@ -23,8 +22,7 @@ for k=1:length(theFiles)
         out=strcat(outpath,'\',name,'_ds','.h5');
     end
     
-    for i=1:size(temp,3)
-        upd(i);
+    for i=progress(1:size(temp,3))
         vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
     end
     saveash5(vid,out);  

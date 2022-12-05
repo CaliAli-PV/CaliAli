@@ -2,6 +2,8 @@ function Mr=interpolate_dropped_frames(Mr)
 
 if isa(Mr,'uint8')
     u8=1;
+else
+    u8=0;
 end
 dropped=squeeze(mean(mean(Mr)))==0;
 if sum(dropped)>0
