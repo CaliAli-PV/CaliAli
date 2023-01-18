@@ -35,7 +35,11 @@ end
 
 if (max(TF)==1)
     [filepath,name,~]=fileparts(theFiles{1, find(TF)});
-    copyfile([filepath,'\',name,'.gpio'],[outpath,'\',name,'.gpio'])
+    if ~isfile([outpath,'\',name,'.gpio'])
+        copyfile([filepath,'\',name,'.gpio'],[outpath,'\',name,'.gpio'])
+    else
+        fprintf(1, 'File %s already exist in destination folder\n', [name,'.gpio']);
+    end
 end
 
 end
