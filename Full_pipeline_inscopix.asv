@@ -11,7 +11,6 @@ theFiles = uipickfiles('REFilter','\.isxd$','Prompt','Choose .isxd video');
 outpath = uigetdir([],'Choose output folder');
 %%  Downsampling
 Downsample_Inscopix(outpath,ds,theFiles);
-get_gpio_data(outpath,theFiles)
 cd(outpath);
 
 %% Motion correction
@@ -30,14 +29,13 @@ end
 function get_gpio_data(outpath,theFiles)
 
 for i=1:size(theFiles,2)
-    TF(i) = contains(theFiles{1, i},'trig_0.isxd');
+TF(i) = contains(theFiles{1, i},'trig_0.isxd');
 end
 
 if (max(TF)==1)
-    [filepath,name,~]=fileparts(theFiles{1, find(TF)});
-    copyfile([filepath,'\',name,'.gpio'],[outpath,'\',name,'.gpio'])
-end
+theFiles{1, find(TF)};
 
+end
 end
 
 
