@@ -16,12 +16,12 @@ cd(outpath);
 
 %% Motion correction
 f= dir('*.h5');
-filenames = {f.name};
+filenames = {[f.folder,'\',f.name]};
 MC_Batch(filenames);
 
 %% Video Alignment
 f= dir('*mc.h5');
-filenames = {f.name};
+filenames = {[f.folder,'\',f.name]};
 align_sessions_PV(sf,gSiz,ef,filenames);
 
 end
