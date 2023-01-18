@@ -1,4 +1,4 @@
-function Full_pipeline()
+function Full_pipeline_inscopix()
 
 %% Parameters
 ds=4;  % downsampling factor;
