@@ -24,8 +24,11 @@ q = (1-xbar)*((xbar*(1-xbar)/ssq)-1);
 x = [p;q];
 %Newton-Raphson
 for i=1:100
+    try
     grad = [psi(p)-psi(p+q)-g1;psi(q)-psi(p+q)-g2];
-    
+    catch
+dummy=1;
+    end
     hess = [psi(1,p)-psi(1,p+q), -psi(1,p+q);-psi(1,p+q),psi(1,q)-psi(1,p+q)];
     x= x-hess\grad;
     p = x(1);

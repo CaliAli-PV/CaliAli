@@ -19,6 +19,7 @@ pars_envs = struct('memory_size_to_use', 256, ...   % GB, memory space you allow
     'patch_dims', [64, 64]);  % Patch dimensions
 max_frame=30001;
 % -------------------------      SPATIAL      -------------------------  %
+% pixel, gaussian width of a gaussian kernel for filtering the data. usualy 1/3 of neuron diameter
 gSiz = gSig*4;          % pixel, neuron diameter
 ssub = 1;           % spatial downsampling factor
 with_dendrites = true;   % with dendrites or not
@@ -117,11 +118,14 @@ neuron.Fs = Fs;
 neuron.getReady(pars_envs);
 evalin( 'base', 'clearvars -except parin theFiles' );
 %% Load parameters stored in .mat file
-[filepath,name,ext] = fileparts(in);
+[filepath,name,~] = fileparts(in);
 m_data=strcat(filepath,'\',name,'.mat');
 if exist(m_data, 'file')
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
+
+    neuron.n_enhanced=m.n_enhanced;
+
     if isfield(m,'Mask')
         neuron.Mask=full(m.Mask);
     else
@@ -133,25 +137,25 @@ if exist(m_data, 'file')
     end
 else
     get_CnPNR_from_video(gSig,{in});
-        m=load(m_data);
+    m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
     neuron.Mask=ones(neuron.options.d1,neuron.options.d2);
+    neuron.n_enhanced=0;    
+
 end
 neuron.options.Cn=neuron.Cn;neuron.options.PNR=neuron.PNR;
 neuron.options.Mask=neuron.Mask;
 
-
 %% initialize neurons from the video data within a selected temporal range
 tic
-neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1);
+neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1,0);
 toc
-% [center, Cn, PNR] =neuron.initComponents_parallel(K, frame_range, 1, 0);
-% neuron.show_contours(0.8, [], neuron.Cn, 0); %PNR*CORR
+% neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
 
 
 %% Update components
-for ite=1:2
+for ite=2:2
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
     for loop=1:10
@@ -165,7 +169,11 @@ for ite=1:2
         neuron.merge_high_corr(show_merge, merge_thr_tempospatial);
         neuron.merge_high_corr(show_merge, [0.9, -inf, -inf]);
         neuron.merge_high_corr(show_merge, [0.01, 0.7, -inf]);
+        try
         dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+        catch
+           weird_bug=1;
+        end
         A_temp=neuron.A;
         C_temp=neuron.C_raw;
         dis
@@ -173,22 +181,22 @@ for ite=1:2
             break
         end
     end
-    
+
     %% save the workspace for future analysis
     save_workspace(neuron);
-    
-    %% Pick up from residuals
+
+    % Pick up from residuals
     if ite<2
         neuron=update_residual(neuron);
     end
 end
 
 
-%% Optional post-process 
+%% Optional post-process
 scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.Fs/10,neuron.C_raw);
+neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw);
 justdeconv(neuron,'thresholded','ar2',0);
-denoise_thresholded(neuron,0);
+denoise_thresholded(neuron,3);
 
 
 %% Save results
@@ -229,11 +237,12 @@ end
 %   view_traces(neuron);
 
 %% Optional post-process
-% 
+% neuron.merge_high_corr(1, [0.1, 0.3, -inf]);
 
 
 % ix=postprocessing_app(neuron)
 %  neuron.viewNeurons(find(ix), neuron.C_raw);
+% save_workspace(neuron);
 
 
 

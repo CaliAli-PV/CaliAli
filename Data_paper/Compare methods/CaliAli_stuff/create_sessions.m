@@ -12,27 +12,37 @@ if ~exist('saveme','var')
 end
 
 N=size(neuron.A,2);
-M=size(neuron.Cn,1);
-K=size(neuron.Cn,2);
-session=zeros([M,K,N]);
+d=size(neuron.Cn);
+
+session=zeros([d(1),d(2),N]);
 
 % [~,~,~,~,mask]=get_contoursPV(neuron,0.6);
 for i=1:N
-    A=neuron.A(:, i);
-    A=A./max(A,[],1);
-    t=reshape(A,M,K);
-    t=full(t);
+    A=full(neuron.A(:, i));
+    A=smooth_a(A,d);
+    A=A./max(A);
+    t=reshape(A,d);
     %  t=t.*mask(:,:,i);
     session(:,:,i)=t;
 end
 session = permute(session,[3 1 2]);
-% newStr = reverse(neuron.file);
-% newStr = string(extractBetween(newStr,".","\"));
-% newStr = reverse(newStr);
+
 
 if saveme==1
 path2=path+"Footprints.mat";
 save(path2,"session")
+end
+
+end
+
+function  a=smooth_a(a,d)
+h = fspecial('disk',3.5);
+for i=1:size(a,2)
+    t=mat2gray(reshape(a(:,i),d));
+    t(t<0.5)=0;
+    im=imfilter(t,h,'replicate');
+    a(:,i)=im(:);
+end
 end
 
 

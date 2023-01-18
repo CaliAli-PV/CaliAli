@@ -1,7 +1,11 @@
 function out=MC_NR_not_used_testing(in,win)
 % out=MC_NR_not_used_testing(V);
 if ~exist('win','var')
-    win=60;
+    if size(in,3)>60
+        win=60;
+    else
+        win=size(in,3);
+    end
 end
 
 %% Get Vesselness-filtered image
@@ -12,23 +16,12 @@ D=get_alignments(X,win);
 
 
 
-
-
 %% Applying Shifts
 v = squeeze(num2cell(in,[1 2]));
-b = ProgressBar(size(v,1), ...
-    'IsParallel', true, ...
-    'UpdateRate', 1,...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'Applying shifts' ...
-    );
-    b.setup([], [], []);
 
 parfor i=1:size(v,1)
-out(:,:,i) = imsharpen(imwarp(v{i},D(:,:,:,i)));
-updateParallel([], pwd);
+    out(:,:,i) = imsharpen(imwarp(v{i},D(:,:,:,i)));
 end
-b.release();
 
 %  implay(cat(1,in,out));
 end
@@ -40,29 +33,23 @@ function D=get_alignments(X,win)
 disp('Distributing video in small batches...')
 x=round(linspace(1,size(X,4),size(X,4)/win));
 x(1)=0;
+if length(x)==1
+x=[0,size(X,4)];
+end
 ms=get_score(X);
-for i=1:size(x,2)-1  
-   MS{i}=ms(x(i)+1:x(i+1));
-  G{i}=X(:,:,:,x(i)+1:x(i+1)); 
+for i=1:size(x,2)-1
+    MS{i}=ms(x(i)+1:x(i+1));
+    G{i}=X(:,:,:,x(i)+1:x(i+1));
 end
 
 %%================================ Intra-batch registration
-b = ProgressBar(size(x,2)-1, ...
-    'IsParallel', true, ...
-    'UpdateRate', 1,...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'Intra-batch registration' ...
-    );
-    b.setup(1, [], []);
-parfor k=1:size(x,2)-1   
-[O{k},D{k}]=batch_register(G{k},MS{k})
-updateParallel([], pwd);
+parfor k=1:size(x,2)-1
+    [O{k},D{k}]=batch_register(G{k},MS{k})
 end
-b.release();
 
 %%================================ Inter-batch registration
-for i=1:size(G,2)    
-  M(:,:,:,i)=uint8(imsharpen(mean(O{i},4)));
+for i=1:size(G,2)
+    M(:,:,:,i)=uint8(imsharpen(mean(O{i},4)));
 end
 
 % ppm = ParforProgressbar(size(M,4)-1,'title', 'Inter-batch Registration');
@@ -72,20 +59,20 @@ temp(:,:,:,1)=M(:,:,:,1);
 Ma=temp;
 for i=progress(2:size(M,4), 'Title', 'Inter-batch registration')
     [~,temp(:,:,:,i),Dm(:,:,:,i)] =MR_Log_demon_MC_batch(Ma,M(:,:,:,i));
-        Ma=imsharpen(temp(:,:,:,i));
+    Ma=imsharpen(temp(:,:,:,i));
 end
 % delete(ppm);
 
 %%================================ Shifts redistribution
 disp('Distributing shifts...')
 Dm=Dm-mean(Dm,4);
-% 
- parfor i=1:size(M,4)
- oM(:,:,:,i) = imwarp(M(:,:,:,i),Dm(:,:,:,i));
- end
+%
+parfor i=1:size(M,4)
+    oM(:,:,:,i) = imwarp(M(:,:,:,i),Dm(:,:,:,i));
+end
 
-for i=1:size(D,2)    
-  D{i}=D{i}+Dm(:,:,:,i);
+for i=1:size(D,2)
+    D{i}=D{i}+Dm(:,:,:,i);
 end
 D=cat(4,D{:});
 
@@ -111,25 +98,16 @@ opt{1} = struct('niter',5, 'sigma_fluid',1,...
 [d1,d2,d3,d4]=size(V);
 C=squeeze(mat2cell(V,d1,d2,d3,ones(1,d4)));
 C(2:end,2)=C(1:end-1,1);
-b = ProgressBar(d4-1, ...
-    'IsParallel', true, ...
-    'UpdateRate', 10,...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'calculating motion score' ...
-    );
-    b.setup(1, [], []);
 parfor i=2:d4
-   K=C(i,:);
-   im1=uint8(mean(K{1,2},3));
-   im2=uint8(mean(K{1,1},3));
+    K=C(i,:);
+    im1=uint8(mean(K{1,2},3));
+    im2=uint8(mean(K{1,1},3));
     [X1,X2,D]=MR_Log_demon_MC_batch(im1,im2,opt);
-%     sz=1;
-%     [~,temp]=ssim(im1,im2,'Exponents',[0 0 1],'Radius',sz,'RegularizationConstants',[0,0,0]);
+    %     sz=1;
+    %     [~,temp]=ssim(im1,im2,'Exponents',[0 0 1],'Radius',sz,'RegularizationConstants',[0,0,0]);
     ou(:,:,i)=sqrt(D(:,:,:,1).^2+D(:,:,:,2).^2);
-%    ou(:,:,i-1)=1-imgaussfilt(temp,3);
-updateParallel([], pwd);
+    %    ou(:,:,i-1)=1-imgaussfilt(temp,3);
 end
-b.release();
 t=squeeze(max(max(ou)));
 t(1)=t(2);
 end

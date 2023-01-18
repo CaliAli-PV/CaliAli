@@ -1,5 +1,4 @@
 function Downsample_avi(outpath,ds_f)
-
 if ~exist('outpath','var')
 outpath = [];
 end
@@ -21,10 +20,9 @@ for k=1:length(theFiles)
     else
         out=strcat(outpath,'\',name,'_ds','.h5');
     end
-    
+    vid=[];
     for i=progress(1:size(temp,3))
         vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
     end
-    saveash5(vid,out);  
-
+    saveash5(v2uint16(vid),out);  
 end

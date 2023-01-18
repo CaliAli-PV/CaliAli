@@ -1,6 +1,6 @@
 function move_dependencies_to_folder(fList,outPath,NonExist_only)
 
-% move_dependencies_to_folder(fList,'H:\My Drive\GitHub\CaliAli\Motion_Correction\Vessel_MC\Min1Pipe_required_codes',1);
+% move_dependencies_to_folder(fList,'H:\My Drive\GitHub\CaliAli\Data_paper\Compare methods\Scout_stuff\Registration',1);
 %% STEPS to move scripts from one path to another avoiding duplication:
 
 

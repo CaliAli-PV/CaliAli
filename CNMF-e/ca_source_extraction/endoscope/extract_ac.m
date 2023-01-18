@@ -13,20 +13,17 @@ function [ai, ci, ind_success, sn] = extract_ac(HY, Y, ind_ctr, sz, spatial_cons
 %% parameters
 nr = sz(1);
 nc = sz(2);
-min_corr = 0; %
+min_corr = 0.2; %
 min_pixels = 5;
 
 %% find pixels highly correlated with the center
 % HY(HY<0) = 0;       % remove some negative signals from nearby neurons
 y0 = HY(ind_ctr, :);
 tmp_corr = reshape(corr(y0', HY'), nr, nc);
-I=tmp_corr>min_corr;
+tmp_corr(tmp_corr<0)=0;
+I=mat2gray(tmp_corr)>min_corr;
 I=get_central_blob(I,nr,nc,ind_ctr);
 data = HY(I, :);
-% Ix=get_data_PV_method(HY,ind_ctr,min_corr);
-% 
-% data = HY(Ix,:);
-
 
 %% estimate ci with the mean or rank-1 NMF
 ci = mean(data, 1);
@@ -136,21 +133,3 @@ se = strel('disk',3);
 out = imdilate(centralBlob,se);
 end
 
-% function out=get_data_PV_method(HY,ind_ctr,min_corr)
-% 
-% Z=linkage(HY,'average','cosine');
-% 
-% L=find_leaves_in_node(Z);
-% 
-% I=cellfun(@(x) logical(ismember(ind_ctr,x)),L);
-% 
-% 
-% L=L(I);
-% 
-% Z=Z(I,3);
-% Z(Z>min_corr)=0;
-% [~,i]=max(Z);
-% pix=L{i};
-% out=ismember(1:size(HY,1),pix);
-% % data = HY(pix,:);
-% end

@@ -48,9 +48,12 @@ for i=1:100
     mu = sum(assignments.*log(data))/sum(assignments);
     sigma = sqrt(sum(assignments.*(log(data)-mu).^2)...
         /sum(assignments));
-
+try
     [p,q] = estimate_beta_mixture_params(1-assignments,data,1);
-
+catch
+    dummy=1;
+    break
+end
 end
 
 % calculating the distribution for same cells:

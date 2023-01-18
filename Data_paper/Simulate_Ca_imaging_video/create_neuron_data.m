@@ -35,8 +35,7 @@ end
 P=lognrnd(spike_prob(1),spike_prob(2),Nneu,1);
 C=[];
 for i=1:ses
-c=create_random_spike(length(X),F,P);
-C=cat(2,c,C);
+C=[C,create_random_spike(length(X),F,P)];
 end
 
 % C=C.*(1+randn(length(X),1).*0.2);

@@ -67,7 +67,7 @@ function [neuron,cell_register,neurons,links]=cellTracking_SCOUT(neurons,varargi
 optional_parameters={'links','weights','max_dist','overlap','chain_prob','corr_thresh','register_sessions','registration_type','registration_method',...
     'registration_template','use_corr','use_spat','max_gap','probability_assignment_method','base','min_prob','binary_corr','max_sess_dist',...
     'footprint_threshold','cell_tracking_options','single_corr','scale_factor','reconstitute','construct_combined'};
-defaults={{},[4,5,5,0,0,0],[45],[],[.5],.6,true,'align_to_base',{'affine','non-rigid'},'spatial',false,true,0,'default',ceil(length(neurons)/2),[.5],false,inf,.1,struct,false,1.5,true,true};
+defaults={{},[4,5,5,0,0,0],[45],[],[.5],.6,true,'align_to_base',{'affine','non-rigid'},'spatial',false,true,0,'default',ceil(length(neurons)/2),[.5],false,inf,0,struct,false,1.5,true,true};
 
 p=inputParser;
 
@@ -123,7 +123,8 @@ neurons=neurons1;
 clear neurons1;
 for i=1:length(neurons)
     neurons1{i}=neurons{i}.copy();
-    neurons{i}=thresholdNeuron(neurons{i},footprint_threshold);
+%     neurons{i}=thresholdNeuron(neurons{i},footprint_threshold); % removed
+%     by PV
 end
 for i=1:length(links)
     links1{i}=links1{i}.copy();
@@ -136,7 +137,8 @@ links=links1;
 clear links1;
 for i=1:length(links)
     links1{i}=links{i}.copy();
-    links{i}=thresholdNeuron(links{i},footprint_threshold);
+%     links{i}=thresholdNeuron(links{i},footprint_threshold); % removed by
+%     PV
 end
 %Normalize FOV for each session
 for i=1:length(neurons)

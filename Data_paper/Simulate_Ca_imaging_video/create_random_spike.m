@@ -12,17 +12,13 @@ for i=1:N
 end
 
 
-
-
 t = 0:T-1; %  From Monitoring Brain Activity with Protein Voltage and Calcium Sensors. Fig 4. For frame rate on 10 fps.
 
 
-
-
 for i=1:size(A,1)
-f = abs(2.5+randn/5); %
-tau = 11+randn; % 
-g = exp(-t/tau)-exp(-t/f);
+rise=1/lognrnd(-0.2139,0.2994,1,1); % parameters obatined from real data
+decay=1/lognrnd(-1.7532,0.4346,1,1); % parameters obatined from real data
+g = exp(-t/decay)-exp(-t/rise);
 temp=A(i,:);
 c = conv(temp, g);
 out(i,:)=c(1,1:T);

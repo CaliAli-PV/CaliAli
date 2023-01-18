@@ -9,7 +9,7 @@ valid_v = @(x) isnumeric(x);
 addParameter(inp,'outpath',[])
 addParameter(inp,'min_dist',8,valid_v)
 addParameter(inp,'Nneu',50,valid_v)
-addParameter(inp,'SNR',2,valid_v)
+addParameter(inp,'PNR',2,valid_v)
 addParameter(inp,'d1',220,valid_v)
 addParameter(inp,'d2',300,valid_v)
 addParameter(inp,'F',1000,valid_v)
@@ -19,7 +19,7 @@ addParameter(inp,'motion',0,valid_v)
 addParameter(inp,'ses',2,valid_v)
 addParameter(inp,'seed','shuffle' )
 addParameter(inp,'B',1)
-addParameter(inp,'spike_prob',[-6.5,1]);
+addParameter(inp,'spike_prob',[-7.2,1.1]);
 addParameter(inp,'save_files',true);
 addParameter(inp,'create_mask',true);
 addParameter(inp,'translation',1,valid_v)
@@ -33,7 +33,7 @@ outpath=inp.Results.outpath;
 min_dist=inp.Results.min_dist;
 spike_prob=inp.Results.spike_prob;
 Nneu=inp.Results.Nneu;
-SNR=inp.Results.SNR;
+PNR=inp.Results.PNR;
 d1=inp.Results.d1;
 d2=inp.Results.d2;
 F=inp.Results.F;
@@ -99,14 +99,14 @@ for i=1:ses
     V=reshape(reshape(A{i},d1*d2,[])*C(:,ix1:ix2),d1,d2,[]);
     LB=reshape(reshape(bA{i},d1*d2,[])*C(:,ix1:ix2),d1,d2,[]);
     tn=N(:,:,ix1:ix2);
-    FV=mult*BL(:,:,i)+  (1-mult)*(V+LB)*(1/(1/SNR+1))   +   (1-mult)*tn*(1-1/(1/SNR+1)); %add data
+    FV=mult*BL(:,:,i)+  (1-mult)*(V+LB)*(1/(1/PNR+1))   +   (1-mult)*tn*(1-1/(1/PNR+1)); %add data
     FV=FV./max(FV,[],'all');  %
     FV=uint16(FV*2^16);
     out{1,i}=FV;
     ix1=ix1+F;
     ix2=ix2+F;
 end
-GT=reshape(reshape(A{1},d1*d2,[])*C,d1,d2,[])+reshape(reshape(bA{1},d1*d2,[])*C,d1,d2,[])*(1/(1/SNR+1)) +N.*(1-1/(1/SNR+1));
+GT=reshape(reshape(A{1},d1*d2,[])*C,d1,d2,[])+reshape(reshape(bA{1},d1*d2,[])*C,d1,d2,[])*(1/(1/PNR+1)) +N.*(1-1/(1/PNR+1));
 GT=GT-min(GT,[],'all');
 GT=GT./max(GT,[],'all');
 GT=uint16(GT*2^16);%

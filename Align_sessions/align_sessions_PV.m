@@ -23,7 +23,7 @@ if ~isfile(out)
     [Vid,P2]=apply_translations(Vid,P1);
     %%
     fprintf(1, 'Calculating non-rigid aligments...\n');
-    [shifts,P3,~]=get_shifts_alignment(P2);
+    [shifts,P3]=get_shifts_alignment(P2);
     P=table(P1,P2,P3,'VariableNames',{'Original','Translations','Trans + Non-Rigid'});
     P=BV_gray2RGB(P);
 

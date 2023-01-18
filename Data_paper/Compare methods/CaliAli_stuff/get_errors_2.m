@@ -1,4 +1,4 @@
-function T=get_errors_2(in,n)
+function [T,Score]=get_errors_2(in,n)
 detec=size(in,1);
 % T=zeros(19,5);
 thr=linspace(0,1,100);
@@ -16,4 +16,5 @@ end
 
 
 T=num2cell(S);
+Score=T{80, 1};
 T = cell2table(T,'VariableNames',{'F1','Sensitivity/recall','precision/PPV','CI','PI'});

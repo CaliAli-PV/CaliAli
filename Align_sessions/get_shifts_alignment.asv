@@ -53,7 +53,7 @@ Proj_t=squeeze(mat2cell(Proj_t,d1,d2,d3,ones(1,d4))); % split data for parallel 
 
 %% Calculate transformation array
 % Prealocate images for parallel computing.
-
+% Note this approach is not RAM efficient.
 b=nchoosek(1:d4,2);
 for i=1:size(b,1)
     Proj{i,1}=Proj_t{b(i,1)};

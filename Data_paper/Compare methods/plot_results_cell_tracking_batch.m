@@ -32,49 +32,44 @@ else
 end
 S=[];
 for i=1:size(in,2)
-    temp=in.(i);
-    [CR.Ac,CR.Sen,CR.PPV,CR.CI,CR.PI,CR.x]=separate_errors(temp);
+    temp=in{:,i};
+    [CR.f1,CR.Sen,CR.PPV,CR.x]=separate_errors(temp);
     S=cat(2,S,CR);
 end
 S=squeeze(struct2cell(S));
 
 nexttile;
-p(1,:)=plot_figures(S{6, 1},S(1,:),plotci);
+p(1,:)=plot_figures(S{end, 1},S(1,:),plotci);
 ylim([0 1]);
 nexttile;
-p(2,:)=plot_figures(S{6, 1},S(2,:),plotci);
+p(2,:)=plot_figures(S{end, 1},S(2,:),plotci);
 ylim([0 1]);
 nexttile;
-[p(3,:),handle]=plot_figures(S{6, 1},S(3,:),plotci);
+[p(3,:),handle]=plot_figures(S{end, 1},S(3,:),plotci);
 ylim([0 1]);
 lgd=legend(handle,lab);
 lgd.Layout.Tile = lgd.Layout.Tile+1;
 end
 
 
-function [F1,Sen,PPV,CI,PI,x]=separate_errors(t)
+function [F1,Sen,PPV,x]=separate_errors(T)
 
-x=linspace(0,1,size(t{1, 1},1))';
+x=linspace(0,1,size(T(1).t,1))';
 
 F1=[];
 Sen=[];
 PPV=[];
-CI=[];
-PI=[];
 
-for i=1:size(t,1)
-    F1=cat(2,F1,t{i,1}.(1));
-    Sen=cat(2,Sen,t{i,1}.(2));
-    PPV=cat(2,PPV,t{i,1}.(3));
-    CI=cat(2,CI,t{i,1}.(4));
-    PI=cat(2,PI,t{i,1}.(5));
+for i=1:size(T,1)
+    F1=cat(2,F1,T(i).t.(1));
+    Sen=cat(2,Sen,T(i).t.(2));
+    PPV=cat(2,PPV,T(i).t.(3));
 end
 
 F1(isnan(F1))=0;
 Sen(isnan(Sen))=0;
 PPV(isnan(PPV))=0;
-CI(isnan(CI))=0;
-PI(isnan(PI))=0;
+
 end
 
 function [p,Handle]=plot_figures(x,in,plotci)

@@ -1,5 +1,5 @@
 %% calculate best matching scores.
-function [out,score]=calculate_best_matching_score2(GTa,A,GTc,C)
+function [out]=calculate_best_matching_score2(GTa,A,GTc,C)
 
 sA=create_similarity_matrix_2(GTa',A');
 sC=create_similarity_matrix_2(GTc,C);
@@ -10,13 +10,6 @@ S=get_max_score(s,sC);
 
 
 out=S;
-
-%% get score
-GTx=GTa*GTc;
-x=A*C;
-score=1-get_cosine(GTx(:)',x(:)');
-
-
 end
 
 function out=get_max_score(s,sC)
