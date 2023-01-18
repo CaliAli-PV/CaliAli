@@ -1,6 +1,7 @@
-function MC_Batch()
-
-theFiles = uipickfiles('FilterSpec','*.h5');
+function MC_Batch(theFiles)
+if ~exist('theFiles','var')
+    theFiles = uipickfiles('FilterSpec','*.h5');
+end
 
 for k=1:length(theFiles)
     fullFileName = theFiles{k};
@@ -15,11 +16,9 @@ for k=1:length(theFiles)
         Mr=MC_NR_not_used_testing(V);
         Mr=interpolate_dropped_frames(Mr);
         Mr=square_borders(Mr,0);
-        %     
+        %
         %% save MC video as .h5
         saveash5(Mr,out);
     end
 end
 
-
-% V2=remove_borders(V,0);
