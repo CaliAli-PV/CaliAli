@@ -11,16 +11,17 @@ theFiles = uipickfiles('REFilter','\.isxd$','Prompt','Choose .isxd video');
 outpath = uigetdir([],'Choose output folder');
 %%  Downsampling
 Downsample_Inscopix(outpath,ds,theFiles);
+get_gpio_data(outpath,theFiles)
 cd(outpath);
 
 %% Motion correction
 f= dir('*.h5');
-filenames = {f.name};
+filenames = {[f.folder,'\',f.name]};
 MC_Batch(filenames);
 
 %% Video Alignment
 f= dir('*mc.h5');
-filenames = {f.name};
+filenames = {[f.folder,'\',f.name]};
 align_sessions_PV(sf,gSiz,ef,filenames);
 
 end
@@ -29,13 +30,25 @@ end
 function get_gpio_data(outpath,theFiles)
 
 for i=1:size(theFiles,2)
-TF(i) = contains(theFiles{1, i},'trig_0.isxd');
+    TF(i) = contains(theFiles{1, i},'trig_0.isxd');
 end
 
 if (max(TF)==1)
-theFiles{1, find(TF)};
+    [filepath,name,~]=fileparts(theFiles{1, find(TF)});
+    if ~isfile([outpath,'\',name,'.gpio'])
+        copyfile([filepath,'\',name,'.gpio'],[outpath,'\',name,'.gpio'])
+    else
+        fprintf(1, 'File %s already exist in destination folder\n', [name,'.gpio']);
+    end
+end
 
 end
-end
+
+function filenames=get_path_in_folder(str)
+
+f= dir('*.h5');
+for i=1:size(f,2)
+
+filenames = {[f(.folder,'\',f.name]};
 
 

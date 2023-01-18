@@ -15,13 +15,11 @@ get_gpio_data(outpath,theFiles)
 cd(outpath);
 
 %% Motion correction
-f= dir('*.h5');
-filenames = {[f.folder,'\',f.name]};
+filenames=get_path_in_folder('*.h5');
 MC_Batch(filenames);
 
 %% Video Alignment
-f= dir('*mc.h5');
-filenames = {[f.folder,'\',f.name]};
+filenames=get_path_in_folder('*mc.h5');
 align_sessions_PV(sf,gSiz,ef,filenames);
 
 end
@@ -40,6 +38,14 @@ if (max(TF)==1)
     else
         fprintf(1, 'File %s already exist in destination folder\n', [name,'.gpio']);
     end
+end
+
+end
+
+function filenames=get_path_in_folder(str)
+f= dir(str);
+for i=1:size(f,1)
+filenames{i} = [f(i).folder,'\',f(i).name];
 end
 
 end
