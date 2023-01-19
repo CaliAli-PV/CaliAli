@@ -25,7 +25,6 @@ parfor i=1:size(S,1)
 end
 else
 mc=squeeze(S(:,:,2));
-
 end
 mc=reshape(mc,[d1,d2]);
 

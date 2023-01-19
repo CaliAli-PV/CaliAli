@@ -42,10 +42,8 @@ function [Proj,b,P]=pre_allocate_projections(P)
 Mb=v2uint8(cell2mat(P{1,1})); % Mean frame
 Vf=v2uint8(cell2mat(P{1,2})); % Blood vessels
 Cn=v2uint8(cell2mat(P{1,3})); % Correlation image
-X=v2uint8(cell2mat(P{1,5}));  % Correlation image+Blood vessels
-if size(X,4)>1
-    X=squeeze(max(X,[],3));
-    P.(5){1,1}=X;
+for i=1:size(Cn,3)
+    X(:,:,i)=mat2gray(max(cat(3,Vf(:,:,i),medfilt2(Cn(:,:,i))),[],3));
 end
 Proj_t=permute(cat(4,Mb,Cn,X,Vf,Vf),[1,2,4,3]);
 [d1,d2,d3,d4]=size(Proj_t);  % data dimensions
@@ -75,12 +73,6 @@ loc_cb=cell(size(b,1),1);
 glob_cb=zeros(size(b,1),1);
 
 
-pb = ProgressBar(size(b,1), ...
-    'IsParallel', true, ...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'Calculating transformations...' ...
-    );
-pb.setup([], [], []);
 parfor i=1:size(b,1)
     img=Proj(i,:);
     % get transformations:
@@ -92,9 +84,8 @@ parfor i=1:size(b,1)
     Tb{i}=t_Tb;
     loc_cb{i}=t_loc_cb;
     glob_cb(i,1)=t_glob_cb;
-    updateParallel([], pwd);
 end
-pb.release();
+
 T=[T,Tb];clear Tb;
 loc_c=[loc_c,loc_cb];clear loc_cb;
 glob_c=[glob_c,glob_cb];clear glob_cb;
@@ -132,9 +123,19 @@ end
 
 function [T,loc_c,glob_c,Tb,loc_cb,glob_cb]=get_transformations(M1,M2)
 
-opt = struct('niter',100, 'sigma_fluid',1,...
+opt{1,1}  = struct('niter',100, 'sigma_fluid',1,...
     'sigma_diffusion',2, 'sigma_i',1,...
     'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
+opt{2,1} = struct('niter',100, 'sigma_fluid',1,...
+    'sigma_diffusion',2, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
+opt{3,1} = struct('niter',100, 'sigma_fluid',1,...
+    'sigma_diffusion',2, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
+opt{4,1} = struct('niter',15, 'sigma_fluid',1,...
+    'sigma_diffusion',2, 'sigma_i',1,...
+    'sigma_x',2, 'do_display',0, 'do_plotenergy',0);
+
 
 Mb=M1(:,:,1); % get mean frame (used to calculate vignetting)
 M1(:,:,1)=[]; % The mean fram is NOT used to align videos, therefor removed.
@@ -150,7 +151,7 @@ Therebore we need to calculate forward and backward registration.
 % Calculate alignments
 [im1,im2,T]=MR_Log_demon(M1,M2,opt);  
 % Calculate local similarity
-loc_c=get_local_corr_Vf(cat(3,double(im1),double(im2)),Mb);
+loc_c=get_local_corr_Vf(cat(3,double(im1(:,:,end)),double(im2(:,:,end))),Mb);
 % Calculate global similarity
 t1v=im1(:,:,end); % get the BV image 
 t2v=im2(:,:,end); % get the BV image 
@@ -161,7 +162,7 @@ T=squeeze(-T);
 % Calculate alignments
 [im1,im2,Tb]=MR_Log_demon(M2,M1,opt);  
 % Calculate local similarity
-loc_cb=get_local_corr_Vf(cat(3,double(im1),double(im2)),Mb);
+loc_cb=get_local_corr_Vf(cat(3,double(im1(:,:,end)),double(im2(:,:,end))),Mb);
 % Calculate global similarity
 t1v=im1(:,:,end); % get the BV image 
 t2v=im2(:,:,end); % get the BV image 

@@ -15,9 +15,10 @@ nlevel=size(X1,3):-1:1;
 it=0;
 for k=nlevel
     if size(opt,1)>1
-        t_opt=opt{nlevel(k)};
+        ty=
+        opt{nlevel(k)}
     else
-        t_opt=opt;
+
     end
     it=it+1;
     % downsample
@@ -30,7 +31,7 @@ for k=nlevel
     Ml = imresize(M,scale);
 %     implay(cat(3,Fl,Ml));
     % register
-    [MP,~,~,vxl,vyl] = register_in(Fl,Ml,t_opt);
+    [MP,~,~,vxl,vyl] = register_in(Fl,Ml,opt);
 %     implay(cat(3,Fl,MP));
     % upsample
     vx = imresize(vxl/scale,size(M));
