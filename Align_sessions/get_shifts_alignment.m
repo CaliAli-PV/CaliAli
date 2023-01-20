@@ -94,7 +94,7 @@ end
 
 function [T,LocW,globW]=arrange_matrix(T_t,loc_c_t,glob_c_t)
 
-n=max(roots([1 -1 -2*size(T_t,1)])); % session number
+n=round(max(roots([1 -1 -2*size(T_t,1)]))); % session number
 T=cell(n);
 loc_w=cell(n);
 glob_w=zeros(n,1);
