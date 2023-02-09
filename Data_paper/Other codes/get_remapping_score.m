@@ -21,3 +21,5 @@ sig=ac(pval<0.05,:);
 for i=1:size(sig,2)
     rs(i)=( (1-pdist([sig(:,i),sig(:,1)]','cosine'))-(1-pdist([sig(:,i),sig(:,end)]','cosine')) )    / ( (1-pdist([sig(:,i),sig(:,1)]','cosine'))+(1-pdist([sig(:,i),sig(:,end)]','cosine')) )  ;
 end
+
+%%test
