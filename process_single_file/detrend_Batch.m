@@ -21,9 +21,8 @@ for k=1:length(theFiles)
 
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
-        
-        Mr=detrend2(sf,V);
-        Mr=remove_borders(Mr,1);
+        Mr=remove_borders(v2uint16(V)+1,1);
+        Mr=detrend2(sf,Mr);        
         %% save MC video as .h5
         if neuron_enhance==1
             Mr=nhance(Mr,gSig);

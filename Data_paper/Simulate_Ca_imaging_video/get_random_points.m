@@ -1,7 +1,5 @@
 function [X,Y]=get_random_points(x,y,minAllowableDistance,numberOfPoints,plotme)
-if ~exist('plotme','var')
-plotme=0;
-end
+
 p = randperm(length(y),length(y));
 y=y(p);
 x=x(p);
@@ -29,7 +27,6 @@ for k=2:length(x)
 end
 
 if plotme
-
 plot(X, Y, 'b*');
 set(gca, 'YDir','reverse')
 end

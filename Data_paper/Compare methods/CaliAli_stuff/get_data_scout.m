@@ -1,4 +1,9 @@
-function [A,C,C_raw,d,S]=get_data_scout(Ses,links)
+function [A,C,C_raw,d,S]=get_data_scout(Ses,links,opt)
+if ~exist('opt','var')
+opt=struct('max_gap',20,'weights',[1,1,1,1,1,1], ...
+        'registration_method',{{'translation','non-rigid'}});
+end
+
 
 for i=1:size(Ses,2)
     load(Ses{1,i},'neuron');
@@ -17,7 +22,13 @@ end
 if exist('links','var')
     for i=1:size(links,2)
         load(Ses{1,i},'neuron');
-        neuron.A=full(neuron.A);
+
+        ta=full(neuron.A);
+        ta=ta./max(ta);
+        d{i}=[neuron.options.d1,neuron.options.d2];
+        ta=smooth_a(ta,d{i});
+        a{i}=ta;
+        neuron.A=ta;
         links{i}=neuron;
     end
 else
@@ -25,12 +36,10 @@ else
 end
 
 if isempty(links)
-    [neu,map,~,~]=cellTracking_SCOUT(neurons,'max_gap',5,'weights',[0,1/5,1/5,1/5,1/5,1/5], ...
-        'registration_method',{'translation','non-rigid'});  %correlation, centroid_dist,overlap,JS,SNR,decay
+    [neu,map,~,~]=cellTracking_SCOUT(neurons,opt);  %correlation, centroid_dist,overlap,JS,SNR,decay
 else
-    [neu,map,~,~]=cellTracking_SCOUT(neurons,'links',links, ...
-        'max_gap',5,'weights',[1/6,1/6,1/6,1/6,1/6,1/6], ...
-        'registration_method',{'translation','non-rigid'});  %correlation, centroid_dist,overlap,JS,SNR,decay
+    [neu,map,~,~]=cellTracking_SCOUT(neurons,'links',links,opt); 
+    %correlation, centroid_dist,overlap,JS,SNR,decay
 end
 
 d=max(cell2mat(d'));  

@@ -19,7 +19,7 @@ if ~isfile(out)
     %% load all video files
     [Vid,F]=load_data(theFiles);
     %% Calculate projections
-    P1=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat);
+    [P1,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat);
     %% Align videos by translations
     fprintf(1, 'Aligning video by translation ...\n');
     [Vid,P2]=apply_translations(Vid,P1);
@@ -128,8 +128,8 @@ end
 function P=BV_gray2RGB(P)
 X=uint8([]);
 for i=1:size(P,2)
-    C=P.(i)(1,:).(3){1,1};
-    Vf=P.(i)(1,:).(2){1,1};
+    C=v2uint8(P.(i)(1,:).(3){1,1});
+    Vf=v2uint8(P.(i)(1,:).(2){1,1});
     for k=1:size(C,3)
         X(:,:,:,k)=imfuse(C(:,:,k),Vf(:,:,k),'Scaling','joint','ColorChannels',[1 2 0]);
     end
@@ -139,7 +139,7 @@ end
 
 end
 %%====================================
-function P=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat)
+function [P,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat)
 
 if isfile(out_mat)
     m=load(out_mat);
@@ -185,6 +185,12 @@ if chk==0
 
 else
     fprintf(1, 'Projections were already calculated. Loading previous file... \n');
+    fprintf(1, 'Detrending videos... \n');
+     for i=1:size(Vid,2)
+        temp=Vid{i};
+       Vid{i}=det_video(temp,sf,n_enhanced,gSig);
+     end
+    Vid=vid2uint16(Vid);
     P=m.P(1,:);
 end
 end

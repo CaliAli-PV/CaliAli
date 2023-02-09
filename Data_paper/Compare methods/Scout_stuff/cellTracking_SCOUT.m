@@ -188,11 +188,16 @@ end
 %% Register Sessions (Global)
 
 if register_sessions
-   %3 alignment iterations
-   for k=1:3
-        [neurons,links]=register_neurons_links(neurons,links,registration_template,registration_type,registration_method,base);
-        base=randi([1,length(neurons)],1,1);
-   end
+    %3 alignment iterations
+    for k=1:1 % PV originaly 3
+        % %      PV neurons are not correctly registrated!
+        k
+        o=1:size(neurons,2);
+        o(base)=[];
+        [neurons(1,o),links]=align_scout_PV(neurons(1,base),neurons(1,o),links);
+    end
+    %         [neurons,links]=register_neurons_links(neurons,links,registration_template,registration_type,registration_method,base);
+    base=randi([1,length(neurons)],1,1);
 end
 num_rows=ceil(length(neurons)/5);
 % figure('Name','Session Alignment')

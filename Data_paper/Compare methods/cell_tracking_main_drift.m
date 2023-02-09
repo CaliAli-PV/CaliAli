@@ -1,5 +1,5 @@
-function [out]=cell_tracking_main()
-% [out]=cell_tracking_main();
+function [out]=cell_tracking_main_drift()
+% [out]=cell_tracking_main_drift();
 [in,link]=create_file_list_reg_exp();
 
 out=table;
@@ -30,12 +30,9 @@ for i=1:size(in,1)
 %     SCo.t=get_errors_2(SCo.m,size(GT.c,1));
 
      %% Get SCOUT defaul
-%      opt=struct('max_gap',20,'weights',[0,1,1,1,1,1], ...
-%         'registration_method',{{'translation','non-rigid'}});
-% %      correlation, centroid_dist,overlap,JS,SNR,decay
-% [SCOUT.a,SCOUT.c,SCOUT.cr,SCOUT.d]=get_data_scout(Ce(4:end),link(i,:),opt);
-
-    [SCOUT.a,SCOUT.c,SCOUT.cr,SCOUT.d]=get_data_scout(Ce(4:end),link(i,:));
+    opt=struct('max_gap',20,'weights',[1,1,1,1,1,1], ...
+        'registration_method',{{'translation','non-rigid'}});
+    [SCOUT.a,SCOUT.c,SCOUT.cr,SCOUT.d]=get_data_scout(Ce(4:end),link(i,:),opt);
     SCOUT=align_shapes_con(GT,SCOUT);
     SCOUT.m=calculate_best_matching_score2(GT.a,SCOUT.a,GT.c,SCOUT.c);
     [SCOUT.t,SCOUT.s]=get_errors_2(SCOUT.m,size(GT.c,1));
@@ -82,7 +79,7 @@ for i=1:size(theFiles,2)
      In=length(dir([path,'\',name,'_ses*_det.h5']));
      %% get individual sessions
     for k=1:In
-     list= dir( [path,'\',name,'_ses',num2str(k-1),'_det_source_extraction\frames_1_*\**\*.mat']); 
+     list= dir( [path,'\',name,'_ses',sprintf('%02d',k-1),'_det_source_extraction\frames_1_*\**\*.mat']); 
      out{i,3+k}=[list(size(list,1)-1).folder,'\',list(size(list,1)-1).name];
     end
      %% get SCOUT links

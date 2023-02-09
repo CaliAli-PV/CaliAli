@@ -1,5 +1,6 @@
-function BW=create_heart_mask(d1,d2)
-
+function BW=create_heart_mask(d)
+d1=d(1);
+d2=d(2);
 t = linspace(-pi,pi, 350);
 X =      t .* sin( pi * .9*sin(t)./t);
 Y = -abs(t) .* cos(pi * sin(t)./t);

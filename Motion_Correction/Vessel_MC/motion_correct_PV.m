@@ -21,5 +21,5 @@ tic; [~,shifts,~] = normcorre_batch(VF(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc 
 
 
 parfor i=1:size(V,3)
-Mr(:,:,i) = imtranslate(V(:,:,i),flip(squeeze(shifts(i).shifts)'));
+Mr(:,:,i) = imtranslate(V(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
 end

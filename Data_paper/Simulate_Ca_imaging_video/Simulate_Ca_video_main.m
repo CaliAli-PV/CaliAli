@@ -1,6 +1,7 @@
 function [out,Mot,outpath,file_name,A]=Simulate_Ca_video_main(varargin)
 % [out,Mot,outpath,file_name,A]=Simulate_Ca_video_main('motion',5,'overlap',1,'overlapMulti',1','min_dist',10,'Nneu',100,'SNR',2,'save_files',false);
 %  Simulate_Ca_video_main('motion',0,'overlap',1,'overlapMulti',0.25','min_dist',6,'Nneu',150,'SNR',0.5);
+% Simulate_Ca_video_main('motion',0,'save_files',0,'spike_prob',"[-5,0]",'drift',1,'Nneu',100,'ses',20);
 % Simulate_Ca_video_main(Inputs);
 
 %% INTIALIZE VARIABLES
@@ -24,14 +25,14 @@ addParameter(inp,'save_files',true);
 addParameter(inp,'create_mask',true);
 addParameter(inp,'translation',1,valid_v)
 addParameter(inp,'comb_fact',0,valid_v)
-
+addParameter(inp,'drift',0,valid_v)
 inp.KeepUnmatched = true;
 parse(inp,varargin{:});
 warning off
 
 outpath=inp.Results.outpath;
 min_dist=inp.Results.min_dist;
-spike_prob=inp.Results.spike_prob;
+spike_prob=str2num(inp.Results.spike_prob);
 Nneu=inp.Results.Nneu;
 PNR=inp.Results.PNR;
 d1=inp.Results.d1;
@@ -47,6 +48,7 @@ comb_fact=inp.Results.comb_fact;
 B=inp.Results.B;
 save_files=inp.Results.save_files;
 create_mask=inp.Results.create_mask;
+drift=inp.Results.drift;
 % set random seed
 if save_files
     if isempty(outpath)
@@ -77,6 +79,15 @@ else
     M=ones(Nneu,F);
 end
 C=C.*M;
+
+if drift==1
+     M=sim_drifting_activities(Nneu,ses);
+    M=double(repelem(M,1,F));
+    C=C.*M;
+%     plot_High_dimension_drift(C);
+%     plot_hyper_plane_projection(bin_data(C,1,100)')
+end
+
 %% add Non-Rigid motion to sessions
 [BL(:,:,1),A{1,1},bA{1,1},Mot{1}]=Add_NRmotion(bl(:,:,1),A_in,bA_in,0,0,translation);
 for i=2:ses
@@ -120,7 +131,7 @@ if save_files
     end
 
     for i=1:ses
-        saveash5(out{1,i},[file_name,'_ses',num2str(i-1)]);
+        saveash5(out{1,i},[file_name,'_ses',sprintf( '%02d',i-1)]);
     end
     saveash5(GT,[file_name,'_GT']);
     seed=s.Seed;
