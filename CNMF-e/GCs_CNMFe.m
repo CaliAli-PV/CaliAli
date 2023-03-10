@@ -223,7 +223,9 @@ end
 %   neuron.Coor=[]
 %   neuron.show_contours(0.9, [], neuron.PNR, 0);  %PNR
 %   neuron.show_contours(0.6, [], neuron.Cn,0);   %CORR
-%   neuron.show_contours(0.6, [], neuron.PNR.*neuron.Cn, 0); %PNR*CORR
+%   neuron.show_contours(0.6, [], neuron.Cn.*neuron.PNR,0);   %CORR
+%   neuron.show_contours(0.6, [], t.Cn, 0); %PNR*CORR
+
 %% normalized spatial components
 % A=neuron.A;A=full(A./max(A,[],1)); A=reshape(max(A,[],2),[size(neuron.Cn,1),size(neuron.Cn,2)]);
 % neuron.show_contours(0.6, [], A, 0);

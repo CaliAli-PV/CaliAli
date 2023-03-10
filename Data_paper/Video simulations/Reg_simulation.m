@@ -7,7 +7,7 @@ Ce = table2cell(readtable('parameters_sim.xlsx','Format','auto','ReadVariableNam
 for i=1:size(Ce,1)
     try
         cd(Ce{i,2});
-        [~,~,path,name]=Simulate_Ca_video_main(Ce{i,:});
+        [~,~,path,name]=Simulate_Ca_video(Ce{i,:});
         file_path=[path,'\',name];
         list=struct2cell(dir([file_path,'_ses*.h5']));
         list=strcat(list(2,:)','\',list(1,:)')';
@@ -18,8 +18,8 @@ for i=1:size(Ce,1)
         get_CnPNR_from_video(2.5,{[file_path,'_GT.h5']});
         process_links(list_links);
         GCs_CNMFe_sim([file_path,'_GT.h5'],2.5,0.15,2.5,10);
-        close all
-        GCs_CNMFe_sim([file_path,'_ses',num2str(size(list,2)-1),'_Aligned.h5'],2.5,0.15,2.5,10);
+        close all   
+        GCs_CNMFe_sim([file_path,'_ses',sprintf('%02d',size(list,2)-1),'_Aligned.h5'],2.5,0.15,2.5,10);
         close all
         for k=1:size(list,2)
             [fp,name,ext]=fileparts(list{1, k});

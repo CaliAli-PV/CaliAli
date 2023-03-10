@@ -1,8 +1,8 @@
 function p=plot_results_cell_tracking_batch(varargin)
 % p=plot_results_cell_tracking_batch(R80,R60,R40,R20);
 % p=plot_results_cell_tracking_batch(L,S,R,noise);
-% p=plot_results_cell_tracking_batch(out);
-% p=plot_results_cell_tracking_batch(Drift);
+% p=plot_results_cell_tracking_batch(High_overlap,Ideal);
+% p=plot_results_cell_tracking_batch(L);
 
 
 n=size(varargin,2);

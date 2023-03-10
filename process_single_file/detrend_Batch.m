@@ -21,8 +21,8 @@ for k=1:length(theFiles)
 
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
-        Mr=remove_borders(v2uint16(V)+1,1);
-        Mr=detrend2(sf,Mr);        
+%         Mr=remove_borders(v2uint16(V)+1,1); %removed for simulations
+        Mr=detrend2(sf,V);        
         %% save MC video as .h5
         if neuron_enhance==1
             Mr=nhance(Mr,gSig);
@@ -50,7 +50,7 @@ end
 function out=detrend2(nums,obj)
 [d1,d2,d3]=size(obj);
 obj=double(reshape(obj,[d1*d2,d3]));
-out=detrend_PV(nums,obj);
+out=detrend_PV(nums/10,obj);
 out=out./GetSn(out);
 out(isnan(out))=0;
 out(isinf(out))=0;

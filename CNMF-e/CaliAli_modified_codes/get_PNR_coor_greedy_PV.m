@@ -48,7 +48,7 @@ end
 
 pnr = reshape(double(Y_max)./Ysig, d1, d2);
 pnr(isnan(pnr))=0;
-Y(bsxfun(@lt, Y, Ysig*2)) = 0;
+Y(bsxfun(@lt, Y, Ysig*3)) = 0;
 
 %% Distribute data to calculate Cn in batch mode
 max_bin=3000;

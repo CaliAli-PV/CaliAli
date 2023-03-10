@@ -67,7 +67,7 @@ function [neuron,cell_register,neurons,links]=cellTracking_SCOUT(neurons,varargi
 optional_parameters={'links','weights','max_dist','overlap','chain_prob','corr_thresh','register_sessions','registration_type','registration_method',...
     'registration_template','use_corr','use_spat','max_gap','probability_assignment_method','base','min_prob','binary_corr','max_sess_dist',...
     'footprint_threshold','cell_tracking_options','single_corr','scale_factor','reconstitute','construct_combined'};
-defaults={{},[4,5,5,0,0,0],[45],[],[.5],.6,true,'align_to_base',{'affine','non-rigid'},'spatial',false,true,0,'default',ceil(length(neurons)/2),[.5],false,inf,0,struct,false,1.5,true,true};
+defaults={{},[4,5,5,0,0,0],[45],[],[.5],.6,true,'align_to_base',{'affine','non-rigid'},'spatial',false,true,0,'default',ceil(length(neurons)/2),[.5],false,inf,.1,struct,false,1.5,true,true};
 
 p=inputParser;
 
@@ -191,10 +191,7 @@ if register_sessions
     %3 alignment iterations
     for k=1:1 % PV originaly 3
         % %      PV neurons are not correctly registrated!
-        k
-        o=1:size(neurons,2);
-        o(base)=[];
-        [neurons(1,o),links]=align_scout_PV(neurons(1,base),neurons(1,o),links);
+        [neurons,links]=align_scout_PV(neurons,links);
     end
     %         [neurons,links]=register_neurons_links(neurons,links,registration_template,registration_type,registration_method,base);
     base=randi([1,length(neurons)],1,1);
@@ -236,18 +233,11 @@ end
 %distance_metrics cell
 %Weights order: correlation, centroid_dist,overlap,JS,SNR,decay
 
-
-
 %overlap similarity, now required
 overlap_matrices=construct_overlap_matrix(neurons);
 
-
 %centroid distance (this metric is required, though  the weight may be 0)
 distance_matrices=construct_distance_matrix(neurons);
-
-
-
-
 
 distance_links=cell(1,length(neurons)*2-2);
 for i=1:length(neurons)-1
@@ -281,7 +271,9 @@ for i=1:length(neurons)
     neurons{i}.SNR=(neurons{i}.SNR-mean(neurons{i}.SNR))/std(neurons{i}.SNR);
 end
 for i=1:length(neurons)
+    neurons{i}=calc_snr(neurons{i}); %% PV 
     for j=i:length(neurons)
+        neurons{j}=calc_snr(neurons{j}); %% PV 
         %SNR_dist{i,j}=pdist2(neurons{i}.SNR,neurons{j}.SNR)./((repmat(neurons{i}.SNR,1,size(neurons{j}.SNR,1))+repmat(neurons{j}.SNR',size(neurons{i}.SNR,1),1))/2);
         
              
@@ -292,42 +284,41 @@ else
     SNR_dist=cell(length(neurons),length(neurons));
 end
 if max_weights(6)>0
+    if isempty(neurons{i}.P.kernel_pars)
+        warning('No decay rate available, setting 6th column of weights to 0')
+        weights(:,6)=0;
+        max_weights(6)=0;
+    elseif length(neurons{i}.P.kernel_pars)<size(neurons{i}.C,1)&~isempty(neurons{i}.P.kernel_pars)
+        neurons{i}.P.kernel_pars(end+1:size(neurons{i}.C,1))=mean(neurons{i}.P.kernel_pars);
+        warning('Some missing decay rates, replacing with average')
 
-if isempty(neurons{i}.P.kernel_pars)
-    warning('No decay rate available, setting 6th column of weights to 0')
-    weights(:,6)=0;
-    max_weights(6)=0;
-elseif length(neurons{i}.P.kernel_pars)<size(neurons{i}.C,1)&~isempty(neurons{i}.P.kernel_pars)
-    neurons{i}.P.kernel_pars(end+1:size(neurons{i}.C,1))=mean(neurons{i}.P.kernel_pars);
-    warning('Some missing decay rates, replacing with average')
-    
-end
+    end
 end
     
-if max_weights(6)>0 
+if max_weights(6)>0
 
-for i=1:length(neurons)
-    if isempty(neurons{i}.P.kernel_pars)||size(neurons{i}.C,1)~=length(neurons{i}.P.kernel_pars)
-        for l=1:length(neurons)
-            neurons{l}=estimate_decay_full(neurons{l});
+    for i=1:length(neurons)
+        if isempty(neurons{i}.P.kernel_pars)||size(neurons{i}.C,1)~=length(neurons{i}.P.kernel_pars)
+            for l=1:length(neurons)
+                neurons{l}=estimate_decay_full(neurons{l});
+            end
+            break
         end
-        break
     end
-end     
-for i=1:length(neurons)
-%     for j=1:length(neurons)
-%    for j=i:length(neurons)
-%         for k=1:size(neurons{i}.C,1)
-%             for l=1:size(neurons{j}.C,1)
-%                 decay_dist{i,j}(k,l)=abs(neurons{i}.P.kernel_pars(k)-neurons{j}.P.kernel_pars(l))/(neurons{i}.P.kernel_pars(k)+neurons{j}.P.kernel_pars(l));
-%             end
-%         end
-%    end
-    for j=1:length(neurons)
-        decay_dist{i,j}=pdist2(neurons{i}.P.kernel_pars,neurons{j}.P.kernel_pars);
-        %decay_dist{i,j}=pdist2(decay_rate{i},decay_rate{j});
+    for i=1:length(neurons)
+        %     for j=1:length(neurons)
+        %    for j=i:length(neurons)
+        %         for k=1:size(neurons{i}.C,1)
+        %             for l=1:size(neurons{j}.C,1)
+        %                 decay_dist{i,j}(k,l)=abs(neurons{i}.P.kernel_pars(k)-neurons{j}.P.kernel_pars(l))/(neurons{i}.P.kernel_pars(k)+neurons{j}.P.kernel_pars(l));
+        %             end
+        %         end
+        %    end
+        for j=1:length(neurons)
+            decay_dist{i,j}=pdist2(neurons{i}.P.kernel_pars,neurons{j}.P.kernel_pars);
+            %decay_dist{i,j}=pdist2(decay_rate{i},decay_rate{j});
+        end
     end
-end
 else
     decay_dist=cell(length(neurons),length(neurons));
 end
@@ -395,7 +386,7 @@ else
     M=poolobj.NumWorkers;
 end
 
-parfor (oo=1:prod(param_vec),M)
+for oo=1:prod(param_vec)  %% removed par/ there are other par inside and oo is always 1 unless more comb of parameters are addded
 %for oo=1:prod(param_vec)
    % for oo=47
 [jj,kk,mm,nn]=ind2sub(param_vec,oo);

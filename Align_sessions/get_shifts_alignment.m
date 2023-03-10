@@ -30,7 +30,8 @@ for k=1:size(P,2)
     P{1,k}={temp};
 end
 
-%% remove black borders 
+%% remove black borders
+
 for k=1:size(P,2)
     temp=P.(k){1,1};
     P.(k){1,1}=remove_borders(temp);
@@ -45,6 +46,8 @@ Cn=v2uint8(cell2mat(P{1,3})); % Correlation image
 for i=1:size(Cn,3)
     X(:,:,i)=mat2gray(max(cat(3,Vf(:,:,i),medfilt2(Cn(:,:,i))),[],3));
 end
+X=v2uint8(X);
+P.(5){1,1}=mat2gray(X);
 Proj_t=permute(cat(4,Mb,Cn,X,Vf,Vf),[1,2,4,3]);
 [d1,d2,d3,d4]=size(Proj_t);  % data dimensions
 Proj_t=squeeze(mat2cell(Proj_t,d1,d2,d3,ones(1,d4))); % split data for parallel computing
@@ -122,19 +125,19 @@ LocW=LocW./sum(LocW,3);
 end
 
 function [T,loc_c,glob_c,Tb,loc_cb,glob_cb]=get_transformations(M1,M2)
-
+plotme=1;
 opt{1,1}  = struct('niter',100, 'sigma_fluid',1,...
-    'sigma_diffusion',2, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
+    'sigma_diffusion',5, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
 opt{2,1} = struct('niter',100, 'sigma_fluid',1,...
-    'sigma_diffusion',2, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
-opt{3,1} = struct('niter',100, 'sigma_fluid',1,...
-    'sigma_diffusion',2, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
-opt{4,1} = struct('niter',15, 'sigma_fluid',1,...
-    'sigma_diffusion',2, 'sigma_i',1,...
-    'sigma_x',2, 'do_display',0, 'do_plotenergy',0);
+    'sigma_diffusion',5, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
+opt{3,1} = struct('niter',20, 'sigma_fluid',3,...
+    'sigma_diffusion',3, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
+opt{4,1} = struct('niter',20, 'sigma_fluid',3,...
+    'sigma_diffusion',3, 'sigma_i',1,...
+    'sigma_x',2, 'do_display',plotme, 'do_plotenergy',plotme);
 
 
 Mb=M1(:,:,1); % get mean frame (used to calculate vignetting)
@@ -151,7 +154,7 @@ Therebore we need to calculate forward and backward registration.
 % Calculate alignments
 [im1,im2,T]=MR_Log_demon(M1,M2,opt);  
 % Calculate local similarity
-loc_c=get_local_corr_Vf(cat(3,double(im1(:,:,end)),double(im2(:,:,end))),Mb);
+loc_c=get_local_corr_Vf(cat(3,double(im1(:,:,2)),double(im2(:,:,2))),Mb);
 % Calculate global similarity
 t1v=im1(:,:,end); % get the BV image 
 t2v=im2(:,:,end); % get the BV image 

@@ -205,9 +205,6 @@ link_pixel_distance=1.25*x(length(vals));
 if use_corr
 for j=1:size(dist_self,1)
     avail_ind=find(distance_metrics{1}(j,:)<max_pixel_distance);
-    
-
-
     avail_ind1=find(distance_links{1}(j,:)<max_pixel_distance);
     if ~single_corr
         avail_ind2=[];
@@ -226,16 +223,12 @@ for j=1:size(dist_self,1)
             if single_corr
                 if mean(corr_score_temp)>mean(corr_score_max)
                     corr_score_max=corr_score_temp;
-                end
-                
+                end             
             else
                 if mean(corr_score_temp)>mean(corr_score_max)
                     corr_score_max=corr_score_temp;
-                end
-                
-                
-            end
-            
+                end                             
+            end            
         end
         if single_corr
             NN_corr2=[NN_corr2,corr_score_max(2)];
@@ -247,14 +240,12 @@ for j=1:size(dist_self,1)
     end
 end
 
-
 end
 
 
 
 
-if use_corr
-    
+if use_corr    
     X=NN_corr2;
     X(X==0)=[];
     X(isoutlier(X))=[];
@@ -268,9 +259,7 @@ if use_corr
         X(isoutlier(X))=[];
         f_corr1=construct_probability_function_main(X,method,'right');
     end
-    
-    
-    
+   
 end
 
 
@@ -298,8 +287,7 @@ for i=1:size(dist_self,1)
             else
                 distance_score{k}{i}=f_distance{k}(distance_metrics{k}(i,avail_ind));
                 distance{k}{i}=distance_metrics{k}(i,avail_ind);
-            end
-            
+            end     
         end
         
         aligned{i}=avail_ind;
@@ -326,8 +314,7 @@ for i=1:size(dist_self,1)
             for j=1:length(avail_ind)
                 
                 corr_max=[0,0];
-                for k=1:length(link_ind)
-                    
+                for k=1:length(link_ind)                 
                     score1=correlation_matrices{1}(i,link_ind(k));
                     temp=correlation_matrices{2}(link_ind(k),avail_ind(j));
                     if single_corr
@@ -338,20 +325,17 @@ for i=1:size(dist_self,1)
                         if mean([score1,temp])>mean(corr_max)
                             corr_max=[score1,temp];
                         end
-                    end
-                    
-                    
+                    end            
                 end
+
                 if single_corr
-                    
-                    
+                                     
                     if isempty(f_corr2)
                         val=0;
                     else
                         val=f_corr2(corr_max(2));
                     end
-                    
-                    
+  
                     if ~isempty(val)&mean(corr_max)>=corr_thresh
                         corr_score{i}(j)=val;
                     else

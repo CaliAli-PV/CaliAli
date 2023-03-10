@@ -1,7 +1,7 @@
 function S=separate_sessions(data,F,bin,sf)
 
 % sf is only important when bining data.
-% S=separate_sessions(neuron.S,neuron.frame_range,1,6);
+% S=separate_sessions(neuron.S,neuron.options.F,1,1);
 
 if ~exist('bin','var')
 bin = 0;

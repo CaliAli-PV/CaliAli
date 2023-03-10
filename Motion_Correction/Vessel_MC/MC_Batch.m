@@ -19,11 +19,12 @@ for k=1:length(theFiles)
         V=h5read(fullFileName,'/Object');
         [V,~]=motion_correct_PV(V); %% Rigid MC
         if do_nr
-        Mr=MC_NR(V);
+%         Mr=MC_NR(V);
+            Mr=MC_NR_not_used_testing(V);
         else
             Mr=V;
         end
-%         Mr=MC_NR_not_used_testing(V);
+%         
         Mr=interpolate_dropped_frames(Mr);
         Mr=square_borders(Mr,0);
         %

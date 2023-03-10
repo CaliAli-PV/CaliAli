@@ -105,7 +105,8 @@ end
 
 function dt=det_video(in,sf,neuron_enhance,gSig)
 [d1,d2,d3]=size(in);
-dt = detrend_PV(sf,reshape(in,[d1*d2,d3]));
+dt = detrend_PV(sf/10,reshape(in,[d1*d2,d3]));
+dt=dt+single(randn(size(dt)));
 dt=dt./GetSn(dt);
 dt=reshape(dt,d1,d2,d3);
 if neuron_enhance==1
@@ -124,20 +125,6 @@ end
 end
 
 
-%%==================================
-function P=BV_gray2RGB(P)
-X=uint8([]);
-for i=1:size(P,2)
-    C=v2uint8(P.(i)(1,:).(3){1,1});
-    Vf=v2uint8(P.(i)(1,:).(2){1,1});
-    for k=1:size(C,3)
-        X(:,:,:,k)=imfuse(C(:,:,k),Vf(:,:,k),'Scaling','joint','ColorChannels',[1 2 0]);
-    end
-    P.(i)(1,:).(5){1,1}=X;
-    X=uint8([]);
-end
-
-end
 %%====================================
 function [P,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat)
 

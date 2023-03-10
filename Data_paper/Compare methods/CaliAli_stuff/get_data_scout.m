@@ -1,7 +1,7 @@
 function [A,C,C_raw,d,S]=get_data_scout(Ses,links,opt)
 if ~exist('opt','var')
 opt=struct('max_gap',20,'weights',[1,1,1,1,1,1], ...
-        'registration_method',{{'translation','non-rigid'}});
+        'registration_method',{{'translation','non-rigid'}},'probability_assignment_method','Kmeans');
 end
 
 
