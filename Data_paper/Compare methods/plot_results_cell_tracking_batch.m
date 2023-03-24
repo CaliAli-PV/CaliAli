@@ -1,8 +1,8 @@
 function p=plot_results_cell_tracking_batch(varargin)
 % p=plot_results_cell_tracking_batch(R80,R60,R40,R20);
 % p=plot_results_cell_tracking_batch(L,S,R,noise);
-% p=plot_results_cell_tracking_batch(High_overlap,Ideal);
-% p=plot_results_cell_tracking_batch(L);
+% p=plot_results_cell_tracking_batch(Ideal);
+% p=plot_results_cell_tracking_batch(Ideal,Dense,Remapping,Noise,Drift);
 
 
 n=size(varargin,2);
@@ -78,6 +78,7 @@ for i=1:size(in,2)-1
 end
 hold on
 co=distinguishable_colors(size(in,2));
+co=co([1,3,2,4],:);
 if plotci==1
     for i=1:size(in,2)
         t=in{1,i}';

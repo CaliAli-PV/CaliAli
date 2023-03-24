@@ -401,7 +401,7 @@ curr_min_prob=min_prob(mm);
 curr_chain_prob=chain_prob(nn);
 
 curr_weights=curr_weights/sum(curr_weights);
-min_num_neighbors=1.5;
+min_num_neighbors=1.5; % PV original 1.5
 %min_num_neighbors=1;
 
 %disp(['Initialization: ', num2str(time), ' seconds'])

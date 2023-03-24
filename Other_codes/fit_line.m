@@ -25,7 +25,7 @@ hold on;plot(xFit,polyval(Fit,xFit),'r','LineWidth',2);
 
 [rho,p]=corr(x,y);
 disp([rho,p])
-str=sprintf('r= %0.2f', rho);
+str=sprintf('r= %0.2f p= %0.2f', rho,p);
 % dim = [.6 .6 .1 .3];
 % annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title(str);

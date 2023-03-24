@@ -20,7 +20,7 @@ y = resample(O,f,length(O))>0.02;
 y=movmax(y,[0,5]).*movmax(y,[5,0]);
 
 rs = resample(r(O2>0),sum(y),sum(O2));
-% rs=rs-movmin(rs,5);
-% rs=rs./movmax(rs,5);
+rs=rs-movmin(rs,5);
+rs=rs./movmax(rs,5);
 R=y;
 R(y==1)=(1-rs);

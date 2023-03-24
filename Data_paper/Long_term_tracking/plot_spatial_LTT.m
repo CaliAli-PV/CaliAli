@@ -1,6 +1,6 @@
 function plot_spatial_LTT(T,F)
-% plot_spatial_LTT(in,F(1))
-%% 5,6,6 are representative recordings 
+% plot_spatial_LTT(out(1,:),F(1))
+%% 
 h=[1,1,1];
 figure;tiledlayout(1,3);
 for m=1:3
@@ -16,9 +16,9 @@ for m=1:3
     s1=full(mean(s(:,1:F)>thr,2)>0);
     s2=full(mean(s(:,1+F:end)>thr,2)>0);
 
-    r=reshape(a*double(s1&~s2),d);
-    g=reshape(a*double(s1&s2),d);
-    b=reshape(a*double(~s1&s2),d);
+    g=reshape(a*double(s1&~s2),d);
+    b=reshape(a*double(s1&s2),d);
+    r=reshape(a*double(~s1&s2),d);
 
 
     Im=cat(3,r,g,b);

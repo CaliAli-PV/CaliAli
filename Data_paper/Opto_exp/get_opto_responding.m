@@ -1,6 +1,6 @@
-function [Sc,X]=get_opto_responding(S,opto);
-wb=20;
-wa=20;
+function [Sc,X]=get_opto_responding(S,opto,sf,dur);
+wb=dur*sf;
+wa=dur*sf;
 
 [d1,d2]=size(S);
 onsets=find(diff(opto)>0.5);
@@ -19,7 +19,7 @@ X=[mean(pre,3),mean(post,3)];
 
 X=(X-mean(mean(pre,3),2))./std(mean(pre,3),[],2);
 
-Sc=mean(X(:,21:end),2);
+Sc=mean(X(:,wb+1:end),2);
 
 % 
 % P2=squeeze(mean(post,2));

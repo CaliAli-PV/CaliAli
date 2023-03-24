@@ -26,9 +26,14 @@ for i=1:size(in,1)
     CR.m=calculate_best_matching_score2(GT.a,CR.a,GT.c,CR.c);
     [CR.t,CR.s]=get_errors_2(CR.m,size(GT.c,1));
     %% Get SCOUT alignment
+    if size(Ce(4:end),2)>15
+        re=false;
+    else
+        re=true;
+    end
           opt=struct('max_gap',20,'weights',[1,1,1,1,1,1], ...
                 'registration_method',{{'translation','non-rigid'}},'probability_assignment_method','Kmeans', ...
-                'chain_prob',0.5,'min_prob',0.5);
+                'chain_prob',0.5,'min_prob',0.5,'max_dist',80,'reconstitute',re);
 
     [SCOUT.a,SCOUT.c,SCOUT.cr,SCOUT.d]=get_data_scout(Ce(4:end),link(i,:),opt);
     SCOUT=align_shapes_con(GT,SCOUT);
@@ -77,7 +82,7 @@ for i=1:size(theFiles,2)
      In=length(dir([path,'\',name,'_ses*_det.h5']));
      %% get individual sessions
     for k=1:In
-     list= dir( [path,'\',name,'_ses',sprintf('%02d',k-1),'_det_source_extraction\frames_1_*\**\*.mat']); 
+     list= dir( [path,'\',name,'_ses',sprintf('%d',k-1),'_det_source_extraction\frames_1_*\**\*.mat']); 
      out{i,3+k}=[list(size(list,1)-1).folder,'\',list(size(list,1)-1).name];
     end
      %% get SCOUT links
