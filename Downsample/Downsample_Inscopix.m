@@ -1,4 +1,4 @@
-function Downsample_Inscopix(outpath,ds_f,theFiles)
+function Downsample_Inscopix(ds_f,outpath,theFiles)
 
 if ~exist('outpath','var')
     outpath = [];

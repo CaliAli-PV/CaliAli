@@ -211,7 +211,7 @@ if use_parallel
     %         end
     %     end
     % do the actual computation
-    parfor mpatch=1:(nr_patch*nc_patch)
+    parfor mpatch=1:(nr_patch*nc_patch) %% removed par for debuging
         %         if flag_ignore{mpatch}
         %             continue;
         %         end

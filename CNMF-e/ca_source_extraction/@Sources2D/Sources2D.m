@@ -61,15 +61,9 @@ classdef Sources2D < handle
         Cn_all; % Modification done by PV
         Mask  % Modification done by PV
         n_enhanced;% Modification done by PV
-        %% Things needed by SCOUT
-        imageSize  % needed by scout
-        centroid % idem'
-        trace
-        A_per_session
-        connectiveness
-        probabilities
-        cell_register
-        SNR
+        Cnr
+        PNRr
+
     end
     
     %% methods

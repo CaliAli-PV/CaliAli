@@ -121,6 +121,8 @@ Names = [
     'Cn                 '                  %PV
     'Mask               '
     'F                  '   
+    'Cnr                '  
+    'PNRr               '  
     ];              %PV
 
 [m,n] = size(Names);
@@ -310,6 +312,8 @@ Values = [
     {'hals'}
     {false}
     {false}
+    {[]}  %PV
+    {[]}  %PV
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV

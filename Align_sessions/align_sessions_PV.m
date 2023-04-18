@@ -39,8 +39,7 @@ if ~isfile(out)
     end
     %% get alignment score
 
-    v=P.(3)(1,:).(5){1,1};
-    v=squeeze(max(v,[],3));
+    v=P.(3)(1,:).(2){1,1};
     m=P.(3)(1,:).(1){1,1};
 
     Global_score=get_blood_vessel_corr_score(v);

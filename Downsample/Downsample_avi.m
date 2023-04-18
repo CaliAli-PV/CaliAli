@@ -1,4 +1,4 @@
-function Downsample_avi(outpath,ds_f)
+function Downsample_avi(ds_f,outpath)
 if ~exist('outpath','var')
 outpath = [];
 end
