@@ -2,7 +2,7 @@
   <img src="./Demo/main_panel.png" alt="slider" width="800px"/>
 </p>
 
-# MIN1PIPE (reads "minipipe")
+# CaliAli
 [CaliAli, a tool for long-term tracking of neuronal population dynamics in calcium imaging](https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1). 
 
 CaliAli is a software tool for tracking neuronal population dynamics in calcium imaging over long periods. It utilizes blood vessel information to improve inter-session alignment and maximize the number of trackable neurons. By incorporating an alignment-before-extraction strategy, it enhances thedetectability of weak signals and excels in scenarios involving neural remapping and high spatial overlap.
