@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./Demo/main_panel.jpg" alt="slider" width="800px"/>
+  <img src="./Demo/main_panel.png" alt="slider" width="800px"/>
 </p>
 
 # MIN1PIPE (reads "minipipe")
@@ -12,7 +12,7 @@ CaliAli is a software tool for tracking neuronal population dynamics in calcium 
 2. [System requirments](#System-requirments)
 3. [Installation](#Installation)
 4. [Usage and Demo](#dataset)
-6. [Potential Troubles](#Potential Troubles)
+6. [Potential Troubles](#Potential_Troubles)
 8. [References](#references)
 
 ---
