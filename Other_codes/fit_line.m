@@ -1,4 +1,4 @@
-function rho=fit_line(x,y,typ);
+function [rho,Fit]=fit_line(x,y,typ);
 ki=x+y;
 x(isnan(ki))=[];
 y(isnan(ki))=[];
