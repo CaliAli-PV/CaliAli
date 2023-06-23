@@ -21,6 +21,7 @@ for k=1:length(theFiles)
         if do_nr
 %         Mr=MC_NR(V);
             Mr=MC_NR_not_used_testing(V);
+            Mr(Mr==1)=0;
         else
             Mr=V;
         end

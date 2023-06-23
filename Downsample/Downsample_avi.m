@@ -1,4 +1,4 @@
-function Downsample_avi(ds_f,outpath)
+function Downsample_avi(ds_f,outpath,theFiles)
 if ~exist('outpath','var')
 outpath = [];
 end
@@ -7,7 +7,10 @@ if ~exist('ds_f','var')
 ds_f = 2;
 end
 
-theFiles = uipickfiles('REFilter','\.avi$');
+if ~exist('theFiles','var')
+    theFiles = uipickfiles('REFilter','\.isxd$');
+end
+
 
 for k=1:length(theFiles)  
     fullFileName = theFiles{k};

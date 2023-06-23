@@ -125,7 +125,7 @@ LocW=LocW./sum(LocW,3);
 end
 
 function [T,loc_c,glob_c,Tb,loc_cb,glob_cb]=get_transformations(M1,M2)
-plotme=1;
+plotme=0;
 opt{1,1}  = struct('niter',100, 'sigma_fluid',1,...
     'sigma_diffusion',5, 'sigma_i',1,...
     'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);

@@ -33,12 +33,10 @@ end
 out=out+1;
 
 [d1,d2,d3]=size(out);
-out=reshape(out,d1*d2,d3)+1;
+out=reshape(out,d1*d2,d3);
 
-M=M(:);
 
-out(M,:)=0;
-out=reshape(out,d1,d2,d3);
+
 
 
 
