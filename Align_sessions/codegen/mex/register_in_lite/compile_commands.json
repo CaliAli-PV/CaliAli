@@ -1,0 +1,158 @@
+[
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  register_in_lite_data.c /Fobuild\\win64\\register_in_lite_data.obj",
+    "file": "register_in_lite_data.c",
+    "output": "build/win64/register_in_lite_data.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  rt_nonfinite.c /Fobuild\\win64\\rt_nonfinite.obj",
+    "file": "rt_nonfinite.c",
+    "output": "build/win64/rt_nonfinite.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  register_in_lite_initialize.c /Fobuild\\win64\\register_in_lite_initialize.obj",
+    "file": "register_in_lite_initialize.c",
+    "output": "build/win64/register_in_lite_initialize.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  register_in_lite_terminate.c /Fobuild\\win64\\register_in_lite_terminate.obj",
+    "file": "register_in_lite_terminate.c",
+    "output": "build/win64/register_in_lite_terminate.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  register_in_lite.c /Fobuild\\win64\\register_in_lite.obj",
+    "file": "register_in_lite.c",
+    "output": "build/win64/register_in_lite.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  ndgrid.c /Fobuild\\win64\\ndgrid.obj",
+    "file": "ndgrid.c",
+    "output": "build/win64/ndgrid.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  interpn.c /Fobuild\\win64\\interpn.obj",
+    "file": "interpn.c",
+    "output": "build/win64/interpn.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  bsearch.c /Fobuild\\win64\\bsearch.obj",
+    "file": "bsearch.c",
+    "output": "build/win64/bsearch.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  indexShapeCheck.c /Fobuild\\win64\\indexShapeCheck.obj",
+    "file": "indexShapeCheck.c",
+    "output": "build/win64/indexShapeCheck.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  gradient.c /Fobuild\\win64\\gradient.obj",
+    "file": "gradient.c",
+    "output": "build/win64/gradient.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  sum.c /Fobuild\\win64\\sum.obj",
+    "file": "sum.c",
+    "output": "build/win64/sum.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  all.c /Fobuild\\win64\\all.obj",
+    "file": "all.c",
+    "output": "build/win64/all.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  svd.c /Fobuild\\win64\\svd.obj",
+    "file": "svd.c",
+    "output": "build/win64/svd.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  svd1.c /Fobuild\\win64\\svd1.obj",
+    "file": "svd1.c",
+    "output": "build/win64/svd1.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  diag.c /Fobuild\\win64\\diag.obj",
+    "file": "diag.c",
+    "output": "build/win64/diag.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  combineVectorElements.c /Fobuild\\win64\\combineVectorElements.obj",
+    "file": "combineVectorElements.c",
+    "output": "build/win64/combineVectorElements.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  imfilter.c /Fobuild\\win64\\imfilter.obj",
+    "file": "imfilter.c",
+    "output": "build/win64/imfilter.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  interface\\_coder_register_in_lite_api.c /Fobuild\\win64\\_coder_register_in_lite_api.obj",
+    "file": "interface/_coder_register_in_lite_api.c",
+    "output": "build/win64/_coder_register_in_lite_api.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  interface\\_coder_register_in_lite_mex.c /Fobuild\\win64\\_coder_register_in_lite_mex.obj",
+    "file": "interface/_coder_register_in_lite_mex.c",
+    "output": "build/win64/_coder_register_in_lite_mex.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  eml_int_forloop_overflow_check.c /Fobuild\\win64\\eml_int_forloop_overflow_check.obj",
+    "file": "eml_int_forloop_overflow_check.c",
+    "output": "build/win64/eml_int_forloop_overflow_check.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  sumMatrixIncludeNaN.c /Fobuild\\win64\\sumMatrixIncludeNaN.obj",
+    "file": "sumMatrixIncludeNaN.c",
+    "output": "build/win64/sumMatrixIncludeNaN.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  unsafeSxfun.c /Fobuild\\win64\\unsafeSxfun.obj",
+    "file": "unsafeSxfun.c",
+    "output": "build/win64/unsafeSxfun.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  div.c /Fobuild\\win64\\div.obj",
+    "file": "div.c",
+    "output": "build/win64/div.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  register_in_lite_emxutil.c /Fobuild\\win64\\register_in_lite_emxutil.obj",
+    "file": "register_in_lite_emxutil.c",
+    "output": "build/win64/register_in_lite_emxutil.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  interface\\_coder_register_in_lite_info.c /Fobuild\\win64\\_coder_register_in_lite_info.obj",
+    "file": "interface/_coder_register_in_lite_info.c",
+    "output": "build/win64/_coder_register_in_lite_info.obj"
+  },
+  {
+    "directory": "H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\\codegen\\mex\\register_in_lite",
+    "command": "cl /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I \".\" /I \"H:\\My Drive\\GitHub\\CaliAli\\Align_sessions\" /I \"C:\\Program Files\\MATLAB\\R2023a\\extern\\include\" /I \".\\interface\" /I \".\" -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101  \"C:\\Program Files\\MATLAB\\R2023a\\extern\\version\\c_mexapi_version.c\" /Fobuild\\win64\\c_mexapi_version.obj",
+    "file": "C:/Program Files/MATLAB/R2023a/extern/version/c_mexapi_version.c",
+    "output": "build/win64/c_mexapi_version.obj"
+  }
+]

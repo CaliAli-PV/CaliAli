@@ -1,7 +1,7 @@
-function obj=update_background_CaliAli(obj, use_parallel,max_frame)
+function obj=update_background_CaliAli(obj, use_parallel)
 
-div=ceil(size(obj.C_raw,2)./max_frame);
-batch=round(linspace(0,size(obj.C_raw,2),div+1));
+
+batch=[0,cumsum(obj.options.F)];
 
 b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);
 f=cellfun(@(x) x.*0,obj.f,'UniformOutput',false);
@@ -9,18 +9,18 @@ b0=cellfun(@(x) abs(x*inf),obj.b0,'UniformOutput',false);
 W=cellfun(@(x) x.*0,obj.W,'UniformOutput',false);
 
 b0_new=inf(size(obj.b0_new,1),size(obj.b0_new,2));
-A_prev=zeros(size(obj.A,1),size(obj.A,2));
-C_prev=[];
-
-for i=1:div
+div=length(batch)-1;
+fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
+for i=progress(1:div)
     out=update_bg_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
     b=cellfun(@(x,y) x+y,b,out.b,'UniformOutput',false);
     f=cellfun(@(x,y) x+y,f,out.f,'UniformOutput',false);
     b0=cellfun(@(x,y) min(cat(3,x,y),[],3),b0,out.b0,'UniformOutput',false);
     W=cellfun(@(x,y) x+y,W,out.W,'UniformOutput',false);
     b0_new=min(cat(3,b0_new,out.b0_new),[],3);
-    A_prev=max(cat(3,A_prev,full(out.A_prev)),[],3);
-    C_prev=cat(2,C_prev,out.C_prev);
+    temp(:,:,i)=out.b0_new;
+    % A_prev=max(cat(3,A_prev,full(out.A_prev)),[],3);
+    % C_prev=cat(2,C_prev,out.C_prev);
 end
 
 b=cellfun(@(x) x./div,b,'UniformOutput',false);
@@ -30,13 +30,12 @@ W=cellfun(@(x) x./div,W,'UniformOutput',false);
 obj.b=b;
 obj.f=f;
 obj.b0=b0;
-obj.b0_new=b0_new;
+obj.b0_new=obj.reconstruct_b0();
 obj.W=W;
-obj.A_prev=sparse(A_prev);
-obj.C_prev=C_prev;
+obj.C_prev=obj.C;
 
 end
-function out=update_bg_in(obj,use_parallel,f_range)
+function out=update_bg_in(in,use_parallel,f_range)
 %% update the background related variables in CNMF framework
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -46,7 +45,7 @@ function out=update_bg_in(obj,use_parallel,f_range)
 %% email: zhoupc1988@gmail.com
 
 %% process parameters
-
+obj=copy(in);
 try
     % map data
     mat_data = obj.P.mat_data;
@@ -73,7 +72,7 @@ try
 catch
     error('No data file selected');
 end
-fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
+
 
 % frames to be loaded for initialization
 frame_range = f_range;
@@ -232,7 +231,6 @@ if use_parallel
             b0{mpatch} = b0{mpatch};
             b{mpatch} = b{mpatch};
             f{mpatch} = f{mpatch};
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
 
@@ -280,7 +278,6 @@ if use_parallel
             [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
         end
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
 
     end
 else
@@ -295,7 +292,6 @@ else
         % stop the updating B because A&C doesn't change in this area
         if isempty(A_block) && (~flag_first)
             [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
 
@@ -342,7 +338,6 @@ else
             [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
         end
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
 
     end
 end
@@ -350,15 +345,14 @@ out.b = b;
 out.f = f;
 out.b0 = b0;
 out.W = W;
+obj.W=W;
+obj.b=b;
+obj.b0=b0;
 out.b0_new = obj.reconstruct_b0();
 out.A_prev = obj.A;
 out.C_prev = obj.C;
 
 %% save the results to log
-fprintf('Finished updating background using %s model.\n', bg_model);
-
-fprintf(flog, '[%s]\b', get_minute());
-fprintf(flog, 'Finished updating background using %s model.\n', bg_model);
 if obj.options.save_intermediate
     bg.b = obj.b;
     bg.f = obj.f;
@@ -367,7 +361,6 @@ if obj.options.save_intermediate
     tmp_str = get_date();
     tmp_str=strrep(tmp_str, '-', '_');
     eval(sprintf('log_data.bg_%s = bg;', tmp_str));
-    fprintf(flog, '\tThe results were saved as intermediate_results.bg_%s\n\n', tmp_str);
 end
 fclose(flog);
 end

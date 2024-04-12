@@ -48,7 +48,7 @@ if use_parallel
             sn{k} = tmp_sn;
             
             % deconvolution
-            [ck, sk, tmp_options]= deconvolveCa(ck_raw, deconv_options, 'sn', tmp_sn);
+            [ck, sk, tmp_options]= deconvolveCa(ck_raw,[], 'sn', tmp_sn);
             
             if sum(abs(ck))==0
                 ck = ck_raw;

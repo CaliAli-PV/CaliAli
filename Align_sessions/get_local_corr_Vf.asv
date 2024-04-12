@@ -1,0 +1,63 @@
+function mc=get_local_corr_Vf(Vf,M)
+[d1,d2,d3]=size(Vf);
+M=mean(M,3);
+b=nchoosek(1:d3,2);
+SE = strel("disk",3);
+for i=1:size(b,1)
+    im1=Vf(:,:,b(i,1));
+    im2=Vf(:,:,b(i,2));
+    im1=mat2gray(im1)+randn(d1,d2)/1000;
+    im2=mat2gray(im2)+randn(d1,d2)/1000;
+    im1 = imhistmatch(im1,max(cat(3,im1,im2),[],3));
+    im2 = imhistmatch(im2,max(cat(3,im1,im2),[],3));
+  
+
+
+    sim=medfilt2(im1.*im2);
+    dif_c=medfilt2(max(cat(3,im1.^2-im1.*im2,im2.^2-im1.*im2),[],3));
+
+    sim=imgaussfilt(sim,12,"FilterSize",91);
+     sim=imgaussfilt(sim,12,"FilterSize",91);
+
+    % [~,out]=ssim(im1,im2);
+    % out=out.*(im1.*im2);
+    out=im1.*im2;
+    out(out<0)=0;
+    out=imopen(out,SE);
+    % [~,out]=ssim(im1,im2,'Exponents',[0 0 1],'Radius',sz,'RegularizationConstants',[0,0,0]);
+    S(:,b(i,1),b(i,2))=out(:);
+end
+
+if size(b,1)>1
+    parfor i=1:size(S,1)
+        v=squeeze(S(i,:,:));
+        v=[v;zeros(1,size(v,2))];
+        v=v+v'+eye(size(v,1));
+        mc(i)=get_min_conn(v);
+    end
+else
+    mc=squeeze(S(:,:,2));
+end
+mc=reshape(mc,[d1,d2]);
+
+m=mean(M,2)*mean(M,1);
+m=(m./max(m,[],'all')).^(1/4);
+mc=m.*mc;
+end
+
+
+
+function out=get_min_conn(v)
+d2=size(v,2);
+t=linspace(0.1,1,100);
+for i=1:100
+    G = graph(v>t(i));
+    A= conncomp(G);
+    s(i)=length(unique(A));
+    if s(i)>1
+        break
+    end
+end
+out=t(i);
+end
+

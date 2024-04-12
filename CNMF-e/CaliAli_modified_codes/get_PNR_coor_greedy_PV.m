@@ -80,6 +80,8 @@ parfor i=1:size(Y_A,1)
 end
 
 cn=adjust_C(max(cn_all,[],3));
+cn=medfilt2(cn);
+pnr=medfilt2(pnr);
 
 end
 

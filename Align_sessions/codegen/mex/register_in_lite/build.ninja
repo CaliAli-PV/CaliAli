@@ -1,0 +1,69 @@
+# CompilerName=msvc150
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root\build\win64
+matlabdir = C:\Program Files\MATLAB\R2023a
+startdir = H:\My Drive\GitHub\CaliAli\Align_sessions
+
+# Toolchain information
+cc = cl
+cxx = cl
+linker = link
+linkerxx = link
+
+cflags =  /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I "$root" /I "$startdir" /I "$matlabdir\extern\include" /I "$root\interface" /I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101 
+
+cxxflags =   /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /utf-8 /I "$root" /I "$startdir" /I "$matlabdir\extern\include" /I "$root\interface" /I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=register_in_lite_mex /openmp /wd4101 
+
+ldflags =  /nologo /manifest   /DLL /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmx.lib libmex.lib libmat.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  /out:"register_in_lite_mex.mexw64" /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmwlapack.lib libmwblas.lib libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib libiomp5md.lib /nodefaultlib:vcomp /LIBPATH:"$matlabdir\bin\win64" /export:mexFunction /export:mexfilerequiredapiversion /export:emlrtMexFcnProperties /export:register_in_lite /export:register_in_lite_initialize /export:register_in_lite_terminate /export:register_in_lite_atexit /export:emxEnsureCapacity_boolean_T /export:emxEnsureCapacity_int32_T /export:emxFree_boolean_T /export:emxFree_int32_T /export:emxInit_boolean_T /export:emxInit_int32_T /export:emxFreeMatrix_cell_wrap_3 /export:emxFreeStruct_cell_wrap_3 /export:emxInitMatrix_cell_wrap_3 /export:emxInitStruct_cell_wrap_3 /export:emxEnsureCapacity_real_T /export:emxFree_real_T /export:emxFree_uint8_T /export:emxInit_real_T /export:emxInit_uint8_T /export:emxEnsureCapacity_uint8_T
+
+linkobjs =  "$matlabdir\extern\lib\win64\microsoft\libmwippfilter.lib" "$matlabdir\extern\lib\win64\microsoft\libmwimfilter.lib"
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in /Fo$out
+
+rule cxx
+    command = $cxx $cxxflags $in /Fo$out
+
+rule link
+    command = $linker @$out.rsp $linkobjs $ldflags
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule linkxx
+    command = $linkerxx $in $linkobjs $ldflags
+
+# Build
+build $builddir\register_in_lite_data.obj : cc $root\register_in_lite_data.c
+build $builddir\rt_nonfinite.obj : cc $root\rt_nonfinite.c
+build $builddir\register_in_lite_initialize.obj : cc $root\register_in_lite_initialize.c
+build $builddir\register_in_lite_terminate.obj : cc $root\register_in_lite_terminate.c
+build $builddir\register_in_lite.obj : cc $root\register_in_lite.c
+build $builddir\ndgrid.obj : cc $root\ndgrid.c
+build $builddir\interpn.obj : cc $root\interpn.c
+build $builddir\bsearch.obj : cc $root\bsearch.c
+build $builddir\indexShapeCheck.obj : cc $root\indexShapeCheck.c
+build $builddir\gradient.obj : cc $root\gradient.c
+build $builddir\sum.obj : cc $root\sum.c
+build $builddir\all.obj : cc $root\all.c
+build $builddir\svd.obj : cc $root\svd.c
+build $builddir\svd1.obj : cc $root\svd1.c
+build $builddir\diag.obj : cc $root\diag.c
+build $builddir\combineVectorElements.obj : cc $root\combineVectorElements.c
+build $builddir\imfilter.obj : cc $root\imfilter.c
+build $builddir\_coder_register_in_lite_api.obj : cc $root\interface\_coder_register_in_lite_api.c
+build $builddir\_coder_register_in_lite_mex.obj : cc $root\interface\_coder_register_in_lite_mex.c
+build $builddir\eml_int_forloop_overflow_check.obj : cc $root\eml_int_forloop_overflow_check.c
+build $builddir\sumMatrixIncludeNaN.obj : cc $root\sumMatrixIncludeNaN.c
+build $builddir\unsafeSxfun.obj : cc $root\unsafeSxfun.c
+build $builddir\div.obj : cc $root\div.c
+build $builddir\register_in_lite_emxutil.obj : cc $root\register_in_lite_emxutil.c
+build $builddir\_coder_register_in_lite_info.obj : cc $root\interface\_coder_register_in_lite_info.c
+build $builddir\c_mexapi_version.obj : cc $matlabdir\extern\version\c_mexapi_version.c
+
+# Link
+build $root\register_in_lite_mex.mexw64 : link $builddir\register_in_lite_data.obj $builddir\rt_nonfinite.obj $builddir\register_in_lite_initialize.obj $builddir\register_in_lite_terminate.obj $builddir\register_in_lite.obj $builddir\ndgrid.obj $builddir\interpn.obj $builddir\bsearch.obj $builddir\indexShapeCheck.obj $builddir\gradient.obj $builddir\sum.obj $builddir\all.obj $builddir\svd.obj $builddir\svd1.obj $builddir\diag.obj $builddir\combineVectorElements.obj $builddir\imfilter.obj $builddir\_coder_register_in_lite_api.obj $builddir\_coder_register_in_lite_mex.obj $builddir\eml_int_forloop_overflow_check.obj $builddir\sumMatrixIncludeNaN.obj $builddir\unsafeSxfun.obj $builddir\div.obj $builddir\register_in_lite_emxutil.obj $builddir\_coder_register_in_lite_info.obj $builddir\c_mexapi_version.obj 

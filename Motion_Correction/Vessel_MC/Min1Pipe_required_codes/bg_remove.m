@@ -25,7 +25,7 @@ function Ydebg = bg_remove(Y, sz, ispara)
     %% begin removing background %%
     nframes = size(Y, 3);
     Ydebg = zeros(size(Y(sz + 1: end - sz, sz + 1: end - sz, :)), class(Y));
-    k = strel('disk', sz);
+    k = strel('disk', sz,8);
     if ispara
         parfor i = 1: nframes
             I = Y(:, :, i);

@@ -1,4 +1,5 @@
 function out=get_blood_vessel_corr_score(v)
+
 v=reshape(v,size(v,1)*size(v,2),[]);
 v=1-squareform(pdist(v','correlation'));
 d2=size(v,2);

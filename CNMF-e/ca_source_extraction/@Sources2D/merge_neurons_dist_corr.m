@@ -22,8 +22,7 @@ function [merged_ROIs, newIDs, obj_bk]  = merge_neurons_dist_corr(obj, show_merg
 
 %% variables & parameters
 fprintf('-------------MERGE HIGHLY CORRELATED CLOSE-BY NEURONS----------\n\n');
-
-A_ = obj.A;          % spatial components
+% spatial components
 if isempty(obj.C_raw)
     obj.C_raw = obj.C;
 end
@@ -54,14 +53,13 @@ deconv_options_0 = obj.options.deconv_options;
 %% find neuron pairs to merge
 % compute spatial correlation
 % temp = bsxfun(@times, A, 1./sum(A.^2,1));
-
 if any(strcmpi(method_dist, {'mean', 'center'}))
     % use the center of mass as neuron centers. 'center' is an old naming.
     ctr = obj.estCenter();
     yy = ctr(:,1);
     xx = ctr(:,2);
 else
-    [~,temp] = max(A_, [], 1);
+    [~,temp] = max(obj.A, [], 1);
     [yy, xx] = ind2sub([obj.options.d1, obj.options.d2], temp);
 end
 dist_v = sqrt(bsxfun(@minus, xx, xx').^2 + bsxfun(@minus, yy, yy').^2);
@@ -177,21 +175,23 @@ while m <= n2merge
     merged_ROIs{k_merged} = IDs;
     
     % determine searching area
-    active_pixel = (sum(A_(:,IDs), 2)>0);
+    active_pixel = (sum(obj.A(:,IDs), 2)>0);
     
     % update spatial/temporal components of the merged neuron
-    data = A_(active_pixel, IDs)*C_raw_(IDs, :);
-    ci = C_raw_(IDs(1), :);
-    for miter=1:10
-        ai = data*ci'/(ci*ci');
-        ci = ai'*data/(ai'*ai);
+    if ~isempty(obj.A_batch)
+        F=get_batch_size(obj,0);
+        batch=[0,cumsum(F)];
+        div=length(batch)-1;
+        for i=1:div
+            [obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1)));
+        end
+        obj.A=Ato2d(obj);
+    else
+        [obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:));
     end
-    
-    obj.A(active_pixel, IDs(1)) = ai;
-    obj.C_raw(IDs(1), :) = ci;
     %     [obj.C(IDs(1), :), obj.S(IDs(1), :), tmp_kernel] = deconvCa(ci, obj.kernel, 3, true, false);
     try
-        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(ci, deconv_options_0);
+        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(C_raw_(IDs(1),:), deconv_options_0);
         obj.P.kernel_pars(IDs(1), :) = deconv_options.pars;
         newIDs(IDs(1)) = IDs(1);
         % remove merged elements
@@ -243,4 +243,19 @@ fclose(flog);
 obj.delete(ind_del);
 try
     close(h_fig);
+catch
+
+end
+end
+
+function [A_,C_raw_]=update_tempo_spatial(A_,C_raw_)
+    data = A_*C_raw_;
+    ci = C_raw_;
+    for miter=1:10
+        ai = data*ci'/(ci*ci');
+        ci = ai'*data/(ai'*ai);
+    end
+    
+    A_ = ai;
+    C_raw_ = ci;
 end

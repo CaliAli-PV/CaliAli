@@ -20,7 +20,10 @@ function [merged_ROIs, newIDs, obj_bk]  = merge_high_corr(obj, show_merge, merge
 %% variables & parameters
 fprintf('-------------MERGE HIGHLY CORRELATED NEURONS----------\n\n');
 
-A_ = obj.A;          % spatial components
+
+A_=obj.A;
+
+% spatial components
 if isempty(obj.C_raw)
     obj.C_raw = obj.C;
 end
@@ -190,18 +193,20 @@ while m <= n2merge
     active_pixel = (sum(A_(:,IDs), 2)>0);
     
     % update spatial/temporal components of the merged neuron
-    data = A_(active_pixel, IDs)*C_raw_(IDs, :);
-    ci = C_raw_(IDs(1), :);
-    for miter=1:10
-        ai = data*ci'/(ci*ci');
-        ci = ai'*data/(ai'*ai);
+    if ~isempty(obj.A_batch)
+        F=get_batch_size(obj,0);
+        batch=[0,cumsum(F)];
+        div=length(batch)-1;
+        for i=1:div
+            [obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1)));
+        end
+        obj.A=Ato2d(obj);
+    else
+        [obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:));
     end
-    
-    obj.A(active_pixel, IDs(1)) = ai;
-    obj.C_raw(IDs(1), :) = ci;
     %     [obj.C(IDs(1), :), obj.S(IDs(1), :), tmp_kernel] = deconvCa(ci, obj.kernel, 3, true, false);
     try
-        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(single(ci), deconv_options_0);
+        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(obj.C_raw(IDs(1),:), deconv_options_0);
         obj.P.kernel_pars(IDs(1), :) = deconv_options.pars(1);  %% PV fix.
         newIDs(IDs(1)) = IDs(1);
         % remove merged elements
@@ -253,4 +258,17 @@ fclose(flog);
 obj.delete(ind_del);
 try
     close(h_fig);
+end
+end
+
+function [A_,C_raw_]=update_tempo_spatial(A_,C_raw_)
+    data = A_*C_raw_;
+    ci = C_raw_;
+    for miter=1:10
+        ai = data*ci'/(ci*ci');
+        ci = ai'*data/(ai'*ai);
+    end
+    
+    A_ = ai;
+    C_raw_ = ci;
 end

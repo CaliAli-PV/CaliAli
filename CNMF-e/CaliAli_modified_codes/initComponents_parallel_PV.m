@@ -291,9 +291,9 @@ fprintf(flog, 'Start running source extraction......\nThe collection of options 
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_range(1), frame_range(2));
 
-[A,C_raw,C,S,Ymean,Cn_update] = int_temp(obj);
+[A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(obj);
 %% export the results
-obj.A = sparse(A);
+obj.A = A;
 obj.C = C;
 obj.C_raw = C_raw;
 obj.S = sparse(S);
@@ -302,6 +302,11 @@ obj.P.k_ids = K;
 obj.ids = (1:K);
 obj.tags = zeros(K,1, 'like', uint16(0));
 obj.P.Ymean = Ymean;
+
+if size(obj.A,3)>1
+    obj.A_batch=obj.A;
+    obj.A=Ato2d(obj);
+end
 
 %% save the results to log
 fprintf(flog, '[%s]\b', get_minute());

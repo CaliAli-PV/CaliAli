@@ -123,6 +123,10 @@ Names = [
     'F                  '   
     'Cnr                '  
     'PNRr               '  
+    'ind                '
+    'CaliAli_opt        '
+    'Spatial_stability  '
+    'Unstable_components'
     ];              %PV
 
 [m,n] = size(Names);
@@ -312,6 +316,10 @@ Values = [
     {'hals'}
     {false}
     {false}
+    {[]}  %PV
+    {[]}  %PV
+    {[]}  %PV
+    {[]}  %PV
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV

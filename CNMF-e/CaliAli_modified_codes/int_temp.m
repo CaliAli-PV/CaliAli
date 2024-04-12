@@ -48,7 +48,7 @@ HY = reshape(single(HY), d1*d2, []);
 %% PV Remove media in each session
 if length(F)>1
     t=0;
-    for i=1:size(F,1)
+    for i=1:numel(F)
         HY(:,t+1:t+F(i)) = HY(:,t+1:t+F(i))-median(HY(:,t+1:t+F(i)),2);
         t=F(i);
     end
@@ -56,9 +56,9 @@ else
     HY = bsxfun(@minus, HY, median(HY, 2));
 end
 if size(HY,2)>10000
-Sn=GetSn_fast(HY,1000,10,d1,d2);
+    Sn=GetSn_fast(HY,1000,10,d1,d2);
 else
- Sn=GetSn(HY);   
+    Sn=GetSn(HY);
 end
 %% Get PNR and CN PV
 if ~isempty(neuron.Cn)
@@ -81,48 +81,59 @@ seed_all=get_seeds(Cn,PNR,gSig,neuron.options.min_corr,neuron.options.min_pnr,Ma
 imagesc(Cn);drawnow;hold on;
 Cn_update(:,:,1)=Cn;
 while true
-fprintf('%2d seed remaining. \n', length(seed_all));
-seed=get_far_neighbors(seed_all,d1,d2,gSiz*1.5,Cn,PNR);
-[row,col] = ind2sub([d1,d2],seed);
-plot(col,row,'.r');drawnow;
+    fprintf('%2d seed remaining. \n', length(seed_all));
+    seed=get_far_neighbors(seed_all,d1,d2,gSiz*1.5,Cn,PNR);
+    [row,col] = ind2sub([d1,d2],seed);
+    plot(col,row,'.r');drawnow;
 
-seed_all(ismember(seed_all,seed))=[];
-Mask(seed)=0;
+    seed_all(ismember(seed_all,seed))=[];
+    Mask(seed)=0;
 
-[Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,d1,d2,gSiz);
-if length(Y_box)==0
-   break 
-end
-[a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron.options.spatial_constraints);
-[c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
-%% Filter a
-af=a;
-if n_enhanced==0
-parfor k=1:size(a,2)
- temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
- af{1,k}=temp(:);
-end
-end
-a=expand_A(a,ind_nhood,d1*d2);
-af=expand_A(af,ind_nhood,d1*d2);
-af(af<0)=0;
+    [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,d1,d2,gSiz);
+    if length(Y_box)==0
+        break
+    end
+    [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron.options.spatial_constraints,size(Y,2));
+    [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
+    %% Filter a
+    af=a;
+    if n_enhanced==0
+        parfor k=1:size(a,2)
+            if ~isempty(a{k})
+                temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
+                af{1,k}=temp(:);
+            else
+                af{1,k}=[];
+            end
+        end
+    end
+    a=expand_A(a,ind_nhood,d1*d2);
+    af=expand_A(af,ind_nhood,d1*d2);
+    af(af<0)=0;
 
-%% update video;
-if isa(Y,'uint8')
-    Y=Y-uint8(a*c);
-else
-    Y=Y-uint16(a*c);
-end
+    kill=sum(s,2)==0;
+    a(:,kill)=[];
+    af(:,kill)=[];
+    c(kill,:)=[];
+    c_raw(kill,:)=[];
+    s(kill,:)=[];
 
-HY=HY-single(af*c);
+    %% update video;
+    if isa(Y,'uint8')
+        Y=Y-uint8(a*c);
+    else
+        Y=Y-uint16(a*c);
+    end
 
-A=cat(2,A,a);
-C=cat(1,C,c);
-C_raw=cat(1,C_raw,c_raw);
-S=cat(1,S,s);
+    HY=HY-single(af*c);
 
-if isempty(seed_all)
-    break
-end
+    A=cat(2,A,a);
+    C=cat(1,C,c);
+    C_raw=cat(1,C_raw,c_raw);
+    S=cat(1,S,s);
+
+    if isempty(seed_all)
+        break
+    end
 
 end

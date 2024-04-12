@@ -7,7 +7,7 @@ function move_dependencies_to_folder(fList,outPath,NonExist_only)
 % 1) remove your current path, then add the path including all inputs scripts:
 
 % 2) use this function to get dependencies:
-% [fList,pList] = matlab.codetools.requiredFilesAndProducts('get_BS_neuron_enhance');
+% [fList,pList] = matlab.codetools.requiredFilesAndProducts('heatmap');
 % fList=fList';
 
 %3)  set path to default, then add the destination path :

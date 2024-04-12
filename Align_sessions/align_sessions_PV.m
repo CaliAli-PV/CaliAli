@@ -1,4 +1,4 @@
-function align_sessions_PV(sf,gSig,n_enhanced,theFiles)
+function align_sessions_PV(sf,gSig,n_enhanced,theFiles,BVz)
 % align_sessions_PV(10);
 if ~exist('gSig','var')
     gSig = 2.5;
@@ -10,7 +10,14 @@ end
 
 if ~exist('theFiles','var')
     theFiles = uipickfiles('FilterSpec','*.h5');
+elseif isempty(theFiles)
+    theFiles = uipickfiles('FilterSpec','*.h5');
 end
+
+if ~exist('BVz','var')
+BVz=[0.6*gSig,0.9*gSig];
+end
+
 
 [filepath,name]=fileparts(theFiles{end});
 out=strcat(filepath,'\',name,'_Aligned','.h5');
@@ -19,15 +26,28 @@ if ~isfile(out)
     %% load all video files
     [Vid,F]=load_data(theFiles);
     %% Calculate projections
-    [P1,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat);
+    [P1,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat,BVz);
     %% Align videos by translations
     fprintf(1, 'Aligning video by translation ...\n');
     [Vid,P2]=apply_translations(Vid,P1);
     %% Align videos by Log-Demon registration
     fprintf(1, 'Calculating non-rigid aligments...\n');
     [shifts,P3]=get_shifts_alignment(P2);
-    P=table(P1,P2,P3,'VariableNames',{'Original','Translations','Trans + Non-Rigid'});
-    P=BV_gray2RGB(P);
+    %% get alignment score
+
+    v=P3.(2){1,1};
+    m=P3.(1){1,1};
+    Global_score=get_blood_vessel_corr_score(v);
+    fprintf(1, 'Blood-vessel similarity score: %1.3f \n',Global_score);
+    if Global_score<0.5
+        fprintf(1, 'Blood-vessel similarity score is too low! \n Results may not be accurate! \n ');
+        fprintf(1, 'Aligning utilizing only neurons data \n ');
+        [Vid,F]=load_data(theFiles);
+        [P1,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat);
+        P1.(2){1,1}=P1.(3){1,1};
+        [Vid,P2]=apply_translations(Vid,P1);
+        [shifts,P3]=get_shifts_alignment(P2);
+    end
 
     %% Apply Shifts
     fprintf(1, 'Applying shifts to video...\n');
@@ -37,19 +57,10 @@ if ~isfile(out)
     if isa(Vid{1},'uint8')
         Mr=v2uint8(Mr);
     end
-    %% get alignment score
 
-    v=P.(3)(1,:).(2){1,1};
-    m=P.(3)(1,:).(1){1,1};
-
-    Global_score=get_blood_vessel_corr_score(v);
-    Local_score=get_local_corr_Vf(v,m);
-    usable_area=mean(Local_score(:)>0.465)*100;
-    fprintf(1, 'Blood-vessel similarity score: %1.3f \n',Global_score);
-    fprintf(1, 'Area with stable blood vessel is: %1.3f%% \n',usable_area);
-    if Global_score<0.4
-        fprintf(1, 'Blood-vessel similarity score is too low! \n Results may not be accurate! \n ');
-    end
+    %%
+    P=table(P1,P2,P3,'VariableNames',{'Original','Translations','Trans + Non-Rigid'});
+    P=BV_gray2RGB(P);
 
     %% save Aligned video;
     fprintf(1, 'Saving Aligned Video...\n');
@@ -58,9 +69,9 @@ if ~isfile(out)
     PNR=max(P3.PNR{1,1},[],3);
 
     if ~isfile(out_mat)
-        save(out_mat,'P','Global_score','Local_score','Cn','PNR','F','n_enhanced');
+        save(out_mat,'P','Global_score','Cn','PNR','F','n_enhanced');
     else
-        save(out_mat,'P','Global_score','Local_score','Cn','PNR','F','n_enhanced','-append');
+        save(out_mat,'P','Global_score','Cn','PNR','F','n_enhanced','-append');
     end
 
 else
@@ -125,7 +136,7 @@ end
 
 
 %%====================================
-function [P,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat)
+function [P,Vid]=calculate_projections(Vid,sf,gSig,n_enhanced,out_mat,BVz)
 
 if isfile(out_mat)
     m=load(out_mat);
@@ -144,7 +155,7 @@ if chk==0
     for i=1:size(Vid,2)
         temp=Vid{i};
         M(:,:,i)=median(Vid{i},3);
-        Vf(:,:,i)=adapthisteq(vesselness_PV(M(:,:,i),0,(0.6:0.032:0.9).*gSig),'Distribution','exponential');
+        Vf(:,:,i)=adapthisteq(vesselness_PV(M(:,:,i),0,linspace(BVz(1),BVz(2),10)),'Distribution','exponential');
         temp=det_video(temp,sf,n_enhanced,gSig);
         k=k+1;
         [~,Cn(:,:,i),PNR(:,:,i)]=get_PNR_coor_greedy_PV(temp,gSig,[],[],n_enhanced);

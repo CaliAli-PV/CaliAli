@@ -1,6 +1,6 @@
-function [Mr,VF]=motion_correct_PV(V)
+function [Mr,VF]=motion_correct_PV(V,opt)
 
-VF=vesselness_PV(V,1,0.5:0.5:2);
+VF=vesselness_PV(V,1,linspace(opt.BVz(1),opt.BVz(2),5));
 % VF=uint8(VF*2^8);
 [d1,d2,~] = size(VF);
 

@@ -1,10 +1,11 @@
-function MC_Batch(theFiles,do_nr)
+function MC_Batch(theFiles,do_nr,varargin)
+
 if ~exist('theFiles','var')
     theFiles = uipickfiles('FilterSpec','*.h5');
 elseif isempty(theFiles)
     theFiles = uipickfiles('FilterSpec','*.h5');
 end
-
+opt=int_var(cat(2,varargin,{'theFiles',theFiles}));
 if ~exist('do_nr','var')
     do_nr = 1;
 end
@@ -17,10 +18,10 @@ for k=1:length(theFiles)
     out=strcat(filepath,'\',name,'_mc','.h5');
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
-        [V,~]=motion_correct_PV(V+1); %% Rigid MC
+        [V,~]=motion_correct_PV(V+1,opt); %% Rigid MC
         if do_nr
 %         Mr=MC_NR(V);
-            Mr=MC_NR_not_used_testing(V);
+            Mr=MC_NR_not_used_testing(V,[],opt);
         else
             Mr=V;
         end

@@ -10,8 +10,8 @@ else
   T(isnan(T))=nanval; 
  N=max(T==nanval,[],3);      
 end
-
-[~,~, ~, M] = FindLargestRectangles(1-N);
+N=1-N;
+[~,~, ~, M] = FindLargestRectangles(N);
 
 Mask=M(2:end-1,2:end-1);
 f1=max(sum(M,1));

@@ -10,9 +10,14 @@ PNR_ind = ind & (PNR>=min_PNR & Mask) ;
 
 seed = Cn_ind & PNR_ind;
 
-seed=find(seed);
+seed=find(double(seed(:)));
 [~,I]= sort(v_max(seed));
 seed=seed(I);
+
+        % [d1,d2]=size(Cn);
+        % [row,col] = ind2sub([d1,d2],seed);
+        %close all;imagesc(v_max);hold on;
+        % plot(col,row,'.r');drawnow;
 
 
 

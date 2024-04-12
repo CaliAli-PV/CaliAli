@@ -1,15 +1,16 @@
-function obj=update_spatial_CaliAli(obj, use_parallel,max_frame)
-
-div=ceil(size(obj.C_raw,2)./max_frame);
-batch=round(linspace(0,size(obj.C_raw,2),div+1));
+function obj=update_spatial_CaliAli(obj, use_parallel)
+fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
+batch=[0,cumsum(obj.options.F)];
 A_temp=obj.A.*0;
-for i=1:div
+div=length(batch)-1;
+obj.A_prev=obj.A;
+for i=progress(1:div)
     out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
-    Ca(:,i)=mean(obj.C(:,batch(i)+1:batch(i+1)),2);
+    Ca(:,i)=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     %      A=max(cat(3,full(A),full(out_A)),[],3);
     A_temp=cat(3,full(A_temp),full(out_A));
 end
-
+Ca=Ca.^2;
 Ca=Ca./sum(Ca,2);
 for i=1:size(Ca,1)
     A(:,i)=sum(squeeze(A_temp(:,i,2:end)).*Ca(i,:),2);
@@ -60,7 +61,7 @@ try
 catch
     error('No data file selected');
 end
-fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
+
 % frames to be loaded
 frame_range = max_frame;
 T = diff(frame_range) + 1;
@@ -143,7 +144,7 @@ if use_parallel
         % no neurons, no need to update sn
         flag_neuron = with_neuron{mpatch};
         if (~flag_neuron) && (~update_sn)
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+            % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         % prepare for updating model variables
@@ -222,7 +223,7 @@ if use_parallel
             sn_new{mpatch} = reshape(sn_patch, nr, nc);
         end
         if ~flag_neuron
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+            % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A_patch(ind_patch, :);
@@ -241,7 +242,7 @@ if use_parallel
         end
         %         A_new{mpatch} = tmp_obj.post_process_spatial(reshape(full(temp), nr, nc, []));
         A_new{mpatch} = full(temp);
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+        % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 else
     for mpatch=1:(nr_patch*nc_patch)
@@ -250,7 +251,7 @@ else
         % no neurons, no need to update sn
         flag_neuron = with_neuron{mpatch};
         if (~flag_neuron) && (~update_sn)
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+            % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         % prepare for updating model variables
@@ -323,7 +324,6 @@ else
             sn_new{mpatch} = reshape(sn_patch, nr, nc);
         end
         if ~flag_neuron
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A_patch(ind_patch, :);
@@ -342,14 +342,12 @@ else
         end
         %         A_new{mpatch} = tmp_obj.post_process_spatial(reshape(full(temp), nr, nc, []));
         A_new{mpatch} = full(temp);
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 end
 
 %% collect results
 K = size(obj.A, 2);
 A_ = zeros(d1, d2, K);
-fprintf('Collect results from all small patches...\n');
 for mpatch=1:(nr_patch*nc_patch)
     A_patch = A_new{mpatch};
     tmp_pos = patch_pos{mpatch};
@@ -366,24 +364,17 @@ if update_sn
     obj.P.sn = cell2mat(sn_new);
 end
 %% post-process results
-fprintf('Post-process spatial components of all neurons...\n');
 out_A = obj.post_process_spatial(obj.reshape(A_new, 2));
 % obj.A = A_new;
 
-fprintf('Done!\n');
-
 %% upadte b0
 if strcmpi(bg_model, 'ring')
-    fprintf('Update the constant baselines for all pixels..\n');
     obj.b0_new = cell2mat(obj.P.Ymean)-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
-    fprintf('Done!\n');
 end
 
 
 %% save the results to log
 
-fprintf(flog, '[%s]\b', get_minute());
-fprintf(flog, 'Finished updating spatial components.\n');
 if obj.options.save_intermediate
     spatial.A = obj.A;
     spatial.ids = obj.ids;
@@ -391,7 +382,6 @@ if obj.options.save_intermediate
     tmp_str = get_date();
     tmp_str=strrep(tmp_str, '-', '_');
     eval(sprintf('log_data.spatial_%s = spatial;', tmp_str));
-    fprintf(flog, '\tThe results were saved as intermediate_results.spatial_%s\n\n', tmp_str);
 end
 fclose(flog);
 end

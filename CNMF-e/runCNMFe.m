@@ -15,9 +15,9 @@ nam = neuron.select_data(nam);  %if nam is [], then select data interactively
 %% parameters
 % -------------------------    COMPUTATION    -------------------------  %
 pars_envs = struct('memory_size_to_use', 256, ...   % GB, memory space you allow to use in MATLAB
-    'memory_size_per_patch', 32, ...   % GB, space for loading data within one patch
+    'memory_size_per_patch', 16, ...   % GB, space for loading data within one patch
     'patch_dims', [64, 64]);  % Patch dimensions
-max_frame=30001;
+
 % -------------------------      SPATIAL      -------------------------  %
 % pixel, gaussian width of a gaussian kernel for filtering the data. usualy 1/3 of neuron diameter
 gSiz = gSig*4;          % pixel, neuron diameter
@@ -25,7 +25,7 @@ ssub = 1;           % spatial downsampling factor
 with_dendrites = true;   % with dendrites or not
 if with_dendrites
     % determine the search locations by dilating the current neuron shapes
-    updateA_search_method = 'dilate';  %#ok<UNRCH>
+    updateA_search_method = 'dilate';  
     updateA_bSiz = 5;
     updateA_dist = neuron.options.dist;
 else
@@ -43,7 +43,7 @@ tsub = 1;           % temporal downsampling factor
 deconv_flag = true;     % run deconvolution or not
 deconv_options = struct('type', 'ar1', ... % model of the calcium traces. {'ar1', 'ar2'}
     'method', 'foopsi', ... % method for running deconvolution {'foopsi', 'constrained', 'thresholded'}
-    'smin', -3, ...         % minimum spike size. When the value is negative, the actual threshold is abs(smin)*noise level
+    'smin', -5, ...         % minimum spike size. When the value is negative, the actual threshold is abs(smin)*noise level
     'optimize_pars', true, ...  % optimize AR coefficients
     'optimize_b', true, ...% optimize the baseline);
     'max_tau', 100);    % maximum decay time (unit: frame);
@@ -124,8 +124,8 @@ if exist(m_data, 'file')
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
 
-    neuron.n_enhanced=m.n_enhanced;
-
+    neuron.n_enhanced=m.opt.n_enhanced;
+    neuron.CaliAli_opt=m.opt;
     if isfield(m,'Mask')
         neuron.Mask=full(m.Mask);
     else
@@ -145,6 +145,9 @@ else
 end
 neuron.options.Cn=neuron.Cn;neuron.options.PNR=neuron.PNR;
 neuron.options.Mask=neuron.Mask;
+neuron.options.ind=neuron.ind;
+
+%% adjust number of sessions for dynamic spatial
 
 %% initialize neurons from the video data within a selected temporal range
 tic
@@ -160,9 +163,9 @@ A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10
     % estimate the background components
-    neuron=update_background_CaliAli(neuron, use_parallel,max_frame);
-    neuron=update_spatial_CaliAli(neuron, use_parallel,max_frame);
-    neuron=update_temporal_CaliAli(neuron, use_parallel,max_frame);
+    neuron=CNMF_CaliAli_update('Background',neuron, use_parallel);
+    neuron=CNMF_CaliAli_update('Spatial',neuron, use_parallel);
+    neuron=CNMF_CaliAli_update('Temporal',neuron, use_parallel);
     %% post-process the results automatically
     neuron.remove_false_positives();
     neuron.merge_neurons_dist_corr(show_merge);
@@ -170,19 +173,19 @@ for loop=1:10
     neuron.merge_high_corr(show_merge, [0.9, -inf, -inf]);
     try
         dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+        dis
     catch
-        weird_bug=1;
+        weird_bug=1
     end
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
-    dis
+
     if dis<0.05
         break
     end
 end    %% save the workspace for future analysis
-neuron=update_residual_Cn_PNR(neuron);
+neuron=update_residual_Cn_PNR_batch(neuron);
 save_workspace(neuron);
-
 
 
 
@@ -198,7 +201,6 @@ neuron.orderROIs('snr');
 save_workspace(neuron);
 
 %% show neuron contours
-neuron.show_contours(0.6, [], neuron.Cn, 0); %PNR*CORR
 fclose('all');
 end
 
@@ -210,9 +212,10 @@ end
 %   neuron.orderROIs('sparsity_spatial');   % order neurons in different ways {'snr', 'decay_time', 'mean', 'circularity','sparsity_spatial','sparsity_temporal','pnr'}
 %   neuron.viewNeurons([], neuron.C_raw);
 %   neuron.viewNeurons([10,13,20], neuron.C_raw);
-%% To save results in a new path run these lines a choose the new folder:
-%   neuron.P.log_file=strcat(uigetdir,filesep,'log_',date,'.txt');
-%   neuron.P.log_folder=strcat(uigetdir,'\'); %update the folder
+%% To save results in a new path run these lines a choose the new 'source_extraction' folder:
+
+% neuron=update_folder_path(neuron);
+
 %   cnmfe_path = neuron.save_workspace();
 %% To visualize neurons contours:
 %   neuron.Coor=[]
@@ -234,9 +237,13 @@ end
 % neuron.merge_high_corr(1, [0.1, 0.3, -inf]);
 
 
-% ix=postprocessing_app(neuron)
-%  neuron.viewNeurons(find(ix), neuron.C_raw);
+% ix=postprocessing_app(neuron);
+% neuron.viewNeurons(find(ix), neuron.C_raw);
+% neuron.delete(ix);
 % save_workspace(neuron);
+%% update residuals
+% neuron=manually_update_residuals(neuron,use_parallel);
+
 
 
 

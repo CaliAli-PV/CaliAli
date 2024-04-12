@@ -4,11 +4,11 @@ outpath = [];
 end
 
 if ~exist('ds_f','var')
-ds_f = 2;
+ds_f = 1;
 end
 
 if ~exist('theFiles','var')
-    theFiles = uipickfiles('REFilter','\.isxd$');
+    theFiles = uipickfiles('REFilter','\.avi$');
 end
 
 
@@ -27,5 +27,5 @@ for k=1:length(theFiles)
     for i=progress(1:size(temp,3))
         vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
     end
-    saveash5(v2uint16(vid),out);  
+    saveash5(v2uint8(vid),out);  
 end

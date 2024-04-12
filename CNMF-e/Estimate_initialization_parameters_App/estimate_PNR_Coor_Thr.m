@@ -1,4 +1,4 @@
-function [pnr_out,cn_out,mask]=estimate_PNR_Coor_Thr(Gsig,inF,min_corr,min_pnr);
+function [pnr_out,cn_out,mask,ind]=estimate_PNR_Coor_Thr(Gsig,inF,min_corr,min_pnr)
 
 % estimate_PNR_Coor_Thr(4)
 if ~exist('Gsig','var')
@@ -38,6 +38,7 @@ while app.done == 0  % polling
     pause(0.05);
 end
 mask=app.mask;
+ind=app.tmp_ind;
 pnr_out=app.PNRSpinner.Value;
 cn_out=app.corrSpinner.Value;% get the values set in the parameter window
 delete(app);

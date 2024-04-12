@@ -1,8 +1,8 @@
 function Full_pipeline_single_file_avi()
 
 %% Parameters
-ds=1;  % downsampling factor;
-sf=30;  %sampling frequency;
+ds=2;  % downsampling factor;
+sf=10;  %sampling frequency;
 gSiz=2.5;  % filtering size
 ef=1;  % Min1pipe robust background extraction
 

@@ -1,9 +1,8 @@
 function mc=get_local_corr_Vf(Vf,M)
-sz=25;
 [d1,d2,d3]=size(Vf);
 M=mean(M,3);
 b=nchoosek(1:d3,2);
-
+SE = strel("disk",3);
 for i=1:size(b,1)
     im1=Vf(:,:,b(i,1));
     im2=Vf(:,:,b(i,2));
@@ -11,7 +10,9 @@ for i=1:size(b,1)
     im2=mat2gray(im2)+randn(d1,d2)/1000;
     im1 = imhistmatch(im1,max(cat(3,im1,im2),[],3));
     im2 = imhistmatch(im2,max(cat(3,im1,im2),[],3));
-    [~,out]=ssim(im1,im2,'Exponents',[0 0 1],'Radius',sz,'RegularizationConstants',[0,0,0]);
+    sim=medfilt2(im1.*im2);
+    dif_c=medfilt2(max(cat(3,im1.^2-im1.*im2,im2.^2-im1.*im2),[],3));
+    out=mat2gray(sim)-mat2gray(dif_c)+1;
     S(:,b(i,1),b(i,2))=out(:);
 end
 

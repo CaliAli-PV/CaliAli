@@ -1,16 +1,13 @@
-function out=MC_NR_not_used_testing(in,win)
+function out=MC_NR_not_used_testing(in,win,opt)
 % out=MC_NR_not_used_testing(V);
-if ~exist('win','var')
-    if size(in,3)>60
-        win=60;
-    else
-        win=size(in,3);
-    end
+if ~exist('win', 'var')
+    win = min(60, size(in, 3));
+elseif isempty(win)
+    win = min(60, size(in, 3));
 end
-
 %% Get Vesselness-filtered image
 % VF=in2VF(in);
-[X]=get_BS_neuron_enhance(in);
+[X]=get_BS_neuron_enhance(in,opt);
 %% Calculatign Shifts
 D=get_alignments(X+1,win);
 
@@ -62,13 +59,13 @@ for i=1:size(x,2)-1
 end
 
 plotme=0;
-opt{1,1}  = struct('niter',25, 'sigma_fluid',1,...
+opt{1,1}  = struct('stop_criterium',0.001,'imagepad',1.2,'niter',25, 'sigma_fluid',1,...
     'sigma_diffusion',5, 'sigma_i',1,...
     'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
-opt{2,1} = struct('niter',25, 'sigma_fluid',1,...
+opt{2,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',25, 'sigma_fluid',1,...
     'sigma_diffusion',5, 'sigma_i',1,...
     'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
-opt{3,1} = struct('niter',10, 'sigma_fluid',3,...
+opt{3,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fluid',3,...
     'sigma_diffusion',2, 'sigma_i',1,...
     'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
 
@@ -126,7 +123,7 @@ end
 end
 
 function t=get_score(V);
-opt = struct('niter',5, 'sigma_fluid',1,...
+opt = struct('stop_criterium',0.001,'imagepad',1.2,'niter',5, 'sigma_fluid',1,...
     'sigma_diffusion',5, 'sigma_i',1,...
     'sigma_x',2, 'do_display',0, 'do_plotenergy',0);
 

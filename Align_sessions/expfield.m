@@ -10,6 +10,6 @@ function [vx,vy] = expfield(vx, vy)
     vy = vy * 2^-n;
     % square it n times
     for i=1:n
-        [vx,vy] = compose(vx,vy, vx,vy);
+        [vx,vy] = compose_demon(vx,vy, vx,vy);
     end
 end

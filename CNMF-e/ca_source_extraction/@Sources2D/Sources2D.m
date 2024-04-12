@@ -10,6 +10,7 @@ classdef Sources2D < handle
     properties
         % spatial
         A;          % spatial components of neurons
+        A_batch;
         A_del;      %PV
         A_prev;     % previous estimation of A
         % temporal
@@ -61,9 +62,12 @@ classdef Sources2D < handle
         Cn_all; % Modification done by PV
         Mask  % Modification done by PV
         n_enhanced;% Modification done by PV
-        Cnr
-        PNRr
-
+        Cnr;% Modification done by PV
+        PNRr ;% Modification done by PV
+        ind ;% Modification done by PV
+        CaliAli_opt;% Modification done by PV
+        Spatial_stability;
+        Unstable_components;
     end
     
     %% methods
@@ -86,18 +90,6 @@ classdef Sources2D < handle
             obj.options = CNMFSetParms(obj.options, varargin{:});
         end
 
-        %% For scout... Elminate in the future
-        function updateCentroid(obj)
-            obj.centroid=[];
-            for i=1:size(obj.A,2)
-                curr_centroid=calculateCentroid(obj.A(:,i),obj.imageSize(1),obj.imageSize(2));
-                obj.centroid=[obj.centroid;curr_centroid];
-
-            end
-            centroid=obj.centroid;
-            obj.centroid(:,2)=centroid(:,1);
-            obj.centroid(:,1)=centroid(:,2);
-        end
 
         %------------------------------------------------------------------PREPROCESSING-------%
         %% data preprocessing
@@ -288,7 +280,7 @@ classdef Sources2D < handle
         end
         
         %% distribute data and be ready to run batch mode source extraction
-        function getReady_batch(obj, pars_envs, log_folder)
+        function getReady_batch(obj, pars_envs, batch_frames)
             %% parameters for scaling things
             if ~exist('pars_envs', 'var') || isempty(pars_envs)
                 pars_envs = struct('memory_size_to_use', 4, ...   % GB, memory space you allow to use in MATLAB
@@ -296,12 +288,7 @@ classdef Sources2D < handle
                     'patch_dims', [64, 64], ...  %GB, patch size
                     'batch_frames', []);       % number of frames per batch
             end
-            batch_frames = pars_envs.batch_frames;
-            if ~exist('log_folder', 'var')||isempty(log_folder)||(~exist(log_folder, 'dir'))
-                obj.P.log_folder = [cd(), filesep];
-            else
-                obj.P.log_folder = log_folder;
-            end
+
             %% distribute all files
             nams = unique(obj.file);
             obj.file = nams;
@@ -818,10 +805,13 @@ classdef Sources2D < handle
                 end
                 fclose(flog);
             end
-            
-            obj.A_del=[obj.A_del,obj.A(:, ind)];
+            obj.A=full(obj.A);
+            obj.A_del=sparse(squeeze(cat(2,obj.A_del,obj.A(:, ind,:))));
             obj.C_del=[obj.C_del;obj.C(ind, :)];
             obj.A(:, ind) = [];
+            if ~isempty(obj.A_batch)
+                obj.A_batch(:, ind,:) = [];
+            end
             obj.C(ind, :) = [];
             if ~isempty(obj.S)
                 try obj.S(ind, :) = []; catch; end
@@ -1710,9 +1700,15 @@ classdef Sources2D < handle
             if ~exist('min_pnr', 'var') || isempty(min_pnr)
                 min_pnr = 3;
             end
-            A_ = obj.A;
-            %             C_ = obj.C_;
             S_ = obj.S;
+            if size(obj.A,3)>1
+                weights=get_weights_spatial(obj);
+                for i=1:size(weights,1)
+                    A_(:,i)=sum(squeeze(obj.A(:,i,1:end)).*weights(i,:),2);
+                end
+            else
+            A_=obj.A;
+            end
             K = size(A_, 2);
             tags_ = zeros(K, 1, 'like', uint16(0));
             min_pixel = obj.options.min_pixel;
@@ -1831,7 +1827,7 @@ classdef Sources2D < handle
             if exist('original_logfile', 'var')
                 obj.P.log_file = original_logfile;
             end
-            evalin('caller', sprintf('save(''%s'', ''max_frame'',''merge_thr_tempospatial'', ''neuron'', ''show_*'', ''use_parallel'', ''with_*'', ''-v7.3''); ', file_path)); %% modified by PV
+            evalin('caller', sprintf('save(''%s'',''merge_thr_tempospatial'', ''neuron'', ''show_*'', ''use_parallel'', ''with_*'', ''-v7.3''); ', file_path)); %% modified by PV
             try
                             log_file = obj.P.log_file;
                 fp = fopen(log_file, 'a');
@@ -1909,7 +1905,9 @@ classdef Sources2D < handle
         end
         %% compress A, S and W
         function compress_results(obj)
+            if size(obj.A,3)<2
             obj.A = sparse(obj.A);
+            end
             obj.S = sparse(obj.S);
             if ~iscell(obj.W)
                 obj.W = sparse(obj.W);
@@ -1951,7 +1949,11 @@ classdef Sources2D < handle
         %% convert Sources2D object to a struct variable
         function neuron = obj2struct(obj, ind)
             if ~exist('ind', 'var') || isempty(ind)
+                if size(obj.A,3)<2
                 neuron.A = sparse(obj.A);
+                else
+                neuron.A = obj.A;
+                end
                 neuron.C = obj.C;
                 neuron.C_raw = obj.C_raw;
                 neuron.S = sparse(obj.S);

@@ -1,11 +1,10 @@
-function obj=update_temporal_CaliAli(obj, use_parallel, max_frame)
-
-div=ceil(size(obj.C_raw,2)./max_frame);
-batch=round(linspace(0,size(obj.C_raw,2),div+1));
-
+function obj=update_temporal_CaliAli(obj, use_parallel)
+fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
+batch=[0,cumsum(obj.options.F)];
 C_raw=[];
 
-for i=1:div
+div=length(batch)-1;
+for i=progress(1:div)
     C_raw_temp =update_temporal_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
     C_raw=catpad(2,C_raw,C_raw_temp);
 end
@@ -61,7 +60,7 @@ try
 catch
     error('No data file selected');
 end
-fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
+% fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
 
 % frames to be loaded
 frame_range = max_frame;
@@ -146,7 +145,7 @@ if use_parallel
         C_patch = C{mpatch};                % previous estimation of neural activity
         
         if isempty(C_patch)
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+            % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A{mpatch};
@@ -211,7 +210,7 @@ if use_parallel
         end
         
         
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+        % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 else
     for mpatch=1:(nr_patch*nc_patch)
@@ -227,7 +226,7 @@ else
         C_patch = C{mpatch};                % previous estimation of neural activity
         
         if isempty(C_patch)
-            fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+            % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A{mpatch};
@@ -287,14 +286,14 @@ else
             AA{mpatch}= sum(A_patch(ind_patch,:).^2, 1);
         end
         
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
+        % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 end
 %% collect results
 K = size(obj.C, 1);
 C_new = zeros(K, T);
 aa = zeros(K, 1);
-fprintf('Collect results from all small patches...\n');
+% fprintf('Collect results from all small patches...\n');
 for mpatch=1:(nr_patch*nc_patch)
     C_raw_patch = C_raw_new{mpatch};
     ind_patch = ind_neurons{mpatch};
@@ -311,14 +310,14 @@ C_raw = bsxfun(@times, C_new, 1./aa);
 
 %% upadte b0
 if strcmpi(bg_model, 'ring')
-    fprintf('Update the constant baselines for all pixels..\n');
+    % fprintf('Update the constant baselines for all pixels..\n');
     obj.b0_new = cell2mat(obj.P.Ymean)-obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
-    fprintf('Done!\n');
+    % fprintf('Done!\n');
 end
 
 %% save the results to log
-fprintf(flog, '[%s]\b', get_minute());
-fprintf(flog, 'Finished updating temporal components.\n');
+% fprintf(flog, '[%s]\b', get_minute());
+% fprintf(flog, 'Finished updating temporal components.\n');
 if obj.options.save_intermediate
     temporal.C_raw = obj.C_raw;
     temporal.ids = obj.ids;
@@ -329,7 +328,7 @@ if obj.options.save_intermediate
     tmp_str = get_date();
     tmp_str=strrep(tmp_str, '-', '_');
     eval(sprintf('log_data.temporal_%s = temporal;', tmp_str));
-    fprintf(flog, '\tThe results were saved as intermediate_results.temporal_%s\n\n', tmp_str);
+    % fprintf(flog, '\tThe results were saved as intermediate_results.temporal_%s\n\n', tmp_str);
 end
 fclose(flog);
 end

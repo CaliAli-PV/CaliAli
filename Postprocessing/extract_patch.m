@@ -78,7 +78,7 @@ for i = 1:K
     try
     A_temp = A_temp(int_x,int_y,int_z);
     catch
-        dummy=1
+     A_temp = zeros(patch_size(1,2));
     end
     if padding
         A_temp = padarray(A_temp,[pad_pre_x,pad_pre_y],0,'pre');

@@ -1,12 +1,14 @@
 
-function [Mp,D]=register(F,M,opt)
+function [Mp,D]=register(F,M,opt,nlevel)
 %% Parameters
 if ~exist('opt','var')
 opt = struct('niter',5, 'sigma_fluid',1,...
     'sigma_diffusion',10, 'sigma_i',0.1,...
     'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
 end
+if ~exist('nlevel','var')
 nlevel=3;
+end
 
 
 % Translate

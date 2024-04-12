@@ -41,7 +41,8 @@ if isempty(outpath)
 else
     out=strcat(outpath,'\',name,'_ds','.h5');
 end
-
+f=inputMovieIsx.get_frame_data(0);
+vid=zeros(size(f,1)/ds_f,size(f,2)/ds_f,nFrames,class(f));
 for i=progress(1:nFrames)
     f=inputMovieIsx.get_frame_data(i-1);
     vid(:,:,i)=imresize(f,1/ds_f,'bilinear');
