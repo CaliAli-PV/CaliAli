@@ -1,68 +1,28 @@
-# Homepage 2
+# Welcome to CaliAli Documentation
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+## Introduction
 
-## Code Annotation Examples
+- [Overview](Intro.md)
+	- [About CaliAli](Intro.md#about)
+	- [Key Features](Intro.md#key)
 
-### Codeblocks
+- [Usage](Usage.md)
+	- [System Requirement](Usage.md#requirement)
+	- [Installation](Usage.md#installation)
 
-Some `code` goes here.
+## Pipeline step-by-step
 
-### Plain codeblock
+- [Preprocessing](Prep.md)
+	- [Downsampling](Prep.md#downsampling)
+	- [Motion correction](Prep.md#mc)
+- [Inter-session Alignment](alignment.md)
+	- [Detrending and noise scaling](alignment.md#detrend)
+	- [Calculation of projections](alignment.md#projections)
+	- [Calculation of displacement fields](alignment.md#displacement)
+	- [Evaluating aligment performance](alignment.md#evaluate)
 
-A plain codeblock:
+<iframe width="640" height="360" src="https://www.youtube.com/watch?v=4IJI6soiQhI" frameborder="0" allowfullscreen></iframe>
 
-```
-Some code here
-def myfunction()
-// some comment
-```
 
-#### Code for a specific language
 
-Some more code with the `py` at the start:
 
-``` py
-import tensorflow as tf
-def whatever()
-```
-
-#### With a title
-
-``` py title="bubble_sort.py"
-def bubble_sort(items):
-    for i in range(len(items)):
-        for j in range(len(items) - 1 - i):
-            if items[j] > items[j + 1]:
-                items[j], items[j + 1] = items[j + 1], items[j]
-```
-
-#### With line numbers
-
-``` py linenums="1"
-def bubble_sort(items):
-    for i in range(len(items)):
-        for j in range(len(items) - 1 - i):
-            if items[j] > items[j + 1]:
-                items[j], items[j + 1] = items[j + 1], items[j]
-```
-
-#### Highlighting lines
-
-``` py hl_lines="2 3"
-def bubble_sort(items):
-    for i in range(len(items)):
-        for j in range(len(items) - 1 - i):
-            if items[j] > items[j + 1]:
-                items[j], items[j + 1] = items[j + 1], items[j]
-```
-
-## Icons and Emojs
-
-:smile: 
-
-:fontawesome-regular-face-laugh-wink:
-
-:fontawesome-brands-twitter:{ .twitter }
-
-:octicons-heart-fill-24:{ .heart }

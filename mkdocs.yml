@@ -1,5 +1,5 @@
-site_name: MkDocs YouTube Tutorial
-site_url: https://james-willett.github.io/mkdocs-material-youtube-tutorial/
+site_name: CaliAli
+site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 theme:
   name: material
   features:
@@ -26,16 +26,17 @@ theme:
         name: Switch to light mode    
       primary: teal
       accent: lime
+plugins:
+  - search
+  - mkdocs-video
 
 
 extra:
   social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/james-willett
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/TheJamesWillett
-    - icon: fontawesome/brands/linkedin
-      link: https://www.linkedin.com/in/willettjames/
+    - icon: fontawesome/brands/github
+      link: https://github.com/CaliAli-PV/CaliAli
+    - icon: fontawesome/solid/file-lines
+      link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -52,4 +53,4 @@ markdown_extensions:
   - attr_list
 
 copyright: |
-  &copy; 2023 <a href="https://github.com/james-willett"  target="_blank" rel="noopener">James Willett</a>
+  &copy; 2023 <a href="https://github.com/CaliAli-PV/CaliAli"  target="_blank" rel="noopener">Pablo Vergara</a>
