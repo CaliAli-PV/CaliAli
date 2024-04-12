@@ -51,6 +51,17 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.mark
   - attr_list
+  
+nav:
+
+      - Overview: Intro.md
+      - Usage: Usage.md
+      - Preprocessing and Demo Data: Prep.md
+      - Inter-session Alignment: alignment.md
+      - Signal Extraction from Concatenated Sessions: extraction.md
+      - Post Processing: Post.md
+      - Utilities: Utilities.md
+
 
 copyright: |
   &copy; 2023 <a href="https://github.com/CaliAli-PV/CaliAli"  target="_blank" rel="noopener">Pablo Vergara</a>
