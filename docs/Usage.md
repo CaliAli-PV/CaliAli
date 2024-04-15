@@ -27,4 +27,4 @@ Installation should take a few minutes:
 -	Add CaliAli to the MATLAB path.
 
 
-![Alt Text](files\Add_to_path.gif)
+![Alt Text](files/Add_to_path.gif)

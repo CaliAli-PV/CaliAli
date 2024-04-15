@@ -11,7 +11,7 @@ This document provides guidance for running each module using four video session
 
 
 ## CaliAli processing steps
-![CaliAli Pipeline](files\pipeline_summary.png)
+![CaliAli Pipeline](files/pipeline_summary.png)
 
 
 CaliAli requires executing the followin steps:
