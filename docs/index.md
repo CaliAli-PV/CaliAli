@@ -12,7 +12,9 @@
 
 ## Pipeline step-by-step
 
-- [Preprocessing and Demo data](Prep.md)
+- [Getting Started](demo_data.md)
+
+- [Downsampling and Motion correction](Prep.md)
 	- [Downsampling](Prep.md#downsampling)
 	- [Motion correction](Prep.md#mc)
 	
@@ -36,6 +38,7 @@
 	- [Monitoring extracted components](Post.md#monitor_app)
 	- [Sort spatial components](Post.md#spatial_sort)
 	- [Monitoring temporal components](ost.md#trace_plot)
+	- [Picking neurons from residual](ost.md#residual)
 	
 - [Utilities](Utilities.md)
 	- [Play video data in .h5 format](Utilities.md#video_app)

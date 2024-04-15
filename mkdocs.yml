@@ -29,7 +29,7 @@ theme:
 plugins:
   - search
   - mkdocs-video
-
+  
 
 extra:
   social:
@@ -49,14 +49,18 @@ markdown_extensions:
   - footnotes
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.mark
   - attr_list
+  - md_in_html
   
 nav:
 
-      - Overview: Intro.md
-      - Usage: Usage.md
-      - Preprocessing and Demo Data: Prep.md
+      - About CaliAli: Intro.md
+      - Installation and system requirements: Usage.md
+      - Getting started: demo_data.md
+      - Downsampling and Motion correction: Prep.md
       - Inter-session Alignment: alignment.md
       - Signal Extraction from Concatenated Sessions: extraction.md
       - Post Processing: Post.md
