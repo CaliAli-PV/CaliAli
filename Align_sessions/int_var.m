@@ -5,10 +5,11 @@ valid_v = @(x) isnumeric(x);
 addParameter(inp,'gSig',2.5,valid_v)     %Neuron Filter size. 2.5 default.
 addParameter(inp,'sf',10,valid_v)        %Frame rate. Defualt 10 fps
 addParameter(inp,'n_enhanced',1)         %MIN1PIE background substraciton. True is recommended. default True
-addParameter(inp,'theFiles','pickup')    %Path to the fill, "pickup" let the user choose 
+addParameter(inp,'theFiles','pickup')    %Cell array containing paths to the input video files, "pickup" let the user choose 
 addParameter(inp,'BVz',[])               %Size of blood vessels [min diameter max diameter] in pixels. 
                                          % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
-addParameter(inp,'dynamic_spatial',0)                                        
+%%                                         
+addParameter(inp,'dynamic_spatial',0)    % not currently in use                                   
 addParameter(inp,'datename',0)           % not currently in use
 %% Internal variables                                         
 addParameter(inp,'Mask',[])              % Used internally    

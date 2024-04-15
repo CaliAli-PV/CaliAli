@@ -1,9 +1,9 @@
 function out=MC_NR_not_used_testing(in,win,opt)
 % out=MC_NR_not_used_testing(V);
 if ~exist('win', 'var')
-    win = min(60, size(in, 3));
+    win = min(opt.sf*6, size(in, 3));
 elseif isempty(win)
-    win = min(60, size(in, 3));
+    win = min(opt.sf*6, size(in, 3));
 end
 %% Get Vesselness-filtered image
 % VF=in2VF(in);
