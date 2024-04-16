@@ -3,7 +3,6 @@ site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 theme:
   name: material
   features:
-    - navigation.tabs
     - navigation.sections
     - toc.integrate
     - navigation.top
@@ -29,6 +28,8 @@ theme:
 plugins:
   - search
   - mkdocs-video
+  - privacy
+  - offline
   
 
 extra:
@@ -54,15 +55,17 @@ markdown_extensions:
   - pymdownx.mark
   - attr_list
   - md_in_html
+  - tables
   
 nav:
 
+      - Index: index.md    
       - About CaliAli: Intro.md
       - Installation and system requirements: Usage.md
       - Getting started: demo_data.md
       - Downsampling and Motion correction: Prep.md
       - Inter-session Alignment: alignment.md
-      - Signal Extraction from Concatenated Sessions: extraction.md
+      - Calcium Signal extraction with CaliAli: extraction.md
       - Post Processing: Post.md
       - Utilities: Utilities.md
 

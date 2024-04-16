@@ -8,11 +8,13 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
 
 The function used to downsample video sessions would depende on the format of the source data:
 
+### Syntax:
+
 === ".avi"
 	``` matlab
 	Downsample_avi(ds_f, outpath, theFiles)	
 	```
-	This function reads AVI video files, downsamples them, and saves the resulting frames as an HDF5 file.
+	This function reads AVI video files, downsamples them, and saves the resulting frames as an HDF5 (.h5) file.
 	
 	!!! Warning "Windows Users: Please note the following system-specific instructions"
 		Matlab does not have the necessary codecs to process `.avi` files in windows. You need to download and install the [K-lite Codec Pack](https://codecguide.com/download_kl.htm) to be able to run this code.
@@ -21,13 +23,13 @@ The function used to downsample video sessions would depende on the format of th
 	``` matlab
 	Downsample_tiff(ds_f, outpath, theFiles)		
 	```
-	This function reads tiff video files, downsamples them, and saves the resulting frames as an HDF5 file.	
+	This function reads tiff video files, downsamples them, and saves the resulting frames as an HDF5 (.h5) file.	
 	
 === ".isdx (Inscopix)"
 	``` matlab
 	Downsample_inscopix(ds_f, outpath, theFiles)
 	```
-	This function reads Inscopix video files, downsamples them, and saves the resulting frames as an HDF5 file.
+	This function reads Inscopix video files, downsamples them, and saves the resulting frames as an HDF5 (.h5) file.
 	
 	!!! Warning "Inscopix Users: Please note the following system-specific instructions"
 		Note that this requires installing the Inscopix Data Processing software. 
@@ -54,9 +56,11 @@ files = {'video1.avi', 'video2.avi'};
 Downsample_avi(2, 'C:\Output', files);
 ```
 !!! Note
-	We recommend using a 4x factor for Inscopix videos and 2x for miniscope videos.
+	We recommend using a 4x factor for Inscopix videos and 2x for UCLA miniscope V4 videos.
 ![Downsampling](files/downsampling.gif)
 
+!!! Note
+	You can monitor `.h5` data using the following function: [Play video data in .h5 format](Utilities.md#video_app) 
 
 ## II. Motion Correction <a id="mc"></a>
 
@@ -71,12 +75,20 @@ The MC_Batch function processes a group of .h5 video files by applying motion co
 !!! Note
 	The output files will be suffixed with `_mc`. This suffix is necessary for subsequent modules to recognize files that have already undergone motion correction. 
 	
+!!! Note
+	The motion correction process is relatively slow. A 10-minute video would be processed in 10 minutes. (1).
+	{ .annotate }
+	
+	1.	~9 frames per second at a resolution of 300x300 pixels, using a 24-core processor (AMD Ryzen Threadripper 3960X). 
+		
+
+	
 ### Input Arguments:
 
 -	theFiles (optional): Cell array containing paths to video files. If `[]` is provided, a file picker dialog will open to select video files interactively.
 -	do_nr: (optional) Logical flag indicating whether to perform non-rigid motion correction (1 for yes, 0 for no). Default is 1.
 -	gSig: Neuron Filter size (aprox. 1/4 of the nueron size in px). Default is 2.5 .
--	sf:	Frame rate. Defualt is 10 fps.
+-	sf:	Frame rate. Default is 10 fps.
 -	BVz: Size of blood vessels [min diameter max diameter] in pixels. Defaults is [0.6*gSig, 0.9*gSig].
 
 ### Example Usage:	
@@ -93,6 +105,9 @@ MC_Batch([], 1,'BVz'[2,3]);
 ```
 ![Motion Correction](files/mc.gif)
 
+!!! danger "Important"
+	Ensure to visually inspect the motion-corrected video before proceeding to the next step. [Play video data in .h5 format](Utilities.md#video_app)
+
 === "FAQ"
 	Why do we need to specify frame rate? (1).
 	{ .annotate }
@@ -107,7 +122,7 @@ MC_Batch([], 1,'BVz'[2,3]);
 	Can I use other motion correction modules other than CaliAli? (1).
 	{ .annotate }
 	
-	1.	It depends. Certain motion correction algorithms, like NoRMCorre, may introduce vertical and horizontal artifacts at the concatenation point between patches, which can affect blood vessel extraction. Adjusting the BVz parameter may resolve these issues. If you are using different modules, remember to manually append the _mc suffix to the corrected files.
+	1.	Not recommended. Certain motion correction algorithms, like NoRMCorre, may introduce vertical and horizontal artifacts at the concatenation point between patches, which can affect blood vessel extraction. Adjusting the BVz parameter may resolve these issues. If you are using different modules, remember to manually append the _mc suffix to the corrected files. After motion correction, all sessions should maintain consistent XY dimensions. Any padding borders should be filled with zeros.
 
 
 

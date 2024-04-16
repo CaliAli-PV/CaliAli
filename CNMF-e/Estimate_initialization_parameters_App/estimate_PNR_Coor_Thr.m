@@ -14,12 +14,12 @@ min_pnr=7;
 end
 
 if ~exist('inF','var')
-warning('..._CnPNR.mat file does not exist!')
-warning('Run ''get_CnPNR_from_video(gSig)'' ')
-return
+    warning('..._CnPNR.mat file does not exist!')
+    warning('Run ''get_CnPNR_from_video(gSig)'' ')
+    return
 else
-[path,file]=fileparts(inF); 
-file2=[path,'\',file,'.mat'];
+    [path,file]=fileparts(inF);
+    file2=[path,'\',file,'.mat'];
 end
 m=load(file2);
 

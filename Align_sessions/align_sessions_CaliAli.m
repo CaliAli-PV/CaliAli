@@ -11,7 +11,7 @@ fprintf(1, 'Aligning video by translation ...\n');
 fprintf(1, 'Calculating non-rigid aligments...\n');
 [opt.shifts,P3,opt.NR_Mask]=get_shifts_alignment(P2);
 [opt.shifts_n,P4,opt.NR_Mask_n]=get_shifts_alignment_only_neurons(P3);
-P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','Trans + Non-Rigid','Neuron Final'});
+P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','Multi-Scale','Final'});
 P=BV_gray2RGB(P);
 [P,opt]=evaluate_BV(P,opt);
 apply_transformations(opt);
@@ -30,7 +30,7 @@ if opt.BV_score<2.7
     fprintf(1, 'Calculating non-rigid aligments...\n');
     [opt.shifts,P3,opt.NR_Mask]=get_shifts_alignment(P2);
     [opt.shifts_n,P4,opt.NR_Mask_n]=get_shifts_alignment_only_neurons(P3);
-    P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','Trans + Non-Rigid','Neuron Final'});
+    P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','Multi-Scale','Final'});
     P=BV_gray2RGB(P);
 end
 get_neuron_projections_correlations(P,3);

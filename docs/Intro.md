@@ -8,7 +8,7 @@ CaliAli is a comprehensive suite designed for extracting neural signals from one
 
 ## Key Features <a id="key-features"></a>
 
-CaliAli includes the following functions, which a:
+CaliAli includes the following functions:
 
 
 -	Downsampling Videos: Provides functions for downsampling videos.
