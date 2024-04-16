@@ -28,8 +28,6 @@ theme:
 plugins:
   - search
   - mkdocs-video
-  - privacy
-  - offline
   
 
 extra:
