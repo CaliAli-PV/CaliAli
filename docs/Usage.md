@@ -1,4 +1,4 @@
-# CaliAli Usage
+# Installation and system requirements
 
 ## System Requirement <a id="requirement"></a>
 CaliAli runs in `MATLAB` and requires the following toolbox:

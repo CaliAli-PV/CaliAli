@@ -107,6 +107,8 @@ MC_Batch([], 1,'BVz'[2,3]);
 
 !!! danger "Important"
 	Ensure to visually inspect the motion-corrected video before proceeding to the next step. [Play video data in .h5 format](Utilities.md#video_app)
+	
+After finishing downsampling and motion correction you can proceed to [Inter-session Alignment](alignment.md)
 
 === "FAQ"
 	Why do we need to specify frame rate? (1).

@@ -6,7 +6,7 @@ CaliAli is a comprehensive suite designed for extracting neural signals from one
 
 ![CaliAli Pipeline](files/pipeline_summary.png)
 
-## Key Features <a id="key-features"></a>
+## Key Features <a id="key"></a>
 
 CaliAli includes the following functions:
 

@@ -144,6 +144,7 @@ implay(mat2gray(P.(4)(1,:).(3){1,1}));
 !!! danger "Important"
 	Please visually verify that sessions are correctly aligned. If you detect noticable displacement in the field of view it means that CaliAli is not suitable for this data.
 	
+After finishing inter-session aligment you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)
 	
 ## Processing single session: <a id="single"></a>
 
@@ -166,3 +167,4 @@ To process sessions individually without concatenation, use the `detrend_batch_a
 	```
 	*This require all files to be located in the same folder
 
+After finishing detrending individual files you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)
