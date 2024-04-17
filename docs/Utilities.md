@@ -19,14 +19,15 @@ This app includes the following functionalities:
 -	++c++	Adjust contrast settings in the video.
 
 !!! bug
-	When adjusting contrast, you need to close the contrast adjustment sceen instead of pressing `Adjust constrast`.
+	When adjusting the contrast of the video, avoid using the `Adjust contrast` button. Instead, simply close the window by clicking the `[x]` button at the upper right corner of the screen.
 
 ## Monitoring Extracted Calcium Transients <a id="mt"></a>
 
-CaliAli includes an app to plot the extracted calcium signals. After loading the `neuron` object, run `view_traces(neuron);`.
+CaliAli includes an app to plot the extracted calcium signals. After loading the `neuron` object, run `view_traces(neuron)`.
 
 ![trace_app](files/trace_app.gif)
 
+This app includes the following functionalities:
 
 -	++left++ / ++right++ 	Scroll back or forward. Alternatively, you can use the scroll bar at the bottom of the screen.
 - 	Use the vertical scroll bar to navigate through traces.
