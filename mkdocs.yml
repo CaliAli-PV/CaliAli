@@ -43,11 +43,16 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - admonition
+  - pymdownx.keys
   - pymdownx.arithmatex:
       generic: true
   - footnotes
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.mark
@@ -69,4 +74,4 @@ nav:
 
 
 copyright: |
-  &copy; 2023 <a href="https://github.com/CaliAli-PV/CaliAli"  target="_blank" rel="noopener">Pablo Vergara</a>
+  &copy; 2024 <a href="https://github.com/CaliAli-PV/CaliAli"  target="_blank" rel="noopener">CaliAli</a>

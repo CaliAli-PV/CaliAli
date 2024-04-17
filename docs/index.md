@@ -2,45 +2,50 @@
 
 ## Introduction
 
-- [Overview](Intro.md)
-	- [About CaliAli](Intro.md#about)
+- [About CaliAli](Intro.md)
 	- [Key Features](Intro.md#key)
 
-- [Usage](Usage.md)
+- [Installation and system requirements](Usage.md)
 	- [System Requirement](Usage.md#requirement)
+		- [Hardware](Usage.md#hardware)
+		- [Others](Usage.md#other)
 	- [Installation](Usage.md#installation)
 
 ## Pipeline step-by-step
 
-- [Getting Started](demo_data.md)
+!!! note
+	Already familiar with the documentation? Get a quick overview of the functions you need to run in the [TL;DR](TLDR.md) section.
 
-- [Downsampling and Motion correction](Prep.md)
-	- [Downsampling](Prep.md#downsampling)
-	- [Motion correction](Prep.md#mc)
+- [Getting Started](demo_data.md)
+	- [CaliAli processing steps](demo_data.md#ps)
+
+- [Downsampling and Motion Correction](Prep.md)
+	- [Downsampling and Conversion to .h5 Format](Prep.md#downsampling)
+	- [Motion Correction](Prep.md#mc)
+
 	
-- [Inter-session Alignment](alignment.md#main)
-	- [Evaluate alignment performance](alignment.md#eval)
-	- [Processing single session](alignment.md#single)
+- [Inter-Session Alignment](alignment.md#main)
+	- [Evaluate Alignment Performance](alignment.md#eval)
+	- [Processing Sessions without Concatenation](alignment.md#single)
 	
-- [Calcium Signal extraction with CaliAli](extraction.md)
-	- [Select Extraction Parameters](extraction.md#cnmfapp)
-	- [Initialization and CNMF](extraction.md#projections)
-	- [Automatic post-processing](extraction.md#auto-post)
-	- [Processing residual data (optional)](extraction.md#auto-post)
-	- [Saving data and Checkpoints](extraction.md#save_data)
+- [Calcium Signal Extraction with CaliAli](extraction.md)
+	- [Select Extraction Parameters](extraction.md#gui)
+	- [Adjusting PNR and Corr. Thresholds](extraction.md#adjust_pnr)
+	- [Extracting Calcium Signals](extraction.md#ecs)
+		
+- [Post-processing](Post.md)
+	- [Monitoring Extracted Components](Post.md#monitor_app)
+	- [Sort spatial Components](Post.md#spatial_sort)
+	- [Deleting and Merging Components](Post.md#del_merge)
+	- [Picking Neurons from Residual](Post.md#residual)
 	
-## After signal extractions
-	
-- [Post processing](Post.md)
-	- [Monitoring extracted components](Post.md#monitor_app)
-	- [Sort spatial components](Post.md#spatial_sort)
-	- [Monitoring temporal components](ost.md#trace_plot)
-	- [Picking neurons from residual](ost.md#residual)
+## Others
 	
 - [Utilities](Utilities.md)
-	- [Play video data in .h5 format](Utilities.md#video_app)
-	- [Separate activities in sessions](Utilities.md#separate_sessions)
-	- [Usefull commands](Utilities.md#commands)
+	- [Reproducing Video Data in .h5 Format](Utilities.md#h5video)
+	- [Monitoring Extracted Calcium Transients](Utilities.md#mt)
+	- [Separate Data from Different Sessions](Utilities.md#separate)
+	- [Other Functions](Utilities.md#of)
 
 
 <!--Example of video embedding-->

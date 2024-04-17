@@ -1,7 +1,3 @@
-# Overview
-
-## About CaliAli <a id="introduction"></a>
-
 CaliAli is a comprehensive suite designed for extracting neural signals from one-photon calcium imaging data collected across multiple sessions in free-moving conditions. CaliAli incorporates all the necessary modules to extract long-term tracked calcium signals from raw video sessions.
 
 ![CaliAli Pipeline](files/pipeline_summary.png)
@@ -20,3 +16,4 @@ CaliAli includes the following functions:
 -	Manual Extraction of Missed Neurons: Offers a GUI for examining residual images and allowing users to choose new seed pixels to re-execute the extraction process.
 -	Several other functions that facilitate video monitoring and calcium signal tracking throughout the extraction process.
 
+ Proceed to [Installation and system requirements](Usage.md)

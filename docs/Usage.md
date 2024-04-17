@@ -8,11 +8,13 @@ CaliAli runs in `MATLAB` and requires the following toolbox:
 -	Statistics and Machine Learning Toolbox'
 -	Parallel Computing Toolbox
 ```
-### Hardware
+CaliAli has been tested successfully on `MATLAB` versions `2022a` and `2023a` running on Windows 11. No anticipated compatibility issues are expected with other operating systems.
+ 
+### Hardware <a id="hardware"></a>
 
 CaliAli autoamtically runs in batch mode, requiring only sufficient RAM to handle the largest imaging session and storing final outputs (less than 2GB if the largest session is 180x260 pixels and 3000 frames).
 
-### Other requirements
+### Other Requirements <a id="other"></a>
 
 !!! note "Process Inscopix data"
 	To process Inscopix data, the [Inscopix Data Processing software](https://inscopix.com/software-analysis-miniscope-imaging/) needs to be installed.
@@ -28,3 +30,6 @@ Installation should take a few minutes:
 
 
 ![Add to path](files/Add_to_path.gif)
+
+
+Already installed? Proceed to [Getting started](demo_data.md)

@@ -1,4 +1,4 @@
-## I. Downsampling and conversion to .h5 format <a id="downsampling"></a>
+## I. Downsampling and Conversion to .h5 Format <a id="downsampling"></a>
 
 The first step in the CaliAli pipeline is to convert the raw video format into the .h5 format used by CaliAli. This step is done together with spatial downsampling.
 
@@ -8,7 +8,7 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
 
 The function used to downsample video sessions would depende on the format of the source data:
 
-### Syntax:
+### Syntax: <a id="syntax"></a>
 
 === ".avi"
 	``` matlab
@@ -36,14 +36,14 @@ The function used to downsample video sessions would depende on the format of th
 		By defalt this funciton search for the Inscopix path in 'C:\Program Files\Inscopix\Data Processing'. If this path is not found, a folder selection dialog box will be called.
 
 	
-### Input Arguments:
+### Input Arguments: <a id="ia"></a>
 
 -	ds_f (optional): Downsampling factor. Default is 1 (no downsampling).
 -	outpath (optional): Output path for saving downscaled video files. If not provided, the files will be saved in the same directory as the input files.
 -	theFiles (optional): Cell array containing paths to video files. If not provided, a file picker dialog will open to select video files interactively.	
 
 
-### Example Usage:	
+### Example Usage:	<a id="eu"></a>
 ``` matlab
 % Downsampling AVI files with a downsampling factor of 2
 Downsample_avi(2);
@@ -60,7 +60,7 @@ Downsample_avi(2, 'C:\Output', files);
 ![Downsampling](files/downsampling.gif)
 
 !!! Note
-	You can monitor `.h5` data using the following function: [Play video data in .h5 format](Utilities.md#video_app) 
+	You can monitor `.h5` data using the following function: [Play video data in .h5 format](Utilities.md#h5video) 
 
 ## II. Motion Correction <a id="mc"></a>
 

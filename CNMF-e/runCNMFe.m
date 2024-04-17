@@ -147,9 +147,7 @@ neuron.options.Cn=neuron.Cn;neuron.options.PNR=neuron.PNR;
 neuron.options.Mask=neuron.Mask;
 neuron.options.ind=neuron.ind;
 
-%% adjust number of sessions for dynamic spatial
-
-%% initialize neurons from the video data within a selected temporal range
+%% initialize neurons from the video data
 tic
 neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1,0);
 toc
@@ -173,7 +171,7 @@ for loop=1:10
     neuron.merge_high_corr(show_merge, [0.9, -inf, -inf]);
     try
         dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
-        dis
+        fprintf('Similarity with previous iteration is %d\n', dis);
     catch
         weird_bug=1
     end
@@ -181,6 +179,7 @@ for loop=1:10
     C_temp=neuron.C_raw;
 
     if dis<0.05
+        fprintf('CNMF has converged to an estable Solution');
         break
     end
 end    %% save the workspace for future analysis

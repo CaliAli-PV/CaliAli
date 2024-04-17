@@ -46,13 +46,18 @@ align_sessions_CaliAli('n_enhanced', 0, 'theFiles', videoFiles);
 % Align video sessions with specified blood vessel size
 align_sessions_CaliAli('BVz', [5 20]);
 
-% Align video sessions with custom parameters including all options
-align_sessions_CaliAli('gSig', 2.5, 'sf', 10, 'n_enhanced', 1, 'theFiles', 'pickup', 'BVz', [5 20]);
+% Align video sessions with custom parameters:
+align_sessions_CaliAli('gSig', 3, 'sf', 15, 'n_enhanced', 0, 'BVz', [5 20]);
 ```
 ![Align Sessions](files/align_sessions.gif)
 
 !!! danger "Important"
-	The order in which session are concatenated is determined by the other in which session are listed!
+	The order in which session are concatenated is determined by the other in which session are listed!	
+	For example, the followin code would align session 2 before session 1:
+	``` matlab
+	videoFiles = {'path/to/session2.avi', 'path/to/session1.avi'};
+	align_sessions_CaliAli('theFiles', videoFiles);
+	```
 	
 !!! note
 	The `align_sessions_CaliAli()` function only detects files with the `_mc.h5` suffix. If you delete this suffix, the files will not be detected.
@@ -70,7 +75,7 @@ After running `align_sessions_CaliAli()` function the following files will be cr
 
 ![output](files/output_alignment.png)
 
-## Evaluating alignment performance: <a id="eval"></a>
+## Evaluating Alignment Performance: <a id="eval"></a>
 
 
 During the execution of `align_sessions_CaliAli()`, you will see output similar to the following displayed in the command window:
@@ -146,7 +151,7 @@ implay(mat2gray(P.(4)(1,:).(3){1,1}));
 	
 After finishing inter-session aligment you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)
 	
-## Processing single session: <a id="single"></a>
+## Processing Sessions without Concatenation: <a id="single"></a>
 
 You can also use CaliAli to process individual sessions without performing video concatenation. This is particularly useful for verifying signal quality between long-term experiments by processing individual sessions.
 
