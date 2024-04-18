@@ -23,5 +23,5 @@ CaliAli requires executing the followin steps:
 
 4. [Post processing](Post.md)
 
-
+=== "Next"
 To begin, proceed to [Downsampling and Motion correction](Prep.md)

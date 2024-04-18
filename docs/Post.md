@@ -84,7 +84,8 @@ After extracting the residual data, you may want to consider redoing the post-pr
 !!! note
 	If you ever change the location of the videos and files generated during the analysis be sure to run [this steps]((Utilities.md#update_path) after
 
-We recommend checking the [Utilities] (Utilities.md)  included with CaliAli.
+=== "Next"
+We recommend checking the [Utilities](Utilities.md)  included with CaliAli.
 
 
 

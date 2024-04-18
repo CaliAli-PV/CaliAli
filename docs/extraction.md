@@ -100,18 +100,18 @@ graph TD;
 	P[Automatic];
 	N[Automatic CNMF];
 	
-style A fill:none, stroke:none;	
-style D fill:#BAE6F7, stroke:#00129A;
-style E fill:#BAE6F7, stroke:#00129A;
-style F fill:#BAE6F7, stroke:#00129A;
-style G fill:#BAE6F7, stroke:#00129A;
-style H fill:#BAE6F7, stroke:#00129A;
-style N fill:#BAE6F7, stroke:#00129A;
+style A fill:none, stroke:none;
+style D stroke:#1CC90E, color:#00129A,  stroke-width:2px;
+style E stroke:#1CC90E, color:#00129A,  stroke-width:2px;
+style F stroke:#1CC90E, color:#00129A,  stroke-width:2px;
+style G stroke:#1CC90E, color:#00129A,  stroke-width:2px;
+style H stroke:#1CC90E, color:#00129A,  stroke-width:2px;
+style N stroke:#1CC90E, color:#00129A,  stroke-width:2px;
 
-style K fill:#F0D0CB, stroke:#7A6A68;
-style L fill:#F0D0CB, stroke:#7A6A68;
-style M fill:#F0D0CB, stroke:#7A6A68;
-style O fill:#F0D0CB, stroke:#7A6A68;
+style K stroke:#E04C3B, color:#7A6A68,  stroke-width:2px; 
+style L stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
+style M stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
+style O stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
 ```
 During the execution of this code, you will see messages in the command window reflecting the steps depicted above. For example:
 
@@ -181,7 +181,8 @@ Loading any of these checkpoint files will load a `neuron` object containing the
 	{ .annotate }
 	
 	1. This dataset contains the same information as dataset C, excluding the calculated rise and decay times of the calcium signals. S is recommended for most analyses.
-	
+
+=== "Next"	
 After reaching the third checkpoint, the corresponding `.mat` file needs to be loaded into `MATLAB` to [post-process and verify the quality of the extracted signals](Post.md).
 	
 

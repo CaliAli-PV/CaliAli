@@ -1,7 +1,7 @@
 function MC_Batch(theFiles,do_nr,varargin)
 
 if ~exist('theFiles','var')
-    theFiles = uipickfiles('FilterSpec','*.h5');
+    
 elseif isempty(theFiles)
     theFiles = uipickfiles('FilterSpec','*.h5');
 end

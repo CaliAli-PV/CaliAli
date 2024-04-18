@@ -172,4 +172,5 @@ To process sessions individually without concatenation, use the `detrend_batch_a
 	```
 	*This require all files to be located in the same folder
 
+=== "Next"
 After finishing detrending individual files you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)

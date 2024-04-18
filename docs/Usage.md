@@ -31,5 +31,5 @@ Installation should take a few minutes:
 
 ![Add to path](files/Add_to_path.gif)
 
-
+=== "Next"
 Already installed? Proceed to [Getting started](demo_data.md)

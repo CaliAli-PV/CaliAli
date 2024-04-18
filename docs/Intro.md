@@ -16,4 +16,5 @@ CaliAli includes the following functions:
 -	Manual Extraction of Missed Neurons: Offers a GUI for examining residual images and allowing users to choose new seed pixels to re-execute the extraction process.
 -	Several other functions that facilitate video monitoring and calcium signal tracking throughout the extraction process.
 
- Proceed to [Installation and system requirements](Usage.md)
+=== "Next"
+Proceed to [Installation and system requirements](Usage.md)
