@@ -52,7 +52,7 @@ align_sessions_CaliAli('gSig', 3, 'sf', 15, 'n_enhanced', 0, 'BVz', [5 20]);
 ![Align Sessions](files/align_sessions.gif)
 
 !!! danger "Important"
-	The order in which session are concatenated is determined by the other in which session are listed!	
+	The order in which sessions are concatenated is determined by the order in which session are listed!	
 	For example, the followin code would align session 2 before session 1:
 	``` matlab
 	videoFiles = {'path/to/session2.avi', 'path/to/session1.avi'};
@@ -106,7 +106,7 @@ This will load the following components:
 - **P**: Table holding projections at different stages of the inter-session alignment process
 - **PNR**: Peak-to-noise ratio image
 
-The most important components is the tabe **P**, which is structured as follow: 
+The most important components is the table **P**, which is structured as follow: 
 
 | Column        | Description                             |
 | --------------| ----------------------------------------|
@@ -117,15 +117,15 @@ The most important components is the tabe **P**, which is structured as follow:
 
 Each column contains a nested table with projections organized as 3D or 4D arrays, representing data from each session:
 
-| Column        | Description                                          |
-| --------------| -----------------------------------------------------|
-| `Mean`        | Mean frame of each session                           |
-| `BloodVessels`| Blood vessels projection of each session             |
-| `Neurons`     | Neuron projections of each session                   |
-| `PNR`         | PNR projections of each session                      |
-| `BV+Neurons`  | Blood vessels and nuerons projection of each session |
+| Column         | Description                                          |
+| ---------------| -----------------------------------------------------|
+| `Mean`         | Mean frame of each session                           |
+| `BloodVessels` | Blood vessels projection of each session             |
+| `Neurons`      | Neuron projections of each session                   |
+| `PNR`          | PNR projections of each session                      |
+| `BV+Neurons`   | Blood vessels and neurons projection of each session |
 
-You can visualize these projection with the following commands:
+You can visualize these projections with the following commands:
 
 ``` matlab
 % Visualize BV+Neurons projection after alignment:
@@ -147,7 +147,7 @@ implay(mat2gray(P.(4)(1,:).(3){1,1}));
 ![BV+Neurons](files/align_demo.gif)
 
 !!! danger "Important"
-	Please visually verify that sessions are correctly aligned. If you detect noticable displacement in the field of view it means that CaliAli is not suitable for this data.
+	Please visually verify that sessions are correctly aligned. If you detect noticeable displacement in the field of view it means that CaliAli is not suitable for this data.
 	
 After finishing inter-session aligment you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)
 	

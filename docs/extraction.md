@@ -59,7 +59,7 @@ Additionally, you have the option to manually draw a mask to exclude specific re
 	Currently you can only draw the mask in the correlation image.
 	
 Once satisfied with the results press the `Ok!` button.
-This will automatically update the parameters for the choosen file with the new thresholds. 
+This will automatically update the parameters for the chosen file with the new thresholds. 
 
 After setting the PNR, Corr, gSig, and Frame rate parameters press `Done!`
 This will create a table named `parin` (parameters inputs) in the matlab workspace. 

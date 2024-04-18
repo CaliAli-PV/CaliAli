@@ -31,8 +31,8 @@ This app includes the following functionalities:
 
 -	++left++ / ++right++ 	Scroll back or forward. Alternatively, you can use the scroll bar at the bottom of the screen.
 - 	Use the vertical scroll bar to navigate through traces.
--	++ctrl+up++ / ++ctrl+down++	Increse/decrease the number of traces being displayed. 
--	++ctrl+right++ / ++ctrl+left++	Increse/decrease the temporal resolution.
+-	++ctrl+up++ / ++ctrl+down++	Increase/decrease the number of traces being displayed. 
+-	++ctrl+right++ / ++ctrl+left++	Increase/decrease the temporal resolution.
 -	Use the mouse scroll wheel to change the vertical zoom.
 - 	Press the `C` button to plot the denoised traces.
 - 	Press the `S` button to plot the predicted rising events.
@@ -67,13 +67,13 @@ This function separates data into sessions based on provided frame information (
 ### Example Usage:
 
 ```matlab
-% Separate spike data with default bin size and sampling frequency (no binninb)
+% Separate spike data with default bin size and sampling frequency (no binning)
 S=separate_sessions(neuron.S, neuron.CaliAli_opt.F);
 
-% Separate spike data with 1s bin cosidering Sampling frequency of 10.
+% Separate spike data with 1s bin considering Sampling frequency of 10.
 S=separate_sessions(neuron.S, neuron.CaliAli_opt.F,1,10);
 
-% Separate raw Calcim traces data with default bin size and sampling frequency (no binninb)
+% Separate raw Calcim traces data with default bin size and sampling frequency (no binning)
 S=separate_sessions(neuron.C_raw, neuron.CaliAli_opt.F);
 ```
 

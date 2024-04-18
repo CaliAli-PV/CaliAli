@@ -33,7 +33,7 @@ The function used to downsample video sessions would depende on the format of th
 	
 	!!! Warning "Inscopix Users: Please note the following system-specific instructions"
 		Note that this requires installing the Inscopix Data Processing software. 
-		By defalt this funciton search for the Inscopix path in 'C:\Program Files\Inscopix\Data Processing'. If this path is not found, a folder selection dialog box will be called.
+		By default this function search for the Inscopix path in 'C:\Program Files\Inscopix\Data Processing'. If this path is not found, a folder selection dialog box will be called.
 
 	
 ### Input Arguments: <a id="ia"></a>

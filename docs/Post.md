@@ -1,7 +1,7 @@
 # Post-Processing
 
 
-CaliAli incorporates a GUI to facilitate the indentification of false-positive detections. 
+CaliAli incorporates a GUI to facilitate the identification of false-positive detections. 
 
 After loading the `neuron` object stored in the [Checkpoint files](extraction.md#chk), execute the following function to call this GUI:
 
@@ -31,7 +31,7 @@ You can label false positives by right-clicking on the neuron contours:
 
 CaliAli can label false positives based on the shape of the extracted spatial components. To accomplish this, CaliAli incorporates a tool that sorts spatial components by their spatial congruence. To utilize this function, press the 'Separate Spatial' button.
 
-This will open a panel displaying all the extracted spatial components. Components with congruent shapes are sorted at the beginning, while neurons with shapes different from the rest of the population are sorted last. Component labeled as false-postive will be listed on the right.
+This will open a panel displaying all the extracted spatial components. Components with congruent shapes are sorted at the beginning, while neurons with shapes different from the rest of the population are sorted last. Components labeled as false-positives will be listed on the right.
 
 ![sort_component_app](files/sort_component_app.gif)
 
@@ -45,7 +45,7 @@ This will label the component as false-positive in the correlation image.
 
 ### Deleting and Merging Components <a id="del_merge"></a>
 
-Once you finish labiling false-positive in the main App press the `Done!` button.
+Once you finish labeling false-positive in the main App press the `Done!` button.
 
 This will create a variable `ix` holding the indices of the labeled false-positives.
 
