@@ -10,7 +10,7 @@ The function used to downsample video sessions would depende on the format of th
 
 ### Syntax: <a id="syntax"></a>
 
-=== ".avi"
+=== ".avi / .m4v / .mp4"
 	``` matlab
 	Downsample_avi(ds_f, outpath, theFiles)	
 	```

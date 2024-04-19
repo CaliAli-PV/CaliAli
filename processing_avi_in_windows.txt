@@ -1,2 +1,0 @@
-If using window to process avi files you need to install the followin codec:
-https://codecguide.com/download_kl.htm

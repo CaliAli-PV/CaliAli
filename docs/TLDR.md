@@ -9,7 +9,7 @@ Run the following functions:
 
 ### 1) Data Downsampling:
 
-=== ".avi"
+=== ".avi / .m4v / .mp4"
 	``` matlab
 	Downsample_avi(2)	
 	```
@@ -33,8 +33,11 @@ MC_Batch();
 ### 3) Inter-session Alignment:
 
 ``` matlab
-% Choose the sessions to align
+% Choose the sessions to align:
 align_sessions_CaliAli();
+
+% If it is only one session:
+detrend_batch_and_calculate_projections()
 ```
 
 ### 4) Calcium Traces Extraction:
