@@ -8,7 +8,7 @@ ds_f = 1;
 end
 
 if ~exist('theFiles','var')
-    theFiles = uipickfiles('REFilter','\.avi$');
+    theFiles = uipickfiles('REFilter','\.avi$|\.m4v$|\.mp4$');
 end
 
 

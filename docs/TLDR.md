@@ -43,7 +43,7 @@ detrend_batch_and_calculate_projections()
 ### 4) Calcium Traces Extraction:
 
 -	Run `CNMFe_app`.
--	Choose the video file with the concatenated data named `<File_name>_Aligned.h5`.
+-	Choose the video file with the concatenated data named `<File_name>_Aligned.h5` or individual sessions named `<File_name>_det.h5`.
 -	Select appropriate initialization parameters.
 -	Run `CNMFe_batch(parin)`.
 
