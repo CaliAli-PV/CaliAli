@@ -4,7 +4,7 @@
 
 # CaliAli: A Comprehensive Suite for Extracting Neural Signals from One-Photon Calcium Imaging Data in multi-session experiments
 
-CaliAli is a powerful software suite designed to extract neural signals from one-photon calcium imaging data collected across multiple sessions in free-moving conditions. Key features of CaliAli include:
+CaliAli is a powerful software suite designed to extract neural signals from one-photon calcium imaging data collected across multiple sessions in free-moving conditions.
 
 Read the full [Online Documentation](https://caliali-pv.github.io/CaliAli/)
 
