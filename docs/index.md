@@ -4,6 +4,9 @@
 
 - [About CaliAli](Intro.md)
 	- [Key Features](Intro.md#key)
+	- [Version History](Intro.md#vh)
+	- [License](Intro.md#li)
+	- [Questions about CaliAli?](Intro.md#q)
 
 - [Installation and system requirements](Usage.md)
 	- [System Requirement](Usage.md#requirement)
@@ -46,6 +49,9 @@
 	- [Monitoring Extracted Calcium Transients](Utilities.md#mt)
 	- [Separate Data from Different Sessions](Utilities.md#separate)
 	- [Other Functions](Utilities.md#of)
+	
+- [TL;DR](TLDR.md)
+
 
 
 <!--Example of video embedding-->
