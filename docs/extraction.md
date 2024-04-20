@@ -58,6 +58,9 @@ Additionally, you have the option to manually draw a mask to exclude specific re
 !!! Note
 	Currently you can only draw the mask in the correlation image.
 	
+!!! Danger "Important"
+	Please note that the initialization of neurons depends solely on the third panel, which is the point-wise product of the correlation and PNR (peak-to-noise ratio). Even if some seeds appear above non-neuronal structures in either the correlation or PNR images, this will not compromise the extraction process as long as those seeds do not appear in the point-wise product image
+	
 Once satisfied with the results press the `Ok!` button.
 This will automatically update the parameters for the chosen file with the new thresholds. 
 

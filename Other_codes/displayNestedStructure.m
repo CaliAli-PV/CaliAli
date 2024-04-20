@@ -1,5 +1,8 @@
 function displayNestedStructure(obj,maxDepth)
-fprintf('%s└─ %s\n', prefix, fieldname);
+% displayNestedStructure(neuron,5)
+
+varName = inputname(1);
+fprintf('%s\n', varName );
 print_structure(obj, '', maxDepth);
 end
 
