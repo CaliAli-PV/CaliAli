@@ -20,7 +20,7 @@ Run the following functions:
 	```	
 === ".isdx (Inscopix)"
 	``` matlab
-	Downsample_inscopix(4)
+	Downsample_Inscopix(4)
 	```
 	
 ### 2) Motion Correction:

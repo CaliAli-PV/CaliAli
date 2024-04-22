@@ -27,7 +27,7 @@ The function used to downsample video sessions would depende on the format of th
 	
 === ".isdx (Inscopix)"
 	``` matlab
-	Downsample_inscopix(ds_f, outpath, theFiles)
+	Downsample_Inscopix(ds_f, outpath, theFiles)
 	```
 	This function reads Inscopix video files, downsamples them, and saves the resulting frames as an HDF5 (.h5) file.
 	
