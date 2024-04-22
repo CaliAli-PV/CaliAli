@@ -179,7 +179,7 @@ for loop=1:10
     C_temp=neuron.C_raw;
 
     if dis<0.05
-        fprintf('CNMF has converged to an estable Solution');
+        fprintf('CNMF has converged to an estable Solution\n');
         break
     end
 end    %% save the workspace for future analysis

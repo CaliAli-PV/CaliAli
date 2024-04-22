@@ -1,1 +1,0 @@
-[a,b] = compute_hodge_decompositon(vx);
