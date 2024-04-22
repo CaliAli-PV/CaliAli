@@ -19,6 +19,15 @@ CaliAli includes the following functions:
 
 ## Version History <a id="vh"></a> 
 
+### CaliAli 1.0.1 Release Notes
+**April 22nd 2024**
+
+- Introduced a new app for determining optimal blood vessel (BV) size.
+- Removed unnecessary or deprecated functions.
+- Several improvements to the documentation.
+
+[Full Changelog](https://github.com/CaliAli-PV/CaliAli/compare/v1.0...v1.0.1) on GitHub.
+
 ### CaliAli Stable Version 1.0 Release Notes
 **April 19th 2024**
 
@@ -40,7 +49,7 @@ We are excited to announce the first stable version of CaliAli, featuring signif
 
 - **Enhanced Inter-Session Alignment:** Further improvements to the inter-session alignment module for precise video session alignment.
 
-For a complete list of changes, please refer to the [Full Changelog](https://github.com/CaliAli-PV/CaliAli/compare/Biorxiv-Version...main) on GitHub.
+[Full Changelog](https://github.com/CaliAli-PV/CaliAli/compare/Biorxiv-Version...main) on GitHub.
 
 ---
 
