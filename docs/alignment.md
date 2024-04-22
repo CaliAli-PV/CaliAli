@@ -65,6 +65,9 @@ align_sessions_CaliAli('gSig', 3, 'sf', 15, 'n_enhanced', 0, 'BVz', [5 20]);
 !!! note
 	Much of the computation time is spent on calculating the neuron projections. However, this time is saved for subsequent analyses, as these images will be used during neuronal extraction. Completing the entire alignment process across four 10-minute sessions typically takes approximately 5 to 10 minutes.
 	
+!!! tip
+	You can customize blood vessel parameters using the [BV app](Utilities.md#bv_app).
+	
 ### Output:	
 
 After running `align_sessions_CaliAli()` function the following files will be created:

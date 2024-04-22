@@ -37,6 +37,21 @@ This app includes the following functionalities:
 - 	Press the `C` button to plot the denoised traces.
 - 	Press the `S` button to plot the predicted rising events.
 
+## App for Optimal Blood Vessel Size Determination <a id="bv_app"></a>
+
+
+Users can determine the optimal blood vessel size using `BV_app()`.
+
+![BV_app](files/BV_app.gif)
+
+Control the sliders to define the minimum and maximum blood vessel width (in pixels). 
+After pressing `Done`, the chosen blood vessel sizes will be printed in the command window. 
+You can use these blood vessel sizes in other CaliAli functions by specifying the input pairs `'BVz'` and `[min, max]`.
+
+!!! Note
+	In many cases, the default blood vessel size yields satisfactory results. However, in certain preparations, horizontal or vertical artifacts may appear in the field of view. The Hessian filter approach used to enhance blood vessels could also extract these structures, which might hinder subsequent inter-session alignment. Customizing the blood vessel size could help avoid these issues.
+
+
 ## Separate Data from Different Sessions <a id="separate"></a>
 
 Separates data into sessions based on frame information and optionally bins the data.
