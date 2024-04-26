@@ -6,10 +6,7 @@
 
 CaliAli is a powerful software suite designed to extract neural signals from one-photon calcium imaging data collected across multiple sessions in free-moving conditions.
 
-Read the full [Online Documentation](https://caliali-pv.github.io/CaliAli/)
-
-[![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
-
+Read the full [Online Documentation](https://caliali-pv.github.io/CaliAli/).
 ### Important Notice: CaliAli Update
 
 CaliAli has undergone a major update! The previous version of the code described in the [BioRxiv preprint](https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1) is now deprecated. If you need to access that version of the code, please switch to the [BioRxiv branch](https://github.com/CaliAli-PV/CaliAli/tree/Biorxiv-Version).
