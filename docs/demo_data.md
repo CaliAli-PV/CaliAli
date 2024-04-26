@@ -7,7 +7,7 @@ This document provides guidance for running each module using four video session
 !!! tip
 	The raw calcium imaging videos described in the CaliAli paper can be found in the source data included with the manuscript.
 	
-!!! note "About Hierarchical Data Format Version 5"
+??? Info "About Hierarchical Data Format Version 5"
 	Note that CaliAli converts raw videos in .avi, .tiff, or .isdx format into .h5 during the downsampling process. Hierarchical Data Format (HDF5) allows loading several gigabytes of data in a few seconds and is ideal for processing multi-session data.
 
 
@@ -25,7 +25,7 @@ CaliAli requires executing the followin steps:
 
 4. [Post processing](Post.md)
 
-!!! Info
+??? Info "How long it takes to process the Demo data?"
 	Processing the demo data is expected to take approximately 5-10 minutes on a standard desktop computer. This includes steps 2 to 4.
 
 === "Next"

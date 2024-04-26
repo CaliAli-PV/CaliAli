@@ -53,7 +53,7 @@ You can delete these components by running `neuron.delete(ix);`. Alternatively, 
 
 After deleting false positives, you can consider merging neurons by manually monitoring neurons that are close by. For this, run`neuron.merge_high_corr(1, [0.1, 0.3, -inf]);`
 
-!!! tip
+???+ tip
 	Note that you can save your results at any point running `save_workspace(neuron);`
 
 ### Picking Neurons from Residual <a id="residual"></a>
@@ -75,11 +75,11 @@ This will initialize these neurons and repeat the CNMF process required to [extr
 
 After extracting the residual data, you may want to consider redoing the post-processing step described earlier
 
-!!! Note
+???+ Tip
 	In most cases picking neurons is not necessary.
 
 
-!!! note
+???+ Info
 	If you ever change the location of the videos and files generated during the analysis be sure to run [this steps](Utilities.md#update_path) after
 
 ---	

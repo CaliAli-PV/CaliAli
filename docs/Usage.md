@@ -10,7 +10,7 @@ CaliAli runs in `MATLAB` and requires the following toolbox:
 ```
 CaliAli has been tested successfully on `MATLAB` versions `2022a` and `2023a` running on Windows 11. No anticipated compatibility issues are expected with other operating systems.
 
-!!! Warning 
+??? Warning "Function requiring MATLAB 2023b"
 	One of the [utilities](Utilities.md#bv_app) included in CaliAli requires 'MATLAB 2023b' due to its use of new functions from MATLAB's AppDesigner. This function is *NOT* essential for running the CaliAli pipeline."
  
 ### Hardware <a id="hardware"></a>
@@ -19,10 +19,10 @@ CaliAli automatically runs in batch mode, requiring only sufficient RAM to handl
 
 ### Other Requirements <a id="other"></a>
 
-!!! note "Process Inscopix data"
+??? note "Process Inscopix data"
 	To process Inscopix data, the [Inscopix Data Processing software](https://inscopix.com/software-analysis-miniscope-imaging/) needs to be installed.
 	
-!!! note "Process [UCLA miniscope](http://miniscope.org/index.php/Main_Page) data on Windows" 
+??? note "Process [UCLA miniscope](http://miniscope.org/index.php/Main_Page) data on Windows" 
 	MATLAB does not have the necessary codecs to process `.avi` files. You need to download and install the [K-lite Codec Pack](https://codecguide.com/download_kl.htm).
 
 ## Installation <a id="installation"></a>

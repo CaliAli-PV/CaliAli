@@ -18,7 +18,7 @@ This app includes the following functionalities:
 -	++page-down++/++page-up++	Advance/go back 30 frames.
 -	++c++	Adjust contrast settings in the video.
 
-!!! bug
+???+ bug
 	When adjusting the contrast of the video, avoid using the `Adjust contrast` button. Instead, simply close the window by clicking the `[x]` button at the upper right corner of the screen.
 
 ## Monitoring Extracted Calcium Transients <a id="mt"></a>
@@ -48,7 +48,7 @@ Control the sliders to define the minimum and maximum blood vessel width (in pix
 After pressing `Done`, the chosen blood vessel sizes will be printed in the command window. 
 You can use these blood vessel sizes in other CaliAli functions by specifying the input pairs `'BVz'` and `[min, max]`.
 
-!!! Note
+??? Question "When should I change the default blood vessels size?"
 	In many cases, the default blood vessel size yields satisfactory results. However, in certain preparations, horizontal or vertical artifacts may appear in the field of view. The Hessian filter approach used to enhance blood vessels could also extract these structures, which might hinder subsequent inter-session alignment. Customizing the blood vessel size could help avoid these issues.
 
 

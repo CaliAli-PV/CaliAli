@@ -55,11 +55,11 @@ Downsample_avi(1, 'C:\Output');
 files = {'video1.avi', 'video2.avi'};
 Downsample_avi(2, 'C:\Output', files);
 ```
-!!! Note
+??? Info "Which downsampling factor should I use?"
 	We recommend using a 4x factor for Inscopix videos and 2x for UCLA miniscope V4 videos.
 ![Downsampling](files/downsampling.gif)
 
-!!! Note
+??? Info "How can I play .h5 videos?"
 	You can monitor `.h5` data using the following function: [Play video data in .h5 format](Utilities.md#h5video) 
 
 ## II. Motion Correction <a id="mc"></a>
@@ -72,10 +72,10 @@ MC_Batch(theFiles, do_nr, varargin);
 ```	
 The MC_Batch function processes a group of .h5 video files by applying motion correction techniques and saving the corrected videos to new HDF5 files.
 
-!!! Note
+???+ Warning "About the _mc suffix"
 	The output files will be suffixed with `_mc`. This suffix is necessary for subsequent modules to recognize files that have already undergone motion correction. 
 	
-!!! Note
+??? Info "How long it takes to motion correct videos?"
 	The motion correction process is relatively slow. A 10-minute video would be processed in 10 minutes. (1).
 	{ .annotate }
 	
@@ -105,7 +105,7 @@ MC_Batch([], 1,'BVz'[2,3]);
 ```
 ![Motion Correction](files/mc.gif)
 
-!!! danger "Important"
+???+ danger "Important"
 	Ensure to visually inspect the motion-corrected video before proceeding to the next step. [Play video data in .h5 format](Utilities.md#video_app)
 
 === "Next"	

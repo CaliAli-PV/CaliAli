@@ -34,7 +34,7 @@ For each loaded file the user can modify the following parameters:
 	
 4.	Frame rate
 
-!!! note
+???+ Info
 	You can process several files at the same time.
 
 ## Adjusting PNR and Corr. Thresholds <a id="adjust_pnr"></a>
@@ -43,7 +43,7 @@ To visually set the PNR and Corr. threshold press the `Get` button higlighted in
 
 ![load_cnmf_app_thr](files/load_cnmf_app_thr.gif)
 
-!!! Bug
+???+ Bug
 	Sometimes, the MATLAB AppDesigner app may not render panels correctly. This is a MATLAB bug. If this happens, just close and reopen the window to fix the issue.
 
 In the opened window, you will find three images displayed: the PNR image, the correlation image, and their point-wise product. Red dots overlaid on these images represent candidate neurons or "seed pixels". Below these images, there are two spinners that control the PNR and correlation thresholds. Adjusting these thresholds will change the number of seed pixels detected.
@@ -55,10 +55,10 @@ Additionally, you have the option to manually draw a mask to exclude specific re
 
 ![draw_mask](files/draw_mask.gif)
 
-!!! Note
+???+ Note
 	Currently you can only draw the mask in the correlation image.
 	
-!!! Danger "Important"
+???+ Danger "Important"
 	Please note that the initialization of neurons depends solely on the third panel, which is the point-wise product of the correlation and PNR (peak-to-noise ratio). Even if some seeds appear above non-neuronal structures in either the correlation or PNR images, this will not compromise the extraction process as long as those seeds do not appear in the point-wise product image
 	
 Once satisfied with the results press the `Ok!` button.
@@ -67,7 +67,7 @@ This will automatically update the parameters for the chosen file with the new t
 After setting the PNR, Corr, gSig, and Frame rate parameters press `Done!`
 This will create a table named `parin` (parameters inputs) in the matlab workspace. 
 
-!!! note
+???+ Info
 	Some parameters specific to CNMF-E are pre-defined in the `runCNMFe.mat` code and typically do not require modifications.  Refer to the original [CNMF-E documentation](https://github.com/zhoupc/CNMF_E/wiki/Pipeline#step-1-parameter-specification) for details.
 
 ## Extracting Calcium Signals <a id="ecs"></a>
@@ -130,11 +130,8 @@ Processing:  100%  |############| 4/4it [00:00:05<00:00:00, 1.30 s/it]
 Deconvolve and denoise all temporal traces again...
 ```
 
-!!! question
-	How does CaliAli deconvolve calcium signals? (1)
-	{ .annotate }
-
-	1.	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, a thresholded FOOPSI approach with an AR(2) model is utilized (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
+??? question "How does CaliAli deconvolve calcium signals?"
+	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, a thresholded FOOPSI approach with an AR(2) model is utilized (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
 
 
 

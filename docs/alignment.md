@@ -51,7 +51,7 @@ align_sessions_CaliAli('gSig', 3, 'sf', 15, 'n_enhanced', 0, 'BVz', [5 20]);
 ```
 ![Align Sessions](files/align_sessions.gif)
 
-!!! danger "Important"
+???+ danger "Important"
 	The order in which sessions are concatenated is determined by the order in which session are listed!	
 	For example, the followin code would align session 2 before session 1:
 	``` matlab
@@ -59,13 +59,13 @@ align_sessions_CaliAli('gSig', 3, 'sf', 15, 'n_enhanced', 0, 'BVz', [5 20]);
 	align_sessions_CaliAli('theFiles', videoFiles);
 	```
 	
-!!! note
+??? Warning "About the _mc suffix"
 	The `align_sessions_CaliAli()` function only detects files with the `_mc.h5` suffix. If you delete this suffix, the files will not be detected.
 	
-!!! note
+??? Info "How long it takes to align sessions?"
 	Much of the computation time is spent on calculating the neuron projections. However, this time is saved for subsequent analyses, as these images will be used during neuronal extraction. Completing the entire alignment process across four 10-minute sessions typically takes approximately 5 to 10 minutes.
 	
-!!! tip
+??? Info "Can I use different blood vessel sizes than those defined by default?"
 	You can customize blood vessel parameters using the [BV app](Utilities.md#bv_app).
 	
 ### Output:	
@@ -149,7 +149,7 @@ implay(mat2gray(P.(4)(1,:).(3){1,1}));
 ```
 ![BV+Neurons](files/align_demo.gif)
 
-!!! danger "Important"
+???+ danger "Important"
 	Please visually verify that sessions are correctly aligned. If you detect noticeable displacement in the field of view it means that CaliAli is not suitable for this data.
 	
 After finishing inter-session aligment you can proceed to [Extract Calcium Traces with CaliAli](extraction.md)
