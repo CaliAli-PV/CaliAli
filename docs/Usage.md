@@ -9,6 +9,9 @@ CaliAli runs in `MATLAB` and requires the following toolbox:
 -	Parallel Computing Toolbox
 ```
 CaliAli has been tested successfully on `MATLAB` versions `2022a` and `2023a` running on Windows 11. No anticipated compatibility issues are expected with other operating systems.
+
+!!! Warning 
+	One of the [utilities](Utilities.md#bv_app) included in CaliAli requires 'MATLAB 2023b' due to its use of new functions from MATLAB's AppDesigner. This function is *NOT* essential for running the CaliAli pipeline."
  
 ### Hardware <a id="hardware"></a>
 
