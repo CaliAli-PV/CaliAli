@@ -79,10 +79,11 @@ After extracting the residual data, you may want to consider redoing the post-pr
 	In most cases picking neurons is not necessary.
 
 
-==CONGRATULATIONS!: You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`.==
-
 !!! note
-	If you ever change the location of the videos and files generated during the analysis be sure to run [this steps]((Utilities.md#update_path) after
+	If you ever change the location of the videos and files generated during the analysis be sure to run [this steps](Utilities.md#update_path) after
+
+---	
+CONGRATULATIONS!: You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`
 
 === "Next"
 We recommend checking the [Utilities](Utilities.md)  included with CaliAli.
