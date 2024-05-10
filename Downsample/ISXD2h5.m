@@ -37,9 +37,9 @@ nFrames = inputMovieIsx.timing.num_samples;
 
 [filepath,name]=fileparts(inputFilePath);
 if isempty(outpath)
-    out=strcat(filepath,'\',name,'_ds','.h5');
+    out=strcat(filepath,filesep,name,'_ds','.h5');
 else
-    out=strcat(outpath,'\',name,'_ds','.h5');
+    out=strcat(outpath,filesep/Volumes/CharZaku/20230217-jY586LW-SMP2,name,'_ds','.h5');
 end
 f=inputMovieIsx.get_frame_data(0);
 vid=zeros(size(f,1)/ds_f,size(f,2)/ds_f,nFrames,class(f));

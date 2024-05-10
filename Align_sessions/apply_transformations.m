@@ -8,7 +8,7 @@ if ~isfile(opt.out)
         fullFileName = opt.theFiles{k};
 
         [filepath,name]=fileparts(fullFileName);
-        fullFileName=strcat(filepath,'\',name,'_det','.h5');
+        fullFileName=strcat(filepath,filesep,name,'_det','.h5');
         fprintf(1, 'Applaying shifts to %s\n', fullFileName);
         Vid=h5read(fullFileName,'/Object');
         Vid=apply_translations(Vid,opt.T(k,:),opt.T_Mask);

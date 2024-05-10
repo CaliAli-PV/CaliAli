@@ -19,7 +19,7 @@ if ~exist('inF','var')
     return
 else
     [path,file]=fileparts(inF);
-    file2=[path,'\',file,'.mat'];
+    file2=[path,filesep,file,'.mat'];
 end
 m=load(file2);
 

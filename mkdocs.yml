@@ -30,7 +30,6 @@ theme:
       
 plugins:
   - search
-  - mkdocs-video
   - tags
 
   

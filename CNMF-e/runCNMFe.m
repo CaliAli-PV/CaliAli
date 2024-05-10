@@ -119,7 +119,7 @@ neuron.getReady(pars_envs);
 evalin( 'base', 'clearvars -except parin theFiles' );
 %% Load parameters stored in .mat file
 [filepath,name,~] = fileparts(in);
-m_data=strcat(filepath,'\',name,'.mat');
+m_data=strcat(filepath,filesep,name,'.mat');
 if exist(m_data, 'file')
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;

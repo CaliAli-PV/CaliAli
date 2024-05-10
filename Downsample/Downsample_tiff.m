@@ -19,9 +19,9 @@ for k=1:length(theFiles)
     
     [filepath,name]=fileparts(fullFileName);
     if isempty(outpath)
-        out=strcat(filepath,'\',name,'_ds','.h5');
+        out=strcat(filepath,filesep,name,'_ds','.h5');
     else
-        out=strcat(outpath,'\',name,'_ds','.h5');
+        out=strcat(outpath,filesep,name,'_ds','.h5');
     end
     vid=[];
     for i=progress(1:size(temp,3))

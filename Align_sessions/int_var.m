@@ -44,8 +44,8 @@ end
 
 if ~isempty(opt.theFiles)
 [filepath,name]=fileparts(opt.theFiles{end});
-opt.out=strcat(filepath,'\',name,'_aligned','.h5');
-opt.out_mat=strcat(filepath,'\',name,'_aligned.mat');
+opt.out=strcat(filepath,filesep,name,'_aligned','.h5');
+opt.out_mat=strcat(filepath,filesep,name,'_aligned.mat');
 else
 opt.out=[];
 opt.out_mat=[];
