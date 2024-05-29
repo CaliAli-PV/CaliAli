@@ -21,3 +21,6 @@ T=reshape(T,(d1+2)*(d2+2),[]);
 M=reshape(M,(d1+2)*(d2+2),1);
 T(~M,:)=[];
 T=reshape(T,f1,f2,[]);
+end
+
+

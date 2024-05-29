@@ -9,5 +9,5 @@ end
 
 %% remove borders
 Mask=min(Mask,[],3);
-% [~,Mask]=remove_borders(double(Mask),0);
+
 end
