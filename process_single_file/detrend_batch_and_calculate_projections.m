@@ -3,9 +3,9 @@ opt_g=int_var(varargin);
 for k=1:length(opt_g.theFiles)
     fullFileName = opt_g.theFiles{k};
     [filepath,name]=fileparts(fullFileName);
-    out=strcat(filepath,'\',name,'_det','.h5');
+    out=strcat(filepath,filesep,name,'_det','.h5');
     [filepath,name]=fileparts(out);
-    out_mat=strcat(filepath,'\',name,'.mat');
+    out_mat=strcat(filepath,filesep,name,'.mat');
     if ~isfile(out)
         fprintf(1, 'Detrending and calculating relevant projections for %s\n', fullFileName);
         Vid=h5read(fullFileName,'/Object');
@@ -16,13 +16,13 @@ for k=1:length(opt_g.theFiles)
             F=size(Vid,3);
             F_all(k)=F; %#ok
             Cn=mat2gray(max(P.(3){1,1},[],3));
-            PNR=max(P.PNR{1,1} ,[],3); 
+            PNR=max(P.PNR{1,1} ,[],3);
             opt.F=F;
             save(out_mat,'P','F','opt','Cn','PNR');
         else
             F=size(Vid,3);
             Cn=mat2gray(max(P.(3){1,1},[],3));
-            PNR=max(P.PNR{1,1} ,[],3); 
+            PNR=max(P.PNR{1,1} ,[],3);
             F_all(k)=F;
             opt.F=F;
             save(out_mat,'P','F','opt','Cn','PNR','-append');
@@ -52,8 +52,8 @@ for k=1:length(opt_g.theFiles)
         else
             date_v(k) = k; %#ok
         end
-            fprintf(1, 'Calculation of projections and detrending is already done for file "%s".\n', fullFileName);
-        end
+        fprintf(1, 'Calculation of projections and detrending is already done for file "%s".\n', fullFileName);
+    end
 end
 opt=opt_g;
 date_v=date_v-date_v(1);

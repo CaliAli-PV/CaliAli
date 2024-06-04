@@ -119,7 +119,7 @@ neuron.getReady(pars_envs);
 evalin( 'base', 'clearvars -except parin theFiles' );
 %% Load parameters stored in .mat file
 [filepath,name,~] = fileparts(in);
-m_data=strcat(filepath,'\',name,'.mat');
+m_data=strcat(filepath,filesep,name,'.mat');
 if exist(m_data, 'file')
     m=load(m_data);
     neuron.Cn=m.Cn;neuron.PNR=m.PNR;
@@ -169,12 +169,10 @@ for loop=1:10
     neuron.merge_neurons_dist_corr(show_merge);
     neuron.merge_high_corr(show_merge, merge_thr_tempospatial);
     neuron.merge_high_corr(show_merge, [0.9, -inf, -inf]);
-    try
-        dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
-        fprintf('Similarity with previous iteration is %d\n', dis);
-    catch
-        weird_bug=1
-    end
+
+    dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+    fprintf('Similarity with previous iteration is %.3f\n', dis);
+
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
 
