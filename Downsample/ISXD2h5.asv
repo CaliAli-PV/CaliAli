@@ -9,7 +9,7 @@ catch
     if ismac
         baseInscopixPath = '/Applications/Inscopix Data Processing.app/Contents/API/MATLAB';
     elseif isunix
-        baseInscopixPath = './Inscopix Data Processing.linux/Contents/API/MATLAB';
+        baseInscopixPath = './';
     elseif ispc
         baseInscopixPath = 'C:\Program Files\Inscopix\Data Processing';
     else
@@ -31,7 +31,7 @@ end
 
 
 
-inputMovieIsx = isx.Movie.read(inputFilePath);
+inputMovieIsx = isx.Movie(inputFilePath);
 nFrames = inputMovieIsx.timing.num_samples;
 
 [filepath,name]=fileparts(inputFilePath);

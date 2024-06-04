@@ -106,7 +106,7 @@ MC_Batch([], 1,'BVz'[2,3]);
 ![Motion Correction](files/mc.gif)
 
 ???+ danger "Important"
-	Ensure to visually inspect the motion-corrected video before proceeding to the next step. [Play video data in .h5 format](Utilities.md#video_app)
+	Ensure to visually inspect the motion-corrected video before proceeding to the next step. [Play video data in .h5 format](Utilities.md#h5video)
 
 === "Next"	
 After finishing downsampling and motion correction you can proceed to [Inter-session Alignment](alignment.md)
