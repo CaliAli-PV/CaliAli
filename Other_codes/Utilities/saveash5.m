@@ -31,7 +31,7 @@ if ~exist(path_to_file,'file') || ~options.append
 else
     fprintf('Appending to existing file \n')
     info = h5info(path_to_file);
-    options.groupname = [filesep,info.Datasets.Name];
+    options.groupname = defoptions.groupname;
     start_point = [ones(1,nd),info.Datasets.Dataspace.Size(end)+1];
 end
 
