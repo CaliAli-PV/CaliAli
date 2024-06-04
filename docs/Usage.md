@@ -17,7 +17,7 @@ CaliAli has been successfully tested on MATLAB versions 2022a and 2023a running 
 ??? bug "MATLAB 2024a is not compatible with CaliAli on Windows"
 	A bug in the 2024a AppDesigner is causing GUI objects to be improperly located within the app's panels, and it is also affecting other functions. This issue does not affect macOS MATLAB or Windows MATLAB 2023b.
 
-??? note "Process Inscopix data on “Windows
+??? note "Process Inscopix data on Windows"
 	To process Inscopix data, the [Inscopix Data Processing software](https://inscopix.com/software-analysis-miniscope-imaging/) needs to be installed.	
 	
 ??? note "Process [UCLA miniscope](http://miniscope.org/index.php/Main_Page) data on Windows" 
@@ -31,7 +31,7 @@ CaliAli has been successfully tested on MATLAB 2024a running on macOS Sonoma 14.
 
 ??? note "Process [UCLA miniscope](http://miniscope.org/index.php/Main_Page) data on MAC"	
 		MATLAB cannot process compressed avi format. Be sure to save your videos in uncompressed format  or TIFF. 
-“
+
 ### Linux
 
 CaliAli has not been tested on linux. No anticipated compatibility issues are expected.
