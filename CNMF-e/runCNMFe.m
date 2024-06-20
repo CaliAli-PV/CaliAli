@@ -231,7 +231,7 @@ end
 %   view_traces(neuron);
 
 %% Optional post-process
-% neuron.merge_high_corr(1, [0.1, 0.3, -inf]);
+% neuron.merge_high_corr(1, [0.3, 0.2, -inf]);
 
 
 % ix=postprocessing_app(neuron);

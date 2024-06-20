@@ -24,4 +24,7 @@ if ~isequal(sA, sA')
     sA = sparse([ii jj],[jj ii], ones(1, 2*numel(ii)), size(sA,1), size(sA,2));
 end
 [l c] = conncomp(graph(sA));
+c=numel(c);
 l = double(l); % make it compatible of the rest of Matlab
+
+
