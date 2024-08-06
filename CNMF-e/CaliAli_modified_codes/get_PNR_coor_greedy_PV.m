@@ -12,7 +12,7 @@ Y=single(Y);
 
 %% preprocessing data
 % create a spatial filter for removing background
-if n_enhanced==0 && gSig>0
+if gSig>0  % We always filt the signal to get the correlation image
         psf = fspecial('gaussian', ceil(gSig*4+1), gSig);
         ind_nonzero = (psf(:)>=max(psf(:,1)));
         psf = psf-mean(psf(ind_nonzero));
@@ -80,8 +80,8 @@ parfor i=1:size(Y_A,1)
 end
 
 cn=adjust_C(max(cn_all,[],3));
-cn=medfilt2(cn);
-pnr=medfilt2(pnr);
+% cn=medfilt2(cn);
+% pnr=medfilt2(pnr);
 
 end
 

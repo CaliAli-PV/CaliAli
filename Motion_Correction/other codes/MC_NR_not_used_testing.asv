@@ -83,7 +83,7 @@ b=mean(squeeze(Po(:,:,3,:)),3);
 T=permute(cat(4,a,a,b),[1,2,4,3]);
 %% Round 2
 parfor k=1:size(x,2)-1
-    [O2{k},D2{k},Vout2{k}]=batch_register(O{k},Va{k},opt,T)
+    [O2{k},D2{k},Vout2{k}]=batch_register(G{k},V{k},opt,T)
 end
 
 

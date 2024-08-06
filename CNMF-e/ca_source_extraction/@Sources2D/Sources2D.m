@@ -296,7 +296,7 @@ classdef Sources2D < handle
             batches_ = cell(100, 1);
             file_id_ = zeros(100,1, 'like', uint8(1));
             numFrames = zeros(100,1);
-            
+            batch_frames=pars_envs.batch_frames;
             k_batch = 0;
             for m=1:length(nams)
                 neuron = obj.copy();
@@ -309,13 +309,13 @@ classdef Sources2D < handle
                 if isempty(batch_frames)
                     batch_frames = T;
                 end
-                nbatches =  2*round(T/batch_frames)-1; %Modification done by PV
+                nbatches =  round(T/batch_frames); %Modification done by PV
                 if nbatches<=1
                     frame_range_t = [1, T];
                 else
-                    frame_range_t = cumsum([0,obj.frame_range]);
+                    frame_range_t = cumsum([0:batch_frames:T]);
                 end
-                nbatches = length(frame_range_t) -1;  %Modification done by PV
+                % nbatches = length(frame_range_t) -1;  %Modification done by PV
                 
                 for n=1:nbatches
                     k_batch = k_batch +1;

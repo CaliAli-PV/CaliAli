@@ -8,6 +8,8 @@ addParameter(inp,'n_enhanced',1)         %MIN1PIE background substraciton. True 
 addParameter(inp,'theFiles','pickup')    %Cell array containing paths to the input video files, "pickup" let the user choose 
 addParameter(inp,'BVz',[])               %Size of blood vessels [min diameter max diameter] in pixels. 
                                          % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
+addParameter(inp,'cdepth','uint16')        
+addParameter(inp,'use_parallel','1')    % Not implemented. It always uses parallel
 %%                                         
 addParameter(inp,'dynamic_spatial',0)    % not currently in use                                   
 addParameter(inp,'datename',0)           % not currently in use

@@ -15,17 +15,17 @@ out=zeros(size(in,1),size(in,2),size(in,3));
 
 if use_parallel
     b2 = ProgressBar(size(in,3), ...
-    'IsParallel', true, ...
-    'UpdateRate', 1,...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'Appling filter' ...
-    );
+        'IsParallel', true, ...
+        'UpdateRate', 1,...
+        'WorkerDirectory', pwd(), ...
+        'Title', 'Appling vesselness filter' ...
+        );
     b2.setup([], [], []);
     parfor i=1:size(in,3)
         temp=double(in(:,:,i));
         temp=apply_vesselness_filter(temp,sz,norm);
         out(:,:,i)=temp;
-         updateParallel([], pwd);
+        updateParallel([], pwd);
     end
     b2.release();
 else
@@ -44,9 +44,9 @@ Ip=mat2gray(in);
 % thr = prctile(Ip(Ip(:)>0),1) * 0.9;
 % Ip(Ip<=thr) = thr;
 % Ip = Ip - min(Ip(:));
-% Ip = Ip ./ max(Ip(:));    
-% 
+% Ip = Ip ./ max(Ip(:));
+%
 % % compute enhancement for two different tau values
- out = vesselness2D(Ip, sz, [1;1], 0.8, false,norm);
+out = vesselness2D(Ip, sz, [1;1], 0.8, false,norm);
 % out = vesselness2D(Ip, 0.05:0.05:1.5, [1;1], 1, false);
 end

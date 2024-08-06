@@ -14,6 +14,7 @@ if ~isfile(opt.out)
         Vid=apply_translations(Vid,opt.T(k,:),opt.T_Mask);
         Vid=apply_NR_shifts(Vid,opt.shifts(:,:,:,k),opt.NR_Mask);
         Vid=apply_NR_shifts(Vid,opt.shifts_n(:,:,:,k),opt.NR_Mask_n);
+        Vid=sharpen_in(Vid,opt);
         if isa(Vid,'uint16')
         Vid=uint16(single(Vid).*R(k));
         else
@@ -47,3 +48,11 @@ Vid=reshape(Vid,size(Vid,1)*size(Vid,2),[]);
 Vid(~Mask(:),:)=[];
 Vid=reshape(Vid,f1,f2,[]);
 end
+
+function Vid=sharpen_in(Vid,opt)
+gSig=opt.gSig;
+parfor i=1:size(Vid,3)
+    Vid(:,:,i)=imsharpen(Vid(:,:,i),'Radius',gSig,'Amount',1);
+end
+end
+

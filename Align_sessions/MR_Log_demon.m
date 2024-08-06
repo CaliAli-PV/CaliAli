@@ -4,8 +4,8 @@ X1=v2uint8(X1);
 X2=v2uint8(X2);
 %% Parameters
 if ~exist('opt','var')
-    opt = struct('stop_criterium',0.001,'imagepad',1.5,'niter',5, 'sigma_fluid',1,...
-        'sigma_diffusion',1, 'sigma_i',1,...
+    opt = struct('stop_criterium',0.001,'imagepad',1.5,'niter',50, 'sigma_fluid',3,...
+        'sigma_diffusion',3, 'sigma_i',1,...
         'sigma_x',1, 'do_display',0, 'do_plotenergy',0);
 end
 
@@ -14,14 +14,18 @@ nlevel=size(X1,3):-1:1;
 %% Multiresolution
 it=0;
 for k=nlevel
-    if size(opt,1)>1
+    if iscell(opt)
         t_opt=opt{nlevel(k)};
     else
         t_opt=opt;
     end
     it=it+1;
     % downsample
+    if isfield(t_opt,'scale')
+    scale=t_opt.scale;
+    else   
     scale = 2^-(k-1);
+    end
 
     F=X1(:,:,k);
     M=X2(:,:,k);
@@ -50,7 +54,7 @@ sx=sum(sx,4);
 sy=sum(sy,4);
 
 
-D=cat(4,sy,sx);
+D=squeeze(cat(4,sy,sx));
 
 end
 

@@ -46,6 +46,7 @@ for iter=1:opt.niter
     [sx,sy] = expfield(vx,vy);  % deformation field
     % Compute energy
     e(iter) = energy(F,M,sx,sy,opt.sigma_i,opt.sigma_x);
+
     if e(iter)<e_min
         sx_min = sx; sy_min = sy; % update best fields
         vx_min = vx; vy_min = vy; % update best fields
@@ -53,7 +54,7 @@ for iter=1:opt.niter
     end
 
     % Stop criterium
-    if iter>1 && abs(e(iter) - e(max(1,iter-5))) < e(1)*opt.stop_criterium
+    if iter>1 && (abs(e(iter) - e(max(1,iter-5))) < e(1)*opt.stop_criterium || (e(iter)-opt.stop_criterium)>min(e))
         break;
     end
     if opt.do_display
@@ -78,7 +79,7 @@ for iter=1:opt.niter
         if opt.do_plotenergy
             subplot(2,2,3)
             hold on;
-            plot(1:iter,e(1:iter)./e(1),'r-'); xlim([0 opt.niter]);
+            plot(1:iter,e(1:iter),'r-'); xlim([0 opt.niter]);
             xlabel('Iteration'); ylabel('Energy');
             hold off;
             drawnow

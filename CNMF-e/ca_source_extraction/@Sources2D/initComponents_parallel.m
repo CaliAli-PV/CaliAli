@@ -306,6 +306,7 @@ PNR = zeros(d1, d2);
 default_kernel = obj.kernel;
 
 results = cell(nr_patch*nc_patch, 1);
+use_parallel=0;
 if use_parallel
     
     [userview,~] = memory;
@@ -355,9 +356,9 @@ if use_parallel
         Ypatch = single(reshape(Ypatch, [], T)); 
         if nk>1
             Ypatch_dt = detrend_data(Ypatch, nk, detrend_method); % detrend data
-            [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope_PV(Ypatch_dt, K, tmp_options, [], tmp_save_avi);
+            [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope(Ypatch_dt, K, tmp_options, [], tmp_save_avi);
         else
-            [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope_PV(Ypatch, K, tmp_options, [], tmp_save_avi);
+            [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope(Ypatch, K, tmp_options, [], tmp_save_avi);
         end
         
         % put everthing into one struct variable

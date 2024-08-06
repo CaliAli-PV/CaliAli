@@ -1,5 +1,4 @@
 function [Vid,p,R,opt]=get_projections_and_detrend(Vid,opt)
-S = class(Vid);
 if ~isempty(opt.Mask)
     Vid=cut_borders(Vid,opt.Mask);
 else
@@ -10,7 +9,7 @@ Vf=get_Vf_vignetting_fixed(M,opt);
 Vid=det_video(Vid,opt.sf,opt.n_enhanced,opt.gSig);
 [~,Cn,PNR]=get_PNR_coor_greedy_PV(Vid,opt.gSig,[],[],opt.n_enhanced);
 R=range(Vid,'all');
-if strcmp(S,'uint8')
+if strcmp(opt.cdepth,'uint8')
     Vid=v2uint8(Vid);
 else
     Vid=v2uint16(Vid);
@@ -31,7 +30,7 @@ end
 function dt=det_video(in,sf,neuron_enhance,gSig)
 [d1,d2,d3]=size(in);
 dt = detrend_PV(sf/10,reshape(in,[d1*d2,d3]))*50;
-dt=dt+single(randn(size(dt)));
+dt=dt+single(randn(size(dt))); %This is to ensure that we dont divide by 0. could happen if defective pixels were not fixed before
 dt=dt./GetSn(dt);
 dt=reshape(dt,d1,d2,d3);
 if neuron_enhance==1
