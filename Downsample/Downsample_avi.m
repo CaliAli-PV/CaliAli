@@ -26,7 +26,7 @@ for k=1:length(theFiles)
         temp=load_avi(fullFileName);
         vid=[];
         for i=progress(1:size(temp,3))
-            vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
+            vid(:,:,i)=imresize(medilt2(temp(:,:,i)),1/ds_f,'bilinear');
         end
         saveash5(v2uint8(vid),out);
     else

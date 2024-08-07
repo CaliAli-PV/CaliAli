@@ -1,5 +1,6 @@
 classdef ProgressBar < matlab.System
     %PROGRESSBAR A class to provide a convenient and useful progress bar
+    % delete(timerfindall('Tag', 'ProgressBar'))
     % -------------------------------------------------------------------------
     % This class mimics the design and some features of the TQDM
     % (https://github.com/tqdm/tqdm) progress bar in python. All optional

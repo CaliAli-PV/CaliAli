@@ -8,14 +8,14 @@ if size(M,3)>1
 else
     parf=0;
 end
-M=double(M);
+M=single(M);
 if parf==1
-    sz=round(max(size(M,[1,2]))/8);
+    sz=round(max(size(M,[1,2]))/16);
     se = offsetstrel('ball',sz,0.01);
     R=M(:,:,1)-imopen(M(:,:,1),se);
     [gradThresh,numIter] = imdiffuseest(R,'ConductionMethod','quadratic');
 
-    C=single(M);
+    M=single(M);
     b = ProgressBar(size(M,3), ...
         'IsParallel', true, ...
         'UpdateRate', 1,...
@@ -24,14 +24,14 @@ if parf==1
         );
     b.setup([], [], []);
     parfor i=1:size(M,3)
-        C(:,:,i) = mat2gray(imdiffusefilt(M(:,:,i)-imopen(M(:,:,i),se),'ConductionMethod','quadratic', ...
+        M(:,:,i) = mat2gray(imdiffusefilt(M(:,:,i)-imopen(M(:,:,i),se),'ConductionMethod','quadratic', ...
             'GradientThreshold',gradThresh,'NumberOfIterations',numIter));
         updateParallel([], pwd);
     end
     b.release();
-    C=C+randn(size(C),'single')/10000;
+    M=M+randn(size(M),'single')/10000;
 
-    Vf=mat2gray(vesselness_PV(C,parf,linspace(opt.BVz(1),opt.BVz(2),10),0));
+    Vf=mat2gray(vesselness_PV(M,parf,linspace(opt.BVz(1),opt.BVz(2),10),0));
     Vf=med_filt(Vf);
 
 else
@@ -42,12 +42,12 @@ else
         if i==1
             [gradThresh,numIter] = imdiffuseest(R,'ConductionMethod','quadratic');
         end
-        C(:,:,i) = mat2gray(imdiffusefilt(R,'ConductionMethod','quadratic', ...
+        M(:,:,i) = mat2gray(imdiffusefilt(R,'ConductionMethod','quadratic', ...
             'GradientThreshold',gradThresh,'NumberOfIterations',numIter));
     end
-    C=C+randn(size(C))/10000;
+    M=M+randn(size(M))/10000;
 
-    Vf=mat2gray(vesselness_PV(C,parf,linspace(opt.BVz(1),opt.BVz(2),10),0));
+    Vf=mat2gray(vesselness_PV(M,parf,linspace(opt.BVz(1),opt.BVz(2),10),0));
     Vf=med_filt(Vf);
 end
 

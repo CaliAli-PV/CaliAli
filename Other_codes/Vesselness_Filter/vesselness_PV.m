@@ -1,4 +1,4 @@
-function out=vesselness_PV(in,use_parallel,sz,norm)
+function in=vesselness_PV(in,use_parallel,sz,norm)
 
 if ~exist('sz','var')
     sz=0.5:0.5:2;
@@ -24,7 +24,7 @@ if use_parallel
     parfor i=1:size(in,3)
         temp=double(in(:,:,i));
         temp=apply_vesselness_filter(temp,sz,norm);
-        out(:,:,i)=temp;
+        in(:,:,i)=temp;
         updateParallel([], pwd);
     end
     b2.release();
@@ -32,7 +32,7 @@ else
     for i=1:size(in,3)
         temp=double(in(:,:,i));
         temp=apply_vesselness_filter(temp,sz,norm);
-        out(:,:,i)=temp;
+        in(:,:,i)=temp;
     end
 end
 end

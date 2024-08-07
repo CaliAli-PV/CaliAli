@@ -1,8 +1,12 @@
 function BV_app()
 
-theFiles = uipickfiles('REFilter','\_mc.h5*$','num',1);
+theFiles = uipickfiles('REFilter','\.h5*$','num',1);
 V=h5read(theFiles{1, 1}  ,'/Object');
-M=median(V,3);
+if strcmp(theFiles{1, 1}(end-4:end-3),'mc')
+    M=median(V,3);
+else
+    M=V(:,:,1);
+end
 
 [M,opt.Mask]=remove_borders(M,0);
 
@@ -10,7 +14,7 @@ if ~exist('opt','var')
     opt.BVz=[0.6*2.5,0.9*2.5];
 end
 
-sz=round(max(size(M))/8);
+sz=round(max(size(M))/18);
 se = offsetstrel('ball',sz,0.01);
 for i=1:size(M,3)
     R=M(:,:,i)-imopen(M(:,:,i),se);

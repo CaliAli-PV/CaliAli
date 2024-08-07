@@ -44,7 +44,7 @@ f=inputMovieIsx.get_frame_data(0);
 vid=zeros(ceil(size(f,1)/ds_f),ceil(size(f,2)/ds_f),nFrames,class(f));
 for i=progress(1:nFrames)
     f=inputMovieIsx.get_frame_data(i-1);
-    vid(:,:,i)=imresize(f,1/ds_f,'bilinear');
+    vid(:,:,i)=imresize(medfilt2(f),1/ds_f,'bilinear');
 end
 saveash5(vid,out);
 

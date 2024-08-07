@@ -24,10 +24,10 @@ for k=1:length(theFiles)
     end
 
     if ~isfile(out)
-        temp=tiff_reader(fullFileName);
+        temp=parallelReadTiff(fullFileName);
         vid=[];
         for i=progress(1:size(temp,3))
-            vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
+            vid(:,:,i)=imresize(medfilt2(temp(:,:,i)),1/ds_f,'bilinear');
         end
         saveash5(v2uint16(vid),out);
     else
