@@ -87,7 +87,7 @@ MC(:, sum(MC,1)==1) = [];
 % folders and files for saving the results
 log_file =  obj.P.log_file;
 flog = fopen(log_file, 'a');
-log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
+% log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
 
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start Merging neurons based on temporal correlations and neuron distances:\n ');

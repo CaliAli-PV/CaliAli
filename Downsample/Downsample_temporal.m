@@ -1,26 +1,36 @@
-function Downsample_temporal(ds_f,theFiles)
+function Downsample_temporal(ds_f,outpath,theFiles)
+if ~exist('outpath','var')
+    outpath = [];
+end
 
 if ~exist('ds_f','var')
-    ds_f = 2;
+    ds_f = 1;
 end
 
 if ~exist('theFiles','var')
-    theFiles = uipickfiles('FilterSpec','*.h5');
+     theFiles = uipickfiles('FilterSpec','*.h5');
 end
 
-
+if ds_f>1
 for k=1:length(theFiles)
     fullFileName = theFiles{k};
     fprintf(1, 'Now reading %s\n', fullFileName);
-    % output file:
+
     [filepath,name]=fileparts(fullFileName);
-    out=strcat(filepath,filesep,name,'_tds','.h5');
+    if isempty(outpath)
+        out=strcat(filepath,filesep,name,'_dst','.h5');
+    else
+        out=strcat(outpath,filesep,name,'_dst','.h5');
+    end
     if ~isfile(out)
-        V=h5read(fullFileName,'/Object');
-        V = V(:, :, 1:ds_f:end);
-        saveash5(v2uint16(V),out);
+        vid=h5read(fullFileName,'/Object');
+        vid=vid(:,:,1:ds_f:end);
+        saveash5(v2uint8(vid),out);
     else
         fprintf(1, 'File %s already exist in destination folder!\n', out);
     end
 end
-     
+
+else
+    fprintf(1, 'Temporal downsampling factor is 1. Change ''ds_f''\n');
+end

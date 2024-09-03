@@ -1,7 +1,8 @@
 function out=plot_energy_PV(IM,e)
-% out=plot_energy_PV(IM,E)
+% out=plot_energy_PV(im,e)
 IM=flip(IM);
 e=flip(e);
+mag_factor_grid=8;
 
 cmap=v2uint8([zeros(256,1),(1:256)',zeros(256,1)]);
 for i=1:size(IM,2)
@@ -16,13 +17,14 @@ for i=1:size(IM,2)
     end
     Fr=[];
 for k=progress(1:size(IM{1, i},2))
-    fig=figure('position',[968.2  286.6 847.2 466.4],'visible','off');
-    tiledlayout(2,4,"TileSpacing","compact");
-    nexttile([1,2])
-    lim=IM{1, i}{7, k};
-    imshow(v2uint8(IM{1, i}{1,k}(lim(1,1):lim(2,1),lim(1,2):lim(2,2))));
-    colormap(cmap);
-    title("Session 1");
+    % fig=figure('position',[968.2  286.6 847.2 466.4],'visible','off');
+     fig=figure('position',[968.2  286.6 1147.2 366.4],'visible','off');
+    tiledlayout(1,6,"TileSpacing","compact");
+    % nexttile([1,2])
+    % lim=IM{1, i}{7, k};
+    % imshow(v2uint8(IM{1, i}{1,k}(lim(1,1):lim(2,1),lim(1,2):lim(2,2))));
+    % colormap(cmap);
+    % title("Session 1");
 
     %===================
     nexttile([1,2])
@@ -32,7 +34,7 @@ for k=progress(1:size(IM{1, i},2))
     title("Session 2 Warped")
     %===================
     nexttile([1,2])
-    showgrid_PV(IM{1, i}{5,k}*10,IM{1, i}{6,k}*10,4,lim)
+    showgrid_PV(IM{1, i}{5,k}*mag_factor_grid,IM{1, i}{6,k}*mag_factor_grid,4,lim)
     title("Displacement grid")
     %===================
     nexttile([1,2])

@@ -1,5 +1,9 @@
-function obj=update_spatial_CaliAli_dynamic_spatial(obj, use_parallel)
+function obj=update_spatial_CaliAli_dynamic_spatial(obj, use_parallel,F)
 fprintf('\n-----------------UPDATE SPATIAL - dynamic mode---------------------------\n');
+
+if ~(exist('F','var') && ~isempty(F))
+    F=get_batch_size(obj,0);
+end
 
 A_T=full(obj.A_batch.*0);
 weights=zeros(size(obj.A_batch,2),size(obj.A_batch,3));

@@ -148,7 +148,7 @@ if ~isempty(options.Cn)
     Cn=options.Cn;
     PNR=options.PNR;
 else
-    [~,~,Cn,PNR]=get_PNR_coor_greedy_PV(HY,gSig);
+    [~,Cn,PNR]=get_PNR_coor_greedy_PV(HY,gSig);
 end
 
 Cn0=Cn;

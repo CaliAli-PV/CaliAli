@@ -7,7 +7,7 @@ elseif isempty(theFiles)
 end
 opt=int_var(cat(2,varargin,{'theFiles',theFiles}));
 if ~exist('do_nr','var')
-    do_nr = 1;
+    do_nr = 0;
 end
 
 for k=1:length(theFiles)

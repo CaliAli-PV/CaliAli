@@ -1,7 +1,10 @@
-function obj=update_background_CaliAli(obj, use_parallel)
+function obj=update_background_CaliAli(obj, use_parallel,F)
 
+if ~(exist('F','var') && ~isempty(F))
+    F=get_batch_size(obj,0);
+end
 
-batch=[0,cumsum(obj.options.F)];
+batch=[0,cumsum(F)];
 
 b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);
 f=cellfun(@(x) x.*0,obj.f,'UniformOutput',false);

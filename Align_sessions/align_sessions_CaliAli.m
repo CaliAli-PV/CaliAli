@@ -6,6 +6,11 @@ if ~isfile(opt.out)
 end
 opt=detrend_batch_and_calculate_projections(opt);
 P1=get_stored_projections(opt);
+
+if opt.UseBV==0
+    fprintf(2, 'Aligning utilizing neurons data  \n ');
+    P1.(2){1,1}=P1.(3){1,1};
+end
 fprintf(1, 'Aligning video by translation ...\n');
 [P2,opt.T,opt.T_Mask]=sessions_translate(P1);
 fprintf(1, 'Calculating non-rigid aligments...\n');
@@ -13,7 +18,9 @@ fprintf(1, 'Calculating non-rigid aligments...\n');
 [opt.shifts_n,P4,opt.NR_Mask_n]=get_shifts_alignment_only_neurons(P3);
 P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','Multi-Scale','Final'});
 P=BV_gray2RGB(P);
-[P,opt]=evaluate_BV(P,opt);
+if opt.UseBV==1
+    [P,opt]=evaluate_BV(P,opt);
+end
 apply_transformations(opt);
 save_relevant_variables(P,opt)
 end
@@ -37,7 +44,9 @@ get_neuron_projections_correlations(P,3);
 end
 
 function save_relevant_variables(P,opt)
-Cn=mat2gray(max(P.(4)(1,:).(3){1,1},[],3));
+Cn=max(P.(4)(1,:).(3){1,1},[],3);
+opt.Cn_scale=max(Cn,[],'all');
+Cn=Cn./opt.Cn_scale;
 PNR=max(P.(4)(1,:).(4){1,1},[],3);
 BV_score=opt.BV_score;
 F=opt.F;

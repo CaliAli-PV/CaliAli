@@ -15,13 +15,17 @@ for k=1:length(opt_g.theFiles)
         if ~isfile(out_mat)
             F=size(Vid,3);
             F_all(k)=F; %#ok
-            Cn=mat2gray(max(P.(3){1,1},[],3));
+            Cn=max(P.(3){1,1},[],3);
+            opt.Cn_scale=max(Cn,[],'all');
+            Cn=Cn./opt.Cn_scale;
             PNR=max(P.PNR{1,1} ,[],3);
             opt.F=F;
             save(out_mat,'P','F','opt','Cn','PNR');
         else
             F=size(Vid,3);
-            Cn=mat2gray(max(P.(3){1,1},[],3));
+            Cn=max(P.(3){1,1},[],3);
+            opt.Cn_scale=max(Cn,[],'all');
+            Cn=Cn./opt.Cn_scale;
             PNR=max(P.PNR{1,1} ,[],3);
             F_all(k)=F;
             opt.F=F;

@@ -3,7 +3,8 @@ function F=get_batch_size(neuron,print_v)
 if ~exist('print_v','var')
     print_v=1;
 end
-F=neuron.options.F;
+F=neuron.CaliAli_opt.F;
+
 if neuron.CaliAli_opt.dynamic_spatial==1
     ses=20;
     if length(F)<ses

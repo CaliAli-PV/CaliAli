@@ -1,4 +1,4 @@
-function [center, Cn, PNR] = initComponents_residual_parallel(obj, K, save_avi, use_parallel, min_corr, min_pnr, seed_method)
+function [center, Cn, PNR] = initComponents_residual_parallel(obj, K,frame_range, save_avi, use_parallel, min_corr, min_pnr, seed_method)
 %% initializing spatial/temporal components for the residual video
 %% input:
 %   K:  scalar, maximum number of neurons
@@ -54,7 +54,6 @@ if exist('seed_method', 'var') && ~isempty(seed_method)
     obj.options.seed_method = seed_method;
 end
 % frames to be loaded for initialization
-frame_range = obj.frame_range;
 T = diff(frame_range) + 1;
 
 % maximum neuron number in each patch
@@ -140,276 +139,29 @@ center = cell(nr_patch, nc_patch);     % save centers of all initialized neurons
 Cn = zeros(d1, d2);
 PNR = zeros(d1, d2);
 default_kernel = obj.kernel;
-
-results = cell(nr_patch*nc_patch, 1);
-if use_parallel
-    parfor mpatch=1:(nr_patch*nc_patch)
-        % get the indices corresponding to the selected patch
-        tmp_patch = patch_pos{mpatch};
-        if strcmpi(bg_model, 'ring')
-            % when it's ring model, log pixels surrounding the patch
-            tmp_block = block_pos{mpatch};
-        else
-            tmp_block = tmp_patch;
-        end
-        [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-        
-        % use ind_patch to indicate pixels within the patch
-        ind_patch = false(diff(tmp_block(1:2))+1, diff(tmp_block(3:4))+1);
-        ind_patch((tmp_patch(1):tmp_patch(2))-tmp_block(1)+1, (tmp_patch(3):tmp_patch(4))-tmp_block(3)+1) = true;
-        
-        % get the neural activity
-        C_patch = C{mpatch};                % previous estimation of neural activity
-        if isempty(C_patch)
-            C_patch = 0;
-            A_patch = 0;
-        else
-            A_patch = A{mpatch};
-        end
-        
-        % boundaries pixels to be avoided for detecting seed pixels
-        tmp_options = options;
-        tmp_options.visible_off = true;
-        tmp_options.bd = bd*([r==1, r==nr_patch, c==1, c==nc_patch]);
-        
-                % get mask and CnPNR
-        tmp_options.Mask=options.Mask(tmp_patch(1):tmp_patch(2),tmp_patch(3):tmp_patch(4));  %PV
-        tmp_options.PNR=[];  %PV
-        tmp_options.Cn=[];  %PV
-        
-        % patch dimension
-        tmp_options.d1 = diff(tmp_patch(1:2))+1;
-        tmp_options.d2 = diff(tmp_patch(3:4))+1;
-        
-        % parameter for calcium indicators. This one may not be used if the
-        % selected deconvolution algorithm doesn't need it
-        tmp_options.kernel = default_kernel;
-        
-        % file names for saving avi file
-        if save_avi
-            tmp_save_avi = sprintf('%sinitialization_res_%d_%d_%d_%d.avi', log_folder, tmp_block(1), tmp_block(2), tmp_block(3), tmp_block(4));
-        else
-            tmp_save_avi = save_avi;
-        end
-        % get data
-        if strcmpi(bg_model, 'ring')
-            % including areas outside of the patch for recorving background
-            % in the ring model
-            Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, true);
-        else
-            Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, false);
-        end
-        [nr_block, nc_block, ~] = size(Ypatch);
-        
-        Ypatch = double(reshape(Ypatch, [], T)) - A_patch*C_patch;
-        % get background
-        if strcmpi(bg_model, 'ring')
-            W_ring = W{mpatch};
-            b0_ring = b0{mpatch};
-            %             Ypatch = bsxfun(@minus, Ypatch(ind_patch,:)- W_ring*Ypatch, b0_ring-W_ring*mean(Ypatch, 2));
-            if bg_ssub==1
-                Ypatch = bsxfun(@minus, double(Ypatch(ind_patch,:))- W_ring*Ypatch, b0_ring-W_ring*mean(Ypatch, 2));
-            else
-                % get the dimension of the downsampled data
-                [d1s, d2s] = size(imresize(zeros(nr_block, nc_block), 1/bg_ssub));
-                % downsample data and reconstruct B^f
-                temp = reshape(bsxfun(@minus, Ypatch, mean(Ypatch, 2)), nr_block, nc_block, []);
-                temp = imresize(temp, 1./bg_ssub);
-                Bf = reshape(W_ring*reshape(temp, [], T), d1s, d2s, T);
-                Bf = imresize(Bf, [nr_block, nc_block]);
-                Bf = reshape(Bf, [], T);
-                
-                Ypatch = bsxfun(@minus, double(Ypatch(ind_patch, :)) - Bf(ind_patch, :), b0_ring);
-            end
-        elseif strcmpi(bg_model, 'nmf')
-            b_nmf = b{mpatch};
-            f_nmf = f{mpatch};
-            Ypatch = Ypatch- b_nmf*f_nmf;
-        else
-            b_svd = b{mpatch};
-            f_svd = f{mpatch};
-            b0_svd = b0{mpatch};
-            Ypatch = Ypatch - bsxfun(@plus, b_svd*f_svd, b0_svd);
-        end
-        
-        
-        
-        [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope_PV(Ypatch, K, tmp_options, [], tmp_save_avi);
-        
-        % put everthing into one struct variable
-        tmp_results.center = tmp_center;
-        tmp_results.Cn = tmp_Cn;
-        tmp_results.PNR = tmp_PNR;
-        results{mpatch} = tmp_results;
-        %     eval(sprintf('results_patch_%d=tmp_results;', mpatch));  %#ok<PFBFN>
-        % display initialization progress
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
-    end
-else
-    for mpatch=1:(nr_patch*nc_patch)
-        % get the indices corresponding to the selected patch
-        tmp_patch = patch_pos{mpatch};
-        if strcmpi(bg_model, 'ring')
-            % when it's ring model, log pixels surrounding the patch
-            tmp_block = block_pos{mpatch};
-        else
-            tmp_block = tmp_patch;
-        end
-        [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-        
-        % use ind_patch to indicate pixels within the patch
-        ind_patch = false(diff(tmp_block(1:2))+1, diff(tmp_block(3:4))+1);
-        ind_patch((tmp_patch(1):tmp_patch(2))-tmp_block(1)+1, (tmp_patch(3):tmp_patch(4))-tmp_block(3)+1) = true;
-        
-        % get the neural activity
-        C_patch = C{mpatch};                % previous estimation of neural activity
-        if isempty(C_patch)
-            C_patch = 0;
-            A_patch = 0;
-        else
-            A_patch = A{mpatch};
-        end
-        
-        % boundaries pixels to be avoided for detecting seed pixels
-        tmp_options = options;
-        tmp_options.visible_off = true;
-        tmp_options.bd = bd*([r==1, r==nr_patch, c==1, c==nc_patch]);
-        
-                % get mask and CnPNR
-        tmp_options.Mask=options.Mask(tmp_patch(1):tmp_patch(2),tmp_patch(3):tmp_patch(4));  %PV
-        tmp_options.PNR=[];  %PV
-        tmp_options.Cn=[];  %PV
-        
-        % patch dimension
-        tmp_options.d1 = diff(tmp_patch(1:2))+1;
-        tmp_options.d2 = diff(tmp_patch(3:4))+1;
-        
-        % parameter for calcium indicators. This one may not be used if the
-        % selected deconvolution algorithm doesn't need it
-        tmp_options.kernel = default_kernel;
-        
-        % file names for saving avi file
-        if save_avi
-            tmp_save_avi = sprintf('%sinitialization_res_%d_%d_%d_%d.avi', log_folder, tmp_block(1), tmp_block(2), tmp_block(3), tmp_block(4));
-        else
-            tmp_save_avi = save_avi;
-        end
-        % get data
-        if strcmpi(bg_model, 'ring')
-            % including areas outside of the patch for recorving background
-            % in the ring model
-            Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, true);
-        else
-            Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, false);
-        end
-        [nr_block, nc_block, ~] = size(Ypatch);
-        
-        Ypatch = double(reshape(Ypatch, [], T)) - A_patch*C_patch;
-        % get background
-        if strcmpi(bg_model, 'ring')
-            W_ring = W{mpatch};
-            b0_ring = b0{mpatch};
-            %             Ypatch = bsxfun(@minus, Ypatch(ind_patch,:)- W_ring*Ypatch, b0_ring-W_ring*mean(Ypatch, 2));
-            if bg_ssub==1
-                Ypatch = bsxfun(@minus, double(Ypatch(ind_patch,:))- W_ring*Ypatch, b0_ring-W_ring*mean(Ypatch, 2));
-            else
-                % get the dimension of the downsampled data
-                [d1s, d2s] = size(imresize(zeros(nr_block, nc_block), 1/bg_ssub));
-                % downsample data and reconstruct B^f
-                temp = reshape(bsxfun(@minus, Ypatch, mean(Ypatch, 2)), nr_block, nc_block, []);
-                temp = imresize(temp, 1./bg_ssub);
-                Bf = reshape(W_ring*reshape(temp, [], T), d1s, d2s, T);
-                Bf = imresize(Bf, [nr_block, nc_block]);
-                Bf = reshape(Bf, [], T);
-                
-                Ypatch = bsxfun(@minus, double(Ypatch(ind_patch, :)) - Bf(ind_patch, :), b0_ring);
-            end
-            
-        elseif strcmpi(bg_model, 'nmf')
-            b_nmf = b{mpatch};
-            f_nmf = f{mpatch};
-            Ypatch = Ypatch- b_nmf*f_nmf;
-        else
-            b_svd = b{mpatch};
-            f_svd = f{mpatch};
-            b0_svd = b0{mpatch};
-            Ypatch = Ypatch - bsxfun(@plus, b_svd*f_svd, b0_svd);
-        end            
-        
-        [tmp_results, tmp_center, tmp_Cn, tmp_PNR, ~] = greedyROI_endoscope_PV(Ypatch, K, tmp_options, [], tmp_save_avi);
-        
-        % put everthing into one struct variable
-        tmp_results.center = tmp_center;
-        tmp_results.Cn = tmp_Cn;
-        tmp_results.PNR = tmp_PNR;
-        results{mpatch} = tmp_results;
-        %     eval(sprintf('results_patch_%d=tmp_results;', mpatch));  %#ok<PFBFN>
-        % display initialization progress
-        fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
-    end
+if isempty(options.Mask)
+    options.Mask=true(d1,d2);
 end
 
-%% collect results
-for mpatch=1:(nr_patch*nc_patch)
-    % get the indices corresponding to the selected patch
-    [mr, mc] = ind2sub([nr_patch, nc_patch], mpatch);
-    tmp_patch = patch_pos{mr, mc};
-    tmp_block = tmp_patch;
-    r0 = tmp_block(1);
-    r1 = tmp_block(2);
-    c0 = tmp_block(3);
-    c1 = tmp_block(4);
-    %         ind_patch = true(r1-r0+1, c1-c0+1);
-    %         ind_patch((tmp_patch(1):tmp_patch(2))-r0+1, (tmp_patch(3):tmp_patch(4))-c0+1) = false;
-    %
-    % unpack results
-    tmp_results = results{mpatch};
-    if isempty(tmp_results)
-        continue;
-    end
-    
-    tmp_Ain = tmp_results.Ain;
-    tmp_ind = (sum(tmp_Ain, 1)>0);
-    tmp_Ain = tmp_Ain(:, tmp_ind);
-    tmp_Cin = tmp_results.Cin(tmp_ind,:);
-    tmp_Cin_raw = tmp_results.Cin_raw(tmp_ind,:);
-    tmp_center = tmp_results.center(tmp_ind,:) ;
-    tmp_Cn = tmp_results.Cn;
-    tmp_PNR = tmp_results.PNR;
-    if options.deconv_flag
-        tmp_Sin = tmp_results.Sin(tmp_ind,:);
-        tmp_kernel_pars = tmp_results.kernel_pars(tmp_ind,:);
-    end
-    tmp_K = size(tmp_Ain, 2);   % number of neurons within the selected patch
-    [tmp_d1, tmp_d2] = size(tmp_Cn);
-    
-    temp = zeros(d1, d2, tmp_K);  % spatial components of all neurons
-    temp(r0:r1, c0:c1, :) = reshape(full(tmp_Ain), tmp_d1, tmp_d2, []);
-    Ain{mr, mc} = reshape(temp, d1*d2, tmp_K);
-    Cin{mr, mc} = tmp_Cin;      % temporal components of all neurons
-    Cin_raw{mr, mc} = tmp_Cin_raw;
-    if options.deconv_flag
-        Sin{mr, mc} = tmp_Sin;
-        kernel_pars{mr,mc} = tmp_kernel_pars;
-    end
-    center{mr, mc} = bsxfun(@plus, tmp_center, [r0-1, c0-1]); % centers
-    
-    Cn(r0:r1, c0:c1) = max(Cn(r0:r1, c0:c1), tmp_Cn);
-    PNR(r0:r1, c0:c1) = max(PNR(r0:r1, c0:c1), tmp_PNR);
-end
+
+CaliAli_opt=obj.CaliAli_opt;
+n_opt=obj.options;
+
+ Ypatch = obj.load_patch_data([],frame_range);
+k=isnan(sum(obj.A));
+ Ypatch = double(reshape(Ypatch, [], T)) - full(obj.A(:,~k))*obj.C(~k,:);
+
+Ypatch = Ypatch-double(reshape(reconstruct_background_PV(obj,frame_range), [], T));
+
+[tmp_results, tmp_center, tmp_Cn, tmp_PNR]=greedyROI_endoscope_CaliAli_original(reshape(Ypatch,d1,d2,T),CaliAli_opt,[],n_opt);
+
 %% export the results
-Ain = cell2mat(reshape(Ain, 1, []));
-Cin = cell2mat(reshape(Cin, [], 1));
-Cin_raw = cell2mat(reshape(Cin_raw, [], 1));
-center = cell2mat(reshape(center, [], 1));
-obj.A = [obj.A, sparse(Ain)];
-obj.C = [obj.C; Cin];
-obj.C_raw = [obj.C_raw; Cin_raw];
+obj.A = [obj.A, tmp_results.Ain];
+obj.C = [obj.C; tmp_results.Cin];
+obj.C_raw = [obj.C_raw; tmp_results.Cin_raw];
 if options.deconv_flag
-    Sin = cell2mat(reshape(Sin, [], 1));
-    kernel_pars = cell2mat(reshape(kernel_pars, [], 1));
-    obj.S = [obj.S; sparse(Sin)];
-    obj.P.kernel_pars = [obj.P.kernel_pars; kernel_pars];
+    obj.S = [obj.S; sparse(tmp_results.Sin)];
+    obj.P.kernel_pars = [obj.P.kernel_pars; tmp_results.kernel_pars];
 else
     obj.S = [obj.S; zeros(size(obj.C))];
 end
@@ -418,7 +170,8 @@ k_ids = obj.P.k_ids;
 obj.ids = [obj.ids, k_ids+(1:K)];
 obj.tags = [obj.tags;zeros(K,1, 'like', uint16(0))];
 obj.P.k_ids = K+k_ids;
-
+obj.Cnr=tmp_Cn;
+obj.PNRr=tmp_PNR;
 %% save the results to log
 
 fprintf(flog, '[%s]\b', get_minute());

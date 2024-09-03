@@ -3,7 +3,6 @@ if ~exist('opt','var')
     opt.BVz=[0.6*2.5,0.9*2.5];
 end
 
-
 if size(M,3)>1
     parf=1;
 else
@@ -17,7 +16,10 @@ se = offsetstrel('ball',sz,0.01);
 
 
 if parf==1
-    M=create_batches(M);
+
+
+     M=create_batches(M,f);
+
     b = ProgressBar(size(M,1), ...
         'IsParallel', true, ...
         'UpdateRate', 1,...
@@ -52,7 +54,7 @@ M = mat2gray(imdiffusefilt(R,'ConductionMethod','quadratic', ...
     'GradientThreshold',gradThresh,'NumberOfIterations',numIter));
 end
 
-function M=create_batches(M)
+function M=create_batches(M,f)
 [d1, d2, f] = size(M);   % Get the dimensions of the original array
 batch_size = 100;        % Define the batch size
 
@@ -67,14 +69,11 @@ M = squeeze(mat2cell(M, d1, d2, batch_sizes));
 end
 
 function in=process_batch(in,se,gradThresh,numIter,bv_scale)
-    [d1, d2, num_frames] = size(in);
-    noise = randn(d1, d2, 'single') / 10000; % Precompute noise array
-    for i = 1:num_frames
-        frame = in(:,:,i);
-        frame = remove_vignetting(frame, se, gradThresh, numIter);
-        frame = frame + noise;  % Add precomputed noise
-        frame = mat2gray(vesselness_PV(frame, 0, bv_scale, 0));
-        in(:,:,i) = medfilt2(frame, 'symmetric');  % Update the frame directly
-    end
+[d1,d2,~]=size(in);
+for i=1:size(in,3)
+        [in(:,:,i),~,~]=remove_vignetting(in(:,:,i),se,gradThresh,numIter);
+        in(:,:,i)=in(:,:,i)+randn(d1,d2,'single')/10000;
+        in(:,:,i)=mat2gray(vesselness_PV(in(:,:,i),0,bv_scale,0));
+        in(:,:,i)=medfilt2(in(:,:,i),'symmetric');
 end
-
+end

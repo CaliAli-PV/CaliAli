@@ -174,7 +174,7 @@ Therefore we need to calculate forward and backward registration.
 
 %% GET FORWARD REGISTRATION
 % Calculate alignments
-[im1,im2,T]=MR_Log_demon(M1,M2,opt);  
+[im1,im2,T,tS,im,e]=MR_Log_demon(M1,M2,opt);  
 fwa=cat(4,im1(:,:,1:3),im2(:,:,1:3));
 % [im1,im2,T,~,IM,E]=MR_Log_demon(M1,M2,opt);
 % Calculate local similarity

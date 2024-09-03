@@ -1,6 +1,9 @@
-function obj=update_temporal_CaliAli(obj, use_parallel)
+function obj=update_temporal_CaliAli(obj, use_parallel,F)
 fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
-batch=[0,cumsum(obj.options.F)];
+if ~(exist('F','var') && ~isempty(F))
+    F=get_batch_size(obj,0);
+end
+batch=[0,cumsum(F)];
 C_raw=[];
 
 div=length(batch)-1;

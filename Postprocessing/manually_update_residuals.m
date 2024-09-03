@@ -1,7 +1,7 @@
 function neuron=manually_update_residuals(neuron,use_parallel)
 
 seed_all=get_seed(neuron);
-
+neuron=update_temporal_CaliAli(neuron, use_parallel);
 neuron=update_residual_custom_seeds(neuron,seed_all);
 
 A_temp=neuron.A;

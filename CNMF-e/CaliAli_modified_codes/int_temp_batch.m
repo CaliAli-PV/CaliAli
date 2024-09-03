@@ -69,6 +69,10 @@ for i=progress(1:size(fn,2)-1)
 
     Mask=neuron.options.Mask;
 
+    if isempty(Mask)
+        Mask=true(d1,d2);
+    end
+
     %% Intialize variables
     seed_all=get_seeds(Cn,PNR,gSig,neuron.options.min_corr,neuron.options.min_pnr,Mask);
     A=[];

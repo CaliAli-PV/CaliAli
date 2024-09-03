@@ -1,7 +1,9 @@
-function obj=update_background_CaliAli_dynamic_spatial(obj, use_parallel)
+function obj=update_background_CaliAli_dynamic_spatial(obj, use_parallel,F)
 
 
-F=get_batch_size(obj,0);
+if ~(exist('F','var') && ~isempty(F))
+    F=get_batch_size(obj,0);
+end
 batch=[0,cumsum(F)];
 
 b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);

@@ -190,7 +190,9 @@ save_workspace(neuron);
 scale_to_noise(neuron);
 neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw);
 justdeconv(neuron,'thresholded','ar2',0);
-denoise_thresholded(neuron,3);
+neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw,neuron.CaliAli_opt.F);
+justdeconv(neuron,'thresholded','ar2',0);
+denoise_thresholded(neuron,5);
 
 
 %% Save results

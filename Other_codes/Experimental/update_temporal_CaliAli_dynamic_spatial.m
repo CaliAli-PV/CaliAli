@@ -1,6 +1,8 @@
-function obj=update_temporal_CaliAli_dynamic_spatial(obj, use_parallel)
+function obj=update_temporal_CaliAli_dynamic_spatial(obj, use_parallel,F)
 fprintf('\n-----------------UPDATE TEMPORAL - dynamic mode---------------------------\n');
-F=get_batch_size(obj,0);
+if ~(exist('F','var') && ~isempty(F))
+    F=get_batch_size(obj,0);
+end
 batch=[0,cumsum(F)];
 C_raw=[];
 div=length(batch)-1;

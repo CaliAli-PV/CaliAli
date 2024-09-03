@@ -9,16 +9,7 @@ end
 % VF=in2VF(in);
 [X]=get_BS_neuron_enhance(in,opt);
 %% Calculatign Shifts
-D=get_alignments(X+1,win);
-
-
-
-%% Applying Shifts
-v = squeeze(num2cell(in,[1 2]));
-
-parfor i=1:size(v,1)
-    out(:,:,i) = imsharpen(imwarp(single(v{i}),D(:,:,:,i),"FillValues",nan));
-end
+out=get_alignments(X+1,in,win);
 M=max(isnan(out),[],3);
 
 if isa(in,'uint16')
@@ -43,7 +34,7 @@ out=reshape(out,d1,d2,d3);
 end
 
 
-function D=get_alignments(X,win)
+function out=get_alignments(X,in,win)
 
 %% distribute video in 20-frames batches
 disp('Distributing video in small batches...')
@@ -52,27 +43,31 @@ x(1)=0;
 if length(x)==1
 x=[0,size(X,4)];
 end
-ms=get_score(X);
+
+[ms, ~] = get_trans_score(mat2gray(squeeze(X(:,:,1,:))), [], 1, 1, 0.01);
+ms=[ms,0];
 for i=1:size(x,2)-1
     MS{i}=ms(x(i)+1:x(i+1));
     G{i}=X(:,:,:,x(i)+1:x(i+1));
 end
 
 plotme=0;
-opt{1,1}  = struct('stop_criterium',0.001,'imagepad',1.2,'niter',25, 'sigma_fluid',1,...
-    'sigma_diffusion',5, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
-opt{2,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',25, 'sigma_fluid',1,...
-    'sigma_diffusion',5, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
-opt{3,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fluid',3,...
-    'sigma_diffusion',2, 'sigma_i',1,...
-    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme);
 
+opt{1,1}  = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fluid',1,...
+    'sigma_diffusion',6, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme,'scale',0.5);
+opt{2,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fluid',1,...
+    'sigma_diffusion',6, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme,'scale',1);
+opt{3,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fluid',1,...
+    'sigma_diffusion',6, 'sigma_i',1,...
+    'sigma_x',1, 'do_display',plotme, 'do_plotenergy',plotme,'scale',1);
 
 %%================================ Intra-batch registration
 parfor k=1:size(x,2)-1
-    [O{k},D{k}]=batch_register(G{k},MS{k},opt)
+    [~,ix]=min(MS{k});
+    T=G{k}(:,:,:,ix);
+    [O{k},D{k},Va{k}]=batch_register(G{k},V{k},opt,T);
 end
 
 %%================================ Inter-batch registration
@@ -108,6 +103,29 @@ for i=1:size(D,2)
 end
 D=cat(4,D{:});
 
+    % a=uint8(mean(Va{i},3));
+    neu=uint8(max(squeeze(O{i}(:,:,1,:)),[],3));
+    bv=uint8(mean(squeeze(O{i}(:,:,3,:)),3));
+    P(:,:,:,i)=cat(3,neu,bv,bv);
+end
+
+R=P(:,:,:,1);
+temp=R;
+for i=progress(2:size(P,4), 'Title', 'Inter-batch registration')
+    [~,temp(:,:,:,i),Dm(:,:,:,i)] =MR_Log_demon(R,P(:,:,:,i),opt);
+    bv=mean(squeeze(temp(:,:,1,:)),3);
+    neu=max(squeeze(temp(:,:,3,:)),[],3);
+    R=cat(3,neu,bv,bv);
+end
+
+% for i=progress(2:size(P,4), 'Title', 'Applying shifts')
+%     temp=Va{1, i};
+%     for k=1:size(temp,3)
+%          temp(:,:,k) = imsharpen(imwarp(temp(:,:,k),Dm(:,:,:,i),"FillValues",nan));
+%     end
+%     Va{1, i}=temp;
+% end
+out=cat(3,Va{:});
 end
 
 function [O,D]=batch_register(in,MS,opt)
