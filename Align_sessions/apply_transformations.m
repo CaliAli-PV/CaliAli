@@ -13,7 +13,9 @@ if ~isfile(opt.out)
         Vid=h5read(fullFileName,'/Object');
         Vid=apply_translations(Vid,opt.T(k,:),opt.T_Mask);
         Vid=apply_NR_shifts(Vid,opt.shifts(:,:,:,k),opt.NR_Mask);
-        Vid=apply_NR_shifts(Vid,opt.shifts_n(:,:,:,k),opt.NR_Mask_n);
+        if opt.FinalAlignmentWithNeuronShapes
+            Vid=apply_NR_shifts(Vid,opt.shifts_n(:,:,:,k),opt.NR_Mask_n);
+        end
         if isa(Vid,'uint16')
         Vid=uint16(single(Vid).*R(k));
         else

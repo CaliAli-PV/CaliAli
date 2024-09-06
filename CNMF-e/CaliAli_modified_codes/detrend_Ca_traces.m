@@ -18,7 +18,7 @@ for j=1:size(F,2)
         out(i,:)=x(i,:)-bl;
     end
     Oc{j}=out;
-    k=F(j);
+    k=k+F(j);
 end
 
 out=cat(2,Oc{:});

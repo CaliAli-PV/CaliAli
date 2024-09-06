@@ -6,13 +6,12 @@ addParameter(inp,'gSig',2.5,valid_v)     %Neuron Filter size. 2.5 default.
 addParameter(inp,'sf',10,valid_v)        %Frame rate. Defualt 10 fps
 addParameter(inp,'n_enhanced',1)         %MIN1PIE background substraciton. True is recommended. default True
 addParameter(inp,'theFiles','pickup')    %Cell array containing paths to the input video files, "pickup" let the user choose 
-addParameter(inp,'UseBV',1)              %Use BVz for alignment. Disable this if you want to align sessions using only neuron 
-                                         % shapes.
+addParameter(inp,'UseBV',1)    %Use BVz for aligmen. Disable this i
 addParameter(inp,'BVz',[])               %Size of blood vessels [min diameter max diameter] in pixels. 
                                          % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
                                          %Size of blood vessels [min diameter max diameter] in pixels. 
 addParameter(inp,'FinalAlignmentWithNeuronShapes',0)    % Add an extra alignment iteration utilizing only neuron shapes after CaliAli
-addParameter(inp,'Force_BVz',0)          % Fore the use of BVz for alignment, even if BVz stability score is low.
+addParameter(inp,'FinalAlignmentWithNeuronShapes',0)    % Add an extra alignment iteration utilizing only ne
 %%                                         
 addParameter(inp,'dynamic_spatial',0)    % not currently in use                                   
 addParameter(inp,'datename',0)           % not currently in use
