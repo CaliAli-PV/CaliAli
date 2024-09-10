@@ -1,8 +1,8 @@
 function scale_to_noise(neuron)
 %  We estimate the noise from the remnant between the raw and deconvolved calcium trace.
 % we use a moving window of size=num
-if size(neuron.options.F,2)>1
-    c=cumsum(neuron.options.F)';
+if size(get_batch_size(neuron,0),2)>1
+    c=cumsum(get_batch_size(neuron,0))';
     c=[[0;c(1:end-1)]+1,c];
 else
     c=[neuron.frame_range(1),neuron.frame_range(2)];

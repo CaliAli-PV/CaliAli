@@ -5,6 +5,10 @@ if ~exist('print_v','var')
 end
 F=neuron.CaliAli_opt.F;
 
+if neuron.CaliAli_opt.batch_sz>0
+    F=diff(round(linspace(1,sum(F),round(sum(F)/neuron.CaliAli_opt.batch_sz)+1)));
+end
+
 if neuron.CaliAli_opt.dynamic_spatial==1
     ses=20;
     if length(F)<ses

@@ -188,7 +188,7 @@ save_workspace(neuron);
 
 %% Optional post-process
 scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw,neuron.CaliAli_opt.F);
+neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw,get_batch_size(neuron));
 justdeconv(neuron,'thresholded','ar2',0);
 denoise_thresholded(neuron,5);
 

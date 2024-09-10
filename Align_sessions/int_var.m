@@ -13,6 +13,7 @@ addParameter(inp,'BVz',[])               %Size of blood vessels [min diameter ma
                                          %Size of blood vessels [min diameter max diameter] in pixels. 
 addParameter(inp,'FinalAlignmentWithNeuronShapes',0)    % Add an extra alignment iteration utilizing only neuron shapes after CaliAli
 addParameter(inp,'Force_BVz',0)          % Fore the use of BVz for alignment, even if BVz stability score is low.
+addParameter(inp,'batch_sz',0)           % Number of frames to use per batch. If batch_sz=0, then the number of frame per batch is equal to the number of frames per_session.
 %%                                         
 addParameter(inp,'dynamic_spatial',0)    % not currently in use                                   
 addParameter(inp,'datename',0)           % not currently in use
