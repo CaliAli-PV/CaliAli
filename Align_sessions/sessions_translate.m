@@ -1,5 +1,13 @@
-function [P,T,Mask]=sessions_translate(P)
-Vf=cell2mat(P{1,2});
+function [P,T,Mask]=sessions_translate(P,only_neurons)
+if ~exist('only_neurons','var')
+    only_neurons = 0; %number of random surrogates
+end
+
+if only_neurons
+    Vf=cell2mat(P{1,3}); % Neurons
+else
+    Vf=cell2mat(P{1,2}); % Blood vessels
+end
 Vf=mat2gray(Vf);
 [s1,s2,~] = size(Vf);bound1=20;bound2=20;
 

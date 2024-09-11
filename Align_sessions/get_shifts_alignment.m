@@ -1,7 +1,10 @@
-function [Shifts,P,Mask]=get_shifts_alignment(P)
+function [Shifts,P,Mask]=get_shifts_alignment(P,only_neurons)
 
+if ~exist('only_neurons','var')
+    only_neurons = 0; %number of random surrogates
+end
 %% pre allocate data for parallel computing
-[Proj,b,P]=pre_allocate_projections(P);
+[Proj,b,P]=pre_allocate_projections(P,only_neurons);
 
 %% Get transformation matrix, and local and global weights.
 [T,locW,globW]=get_matrices(Proj,b);
@@ -42,9 +45,10 @@ end
 
 end
 
-function [Proj,b,P]=pre_allocate_projections(P)
+function [Proj,b,P]=pre_allocate_projections(P,only_neurons)
 Mb=v2uint8(cell2mat(P{1,1})); % Mean frame
 Vf=v2uint8(cell2mat(P{1,2})); % Blood vessels
+
 % Cn=v2uint8(cell2mat(P{1,3})); % Correlation image
 Cn=cell2mat(P{1,3});
 PNR=cell2mat(P{1,4});
@@ -52,6 +56,11 @@ Cn=v2uint8(mat2gray(PNR).*mat2gray(Cn).^2);
 for i=1:size(Cn,3)
     Cn(:,:,i)=adapthisteq(Cn(:,:,i));
 end
+
+if only_neurons
+    Vf=Cn; % Blood vessels
+end
+
 for i=1:size(Cn,3)
     X(:,:,i)=mat2gray(max(cat(3,Vf(:,:,i),medfilt2(Cn(:,:,i))),[],3));
 end

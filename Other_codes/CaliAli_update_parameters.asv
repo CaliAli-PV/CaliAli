@@ -1,0 +1,20 @@
+function CaliAli_update_parameters(varargin)
+theFiles = uipickfiles('FilterSpec','*.mat');
+
+if ~isempty(varargin)
+    par=struct(varargin{:});
+    for i=1:size(theFiles,1)
+        load(theFiles{i})
+        fn = fieldnames(par);  % Get the field names of B
+        for k = 1:numel(fn)
+            opt.(fn{k}) = par.(fn{i});  % Replace the corresponding fields in A
+        end
+
+
+    end
+
+end
+
+end
+
+

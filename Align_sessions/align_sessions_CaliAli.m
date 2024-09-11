@@ -27,7 +27,6 @@ if opt.UseBV==1
 end
 
 T=get_alignment_metrics(P);
-T
 apply_transformations(opt);
 save_relevant_variables(P,opt,T)
 end
@@ -39,11 +38,9 @@ if opt.BV_score<2.7 && opt.Force_BVz==0
     fprintf(2, 'Blood-vessel similarity score is too low! \n Results may not be accurate! \n ');
     fprintf(2, 'Aligning utilizing neurons data  \n ');
     P1=P.(1)(1,:);
-    P1.(2){1,1}=P1.(3){1,1};
-    [P2,opt.T,opt.T_Mask]=sessions_translate(P1);
+    [P2,opt.T,opt.T_Mask]=sessions_translate(P1,1);
     fprintf(1, 'Calculating non-rigid aligments...\n');
-    [opt.shifts,P3,opt.NR_Mask]=get_shifts_alignment(P2);
-    [opt.shifts_n,P4,opt.NR_Mask_n]=get_shifts_alignment_only_neurons(P3);
+    [opt.shifts,P3,opt.NR_Mask]=get_shifts_alignment(P2,1);
     if opt.FinalAlignmentWithNeuronShapes
         [opt.shifts_n,P4,opt.NR_Mask_n]=get_shifts_alignment_only_neurons(P3);
         P=table(P1,P2,P3,P4,'VariableNames',{'Original','Translations','CaliAli','CaliAli+neurons'});
@@ -66,7 +63,7 @@ n_enhanced=opt.n_enhanced;
 if ~isfile(opt.out_mat)
     save(opt.out_mat,'P','BV_score','Cn','PNR','F','n_enhanced','opt','T');
 else
-    save(opt.out_mat,'P','BV_score','Cn','PNR','F','n_enhanced','opt','-append','T');
+    save(opt.out_mat,'P','BV_score','Cn','PNR','F','n_enhanced','opt','T','-append');
 end
 end
 
