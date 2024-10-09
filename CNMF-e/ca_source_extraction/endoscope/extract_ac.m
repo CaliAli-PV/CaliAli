@@ -123,7 +123,7 @@ yCentroids = centroids(2:2:end);
 % Find distances to middle of image
 [rc,cc] = ind2sub([nr,nc],ind_ctr);
 
-distances = sqrt((rc-xCentroids).^2 + (cc-yCentroids).^2);
+distances = sqrt((cc-xCentroids).^2 + (rc-yCentroids).^2);
 % Find the min distance
 [~, indexOfMin] = min(distances);
 % Extract binary image of only the closest blob
