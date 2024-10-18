@@ -1,8 +1,8 @@
-function [Mr,VF]=motion_correct_PV(V,opt)
+function [Mr,BV]=motion_correct_PV(V,opt)
 
-VF=vesselness_PV(V,1,linspace(opt.BVz(1),opt.BVz(2),5));
+BV=get_Vf_vignetting_fixed(V,opt);
 % VF=uint8(VF*2^8);
-[d1,d2,~] = size(VF);
+[d1,d2,~] = size(BV);
 
 b1=d1/10;
 b2=d2/10;
@@ -15,11 +15,12 @@ end
 
 options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false);
 
-tic; [~,shifts,~] = normcorre_batch(VF(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc % register filtered dat
+tic; [~,shifts,~] = normcorre_batch(BV(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc % register filtered dat
 
 % options_r = NoRMCorreSetParms('d1',d1,'d2',d2,'bin_width',200,'max_shift',20,'iter',1,'correct_bidir',false);
-
+BV=v2uint16(BV);
 
 parfor i=1:size(V,3)
 Mr(:,:,i) = imtranslate(V(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
+BV(:,:,i) = imtranslate(BV(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
 end

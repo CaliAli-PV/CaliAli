@@ -1,4 +1,4 @@
-function out=vesselness_PV(in,use_parallel,sz,norm)
+function vid=vesselness_PV(vid,use_parallel,sz,norm)
 
 if ~exist('sz','var')
     sz=0.5:0.5:2;
@@ -11,28 +11,28 @@ if ~exist('use_parallel','var')
     use_parallel=1;
 end
 
-out=zeros(size(in,1),size(in,2),size(in,3));
-
 if use_parallel
-    b2 = ProgressBar(size(in,3), ...
+    b2 = ProgressBar(size(vid,3), ...
     'IsParallel', true, ...
     'UpdateRate', 1,...
     'WorkerDirectory', pwd(), ...
     'Title', 'Appling filter' ...
     );
     b2.setup([], [], []);
-    parfor i=1:size(in,3)
-        temp=double(in(:,:,i));
+    vid = videoConvert(vid);
+    parfor i=1:size(vid,2)
+        temp=double(vid{i});
         temp=apply_vesselness_filter(temp,sz,norm);
-        out(:,:,i)=temp;
-         updateParallel([], pwd);
+        vid{i}=temp;
+        updateParallel([], pwd);
     end
     b2.release();
+    vid = videoConvert(vid);
 else
-    for i=1:size(in,3)
-        temp=double(in(:,:,i));
+    for i=1:size(vid,3)
+        temp=double(vid(:,:,i));
         temp=apply_vesselness_filter(temp,sz,norm);
-        out(:,:,i)=temp;
+        vid(:,:,i)=temp;
     end
 end
 end

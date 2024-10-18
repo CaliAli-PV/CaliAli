@@ -18,19 +18,17 @@ for k=1:length(theFiles)
     out=strcat(filepath,filesep,name,'_mc','.h5');
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
-             [V,~]=motion_correct_PV(V+1,opt); %% Rigid MC
+        [V,BV]=motion_correct_PV(V+1,opt); %% Rigid MC
         if do_nr
-%         Mr=MC_NR(V);
-            Mr=MC_NR_not_used_testing(V,[],opt);
-        else
-            Mr=V;
+            %         Mr=MC_NR(V);
+            V=MC_NR_not_used_testing(V,BV,[],opt);
         end
-%         
-        Mr=interpolate_dropped_frames(Mr);
-        Mr=square_borders(Mr,0);
+        %
+        V=interpolate_dropped_frames(V);
+        V=square_borders(V,0);
         %
         %% save MC video as .h5
-        saveash5(Mr,out);
+        saveash5(V,out);
     end
 end
 

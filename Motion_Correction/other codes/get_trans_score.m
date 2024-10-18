@@ -1,7 +1,8 @@
-function [acorr, duse] = get_trans_score(Y, flag, ispara, isdisp, mq, maskc)
+function [out, duse] = get_trans_score(Y, flag, ispara, isdisp, mq, maskc)
 % compute translation score with KLT tracker: mean displacement of matched
 % points
 %   Jinghao Lu, 01/30/2018
+     d=length(Y);
 
     %% initialization %%
     %%% initialize parameters %%%
@@ -90,4 +91,7 @@ function [acorr, duse] = get_trans_score(Y, flag, ispara, isdisp, mq, maskc)
         idss = find(isnan(acorr));
         acorr(idss) = interp1(ids, acorr(ids), idss, 'pchip', 'extrap');
     end
+
+    out=zeros(1,d);
+    out(1:length(acorr))=acorr;
 end

@@ -7,4 +7,7 @@ parfor i=1:size(obj,1)
     out(i,:)=obj(i,:)-temp;  
 end
 
+
+
+
     
