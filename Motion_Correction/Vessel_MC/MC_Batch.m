@@ -18,6 +18,7 @@ for k=1:length(theFiles)
     out=strcat(filepath,filesep,name,'_mc','.h5');
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
+        V=video_deblur(V);
         [V,BV]=motion_correct_PV(V+1,opt); %% Rigid MC
         if do_nr
             %         Mr=MC_NR(V);
@@ -29,6 +30,8 @@ for k=1:length(theFiles)
         %
         %% save MC video as .h5
         saveash5(V,out);
+    else
+        fprintf(1, 'File %s already exist!\n', out);
     end
 end
 
