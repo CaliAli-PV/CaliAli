@@ -1,11 +1,8 @@
 function T=get_stored_projections(opt)
 T=table;
-for k=1:size(opt.theFiles,2)
-    fullFileName = opt.theFiles{k};
-    [filepath,name]=fileparts(fullFileName);
-    in=strcat(filepath,filesep,name,'_det','.mat');
-    temp=load(in);
-    temp=check_video_sizes(opt,temp,fullFileName);
+for k=1:size(opt.output_files,2)
+    fullFileName = opt.output_files{k};
+    temp=loadh5(fullFileName,'/CaliAli_options/inter_session_alignment');
     T=cat_table(T,temp.P);
 end
 T=scale_Cn(T);

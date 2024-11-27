@@ -3,7 +3,7 @@ clear; clc; close all;
 
 %% choose multiple datasets or just one  
 neuron = Sources2D(); 
-nams = {'E:\DK_CNMFE_vs_CaliAli\Simulations\240822_183215_ses09_mc_aligned.h5'};          % you can put all file names into a cell array; when it's empty, manually select files 
+nams = {'E:\DK_CNMFE_vs_CaliAli\Simulations\demo\240924_155653_ses01_mc_aligned.h5'};          % you can put all file names into a cell array; when it's empty, manually select files 
 nams = neuron.select_multiple_files(nams);  %if nam is [], then select data interactively 
 
 %% parameters  
@@ -11,7 +11,7 @@ nams = neuron.select_multiple_files(nams);  %if nam is [], then select data inte
 pars_envs = struct('memory_size_to_use', 256, ...   % GB, memory space you allow to use in MATLAB 
     'memory_size_per_patch', 256, ...   % GB, space for loading data within one patch 
     'patch_dims', [64, 64],...  %GB, patch size 
-    'batch_frames', 15000);           % number of frames per batch 
+    'batch_frames', 1000);           % number of frames per batch 
   % -------------------------      SPATIAL      -------------------------  %
 gSig = 2.5;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
 gSiz = 10;          % pixel, neuron diameter
@@ -118,7 +118,7 @@ neuron.Fs = Fs;
 merge_thr_tempospatial = [0.8, 0.4, -inf]; 
 
 %% distribute data and be ready to run source extraction 
-neuron.getReady_batch(pars_envs); 
+neuron.getReady_batch(pars_envs,pars_envs.batch_frames); 
 
 %% Load parameters stored in .mat file
 [filepath,name,~] = fileparts(nams{1});

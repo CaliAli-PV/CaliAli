@@ -1,16 +1,11 @@
-function runCNMFe(in,PNR_th,Coor_th,gSig,sf)
+function runCNMFe(in,PNR_th,Corr_th,gSig,sf)
 
 %% clear the workspace and select data
 % clear; clc; close all;
 
 %% choose data
 neuron = Sources2D();
-if exist('in','var')
-    nam=in;
-else
-    nam = [];% get_fullname('./data_1p.tif');          % this demo data is very small, here we just use it as an example
-end
-nam = neuron.select_data(nam);  %if nam is [], then select data interactively
+neuron.select_data(in);  %if nam is [], then select data interactively
 
 %% parameters
 % -------------------------    COMPUTATION    -------------------------  %
@@ -66,15 +61,14 @@ show_merge = false;  % if true, manually verify the merging step
 merge_thr = 0.65;     % thresholds for merging neurons; [spatial overlap ratio, temporal correlation of calcium traces, spike correlation]
 method_dist = 'max';   % method for computing neuron distances {'mean', 'max'}
 dmin = 5;       % minimum distances between two neurons. it is used together with merge_thr
-merge_thr_tempospatial = [0.8, 0.4, -inf];  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
+merge_thr_spatial = [0.8, 0.4, -inf];  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
 
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
-min_corr = Coor_th;     % minimum local correlation for a seeding pixel
+min_corr = Corr_th;     % minimum local correlation for a seeding pixel
 min_pnr = PNR_th;       % minimum peak-to-noise ratio for a seeding pixel
 min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
 bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
-frame_range = [];   % when [], uses all frames
 use_parallel = true;    % use parallel computation for parallel computing
 center_psf = true;  % set the value as true when the background fluctuation is large (usually 1p data)
 % set the value as false when the background fluctuation is small (2p)
@@ -111,11 +105,14 @@ neuron.updateParams('gSig', gSig, ...       % -------- spatial --------
     'min_pnr', min_pnr, ...
     'min_pixel', min_pixel, ...
     'bd', bd, ...
-    'center_psf', center_psf);
+    'center_psf', center_psf,...
+    'pars_envs',pars_envs);
 neuron.Fs = Fs;
 
+neuron.select_data(in);  %if nam is [], then select data interactively
+
 %% distribute data and be ready to run source extraction
-neuron.getReady(pars_envs);
+neuron.getReady();
 evalin( 'base', 'clearvars -except parin theFiles' );
 %% Load parameters stored in .mat file
 [filepath,name,~] = fileparts(in);
@@ -149,7 +146,7 @@ neuron.options.ind=neuron.ind;
 
 %% initialize neurons from the video data
 tic
-neuron =initComponents_parallel_PV(neuron,K, frame_range, 0, 1,0);
+neuron =initComponents_parallel_PV(neuron,K,[], 0, 1,0);
 toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
@@ -161,13 +158,13 @@ A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10
     % estimate the background components
-    neuron=CNMF_CaliAli_update('Background',neuron, use_parallel);
-    neuron=CNMF_CaliAli_update('Spatial',neuron, use_parallel);
-    neuron=CNMF_CaliAli_update('Temporal',neuron, use_parallel);
+    neuron=CNMF_CaliAli_update('Background',neuron);
+    neuron=CNMF_CaliAli_update('Spatial',neuron);
+    neuron=CNMF_CaliAli_update('Temporal',neuron);
     %% post-process the results automatically
     neuron.remove_false_positives();
     neuron.merge_neurons_dist_corr(show_merge);
-    neuron.merge_high_corr(show_merge, merge_thr_tempospatial);
+    neuron.merge_high_corr(show_merge, merge_thr_spatial);
     neuron.merge_high_corr(show_merge, [0.9, -inf, -inf]);
 
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);

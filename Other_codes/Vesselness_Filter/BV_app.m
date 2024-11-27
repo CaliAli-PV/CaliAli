@@ -6,7 +6,7 @@ V=h5read(theFiles{1, 1}  ,'/Object');
 if contains(theFiles{1, 1},'_mc')
     M=median(V,3);
 else
-    M=V(:,:,1);
+    M=V(:,:,round(size(V,3)/2));
 end
 
 [M,opt.Mask]=remove_borders(M,0);

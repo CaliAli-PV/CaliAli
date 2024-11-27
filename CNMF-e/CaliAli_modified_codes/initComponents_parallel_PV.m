@@ -1,4 +1,4 @@
-function [obj,Cn_update,ma] = initComponents_parallel_PV(obj, K, frame_range, save_avi, use_parallel, use_prev)
+function [obj,Cn_update] = initComponents_parallel_PV(obj, K, frame_range, save_avi, use_parallel, use_prev)
 %% initializing spatial/temporal components for calcium imaging data
 %% input:
 %   K:  scalar, maximum number of neurons
@@ -15,6 +15,7 @@ function [obj,Cn_update,ma] = initComponents_parallel_PV(obj, K, frame_range, sa
 %% email: zhoupc1988@gmail.com
 
 %% process parameters
+use_parallel=obj.use_parallel;
 try
     % map data
     mat_data = obj.P.mat_data;

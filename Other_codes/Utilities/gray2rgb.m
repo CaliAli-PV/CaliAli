@@ -19,7 +19,11 @@ grayVideo=v2uint8(grayVideo);
 [d1, d2, numFrames] = size(grayVideo);
 
 % Get the colormap function based on the provided colormap name
+if ischar(colormapName)
 cmap = feval(colormapName, 256);  % Create a 256-level colormap
+else
+    cmap=linspace(0,1,256)'*colormapName;
+end
 
 % Preallocate the RGB video array
 rgbVideo = zeros(d1, d2, 3, numFrames);

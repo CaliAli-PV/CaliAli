@@ -1,5 +1,7 @@
-function neuron=CNMF_CaliAli_update(component_name,neuron, use_parallel,F)
 
+function neuron=CNMF_CaliAli_update(component_name,neuron,F)
+
+use_parallel=neuron.use_parallel;
 if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(neuron,0);
 end

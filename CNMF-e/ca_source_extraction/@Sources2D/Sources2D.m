@@ -66,8 +66,10 @@ classdef Sources2D < handle
         PNRr ;% Modification done by PV
         ind ;% Modification done by PV
         CaliAli_opt;% Modification done by PV
-        Spatial_stability;
-        Unstable_components;
+        pars_envs;
+        show_merge;
+        merge_thr_spatial;
+        use_parallel;
     end
 
     %% methods
@@ -226,7 +228,8 @@ classdef Sources2D < handle
             Ypatch(isnan(Ypatch)) = 0;
         end
         %% distribute data and be ready to run source extraction
-        function getReady(obj, pars_envs, filter_kernel)
+        function getReady(obj, filter_kernel)
+            pars_envs=obj.pars_envs;
             % data and its extension
             if iscell(obj.file)
                 nam = obj.file{1};

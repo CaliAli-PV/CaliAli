@@ -1,30 +1,26 @@
-function apply_transformations(varargin)
-
-opt=int_var(varargin);
+function opt=apply_transformations(opt)
 R=opt.range;
 R=single(R./max(R));
-if ~isfile(opt.out)
-    for k=1:length(opt.theFiles)
-        fullFileName = opt.theFiles{k};
 
-        [filepath,name]=fileparts(fullFileName);
-        fullFileName=strcat(filepath,filesep,name,'_det','.h5');
+if ~isfile(opt.out_path)
+    for k=1:length(opt.output_files)
+        fullFileName = opt.output_files{k};
         fprintf(1, 'Applaying shifts to %s\n', fullFileName);
-        Vid=h5read(fullFileName,'/Object');
-        Vid=apply_translations(Vid,opt.T(k,:),opt.T_Mask);
-        Vid=apply_NR_shifts(Vid,opt.shifts(:,:,:,k),opt.NR_Mask);
-        if opt.FinalAlignmentWithNeuronShapes
-            Vid=apply_NR_shifts(Vid,opt.shifts_n(:,:,:,k),opt.NR_Mask_n);
+        Y=h5read(fullFileName,'/Object');
+        Y=apply_translations(Y,opt.T(k,:),opt.T_Mask);
+        Y=apply_NR_shifts(Y,opt.shifts(:,:,:,k),opt.NR_Mask);
+        if opt.final_neurons
+            Y=apply_NR_shifts(Y,opt.shifts_n(:,:,:,k),opt.NR_Mask_n);
         end
-        if isa(Vid,'uint16')
-        Vid=uint16(single(Vid).*R(k));
+        if isa(Y,'uint16')
+        Y=uint16(single(Y).*R(k));
         else
-        Vid=uint8(single(Vid).*R(k));
+        Y=uint8(single(Y).*R(k));
         end
-        saveash5(Vid,opt.out);
+        saveh5(Y,opt.out_path,'append',1,'rootname','Object');
     end
 else
-    fprintf(1, 'File with name "%s" already exist.\n',opt.out);
+    fprintf(1, 'File with name "%s" already exist.\n',opt.out_path);
 end
 
 end

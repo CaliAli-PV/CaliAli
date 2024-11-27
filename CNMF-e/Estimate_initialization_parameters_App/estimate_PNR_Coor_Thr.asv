@@ -1,4 +1,4 @@
-function neuron=estimate_PNR_Coor_Thr(inF)
+function [pnr_out,cn_out,mask,ind]=estimate_PNR_Coor_Thr(inF)
 
 neuron=loadh5(inF,'/neuron');
 
@@ -12,12 +12,10 @@ app.done=0;
 while app.done == 0  % polling
     pause(0.05);
 end
-neuron.Mask=app.mask;
-neuron.Cn=app.cn;
-neuron.PNR=app.pnr;
-neuron.ind=app.tmp_ind;
-neuron.min_pnr=app.PNRSpinner.Value;
-neuron.min_cn=app.corrSpinner.Value;% get the values set in the parameter window
+mask=app.mask;
+ind=app.tmp_ind;
+pnr_out=app.PNRSpinner.Value;
+cn_out=app.corrSpinner.Value;% get the values set in the parameter window
 delete(app);
 
 

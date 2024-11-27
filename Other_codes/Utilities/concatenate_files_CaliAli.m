@@ -1,4 +1,4 @@
-function concatenate_files_CaliAli(outpath,theFiles)
+function out=concatenate_files_CaliAli(outpath,theFiles)
 if ~exist('outpath','var')
     outpath = [];
 end

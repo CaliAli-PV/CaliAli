@@ -1,10 +1,11 @@
-function [Shifts,P,Mask]=get_shifts_alignment(P,only_neurons)
+function [Shifts,P,Mask]=get_shifts_alignment(P,opt,only_neurons)
 
-if ~exist('only_neurons','var')
-    only_neurons = 0; %number of random surrogates
+if ~exist("only_neurons",'var')
+    only_neurons=false;
 end
+
 %% pre allocate data for parallel computing
-[Proj,b,P]=pre_allocate_projections(P,only_neurons);
+[Proj,b,P]=pre_allocate_projections(P,opt,only_neurons);
 
 %% Get transformation matrix, and local and global weights.
 [T,locW,globW]=get_matrices(Proj,b);
@@ -45,11 +46,11 @@ end
 
 end
 
-function [Proj,b,P]=pre_allocate_projections(P,only_neurons)
+function [Proj,b,P]=pre_allocate_projections(P,opt,only_neurons)
 Mb=v2uint8(cell2mat(P{1,1})); % Mean frame
 Vf=v2uint8(cell2mat(P{1,2})); % Blood vessels
 
-% Cn=v2uint8(cell2mat(P{1,3})); % Correlation image
+
 Cn=cell2mat(P{1,3});
 PNR=cell2mat(P{1,4});
 Cn=v2uint8(mat2gray(PNR).*mat2gray(Cn).^2);
@@ -57,8 +58,12 @@ for i=1:size(Cn,3)
     Cn(:,:,i)=adapthisteq(Cn(:,:,i));
 end
 
-if only_neurons
-    Vf=Cn; % Blood vessels
+if ~contains(opt.projections,'BV')||only_neurons
+    Vf=Cn;
+end
+
+if ~contains(opt.projections,'neuron')
+    Cn=Vf;
 end
 
 for i=1:size(Cn,3)
@@ -142,7 +147,7 @@ globW=globW./sum(globW);
 % LocW=LocW./sum(LocW,3);
 X=LocW./sum(LocW,3);
 for i=1:size(X,3)
-X(:,:,i) = imgaussfilt(X(:,:,i),8, 'FilterSize',91);
+    X(:,:,i) = imgaussfilt(X(:,:,i),8, 'FilterSize',91);
 end
 LocW=mat2gray(X)./sum(mat2gray(X),3);
 
@@ -150,7 +155,7 @@ LocW=mat2gray(X)./sum(mat2gray(X),3);
 %     LocW(:,:,i)=medfilt2(LocW(:,:,i));
 % end
 if size(LocW,3)==2
-LocW=LocW*0+0.5;
+    LocW=LocW*0+0.5;
 end
 
 end
@@ -183,7 +188,7 @@ Therefore we need to calculate forward and backward registration.
 
 %% GET FORWARD REGISTRATION
 % Calculate alignments
-[im1,im2,T,tS,im,e]=MR_Log_demon(M1,M2,opt);  
+[im1,im2,T,tS,im,e]=MR_Log_demon(M1,M2,opt);
 fwa=cat(4,im1(:,:,1:3),im2(:,:,1:3));
 % [im1,im2,T,~,IM,E]=MR_Log_demon(M1,M2,opt);
 % Calculate local similarity
@@ -191,22 +196,22 @@ loc_c=get_local_corr_Vf(cat(3,double(im1(:,:,2)),double(im2(:,:,2))),Mb);
 % loc_c=mat2gray(imgaussfilt(loc_c.*mat2gray(im2(:,:,2)),5));
 % loc_c=double(im2(:,:,2)).*double(im1(:,:,2));
 % Calculate global similarity
-t1v=im1(:,:,2); % get the BV image 
-t2v=im2(:,:,2); % get the BV image 
+t1v=im1(:,:,2); % get the BV image
+t2v=im2(:,:,2); % get the BV image
 glob_c= 1-pdist([double(t1v(:)');double(t2v(:)')],'correlation');
 T=squeeze(-T);
 
 %% GET BACKWARD REGISTRATION
 % Calculate alignments
-[im1,im2,Tb]=MR_Log_demon(M2,M1,opt); 
+[im1,im2,Tb]=MR_Log_demon(M2,M1,opt);
 bwa=cat(4,im1(:,:,1:3),im2(:,:,1:3));
 % Calculate local similarity
 loc_cb=get_local_corr_Vf(cat(3,double(im1(:,:,2)),double(im2(:,:,2))),Mb);
 % loc_cb=mat2gray(imgaussfilt(loc_cb.*mat2gray(im2(:,:,2)),5));
 % loc_cb=double(im2(:,:,2)).*double(im1(:,:,2));
 % Calculate global similarity
-t1v=im1(:,:,end); % get the BV image 
-t2v=im2(:,:,end); % get the BV image 
+t1v=im1(:,:,end); % get the BV image
+t2v=im2(:,:,end); % get the BV image
 glob_cb= 1-pdist([double(t1v(:)');double(t2v(:)')],'correlation');
 Tb=squeeze(-Tb);
 end
