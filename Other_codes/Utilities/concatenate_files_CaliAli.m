@@ -1,4 +1,4 @@
-function concatenate_files_CaliAli(outpath,theFiles)
+function out = concatenate_files_CaliAli(outpath,theFiles)
 if ~exist('outpath','var')
     outpath = [];
 end
@@ -15,7 +15,7 @@ if isempty(outpath)
 else
     out=strcat(outpath,filesep,name,'_con','.h5');
 end
-vid=[];
+vid={};
 if ~isfile(out)
     for k=progress(1:length(theFiles))
         fullFileName = theFiles{k};

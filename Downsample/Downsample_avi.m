@@ -1,4 +1,4 @@
-function Downsample_avi(ds_f,outpath,theFiles)
+function out= Downsample_avi(ds_f,outpath,theFiles)
 if ~exist('outpath','var')
     outpath = [];
 end
@@ -18,18 +18,18 @@ for k=1:length(theFiles)
 
     [filepath,name]=fileparts(fullFileName);
     if isempty(outpath)
-        out=strcat(filepath,filesep,name,'_ds','.h5');
+        out{k}=strcat(filepath,filesep,name,'_ds','.h5');
     else
-        out=strcat(outpath,filesep,name,'_ds','.h5');
+        out{k}=strcat(outpath,filesep,name,'_ds','.h5');
     end
-    if ~isfile(out)
+    if ~isfile(out{k})
         temp=load_avi(fullFileName);
         vid=[];
         for i=progress(1:size(temp,3))
             vid(:,:,i)=imresize(temp(:,:,i),1/ds_f,'bilinear');
         end
-        saveash5(v2uint8(vid),out);
+        saveash5(v2uint8(vid),out{k});
     else
-        fprintf(1, 'File %s already exist in destination folder!\n', out);
+        fprintf(1, 'File %s already exist in destination folder!\n', out{k});
     end
 end

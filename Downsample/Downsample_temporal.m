@@ -1,4 +1,4 @@
-function Downsample_temporal(ds_f,outpath,theFiles)
+function out = Downsample_temporal(ds_f,outpath,theFiles)
 if ~exist('outpath','var')
     outpath = [];
 end
@@ -18,16 +18,16 @@ for k=1:length(theFiles)
 
     [filepath,name]=fileparts(fullFileName);
     if isempty(outpath)
-        out=strcat(filepath,filesep,name,'_dst','.h5');
+        out{k}=strcat(filepath,filesep,name,'_dst','.h5');
     else
-        out=strcat(outpath,filesep,name,'_dst','.h5');
+        out{k}=strcat(outpath,filesep,name,'_dst','.h5');
     end
-    if ~isfile(out)
+    if ~isfile(out{k})
         vid=h5read(fullFileName,'/Object');
         vid=vid(:,:,1:ds_f:end);
-        saveash5(v2uint8(vid),out);
+        saveash5(v2uint8(vid),out{k});
     else
-        fprintf(1, 'File %s already exist in destination folder!\n', out);
+        fprintf(1, 'File %s already exist in destination folder!\n', out{k});
     end
 end
 
