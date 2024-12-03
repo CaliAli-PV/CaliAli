@@ -1,5 +1,6 @@
 function Y=CaliAli_remove_background(Y,opt)
-if opt.preprocessing.detrend>1
+
+if opt.preprocessing.detrend>0
     Y=detrend_vid(Y,opt);
 end
 
@@ -8,8 +9,16 @@ if opt.preprocessing.noise_scale
 end
 
 if opt.preprocessing.neuron_enhance
-    Y=MIN1PIPE_bg_removal(Y,opt);
+    if strcmp(opt.preprocessing.structure,'neuron')
+        Y=MIN1PIPE_bg_removal(Y,opt);
+    elseif strcmp(opt.preprocessing.structure,'dendrite')
+        Y=dendrite_bg_removal(Y,opt);
+    end
 end
+
+% if opt.preprocessing.noise_scale
+%     Y=noise_scaling(Y);
+% end
 end
 
 function Y=MIN1PIPE_bg_removal(Y,opt)
@@ -25,16 +34,21 @@ end
 
 function Y=noise_scaling(Y)
 [d1,d2,d3]=size(Y);
-Y=mat2gray(reshape(Y,[d1*d2,d3]))*100;
+Y=reshape(Y,[d1*d2,d3]);
+Y=Y./max(Y,[],'all')*100;
 Y=Y+randn(size(Y));
+Y(Y<0)=randn(sum(Y<0,'all'),1);
 Y=Y./GetSn(Y);
-Y(isnan(Y))=0;
-Y(isinf(Y))=0;
+Y(isnan(Y))=randn(sum(isnan(Y),'all'),1);
+Y(isinf(Y))=randn(sum(isinf(Y),'all'),1);
 Y=reshape(Y,[d1,d2,d3]);
 end
 
 function Y=detrend_vid(Y,opt)
 [d1,d2,d3]=size(Y);
-Y = detrend_PV(opt.sf*opt.preprocessing.detrend,reshape(Y,[d1*d2,d3]));
-Y=reshape(Y,d1,d2,d3);
+obj=reshape(single(Y),d1*d2,d3);
+temp=movmedian(obj,opt.sf*opt.preprocessing.detrend,2);
+temp=movmin(temp,opt.sf*opt.preprocessing.detrend*10,2);
+Y=double(obj-temp);
+Y=gather(reshape(Y,d1,d2,d3));
 end

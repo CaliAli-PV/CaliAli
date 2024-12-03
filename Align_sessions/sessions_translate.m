@@ -7,10 +7,17 @@ else
 end
 
 ref=mat2gray(ref);
-[s1,s2,~] = size(ref);bound1=20;bound2=20;
+[d1,d2,d3] = size(ref);bound1=20;bound2=20;
 
-options_r = NoRMCorreSetParms('d1',s1-bound1,'init_batch',1,...
-    'd2',s2-bound2,'bin_width',2,'max_shift',[1000,1000,1000],...
+if ~opt.do_alignment
+    Mask=true(d1,d2);
+    T=zeros(d3,2);
+    return
+end
+
+
+options_r = NoRMCorreSetParms('d1',d1-bound1,'init_batch',1,...
+    'd2',d2-bound2,'bin_width',2,'max_shift',[1000,1000,1000],...
     'iter',5,'correct_bidir',false,'shifts_method','fft','boundary','NaN');
 
 [M,shifts,~] = normcorre_batch(ref(bound1/2+1:end-bound1/2,bound2/2+1:end-bound2/2,:),options_r);
@@ -25,14 +32,14 @@ end
 
 %% Apply shifts to projections
 for i=1:size(P,2)-1
-temp = apply_shifts(cell2mat(P{1,i}),shifts,options_r);
-[temp,Mask]=remove_borders(temp);
-P{1,i}={temp};
+    temp = apply_shifts(cell2mat(P{1,i}),shifts,options_r);
+    [temp,Mask]=remove_borders(temp);
+    P{1,i}={temp};
 end
 P=scale_Cn(P);
 
 for i=1:size(shifts,1)
-T(i,:)=flip(squeeze(shifts(i).shifts)');
+    T(i,:)=flip(squeeze(shifts(i).shifts)');
 end
 end
 

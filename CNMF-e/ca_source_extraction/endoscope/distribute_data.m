@@ -43,7 +43,7 @@ if isempty(patch_dims)
     % find the optimial batch size
     patch_dims = [1, 1] * patch_width;
 else
-    patch_dims(patch_dims< min_patch_width) = min_patch_width;
+    patch_dims(patch_dims< min_patch_width) = min_patch_width(patch_dims< min_patch_width);
 %     patch_dims(patch_dims>max_patch_width) = max_patch_width; 
     if length(patch_dims)==1
         patch_dims = patch_dims * [1,1];

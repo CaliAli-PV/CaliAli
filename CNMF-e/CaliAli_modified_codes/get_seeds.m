@@ -1,12 +1,13 @@
-function seed=get_seeds(Cn,PNR,gSig,min_corr,min_PNR,Mask)
+function seed=get_seeds(neuron)
 
+v_max=CaliAli_get_local_maxima(neuron.CaliAli_opt);
 
-tmp_d = max(1,round(gSig));
-v_max = ordfilt2(Cn.*PNR, tmp_d^2, true(tmp_d));
+Cn=neuron.CaliAli_opt.inter_session_alignment.Cn;
+PNR=neuron.CaliAli_opt.inter_session_alignment.PNR;
 ind = (v_max==Cn.*PNR);
 
-Cn_ind = ind & (Cn>=min_corr & Mask) ;
-PNR_ind = ind & (PNR>=min_PNR & Mask) ;
+Cn_ind = ind & (Cn>=neuron.options.min_corr & neuron.CaliAli_opt.cnmf.seed_mask);
+PNR_ind = ind & (PNR>=neuron.options.min_pnr & neuron.CaliAli_opt.cnmf.seed_mask);
 
 seed = Cn_ind & PNR_ind;
 

@@ -373,7 +373,7 @@ elseif strcmpi(ext, '.mat')
     data_info = whos(data);
     
     if length(data_info)>1
-        dims = data.Ysiz;
+        dims = data_info(strcmp({data_info.name}, 'Y')).size;
     else
         dims = data_info.size;
     end

@@ -1,7 +1,7 @@
-function ix=postprocessing_app(neuron)
+function ix=postprocessing_app(neuron,thr)
                          
                 
-app=View_components(neuron);
+app=View_components(neuron,thr);
 app.done=0;
 while app.done == 0  % polling
     pause(0.05);

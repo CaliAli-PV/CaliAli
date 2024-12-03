@@ -4,6 +4,15 @@ if ~exist("only_neurons",'var')
     only_neurons=false;
 end
 
+
+if ~opt.do_alignment
+    [d1,d2,d3]=size(P.(1){1,1});
+    Mask=true(d1,d2);
+    Shifts=zeros(d1,d2,2,d3);
+    return
+end
+
+
 %% pre allocate data for parallel computing
 [Proj,b,P]=pre_allocate_projections(P,opt,only_neurons);
 

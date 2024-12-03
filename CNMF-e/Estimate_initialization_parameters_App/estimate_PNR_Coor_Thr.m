@@ -1,18 +1,19 @@
 function neuron=estimate_PNR_Coor_Thr(inF)
 
-neuron=loadh5(inF,'/neuron');
+CaliAli_options=CaliAli_load(inF,'CaliAli_options');
+neuron=CaliAli_options.cnmf;
 
-m=loadh5(inF,'/CaliAli_options/inter_session_alignment');
-if ~isfield(neuron,'Mask')
-    neuron.Mask=ones(size(m.Cn));
+m=CaliAli_options.inter_session_alignment;
+if isempty(neuron.seed_mask)
+    neuron.seed_mask=ones(size(m.Cn));
 end
-
-app=estimate_Corr_PNR(m.Cn,m.PNR,m.gSig,neuron.min_corr,neuron.min_pnr,logical(neuron.Mask));
+v_max=CaliAli_get_local_maxima(CaliAli_options);
+app=estimate_Corr_PNR(m.Cn,m.PNR,v_max,neuron.min_corr,neuron.min_pnr,logical(neuron.seed_mask));
 app.done=0;
 while app.done == 0  % polling
     pause(0.05);
 end
-neuron.Mask=app.mask;
+neuron.seed_mask=app.mask;
 neuron.Cn=app.cn;
 neuron.PNR=app.pnr;
 neuron.ind=app.tmp_ind;

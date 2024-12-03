@@ -20,7 +20,7 @@ try
     % map data
     mat_data = obj.P.mat_data;
     mat_file = mat_data.Properties.Source;
-    
+
     % dimension of data
     dims = mat_data.dims;
     d1 = dims(1);
@@ -40,7 +40,7 @@ try
     end
     T = diff(frame_range) + 1;
     obj.frame_range = frame_range;
-    
+
     % folders and files for saving the results
     tmp_dir = sprintf('%s%sframes_%d_%d%s', fileparts(mat_file),filesep, frame_range(1), frame_range(2), filesep);
     if ~exist(tmp_dir, 'dir')
@@ -53,7 +53,7 @@ try
     obj.P.log_file = log_file;
     obj.P.log_data = log_data_file;
     log_data = matfile(log_data_file, 'Writable', true);
-    
+
     % scan the previous initialization results
     temp = dir(tmp_dir);
     previous_folder = cell(length(temp),1);
@@ -64,10 +64,10 @@ try
             previous_folder{k} = temp(m).name;
         end
     end
-    
+
     % create a folder for new log
     mkdir(log_folder);
-    
+
     % manually check whether to re-use the previous results
     if ~exist('use_prev', 'var') || isempty(use_prev)
         use_prev = true;
@@ -82,7 +82,7 @@ try
         fprintf('\ttype -i to remove some previous results from your hard drive\n');
         fprintf('\ttype anything if you want to start a new initialization\n');
         fprintf('\t--------------------------  END  --------------------------\n');
-        
+
         while true
             choice = input('* make your choice:    ');
             if (choice>0) && (choice<=k)
@@ -91,18 +91,18 @@ try
                     % copy the previous log file
                     log_old = fopen(fullfile(tmp_dir, previous_folder{choice}, 'logs.txt'), 'r');
                     flog = fopen(log_file, 'a');
-                    
+
                     while true
                         temp = fgets(log_old);
                         fprintf(flog, '%s',temp);
-                        
+
                         if strfind(temp, 'Finished the initialization procedure.') %#ok<*STRIFCND>
                             fclose(log_old);
                             break;
                         end
                     end
                     fclose(flog);
-                    
+
                     % copy the previous results
                     data = matfile(fullfile(tmp_dir, previous_folder{1}, 'intermediate_results.mat'));
                     log_data.initialization = data.initialization;
@@ -137,12 +137,12 @@ try
                 end
                 % write this operation to the log file
                 flog = fopen(log_file, 'a');
-                
+
                 fprintf(flog, '\n--------%s--------\n', get_date());
                 fprintf(flog, '[%s]\b', get_minute());
                 fprintf(flog, 'Continue the analysis from the previous initialization results:\n\t%s \n\n', previous_folder{choice});
                 %                 fprintf('\tContinue the previous initialization  \n\n');
-                
+
                 return;
             elseif (choice<0) && (choice>=-k)
                 % delete the folder
@@ -155,14 +155,14 @@ try
                 break;
             end
         end
-        
+
     end
     %
-    
+
     % parameters for patching information
     patch_pos = mat_data.patch_pos;
     block_pos = mat_data.block_pos;
-    
+
     % number of patches
     [nr_patch, nc_patch] = size(patch_pos);
 catch
@@ -221,7 +221,7 @@ if strcmpi(bg_model, 'ring')
         nr_block = diff(tmp_block(1:2))+1;
         nc_block = diff(tmp_block(3:4))+1;
         b0{mpatch} = zeros(nr*nc, 1);
-        
+
         if bg_ssub==1
             [csub, rsub] = meshgrid(tmp_patch(3):tmp_patch(4), tmp_patch(1):tmp_patch(2));
             csub = reshape(csub, [], 1);
@@ -231,13 +231,13 @@ if strcmpi(bg_model, 'ring')
             rsub = bsxfun(@plus, rsub, r_shift);
             ind = and(and(csub>=1, csub<=d2), and(rsub>=1, rsub<=d1));
             jj = (csub-tmp_block(3)) * (diff(tmp_block(1:2))+1) + (rsub-tmp_block(1)+1);
-            
+
             temp = sparse(ii(ind), jj(ind), 1, nr*nc, nr_block*nc_block);
             W{mpatch} = bsxfun(@times, temp, 1./sum(temp, 2));
         else
             d1s = ceil(nr_block/bg_ssub);
             d2s = ceil(nc_block/bg_ssub);
-            
+
             [csub, rsub] = meshgrid(1:d2s, 1:d1s);
             csub = reshape(csub, [], 1);
             rsub = reshape(rsub, [], 1);
@@ -292,7 +292,11 @@ fprintf(flog, 'Start running source extraction......\nThe collection of options 
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_range(1), frame_range(2));
 
-[A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(obj);
+if strcmp(obj.CaliAli_opt.preprocessing.structure,'neuron')
+    [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(obj);
+elseif strcmp(obj.CaliAli_opt.preprocessing.structure,'dendrite')
+    [A,C_raw,C,S,Ymean] = int_temp_batch_dendrite(obj);
+end
 %% export the results
 obj.A = A;
 obj.C = C;
@@ -302,7 +306,7 @@ K = size(obj.A, 2);
 obj.P.k_ids = K;
 obj.ids = (1:K);
 obj.tags = zeros(K,1, 'like', uint16(0));
-obj.P.Ymean = Ymean;
+obj.P.Ymean=Ymean;
 
 if size(obj.A,3)>1
     obj.A_batch=obj.A;

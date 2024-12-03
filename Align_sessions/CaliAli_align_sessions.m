@@ -1,13 +1,13 @@
 function CaliAli_align_sessions(varargin)
 % CaliAli_align_sessions();
-opt_all=CaliAli_parameters(varargin);
-opt=opt_all.inter_session_alignment;
+CaliAli_options=CaliAli_parameters(varargin{:});
+opt=CaliAli_options.inter_session_alignment;
 if isempty(opt.input_files)
-    opt.input_files = uipickfiles('FilterSpec','*_mc.h5');
+    opt.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
-opt=detrend_batch_and_calculate_projections(opt,opt_all);
-opt.out_path=[opt.output_files{end}(1:end-6),'Aligned.h5'];
+opt=detrend_batch_and_calculate_projections(CaliAli_options);
+opt.out_path=[opt.output_files{end}(1:end-7),'Aligned.mat'];
 
 opt=match_video_size(opt);
 
@@ -30,8 +30,8 @@ end
 opt.P=P;
 opt.alignment_metrics=get_alignment_metrics(P);
 opt=apply_transformations(opt);
-opt_all.inter_session_alignment=opt;
-save_relevant_variables(opt_all);
+CaliAli_options.inter_session_alignment=opt;
+save_relevant_variables(CaliAli_options);
 end
 
 function [P,opt]=evaluate_BV(P,opt)
@@ -55,12 +55,12 @@ end
 get_neuron_projections_correlations(P,3);
 end
 
-function save_relevant_variables(opt)
-P=opt.inter_session_alignment.P;
-opt.inter_session_alignment.Cn=max(P.(size(P,2))(1,:).(3){1,1},[],3);
-opt.inter_session_alignment.Cn_scale=max(opt.inter_session_alignment.Cn,[],'all');
-opt.inter_session_alignment.Cn=opt.inter_session_alignment.Cn./opt.inter_session_alignment.Cn_scale;
-opt.inter_session_alignment.PNR=max(P.(size(P,2))(1,:).(4){1,1},[],3);
-saveh5(opt,opt.inter_session_alignment.out_path,'append',1,'rootname','CaliAli_options');
+function save_relevant_variables(CaliAli_options)
+P=CaliAli_options.inter_session_alignment.P;
+CaliAli_options.inter_session_alignment.Cn=max(P.(size(P,2))(1,:).(3){1,1},[],3);
+CaliAli_options.inter_session_alignment.Cn_scale=max(CaliAli_options.inter_session_alignment.Cn,[],'all');
+CaliAli_options.inter_session_alignment.Cn=CaliAli_options.inter_session_alignment.Cn./CaliAli_options.inter_session_alignment.Cn_scale;
+CaliAli_options.inter_session_alignment.PNR=max(P.(size(P,2))(1,:).(4){1,1},[],3);
+CaliAli_save(CaliAli_options.inter_session_alignment.out_path(:),CaliAli_options);
 end
 

@@ -1,4 +1,14 @@
-function [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,d1,d2,gSiz)
+function [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,neuron)
+
+d1=neuron.options.d1;
+d2=neuron.options.d2;
+gSig=neuron.options.gSig;
+if numel(gSig)<2
+gSiz=[gSig*6,gSig*6];
+else
+gSiz=gSig.*4*1.5;
+end
+
 
 Y_box={};
 HY_box={};
@@ -20,8 +30,8 @@ for k = 1:length(seed)
     end
 
     [r, c]  = ind2sub([d1, d2], ind_p);
-    rsub = max(1, -gSiz+r):min(d1, gSiz+r);
-    csub = max(1, -gSiz+c):min(d2, gSiz+c);
+    rsub = max(1, -gSiz(2)+r):min(d1, gSiz(2)+r);
+    csub = max(1, -gSiz(1)+c):min(d2, gSiz(1)+c);
     [cind, rind] = meshgrid(csub, rsub);
     [nr, nc] = size(cind);
     sz{k}=[nr, nc];

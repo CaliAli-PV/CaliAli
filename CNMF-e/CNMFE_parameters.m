@@ -1,9 +1,3 @@
-% neuron=CNMFE_parameters();
-% neuron = parse_inputs(varargin{1,:});
-% neuron = Sources2D();
-% %% parameters
-% neuron = fill_neuron(neuron, pars);
-% neuron.options = fill_neuron(neuron.options, pars);
 function pars=CNMFE_parameters(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
@@ -38,7 +32,7 @@ addParameter(inp, 'deconv_options', struct('type', 'ar1', ... % model of the cal
     'optimize_b', true, ...% optimize the baseline);
     'max_tau', 100), @isstruct);    % maximum decay time (unit: frame);
 addParameter(inp, 'nk', 1, @isnumeric);             % detrending the slow fluctuation. usually 1 is fine (no detrending)
-addParameter(inp, 'detrend_method', 'spline', @ischar);  % compute the local minimum as an estimation of trend.
+addParameter(inp, 'detrend_method', 'spline');  % compute the local minimum as an estimation of trend.
 
 % -------------------------     BACKGROUND    -------------------------  %
 addParameter(inp, 'background_model', 'ring', @ischar);  % model of the background {'ring', 'svd'(default), 'nmf'}
@@ -62,9 +56,10 @@ addParameter(inp, 'min_pixel', [], @isnumeric);      % This will be calculated l
 addParameter(inp, 'bd', 0, @isnumeric);             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 addParameter(inp, 'use_parallel', true, @islogical);    % use parallel computation for parallel computing
 addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when the background fluctuation is large (usually 1p data)
+addParameter(inp, 'seed_mask', []);  % set the value as true when the background fluctuation is large (usually 1p data)
 
 %% Parse Inputs
-varargin = varargin{1, :};
+varargin=varargin{:};
 if isstruct(varargin)
     varargin = [fieldnames(varargin), struct2cell(varargin)]';
 end
@@ -73,9 +68,13 @@ pars = inp.Results;
 
 
 %% Calculate Dependent Parameters
-pars.gSiz = pars.gSig * 4;
-pars.ring_radius = round(pars.bg_neuron_factor * pars.gSiz);
-pars.min_pixel = pars.gSig ^ 2;
+pars.gSiz = mean(pars.gSig) * 4;
+pars.ring_radius = round(pars.bg_neuron_factor * mean(pars.gSiz));
+if length(pars.gSig)>1
+    pars.min_pixel = prod(pars.gSig);
+else
+    pars.min_pixel = pars.gSig^2;
+end
 
 
 %% Conditional Parameter Setting
@@ -88,17 +87,3 @@ else
 end
 end
 
-
-function neuron = fill_neuron(neuron, pars)
-% Fills structure A with matching fields from structure B.
-
-fields_B = fieldnames(pars);
-
-for i = 1:numel(fields_B)
-    field_name = fields_B{i};
-    if isprop(neuron, field_name)||isfield(neuron, field_name)
-        neuron.(field_name) = pars.(field_name);
-    end
-end
-
-end

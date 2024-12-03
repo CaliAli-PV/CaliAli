@@ -18,6 +18,7 @@ function V = Non_rigid_mc(V, ref, opt)
 
 
 % Get a pyramid of images (e.g., blood vessel and neuron projections)
+fprintf('Appling non-rigid motion correction...\n');
 [X] = get_video_pyramid(V, ref, opt); 
 
 % Perform non-rigid motion correction in parallel

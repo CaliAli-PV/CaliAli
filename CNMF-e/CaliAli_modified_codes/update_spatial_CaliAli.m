@@ -1,14 +1,14 @@
 function obj=update_spatial_CaliAli(obj, use_parallel,F)
 fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj,0);
+    F=get_batch_size(obj);
 end
 batch=[0,cumsum(F)];
 A_temp=obj.A.*0;
 div=length(batch)-1;
 obj.A_prev=obj.A;
 for i=progress(1:div)
-    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
+    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
     Ca(:,i)=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     %      A=max(cat(3,full(A),full(out_A)),[],3);
     A_temp=cat(3,full(A_temp),full(out_A));
@@ -26,7 +26,7 @@ end
 
 
 
-function out_A=update_spatial_in(obj, use_parallel,max_frame, update_sn)
+function out_A=update_spatial_in(obj, use_parallel,max_frame,idx, update_sn)
 %% update the the spatial components for all neurons
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -369,10 +369,13 @@ end
 %% post-process results
 out_A = obj.post_process_spatial(obj.reshape(A_new, 2));
 % obj.A = A_new;
+if strcmp(obj.CaliAli_opt.preprocessing.structure,'dendrite')  
+out_A=filter_vessel_spatial(out_A,obj.options.d1,obj.options.d2);
+end
 
 %% upadte b0
 if strcmpi(bg_model, 'ring')
-    obj.b0_new = cell2mat(obj.P.Ymean)-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
+    obj.b0_new = obj.P.Ymean{idx}-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
 end
 
 

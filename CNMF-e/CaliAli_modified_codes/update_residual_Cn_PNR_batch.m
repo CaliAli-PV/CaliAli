@@ -12,28 +12,21 @@ d1=neuron.options.d1;
 d2=neuron.options.d2;
 gSig=neuron.options.gSig;
 n_enhanced=neuron.n_enhanced;
-fn=[0,cumsum(get_batch_size(neuron,0))];
+fn=[0,cumsum(get_batch_size(neuron))];
 for i=progress(1:size(fn,2)-1)
     Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
     if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
     Y(isnan(Y)) = 0;    % remove nan values
     %% substract neurons
 
-    if isa(Y,'uint8')
-        if ~isempty(neuron.A_batch)
-            Y=Y-uint8(neuron.A_batch(:,:,i)*neuron.C(:,fn(i)+1:fn(i+1)));
-        else
-            Y=Y-uint8(full(neuron.A)*neuron.C(:,fn(i)+1:fn(i+1)));
-        end
-    else
-        if ~isempty(neuron.A_batch)
-            Y=Y-uint16(neuron.A_batch(:,:,i)*neuron.C(:,fn(i)+1:fn(i+1)));
-        else
-            Y=Y-uint16(full(neuron.A)*neuron.C(:,fn(i)+1:fn(i+1)));
-        end
-    end
+    Y=single(Y)-single(full(neuron.A)*neuron.C(:,fn(i)+1:fn(i+1)));
 
-    [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(reshape(Y,d1,d2,[]),gSig,[],[],n_enhanced);
+    Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
+    if strcmp(neuron.CaliAli_opt.preprocessing.structure,'neuron')
+        [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(reshape(Y,d1,d2,[]),gSig,[],[],n_enhanced);
+    elseif strcmp(neuron.CaliAli_opt.preprocessing.structure,'dendrite')
+        [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_fast(reshape(Y,d1,d2,[]));
+    end
 end
 Cn=mat2gray(max(Cn_all,[],3));
 PNR=max(pnr_all,[],3);

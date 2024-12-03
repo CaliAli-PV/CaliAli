@@ -6,7 +6,7 @@ if ~isfile(opt.out_path)
     for k=1:length(opt.output_files)
         fullFileName = opt.output_files{k};
         fprintf(1, 'Applaying shifts to %s\n', fullFileName);
-        Y=h5read(fullFileName,'/Object');
+        Y=CaliAli_load(fullFileName,'Y');
         Y=apply_translations(Y,opt.T(k,:),opt.T_Mask);
         Y=apply_NR_shifts(Y,opt.shifts(:,:,:,k),opt.NR_Mask);
         if opt.final_neurons
@@ -17,7 +17,7 @@ if ~isfile(opt.out_path)
         else
         Y=uint8(single(Y).*R(k));
         end
-        saveh5(Y,opt.out_path,'append',1,'rootname','Object');
+        CaliAli_save_chunk(opt.out_path,Y);
     end
 else
     fprintf(1, 'File with name "%s" already exist.\n',opt.out_path);
@@ -31,7 +31,7 @@ f1=max(sum(Mask,1));
 f2=max(sum(Mask,2));
 Vid=imtranslate(Vid,T);
 Vid=reshape(Vid,d1*d2,[]);
-Vid=Vid(Mask,:);
+Vid=Vid(logical(Mask),:);
 Vid=reshape(Vid,f1,f2,[]);
 end
 

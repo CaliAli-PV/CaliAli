@@ -1,7 +1,7 @@
 function obj=update_background_CaliAli(obj, use_parallel,F)
 
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj,0);
+    F=get_batch_size(obj);
 end
 
 batch=[0,cumsum(F)];

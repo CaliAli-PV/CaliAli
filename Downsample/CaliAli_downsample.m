@@ -1,4 +1,4 @@
-function out=CaliAli_downsample(varargin)
+function CaliAli_options=CaliAli_downsample(varargin)
 % CaliAli_downsample downsamples video files spatially and temporally.
 %
 %   out = CaliAli_downsample(varargin)
@@ -23,8 +23,8 @@ function out=CaliAli_downsample(varargin)
 %   Outputs:
 %       out             - Cell array of output file paths
 % Parse input arguments
-opt_all= CaliAli_parameters(varargin);
-opt = opt_all.downsampling;
+CaliAli_options= CaliAli_parameters(varargin{:});
+opt = CaliAli_options.downsampling;
 % If 'input_files' is set to 'pickup', prompt the user to select files
 
 if isempty(opt.input_files)
@@ -37,9 +37,9 @@ for k = 1:length(opt.input_files)
     % Extract the file path and name
     [filepath, name] = fileparts(fullFileName);
     % Construct the output file path
-    out{k} = strcat(filepath, filesep, name, '_ds', '.h5');
+    opt.output_files{k} = strcat(filepath, filesep, name, '_ds', '.mat');
     % Check if the output file already exists
-    if ~isfile(out{k})
+    if ~isfile(opt.output_files{k})
         [~,~,ext]=fileparts(fullFileName);
         switch true
             case contains('.avi .m4v .mp4',ext,'IgnoreCase',true)
@@ -68,9 +68,9 @@ for k = 1:length(opt.input_files)
         % Save the downsampled video as an HDF5 file
         % Save CaliAli parameters (likely related to camera alignment or other metadata)
         Y=v2uint8(Y);
-        opt_all.downsampling=opt;
-        saveh5(Y, out{k},'append',1,'rootname','Object');
-        saveh5(opt_all,out{k},'append',1,'rootname','CaliAli_options')
+        CaliAli_options.downsampling=opt;
+        CaliAli_save(opt.output_files{k}(:),Y,CaliAli_options);
+        
     else
         % If the output file already exists, skip processing and print a message
         fprintf(1, 'File %s already exist in destination folder!\n', out{k});

@@ -1,7 +1,7 @@
 function BV_app()
 
-theFiles = uipickfiles('REFilter','\.h5*$','num',1);
-V=h5read(theFiles{1, 1}  ,'/Object');
+theFiles = uipickfiles('REFilter','\.mat*$','num',1);
+V=CaliAli_load(theFiles{1, 1}  ,'Y');
 
 if contains(theFiles{1, 1},'_mc')
     M=median(V,3);

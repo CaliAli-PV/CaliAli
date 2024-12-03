@@ -2,7 +2,7 @@ function [Mr,Ref]=Rigid_mc(Y,opt)
 % Motion corrects the image volume Y using NoRMCorre.
 % Y: 3D image volume.
 % opt: Options for motion correction.
-
+fprintf('Appling translation motion correction...\n');
 % Generate reference projection based on specified option.
 if strcmp(opt.reference_projection_rigid,'BV')
     Ref=CaliAli_get_blood_vessels(Y,opt); % Correct for vignetting.

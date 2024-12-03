@@ -229,7 +229,7 @@ classdef Sources2D < handle
         end
         %% distribute data and be ready to run source extraction
         function getReady(obj, filter_kernel)
-            pars_envs=obj.pars_envs;
+            pars_env=obj.pars_envs;
             % data and its extension
             if iscell(obj.file)
                 nam = obj.file{1};
@@ -237,14 +237,14 @@ classdef Sources2D < handle
                 nam = obj.file;
             end
             % parameters for scaling things
-            if ~exist('pars_envs', 'var') || isempty(pars_envs)
+            if ~exist('pars_env', 'var') || isempty(pars_env)
                 memory_size_to_use = 16.0;  %GB
                 memory_size_per_patch = 1.0;  % GB;
                 patch_dims = [64, 64];
             else
-                memory_size_to_use = pars_envs.memory_size_to_use;
-                memory_size_per_patch = pars_envs.memory_size_per_patch;
-                patch_dims = pars_envs.patch_dims;
+                memory_size_to_use = pars_env.memory_size_to_use;
+                memory_size_per_patch = pars_env.memory_size_per_patch;
+                patch_dims = pars_env.patch_dims;
             end
 
             if ~exist('filter_kernel', 'var')
@@ -1722,8 +1722,10 @@ classdef Sources2D < handle
             % check the number of nonzero pixels
             nz_pixels = full(sum(A_>0, 1));
             tags_ = tags_ + uint16(nz_pixels'<min_pixel);
-            kill = remove_sparse_PV(A_,obj.options.d1,obj.options.d2); %% PV
-            tags_(kill)=1;  %PV
+            if strcmp(obj.CaliAli_opt.preprocessing.structure,'neuron')
+                kill = remove_sparse_PV(A_,obj.options.d1,obj.options.d2); %% PV
+                tags_(kill)=1;  %PV
+            end
             % check the number of calcium transients after the first frame
             if obj.options.deconv_flag
                 nz_spikes = full(sum(S_(:,2:end)>0, 2));
@@ -1835,7 +1837,7 @@ classdef Sources2D < handle
             end
 
             try
-                evalin('caller', sprintf('save(''%s'',''merge_thr_tempospatial'', ''neuron'', ''show_*'', ''use_parallel'', ''with_*'', ''-v7.3''); ', file_path)); %% modified by PV
+                evalin('caller', sprintf('save(''%s'',''neuron'', ''-v7.3''); ', file_path)); %% modified by PV
                 log_file = obj.P.log_file;
                 fp = fopen(log_file, 'a');
                 fprintf(fp, '\n--------%s--------\n[%s]\bSave the current workspace into file \n\t%s\n\n', get_date(), get_minute(), file_path);

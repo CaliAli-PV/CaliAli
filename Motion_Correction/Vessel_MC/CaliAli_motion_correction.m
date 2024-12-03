@@ -1,9 +1,9 @@
-function opt=CaliAli_motion_correction(varargin)
+function CaliAli_options=CaliAli_motion_correction(varargin)
 
-opt_all = CaliAli_parameters(varargin);
-opt = opt_all.motion_correction;
+CaliAli_options = CaliAli_parameters(varargin{:});
+opt = CaliAli_options.motion_correction;
 if isempty(opt.input_files)
-    opt.input_files = uipickfiles('FilterSpec','*.h5');
+    opt.input_files = uipickfiles('FilterSpec','*_ds*.mat');
 end
 
 
@@ -12,9 +12,10 @@ for k=1:length(opt.input_files)
     fprintf(1, 'Now reading %s\n', fullFileName);
     % output file:
     [filepath,name]=fileparts(fullFileName);
-    opt.output_file=strcat(filepath,filesep,name,'_mc','.h5');
+    opt.output_file=strcat(filepath,filesep,name,'_mc','.mat');
+    out{k}=opt.output_file;
     if ~isfile(opt.output_file)
-        Y=loadh5(fullFileName,'/Object');
+        Y=CaliAli_load(fullFileName,'Y');
         if isempty(gcp('nocreate'))
             % If no pool, create one
             parpool
@@ -28,11 +29,11 @@ for k=1:length(opt.input_files)
         Y=square_borders(Y,0);
         %
         %% save MC video as .h5
-        opt_all.motion_correction=opt;
-        saveh5(Y,opt.output_file,'rootname','Object');
-        saveh5(opt_all,opt.output_file,'append',1,'rootname','CaliAli_options')
+        CaliAli_options.motion_correction=opt;
+        CaliAli_save(opt.output_file(:),Y,CaliAli_options);
     else
         fprintf(1, 'File %s already exist!\n', opt.output_file);
     end
+    CaliAli_options.motion_correction.output_files=out;
 end
 

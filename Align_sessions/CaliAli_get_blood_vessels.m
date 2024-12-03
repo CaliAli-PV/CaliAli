@@ -42,21 +42,14 @@ se = offsetstrel('ball',sz,0.01);  % Create a ball-shaped structuring element
 % Process the input
 if parf==1  % Parallel processing for videos
     M = create_batches(M);  % Divide the video into batches
-    b = ProgressBar(size(M,1), ...  % Create a progress bar
-        'IsParallel', true, ...
-        'UpdateRate', 1,...
-        'WorkerDirectory', pwd(), ...
-        'Title', 'Appling diffuse filter' ...
-        );
-    b.setup([], [], []);
     bv_scale = linspace(opt.BVsize(1), opt.BVsize(2), 10);  % Vessel scales for vesselness filter
+    fprintf('Calculating blood vessels in batch mode...\n');
     parfor i = 1:size(M,1)
         M{i} = process_batch(M{i}, se, gradThresh, numIter, bv_scale); % Process each batch in parallel
-        updateParallel([], pwd); 
     end
-    b.release();  % Release the progress bar
     M = cat(3,M{:});  % Concatenate the processed batches
 else  % Sequential processing for single images
+    fprintf('Calculating blood vessels...\n');
     [M,~,~] = remove_vignetting(M,se,gradThresh,numIter);  % Remove vignetting
     M = M + randn(size(M))/10000;  % Add small noise to avoid artifacts
     M = mat2gray(vesselness_PV(M,0,linspace(opt.BVsize(1),opt.BVsize(2),10),0)); % Apply vesselness filter
