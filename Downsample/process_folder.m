@@ -1,0 +1,13 @@
+function process_folder(fullFileName,opt)
+files=dir([fullFileName,filesep,'*',opt.file_extension]);  
+opt.input_files   = fullfile({files.folder}, {files.name})';
+CaliAli_options=CaliAli_downsample(opt);
+
+
+folders = strsplit(CaliAli_options.downsampling.output_files{1, 1}, filesep);
+
+outpath=[filesep,fullfile(folders{1:end-2}),filesep,folders{end-1},'_con.mat'];
+CaliAli_concatenate_files(outpath,CaliAli_options.downsampling.output_files);
+
+
+

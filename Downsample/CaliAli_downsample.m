@@ -34,8 +34,12 @@ end
 for k = 1:length(opt.input_files)
     fullFileName = opt.input_files{k};  % Get the full path of the current file
     fprintf(1, 'Now reading %s\n', fullFileName);  % Print the file being processed
+    if isfolder(fullFileName) % check if inputs correspond to folders or files
+        process_folder(fullFileName,opt)
+        continue
+    end
     % Extract the file path and name
-    [filepath, name] = fileparts(fullFileName);
+    [filepath, name,ext] = fileparts(fullFileName);
     % Construct the output file path
     opt.output_files{k} = strcat(filepath, filesep, name, '_ds', '.mat');
     % Check if the output file already exists
@@ -73,6 +77,8 @@ for k = 1:length(opt.input_files)
         
     else
         % If the output file already exists, skip processing and print a message
-        fprintf(1, 'File %s already exist in destination folder!\n', out{k});
+        fprintf(1, 'File %s already exist in destination folder!\n', opt.output_files{k});
     end
 end
+
+CaliAli_options.downsampling=opt;

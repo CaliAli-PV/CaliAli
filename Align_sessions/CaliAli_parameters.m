@@ -41,6 +41,9 @@ addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diamet
 addParameter(inp,'spatial_ds',1,valid_v)      %Spatial Downsampling factor
 addParameter(inp,'temporal_ds',1,valid_v)     %Temporal Downsampling factor
 
+addParameter(inp,'file_extension','avi')      % if a folder is selected instead of a single video file,
+% Concatenate all videos with the specified file extension 
+
 varargin=varargin{:};
 if isstruct(varargin)
     varargin = [fieldnames(varargin), struct2cell(varargin)]';
