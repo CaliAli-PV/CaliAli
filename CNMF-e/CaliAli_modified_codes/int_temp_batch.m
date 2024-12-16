@@ -4,8 +4,8 @@ function [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron)
 %%
 d1=neuron.options.d1;
 d2=neuron.options.d2;
-gSig=neuron.options.gSig;
-n_enhanced=neuron.CaliAli_opt.preprocessing.neuron_enhance;
+gSig=neuron.CaliAli_options.cnmf.gSig;
+n_enhanced=neuron.CaliAli_options.preprocessing.neuron_enhance;
 gSiz=gSig*4;
 F=get_batch_size(neuron);
 fn=[0,cumsum(F)];
@@ -55,7 +55,7 @@ for i=progress(1:size(fn,2)-1)
     %%
     % screen seeding pixels as center of the neuron
 
-    Mask=neuron.options.Mask;
+    Mask=neuron.CaliAli_options.cnmf.seed_mask;
 
     if isempty(Mask)
         Mask=true(d1,d2);
@@ -83,7 +83,7 @@ for i=progress(1:size(fn,2)-1)
             break
         end
         [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron,size(Y,2));
-        [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
+        [c,s]=deconv_PV(c_raw,neuron.CaliAli_options.cnmf.deconv_options);
         %% Filter a
         af=a;
         if n_enhanced==0

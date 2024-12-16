@@ -16,16 +16,20 @@ div=length(batch)-1;
 fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
 for i=progress(1:div)
     out=update_bg_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
-    b=cellfun(@(x,y) x+y,b,out.b,'UniformOutput',false);
-    f=cellfun(@(x,y) x+y,f,out.f,'UniformOutput',false);
+    if i==1
+        b=out.b;
+        f=out.f;
+    else
+        b=cellfun(@(x,y) x+y,b,out.b,'UniformOutput',false);
+        f=cellfun(@(x,y) x+y,f,out.f,'UniformOutput',false);
+    end
     b0=cellfun(@(x,y) min(cat(3,x,y),[],3),b0,out.b0,'UniformOutput',false);
     W=cellfun(@(x,y) x+y,W,out.W,'UniformOutput',false);
     b0_new=min(cat(3,b0_new,out.b0_new),[],3);
     temp(:,:,i)=out.b0_new;
-    % A_prev=max(cat(3,A_prev,full(out.A_prev)),[],3);
-    % C_prev=cat(2,C_prev,out.C_prev);
 end
-
+% A_prev=max(cat(3,A_prev,full(out.A_prev)),[],3);
+% C_prev=cat(2,C_prev,out.C_prev);
 b=cellfun(@(x) x./div,b,'UniformOutput',false);
 f=cellfun(@(x) x./div,f,'UniformOutput',false);
 W=cellfun(@(x) x./div,W,'UniformOutput',false);
@@ -186,33 +190,6 @@ else
 end
 
 if use_parallel
-    % load data before running parfor
-    %     data_patch = cell(nr_patch, nc_patch);
-    %     flag_ignore = cell(nr_patch, nc_patch);
-    %     for mpatch=1:(nr_patch*nc_patch)
-    %         tmp_patch = patch_pos{mpatch};
-    %         A_block = A{mpatch};
-    %
-    %         % stop updating B because A&C doesn't change in this area
-    %         if isempty(A_block) && (~flag_first)
-    %             flag_ignore{mpatch} = true;
-    %             [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-    %
-    %             % keep the current results. this step looks rediculous, but it
-    %             % is needed for some computer/matlab. very weird.
-    %             W{mpatch} = W{mpatch};
-    %             b0{mpatch} = b0{mpatch};
-    %             b{mpatch} = b{mpatch};
-    %             f{mpatch} = f{mpatch};
-    %             fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
-    %             continue;
-    %         else
-    %             flag_ignore{mpatch} = false;
-    %             % pull data
-    %             data_patch{mpatch} = get_patch_data(mat_data, tmp_patch, frame_range, true);
-    %         end
-    %     end
-    % do the actual computation
     parfor mpatch=1:(nr_patch*nc_patch) %% removed par for debuging
         %         if flag_ignore{mpatch}
         %             continue;
@@ -271,14 +248,12 @@ if use_parallel
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
-            sn_patch = sn_block(ind_patch);
-            [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
+            [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
         else
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
-            sn_patch = sn_block(ind_patch);
-            [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
+            [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
         end
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
 

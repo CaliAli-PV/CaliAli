@@ -1,4 +1,4 @@
-function runCNMFe(in)
+function runCNMFe_dendrite(in)
 
 neuron = Sources2D();
 pars=CaliAli_load(in,'CaliAli_options.cnmf');
@@ -14,13 +14,17 @@ evalin( 'base', 'clearvars -except parin theFiles' );
 tic
 neuron =initComponents_parallel_PV(neuron,[],[], 0, 1,0);
 toc
+save_workspace(neuron);
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
-Initialization=neuron;
-CaliAli_save(in(:),Initialization);
+ neuron.merge_high_corr(neuron.show_merge, [0.7, -inf, -inf]);
+ neuron.merge_high_corr(neuron.show_merge, neuron.CaliAli_options.cnmf.merge_thr_spatial);
+
+neuron = merge_fibers(neuron,neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_fiber);
+
+save_workspace(neuron);
 
 
 %% Update components
-
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10
@@ -31,8 +35,9 @@ for loop=1:10
     %% post-process the results automatically
     neuron.remove_false_positives();
     neuron.merge_neurons_dist_corr(neuron.show_merge);
+    neuron.merge_high_corr(neuron.show_merge, [0.7, -inf, -inf]);
     neuron.merge_high_corr(neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_spatial);
-    neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
+    neuron = merge_fibers(neuron,neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_fiber);
 
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     fprintf('Disimilarity with previous iteration is %.3f\n', dis);
@@ -79,8 +84,8 @@ end
 %   cnmfe_path = neuron.save_workspace();
 %% To visualize neurons contours:
 %   neuron.Coor=[]
-%   neuron.show_contours(0.9, [], neuron.PNR, 0);  %PNR
-%   neuron.show_contours(0.6, [], neuron.Cn,0);   %CORR
+%   neuron.show_contours(0.9, [], neuron.CaliAli_options.inter_session_alignment.PNR, 0);  %PNR
+%   neuron.show_contours(1, [],neuron.CaliAli_options.inter_session_alignment.Cn  ,0);   %CORR
 %   neuron.show_contours(0.9, [], neuron.Cn.*neuron.PNR,0); %PNR*CORR
 
 
@@ -97,7 +102,7 @@ end
 % neuron.merge_high_corr(1, [0.3, 0.2, -inf]);
 
 
-% ix=postprocessing_app(neuron,0.6);
+% ix=postprocessing_app(neuron,1);
 % neuron.viewNeurons(find(ix), neuron.C_raw);
 % neuron.delete(ix);
 % save_workspace(neuron);

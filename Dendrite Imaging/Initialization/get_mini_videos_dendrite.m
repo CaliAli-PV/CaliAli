@@ -1,4 +1,4 @@
-function [Y_box, ind_nhood, center, sz] = get_mini_videos_dendrite(Y, seed, neuron)
+function [Y_box, ind_nhood, center, sz,Cn_out] = get_mini_videos_dendrite(Y, seed, neuron,Cn)
 %GET_MINI_VIDEOS_DENDRITE Extracts mini-videos around seed points on a dendrite.
 %
 %   [Y_box, ind_nhood, center, sz] = get_mini_videos_dendrite(Y, seed, neuron)
@@ -10,6 +10,7 @@ function [Y_box, ind_nhood, center, sz] = get_mini_videos_dendrite(Y, seed, neur
 %                       - options.d1: Image height (number of rows).
 %                       - options.d2: Image width (number of columns).
 %                       - options.gSig: Gaussian sigma for neighborhood size.
+%        Cn         - Optional: Correlation image. 
 %
 %   Outputs:
 %       Y_box       - Cell array of mini-videos (pixel values x time) around each seed.
@@ -26,31 +27,34 @@ gSig = neuron.options.gSig;
 if numel(gSig) < 2
     gSiz = [gSig * 6, gSig * 6];  % Use 6*sigma if only one sigma value is provided
 else
-    gSiz = gSig .* 4 * 1.5;       % Use 4*sigma*1.5 if two sigma values are provided 
+    gSiz = gSig .* 4 * 2.5;       % Use 4*sigma*1.5 if two sigma values are provided 
 end
 
 % Initialize output cell arrays
 Y_box = {};
-HY_box = {}; % This seems unused in the code
 ind_nhood = {};
 center = {};
 sz = {};
+
+if ~exist('Cn','var')
+    Cn=zeros(d1,d2);
+end
 
 % Loop through each seed point
 for k = 1:length(seed)
     ind_p = seed(k);  % Get linear index of the seed point
     y0 = Y(ind_p, :); % Get the fluorescence trace at the seed point
-
-    % Check if the signal at the seed point is weak
-    P = max(y0) / (median(abs(y0)) / 0.6745 * 3) < 1; 
-    if P  % If signal is weak, skip this seed point
-        ind_nhood{k} = [];
-        HY_box{k} = [];
-        Y_box{k} = [];
-        center{k} = [];
-        sz{k} = [];
-        continue; 
-    end
+    % 
+    % % Check if the signal at the seed point is weak
+    % P = max(y0) / (median(abs(y0)) / 0.6745 * 3) < 1;
+    % if P  % If signal is weak, skip this seed point
+    %     ind_nhood{k} = [];
+    %     HY_box{k} = [];
+    %     Y_box{k} = [];
+    %     center{k} = [];
+    %     sz{k} = [];
+    %     continue;
+    % end
 
     % Convert linear index to row and column subscripts
     [r, c] = ind2sub([d1, d2], ind_p);
@@ -65,6 +69,7 @@ for k = 1:length(seed)
 
     % Store neighborhood size
     sz{k} = [nr, nc];
+    Cn_out{k}=Cn(rsub,csub);
 
     % Calculate linear indices of pixels in the neighborhood
     ind_nhood{k} = sub2ind([d1, d2], rind(:), cind(:));

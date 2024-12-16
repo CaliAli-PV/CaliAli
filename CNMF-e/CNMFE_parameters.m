@@ -22,7 +22,7 @@ addParameter(inp, 'spatial_constraints', struct('connected', false, 'circular', 
 addParameter(inp, 'spatial_algorithm', 'hals_thresh', @ischar);
 
 % -------------------------      TEMPORAL     -------------------------  %
-addParameter(inp, 'Fs', 10, @isnumeric);             % frame rate
+addParameter(inp, 'sf', 10, @isnumeric);             % frame rate
 addParameter(inp, 'tsub', 1, @isnumeric);           % temporal downsampling factor
 addParameter(inp, 'deconv_flag', true, @islogical);     % run deconvolution or not
 addParameter(inp, 'deconv_options', struct('type', 'ar1', ... % model of the calcium traces. {'ar1', 'ar2'}
@@ -47,6 +47,7 @@ addParameter(inp, 'merge_thr', 0.65, @isnumeric);     % thresholds for merging n
 addParameter(inp, 'method_dist', 'max', @ischar);   % method for computing neuron distances {'mean', 'max'}
 addParameter(inp, 'dmin', 5, @isnumeric);       % minimum distances between two neurons. it is used together with merge_thr
 addParameter(inp, 'merge_thr_spatial', [0.8, 0.4, -inf], @isnumeric);  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
+addParameter(inp, 'merge_thr_fiber', [5, 15,0.4], @isnumeric);  % merge close fiber with similar orientation. [distance,angle, temporal correlation.
 
 % -------------------------  INITIALIZATION   -------------------------  %
 addParameter(inp, 'K', [], @isnumeric);             % maximum number of neurons per patch. when K=[], take as many as possible.
@@ -68,12 +69,15 @@ pars = inp.Results;
 
 
 %% Calculate Dependent Parameters
-pars.gSiz = mean(pars.gSig) * 4;
-pars.ring_radius = round(pars.bg_neuron_factor * mean(pars.gSiz));
-if length(pars.gSig)>1
-    pars.min_pixel = prod(pars.gSig);
-else
-    pars.min_pixel = pars.gSig^2;
+pars.gSiz = min(pars.gSig) * 4;
+pars.ring_radius = round(pars.bg_neuron_factor * min(pars.gSiz));
+
+if isempty(pars.min_pixel)
+    if length(pars.gSig)>1
+        pars.min_pixel = prod(pars.gSig);
+    else
+        pars.min_pixel = pars.gSig^2;
+    end
 end
 
 

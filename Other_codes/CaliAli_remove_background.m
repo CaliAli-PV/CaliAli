@@ -16,9 +16,6 @@ if opt.preprocessing.neuron_enhance
     end
 end
 
-% if opt.preprocessing.noise_scale
-%     Y=noise_scaling(Y);
-% end
 end
 
 function Y=MIN1PIPE_bg_removal(Y,opt)
@@ -34,10 +31,10 @@ end
 
 function Y=noise_scaling(Y)
 [d1,d2,d3]=size(Y);
-Y=reshape(Y,[d1*d2,d3]);
-Y=Y./max(Y,[],'all')*100;
+Y=double(reshape(Y,[d1*d2,d3]));
+Y=Y./max(Y,[],'all')*1000;
 Y=Y+randn(size(Y));
-Y(Y<0)=randn(sum(Y<0,'all'),1);
+Y=Y-median(Y,2);
 Y=Y./GetSn(Y);
 Y(isnan(Y))=randn(sum(isnan(Y),'all'),1);
 Y(isinf(Y))=randn(sum(isinf(Y),'all'),1);

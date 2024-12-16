@@ -13,13 +13,12 @@ for i=progress(1:size(fn,2)-1)
     Y(isnan(Y)) = 0;    % remove nan values
     %%
     % screen seeding pixels as center of the neuron
-    Mask=neuron.options.Mask;
-    if isempty(Mask)
-        Mask=true(d1,d2);
+    if isempty(neuron.CaliAli_options.cnmf.seed_mask)
+        neuron.CaliAli_options.cnmf.seed_mask=true(d1,d2);
     end
 
     %% Intialize variables
-    seed_all=get_seeds(neuron);
+    seed_all=get_seed_dendrites(neuron);
     A=[];
     C=[];
     C_raw=[];
@@ -27,25 +26,26 @@ for i=progress(1:size(fn,2)-1)
     while true
         seed=get_far_neighbors(seed_all,neuron);
         seed_all(ismember(seed_all,seed))=[];
-        Mask(seed)=0;
-        [Y_box,ind_nhood,center,sz]=get_mini_videos_dendrite(Y,seed,neuron);
+        [Y_box,ind_nhood,center,sz,Cn_in]=get_mini_videos_dendrite(Y,seed,neuron,neuron.CaliAli_options.inter_session_alignment.Cn);
         if isempty(Y_box)
             break
         end
-        try
-        [a,c_raw]=estimate_components_dendrite(Y_box,center,sz,size(Y,2),neuron.CaliAli_opt);
-        catch
-            dummy=1
-        end
-        [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
- 
+
+        [a,c_raw]=estimate_components_dendrite(Y_box,center,sz,size(Y,2),neuron.CaliAli_options,Cn_in);
+
+        [c,s]=deconv_PV(c_raw,neuron.CaliAli_options.cnmf.deconv_options);
+
         %% Filter a
+
         a=expand_A(a,ind_nhood,d1*d2);
 
-        signal=single(a*c);
-        signal(isnan(signal))=0;
-        %% update video;
-        Y=Y-signal;
+          Y=Y-a*c;
+
+
+        % Cn=neuron.CaliAli_options.inter_session_alignment.Cn;[row,col] = ind2sub([d1,d2],seed);
+        % figure;imagesc(Cn);hold on;plot(col,row,'or');
+        % figure;imagesc(mat2gray(reshape(max(a,[],2),d1,d2)));
+
 
         A=cat(2,A,a);
         C=cat(1,C,c);

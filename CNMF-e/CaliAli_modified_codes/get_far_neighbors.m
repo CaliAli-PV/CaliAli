@@ -1,7 +1,7 @@
 function [out]=get_far_neighbors(seed,neuron)
-gSig=neuron.CaliAli_opt.downsampling.gSig;
-Cn=neuron.CaliAli_opt.inter_session_alignment.Cn;
-PNR=neuron.CaliAli_opt.inter_session_alignment.PNR;
+gSig=neuron.CaliAli_options.downsampling.gSig;
+Cn=neuron.CaliAli_options.inter_session_alignment.Cn;
+PNR=neuron.CaliAli_options.inter_session_alignment.PNR;
 d1=neuron.options.d1;
 d2=neuron.options.d2;
 if numel(seed)>1

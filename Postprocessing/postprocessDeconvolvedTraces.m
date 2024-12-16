@@ -71,7 +71,7 @@ function neuron = deconv_traces(neuron, deconv_options)
     end
     b.release();
     % Denoise the deconvolved traces
-    [c, s] = denoise_traces(cr, c, s, abs(deconv_options.smin), neuron.Fs);
+    [c, s] = denoise_traces(cr, c, s, abs(deconv_options.smin), neuron.sf);
     
     % Update neuron struct with deconvolved and denoised traces
     neuron.C = c;

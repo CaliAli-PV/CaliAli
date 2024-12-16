@@ -1,7 +1,9 @@
 
 % Load the demo parameters. Modifiy this function to analyze your own data.
-params=CaliAli_demo_parameters();
-% params=CaliAli_demo_parameters_dendrites_1p();
+CaliAli_options=CaliAli_demo_parameters();
+% CaliAli_options=CaliAli_demo_parameters_dendrites_1p();
+% CaliAli_options=CaliAli_demo_parameters_dendrites_2p();
+
 
 % Do downsampling:
 CaliAli_options=CaliAli_downsample(params);  
@@ -20,4 +22,7 @@ CaliAli_align_sessions(CaliAli_options);
 opt=detrend_batch_and_calculate_projections(CaliAli_options);
 
 
-opt=detrend_batch_and_calculate_projections(CaliAli_parameters(params));
+CaliAli_update_parameters('background_model','svd');
+
+
+

@@ -124,7 +124,7 @@ Names = [
     'Cnr                '  
     'PNRr               '  
     'ind                '
-    'CaliAli_opt        '
+    'CaliAli_options    '
     'pars_envs          '
     'show_merge         '
     'merge_thr_spatial  '

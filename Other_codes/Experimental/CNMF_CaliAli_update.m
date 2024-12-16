@@ -1,4 +1,3 @@
-
 function neuron=CNMF_CaliAli_update(component_name,neuron,F)
 
 use_parallel=neuron.use_parallel;

@@ -1,37 +1,19 @@
-function [merged_ROIs, newIDs, obj_bk]  = merge_high_corr(obj, show_merge, merge_thr)
+function neuron  = merge_fibers(neuron, show_merge, merge_thr)
 %% merge neurons if they have high temporal correlations
-% inputs:
-%   show_merge: boolean scale, manually verify the merging
-%   merge_thr: scalar or 1*3 vector, threshold for three metrics {'A', 'C', 'S'}, it merge neurons based
-%       on correlations of spatial shapes ('A'),  calcium traces ('C') and  spike counts ('S').
-%       if it's a scalar, it's the temporal corrleation of C.
-%       the other two are 0.
-% output:
-%   merged_ROIs: cell arrarys, each element contains indices of merged
-%   components
-%   newIDs: vector, each element is the new index of the merged neurons
-%   obj_bk: same as obj, the obj before being merged.
-
-%% Author: Pengcheng Zhou, Carnegie Mellon University.
-%  The basic idea is proposed by Eftychios A. Pnevmatikakis: high temporal
-%  correlation + spatial overlap
-%  reference: Pnevmatikakis et.al.(2016). Simultaneous Denoising, Deconvolution, and Demixing of Calcium Imaging Data. Neuron
 
 %% variables & parameters
-fprintf('-------------MERGE HIGHLY CORRELATED NEURONS----------\n\n');
+fprintf('--------MERGE CORRELATED FIBER wit similar orientation-------\n\n');
 
 
-A_=obj.A;
+A_=neuron.A;
 
 % spatial components
-if isempty(obj.C_raw)
-    obj.C_raw = obj.C;
+if isempty(neuron.C_raw)
+    neuron.C_raw = neuron.C;
 end
-C_raw_ = obj.C_raw;
+C_raw_ = neuron.C_raw;
 
-% C_=medfilt1(C_raw_,obj.Fs*5,[],2);  %% Added by PV
-
-C_ = obj.C;
+C_ = neuron.C;
 
 if ~exist('show_merge', 'var') || isempty(show_merge)
     show_merge = false;
@@ -42,60 +24,43 @@ if show_merge
     stop_show = false;
 end
 if ~exist('merge_thr', 'var') || isempty(merge_thr) || numel(merge_thr)~=3
-    merge_thr = obj.options.merge_thr;
+    merge_thr = neuron.options.merge_thr;
 end
 if length(merge_thr)==1
     merge_thr = [0, merge_thr, 0];
 end
-A_thr = merge_thr(1);
-C_thr = merge_thr(2);
-S_thr = merge_thr(3);
+
+C_thr = merge_thr(3);
 [K, ~] = size(C_);   % number of neurons
-deconv_options_0 = obj.options.deconv_options;
+deconv_options_0 = neuron.options.deconv_options;
 
 %% find neuron pairs to merge
-% compute spatial correlation
-temp = bsxfun(@times, A_, 1./sqrt(sum(A_.^2,1)));
-% temp = bsxfun(@times, A_>0, 1./sqrt(sum(A_>0)));
-A_overlap = temp'*temp;
 
-%% PV: This normalize relative to the maximum similarity. 
-%If a small components completly overlap with a big component the
-%similarity will not be 1. This modification solve this issue.
+%Aproximate components to lines
 
-t=sort(A_);
-temp = bsxfun(@times, t, 1./sqrt(sum(t.^2,1)));
-% temp = bsxfun(@times, A_>0, 1./sqrt(sum(A_>0)));
-A_overlap_max = temp'*temp;
+for i=1:size(A_,2)
+    [centroids(i,:), angles(i)] = collapse_to_line(reshape(A_(:,i),neuron.options.d1,neuron.options.d2),0);
+end
 
-A_overlap=A_overlap./A_overlap_max;
+parallel_lines = find_parallel_lines(centroids, angles,merge_thr(2),merge_thr(1));
+
  %%
-S_ = obj.S;
-if isempty(S_) || (size(S_, 1)~=size(obj.C, 1))
+S_ = neuron.S;
+if isempty(S_) || (size(S_, 1)~=size(neuron.C, 1))
     try
-        S_ = diff(obj.C_raw, 1, 2);
+        S_ = diff(neuron.C_raw, 1, 2);
     catch
-        S_ = diff(obj.C, 1, 2);
+        S_ = diff(neuron.C, 1, 2);
     end
     S_(:, end+1) = 0;
     
     S_(bsxfun(@lt, S_, 2*GetSn(S_))) = 0;
 end
-S_corr = corr(S_') - eye(K);
 C_corr = corr(C_')-eye(K);
 
 %% using merging criterion to detect paired neurons
-flag_merge = (A_overlap>=A_thr)&(C_corr>=C_thr)&(S_corr>=S_thr);
-if length(merge_thr)>3
-    max_decay_diff = merge_thr(4);
-    taud = zeros(K, 1);
-    for m=1:K
-        temp = ar2exp(obj.P.kernel_pars(m));
-        taud(m) = temp(1);
-    end
-    decay_diff = abs(bsxfun(@minus, taud, taud'));
-    flag_merge = flag_merge & (decay_diff<max_decay_diff);
-end
+flag_merge = parallel_lines&(C_corr>=merge_thr(3));
+
 [l,c] = graph_connected_comp(sparse(flag_merge));     % extract connected components
 
 MC = bsxfun(@eq, reshape(l, [],1), 1:c);
@@ -103,7 +68,7 @@ MC(:, sum(MC,1)==1) = [];
 
 %% write log file
 % folders and files for saving the results
-log_file =  obj.P.log_file;
+log_file =  neuron.P.log_file;
 flog = fopen(log_file, 'a');
 %log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
 
@@ -111,9 +76,9 @@ try
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start Merging neurons based on temporal correlations:\n ');
 fprintf(flog, '\tThresholds:\n');
-fprintf(flog, '\t\tTemporal correlation of C: %.3f\n', C_thr);
-fprintf(flog, '\t\tSpatial overlaps: %.3f\n', A_thr);
-fprintf(flog, '\t\tSpike count correlation: %.3f\n', S_thr);
+fprintf(flog, '\t\t Minumum distance between fibers: %.3f\n', merge_thr(1));
+fprintf(flog, '\t\t Maximum angle diferences between parallel fibers : %.3f\n', merge_thr(2));
+fprintf(flog, '\t\t Calcium transient correlation : %.3f\n', merge_thr(3));
 
 if isempty(MC)
     fprintf('All pairs of neurons are below the merging criterion!\n\n');
@@ -134,7 +99,7 @@ catch
     
 end
 %% start merging
-obj_bk = obj.copy();
+obj_bk = neuron.copy();
 [nr, n2merge] = size(MC);
 ind_del = false(nr, 1 );    % indicator of deleting corresponding neurons
 merged_ROIs = cell(n2merge,1);
@@ -193,21 +158,21 @@ while m <= n2merge
     active_pixel = (sum(A_(:,IDs), 2)>0);
     
     % update spatial/temporal components of the merged neuron
-    if ~isempty(obj.A_batch)
-        F=get_batch_size(obj,0);
+    if ~isempty(neuron.A_batch)
+        F=get_batch_size(neuron,0);
         batch=[0,cumsum(F)];
         div=length(batch)-1;
         for i=1:div
-            [obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(obj.A_batch(active_pixel,IDs(:),i),C_raw_(IDs(:),batch(i)+1:batch(i+1)));
+            [neuron.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(neuron.A_batch(active_pixel,IDs(:),i),C_raw_(IDs(:),batch(i)+1:batch(i+1)));
         end
-        obj.A=Ato2d(obj);
+        neuron.A=Ato2d(neuron);
     else
-        [obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(obj.A(active_pixel,IDs(:)),C_raw_(IDs(:),:));
+        [neuron.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(neuron.A(active_pixel,IDs(:)),C_raw_(IDs(:),:));
     end
     %     [obj.C(IDs(1), :), obj.S(IDs(1), :), tmp_kernel] = deconvCa(ci, obj.kernel, 3, true, false);
     try
-        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(max(obj.C_raw(IDs(:),:)), deconv_options_0);
-        obj.P.kernel_pars(IDs(1), :) = deconv_options.pars(1);  %% PV fix.
+        [neuron.C(IDs(1), :), neuron.S(IDs(1),:), deconv_options] = deconvolveCa(max(neuron.C_raw(IDs(:),:)), deconv_options_0);
+        neuron.P.kernel_pars(IDs(1), :) = deconv_options.pars(1);  %% PV fix.
         newIDs(IDs(1)) = IDs(1);
         % remove merged elements
         ind_del(IDs(2:end)) = true;
@@ -236,14 +201,14 @@ for m=1:length(newIDs)
     ind_before = merged_ROIs{m};
     ids_merged = obj_bk.ids(ind_before);
     ind_after = ind_before(1);
-    ids_new = obj.ids(ind_after);
+    ids_new = neuron.ids(ind_after);
     fprintf(flog, '\t\t');
     for k=1:length(ids_merged)
         fprintf(flog, '%d, ', ids_merged(k));
     end
     fprintf(flog, '---> %d\n', ids_new);
     merge_records.before = obj_bk.obj2struct(ind_before);
-    merge_records.after = obj.obj2struct(ind_after);
+    merge_records.after = neuron.obj2struct(ind_after);
     merge_results{m} = merge_records;
 end
 % folders and files for saving the results
@@ -255,7 +220,7 @@ fprintf(flog, '\tNow the old neurons will be deleted and the merged new ones wil
 fclose(flog);
 
 % remove merged neurons and update obj
-obj.delete(ind_del);
+neuron.delete(ind_del);
 try
     close(h_fig);
 end

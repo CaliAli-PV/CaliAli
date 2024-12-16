@@ -15,6 +15,12 @@ else
 end
 
 
+if ~isempty(opt.preprocessing.median_filtering)
+Cn=medfilt2(Cn,opt.preprocessing.median_filtering);
+PNR=medfilt2(PNR,opt.preprocessing.median_filtering);
+end
+
+
 R=range(Y,'all');
 if strcmp(S,'uint8')
     Y=v2uint8(Y);
@@ -31,5 +37,5 @@ function Y=remove_BV(Y,BV)
 mask=mat2gray(BV.^2);
 mask=(1-double(mask));
 mask=mask.^10;
-Y=Y.*mask;
+Y=double(Y).*mask;
 end

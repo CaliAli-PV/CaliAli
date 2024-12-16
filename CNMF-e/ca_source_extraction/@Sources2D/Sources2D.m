@@ -30,7 +30,7 @@ classdef Sources2D < handle
         options;    % options for model fitting
         P;          % some estimated parameters or parameters relating to data
         % data info
-        Fs = nan;    % frame rate
+        sf = nan;    % frame rate
         file = '';
         frame_range;  % frame range of the data
         %quality control
@@ -65,7 +65,7 @@ classdef Sources2D < handle
         Cnr;% Modification done by PV
         PNRr ;% Modification done by PV
         ind ;% Modification done by PV
-        CaliAli_opt;% Modification done by PV
+        CaliAli_options;% Modification done by PV
         pars_envs;
         show_merge;
         merge_thr_spatial;
@@ -886,8 +886,8 @@ classdef Sources2D < handle
             end
             if exist('avi_nm', 'var') && ischar(avi_nm)
                 avi_file = VideoWriter(avi_nm);
-                if ~isnan(obj.Fs)
-                    avi_file.FrameRate = obj.Fs;
+                if ~isnan(obj.sf)
+                    avi_file.FrameRate = obj.sf;
                 end
                 avi_file.open();
                 avi_flag = true;
@@ -906,10 +906,10 @@ classdef Sources2D < handle
             for t=1:size(Y,3)
                 imagesc(Y(:, :, t), min_max); colormap(col_map);
                 axis equal; axis off tight;
-                if isnan(obj.Fs)
+                if isnan(obj.sf)
                     title(sprintf('Frame %d', t));
                 else
-                    text(1, 10, sprintf('Time = %.2f', t/obj.Fs), 'fontsize', 15, 'color', 'w');
+                    text(1, 10, sprintf('Time = %.2f', t/obj.sf), 'fontsize', 15, 'color', 'w');
                 end
                 pause(t_pause);
                 if avi_flag
@@ -1642,7 +1642,7 @@ classdef Sources2D < handle
             % play
             if nargin>1
                 fp = VideoWriter(avi_file);
-                fp.FrameRate = obj.Fs;
+                fp.FrameRate = obj.sf;
                 fp.open();
             end
 
@@ -1652,7 +1652,7 @@ classdef Sources2D < handle
                 img = obj.reshape(img, 2)/cmax*1000;
                 imagesc(uint8(img));
                 axis equal off tight;
-                text(5, 10, sprintf('Time: %.2f seconds',(m-indt(1))/obj.Fs), 'color', 'w',...
+                text(5, 10, sprintf('Time: %.2f seconds',(m-indt(1))/obj.sf), 'color', 'w',...
                     'fontsize', 16);
                 pause(.01);
                 if exist('fp', 'var')
@@ -1722,7 +1722,7 @@ classdef Sources2D < handle
             % check the number of nonzero pixels
             nz_pixels = full(sum(A_>0, 1));
             tags_ = tags_ + uint16(nz_pixels'<min_pixel);
-            if strcmp(obj.CaliAli_opt.preprocessing.structure,'neuron')
+            if strcmp(obj.CaliAli_options.preprocessing.structure,'neuron')
                 kill = remove_sparse_PV(A_,obj.options.d1,obj.options.d2); %% PV
                 tags_(kill)=1;  %PV
             end
@@ -1812,7 +1812,7 @@ classdef Sources2D < handle
             end
 
             if ~exist('w', 'var')||isempty(w)
-                w = obj.Fs;
+                w = obj.sf;
             end
             E =obj.C;    % event detection
             Emin = ordfilt2(E, 1, ones(1, w));
@@ -1972,7 +1972,7 @@ classdef Sources2D < handle
                 neuron.f = obj.f;
                 neuron.W = obj.W;
                 neuron.b0 = obj.b0;
-                neuron.Fs = obj.Fs;
+                neuron.sf = obj.sf;
                 neuron.frame_range = obj.frame_range;
                 neuron.kernel = obj.kernel;
                 neuron.file = obj.kernel;

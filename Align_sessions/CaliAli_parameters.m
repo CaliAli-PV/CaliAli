@@ -80,8 +80,11 @@ addParameter(inp, 'dendrite_theta', 30);    % Filter dendrites based on their or
                                             % 0: No filtering.
                                             % Positive value (0 to +90): Filter out dendrites with orientation < dendrite_theta.
                                             % Negative value (0 to -90): Filter out dendrites with orientation > -dendrite_theta.
+
 addParameter(inp,'fastPNR',false)           % Avoid calculating the correlation image 
                                             % and use Laplaciang filtering instead (Faster by accuracy havent been tested.)
+
+ addParameter(inp,'median_filtering',[])    % Apply median filtering to the image                                      
 
 varargin=varargin{1, :};
 if isstruct(varargin)

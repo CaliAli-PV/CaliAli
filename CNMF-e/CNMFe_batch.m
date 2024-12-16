@@ -1,13 +1,16 @@
-function CNMFe_batch(parin)
+function CNMFe_batch()
 
-for i=1:size(parin,1)
+
+input_files = uipickfiles('FilterSpec','*_ds*.mat');
+
+
+for i=1:size(input_files,1)
     try
-    temp=parin{i,1:5};
-    runCNMFe(temp{1, 1});
+    temp=input_files{i};
+
+    runCNMFe_dendrite(temp);
     catch ME
-        m=parin{i,1};
-        m=m{1,1};
-        [~,m,~] = fileparts(m);
+        m=input_files{i};
         fprintf(['fail to process ',m,'\n'])
         rethrow(ME)
     end

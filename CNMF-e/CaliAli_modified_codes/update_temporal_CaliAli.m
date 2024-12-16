@@ -98,6 +98,9 @@ ind_neurons = cell(nr_patch, nc_patch);
 
 AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
+if isempty(obj.A_prev)
+obj.A_prev=obj.A;
+end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')
         tmp_block = block_pos{mpatch};

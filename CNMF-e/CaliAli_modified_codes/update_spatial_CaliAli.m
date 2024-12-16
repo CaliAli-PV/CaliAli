@@ -68,6 +68,9 @@ end
 % frames to be loaded
 frame_range = max_frame;
 T = diff(frame_range) + 1;
+if isempty(obj.C_prev)
+obj.C_prev=obj.C;
+end
 
 % threshold for detecting large residuals
 % thresh_outlier = obj.options.thresh_outlier;
@@ -369,7 +372,7 @@ end
 %% post-process results
 out_A = obj.post_process_spatial(obj.reshape(A_new, 2));
 % obj.A = A_new;
-if strcmp(obj.CaliAli_opt.preprocessing.structure,'dendrite')  
+if strcmp(obj.CaliAli_options.preprocessing.structure,'dendrite')  
 out_A=filter_vessel_spatial(out_A,obj.options.d1,obj.options.d2);
 end
 

@@ -36,7 +36,7 @@ d1 = dims(1); d2 = dims(2); T = dims(3);
 fprintf('\nThe data has %d X %d pixels X %d frames. \nLoading all data (double precision) requires %.3f GB RAM\n\n', d1, d2, T, prod(dims)/(2^27));
 
 max_elements = memory_size_per_patch* (500^3); % x GB data can save x*1000^3/8 dobule numbers.
-min_patch_width = 2*w_overlap+3;
+min_patch_width = [2*w_overlap+3,2*w_overlap+3];
 max_patch_width = max(round(sqrt(double(round(max_elements/T))))-w_overlap*2, min_patch_width);
 
 if isempty(patch_dims)
