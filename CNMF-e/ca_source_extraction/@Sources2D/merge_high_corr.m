@@ -198,15 +198,15 @@ while m <= n2merge
         batch=[0,cumsum(F)];
         div=length(batch)-1;
         for i=1:div
-            [obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1)));
+            [obj.A_batch(active_pixel,IDs(1),i),C_raw_(IDs(1),batch(i)+1:batch(i+1))]=update_tempo_spatial(obj.A_batch(active_pixel,IDs(:),i),C_raw_(IDs(:),batch(i)+1:batch(i+1)));
         end
         obj.A=Ato2d(obj);
     else
-        [obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:));
+        [obj.A(active_pixel,IDs(1)),C_raw_(IDs(1),:)]=update_tempo_spatial(obj.A(active_pixel,IDs(:)),C_raw_(IDs(:),:));
     end
     %     [obj.C(IDs(1), :), obj.S(IDs(1), :), tmp_kernel] = deconvCa(ci, obj.kernel, 3, true, false);
     try
-        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(obj.C_raw(IDs(1),:), deconv_options_0);
+        [obj.C(IDs(1), :), obj.S(IDs(1),:), deconv_options] = deconvolveCa(max(obj.C_raw(IDs(:),:)), deconv_options_0);
         obj.P.kernel_pars(IDs(1), :) = deconv_options.pars(1);  %% PV fix.
         newIDs(IDs(1)) = IDs(1);
         % remove merged elements
@@ -263,7 +263,7 @@ end
 
 function [A_,C_raw_]=update_tempo_spatial(A_,C_raw_)
     data = A_*C_raw_;
-    ci = C_raw_;
+    ci = max(C_raw_);
     for miter=1:10
         ai = data*ci'/(ci*ci');
         ci = ai'*data/(ai'*ai);

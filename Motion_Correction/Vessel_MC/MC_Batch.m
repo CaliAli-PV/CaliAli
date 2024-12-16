@@ -18,7 +18,6 @@ for k=1:length(theFiles)
     out=strcat(filepath,filesep,name,'_mc','.h5');
     if ~isfile(out)
         V=h5read(fullFileName,'/Object');
-        V=video_deblur(V);
         [V,BV]=motion_correct_PV(V+1,opt); %% Rigid MC
         if do_nr
             %         Mr=MC_NR(V);
