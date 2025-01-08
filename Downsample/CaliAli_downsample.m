@@ -51,7 +51,7 @@ for k = 1:length(opt.input_files)
             case contains('.isxd',ext,'IgnoreCase',true)
                 temp = ISXD2h5(inputFilePath);
             case contains(ext,'.tif','IgnoreCase',true)
-                temp=parallelReadTiff(fullFileName);
+                temp=ScanImageTiffReader(char(fullFileName));  % You caa change this to parallelReadTiff for some speed gains. but this doesnt work for very big files 
             otherwise
                 error('Unsupported file format. Supported formats are: .avi, .m4v, .mp4, .isxd, .tif, .tiff');
         end

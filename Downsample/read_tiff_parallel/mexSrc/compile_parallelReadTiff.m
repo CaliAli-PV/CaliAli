@@ -36,9 +36,10 @@ elseif ismac
 
     system('chmod 777 ../mac/parallelReadTiff.mexmaci64');
 elseif ispc
+    setenv('MW_MINGW64_LOC','C:/mingw64');
     releaseFolder = '../windows';
     if ~exist(releaseFolder, 'dir')
         mkdir(releaseFolder);
     end
-    mex  -outdir ../windows -output parallelReadTiff.mexw64 -v CXX="C:/ProgramData/MATLAB/SupportPackages/R2023b/3P.instrset/mingw_w64.instrset/bin/g++" -v CXXOPTIMFLAGS="-DNDEBUG -O3" LDOPTIMFLAGS="-Wl',-rpath='''$ORIGIN'''' -O3 -DNDEBUG" CXXFLAGS='$CXXFLAGS -fopenmp -O3' LDFLAGS='$LDFLAGS -fopenmp -O3' -I'C:/msys64/mingw64/include' -L'C:/msys64/mingw64/lib' -ltiff.dll parallelreadtiffmex.cpp ../src/helperfunctions.cpp ../src/parallelreadtiff.cpp
+    mex  -outdir ../windows -output parallelReadTiff.mexw64 -v CXX="C:/mingw64/bin/g++" -v CXXOPTIMFLAGS="-DNDEBUG -O3" LDOPTIMFLAGS="-Wl',-rpath='''$ORIGIN'''' -O3 -DNDEBUG" CXXFLAGS='$CXXFLAGS -fopenmp -O3' LDFLAGS='$LDFLAGS -fopenmp -O3' -I'C:/Program Files (x86)/tiff/include' -L'C:\Program Files (x86)\tiff\lib' -ltiff.dll parallelreadtiffmex.cpp ../src/helperfunctions.cpp ../src/parallelreadtiff.cpp
 end

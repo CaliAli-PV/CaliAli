@@ -49,10 +49,15 @@ void mexFunction(int nlhs, mxArray *plhs[],
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &y);
 
     if(nrhs == 1){
-        uint32_t s = 0, m = 0, t = 1;
+        uint16_t s = 0, m = 0, t = 1;
         while(TIFFSetDirectory(tif,t)){
             s = t;
             t *= 8;
+            if(s > t){
+                t = 65535;
+                printf("Number of slices > 32768\n");
+                break;
+            }
         }
         while(s != t){
             m = (s+t+1)/2;
