@@ -4,9 +4,8 @@ CaliAli_options=CaliAli_demo_parameters();
 % CaliAli_options=CaliAli_demo_parameters_dendrites_1p();
 % CaliAli_options=CaliAli_demo_parameters_dendrites_2p();
 
-
 % Do downsampling:
-CaliAli_options=CaliAli_downsample(params);  
+CaliAli_options=CaliAli_downsample(CaliAli_options);  
 
 CaliAli_options.motion_correction.input_files=CaliAli_options.downsampling.output_files;
 

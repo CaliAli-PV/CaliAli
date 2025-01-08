@@ -22,9 +22,9 @@ for i=progress(1:size(fn,2)-1)
     Y=single(Y)-single(full(neuron.A)*neuron.C(:,fn(i)+1:fn(i+1)));
 
     Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
-    if strcmp(neuron.CaliAli_opt.preprocessing.structure,'neuron')
+    if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
         [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(reshape(Y,d1,d2,[]),gSig,[],[],n_enhanced);
-    elseif strcmp(neuron.CaliAli_opt.preprocessing.structure,'dendrite')
+    elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
         [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_fast(reshape(Y,d1,d2,[]));
     end
 end

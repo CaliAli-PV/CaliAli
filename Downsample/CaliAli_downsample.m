@@ -69,9 +69,10 @@ for k = 1:length(opt.input_files)
         else
         Y=temp;
         end
+        clear temp
         % Save the downsampled video as an HDF5 file
         % Save CaliAli parameters (likely related to camera alignment or other metadata)
-        Y=v2uint8(Y);
+        Y=v2uint8(Y)+1;
         CaliAli_options.downsampling=opt;
         CaliAli_save(opt.output_files{k}(:),Y,CaliAli_options);
         

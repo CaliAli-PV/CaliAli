@@ -45,7 +45,7 @@ for loop=1:10
         break
     end
 end    %% save the workspace for future analysis
-neuron=update_residual_Cn_PNR_batch(neuron);
+% neuron=update_residual_Cn_PNR_batch(neuron);
 save_workspace(neuron);
 
 
