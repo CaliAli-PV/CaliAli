@@ -8,12 +8,12 @@ params.BVsize = [];             % Size of blood vessels (pixels),
                                  %  [min diameter, max diameter]. 
                                  %  Default is calculated based on gSig.
 params.spatial_ds = 2;          % Spatial downsampling factor
-params.temporal_ds = 2;         % Temporal downsampling factor
+params.temporal_ds = 1;         % Temporal downsampling factor
 
 params.neuron_enhance = true;   % Enhance neurons using MIN1PIE background subtraction
 params.noise_scale = true;      % Scale noise for each pixel
 params.detrend = 1;             % Detrending window (seconds). 0 = no detrending
-params.file_extension = 'mp4';      % if a folder is selected instead of a single video file, 
+params.file_extension = 'avi';  % if a folder is selected instead of a single video file, 
 % Concatenate all videos with the specified file extension within that
 % folder
 

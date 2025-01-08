@@ -51,7 +51,7 @@ for k = 1:length(opt.input_files)
             case contains('.isxd',ext,'IgnoreCase',true)
                 temp = ISXD2h5(inputFilePath);
             case contains(ext,'.tif','IgnoreCase',true)
-                temp=ScanImageTiffReader(char(fullFileName));  % You caa change this to parallelReadTiff for some speed gains. but this doesnt work for very big files 
+                temp=tiff_reader_fast(fullFileName);  % You caa change this to parallelReadTiff for some speed gains. but this doesnt work for very big files 
             otherwise
                 error('Unsupported file format. Supported formats are: .avi, .m4v, .mp4, .isxd, .tif, .tiff');
         end
@@ -75,7 +75,7 @@ for k = 1:length(opt.input_files)
         Y=v2uint8(Y)+1;
         CaliAli_options.downsampling=opt;
         CaliAli_save(opt.output_files{k}(:),Y,CaliAli_options);
-        
+        fprintf(1, 'File saved in %s\n',opt.output_files{k});     
     else
         % If the output file already exists, skip processing and print a message
         fprintf(1, 'File %s already exist in destination folder!\n', opt.output_files{k});

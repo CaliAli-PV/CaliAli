@@ -12,7 +12,7 @@ Y=single(Y);
 
 %% preprocessing data
 % create a spatial filter for removing background
-if n_enhanced==0 && gSig>0
+if n_enhanced==0 & gSig>0
         psf = fspecial('gaussian', ceil(gSig*4+1), gSig);
         ind_nonzero = (psf(:)>=max(psf(:,1)));
         psf = psf-mean(psf(ind_nonzero));

@@ -1,4 +1,4 @@
-function CNMFe_batch()
+function CaliAli_cnmfe()
 
 
 input_files = uipickfiles('FilterSpec','*_ds*.mat');

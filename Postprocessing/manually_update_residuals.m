@@ -23,7 +23,6 @@ end
 %% post-process the results automatically
 neuron.remove_false_positives();
 
-
 neuron=update_residual_Cn_PNR(neuron);
 
 %% Optional post-process
