@@ -80,9 +80,11 @@ uint8_t isImageJIm(const char* fileName){
             uint64_t* size = getImageSize(fileName);
             if(size[2] > 1){
                 if(TIFFSetDirectory(tif,1)){
+                    free(size);
                     return 0;
                 }
             }
+            free(size);
             uint16_t compressed = 1;
             TIFFGetField(tif, TIFFTAG_COMPRESSION, &compressed);
             TIFFClose(tif);
@@ -113,21 +115,18 @@ uint64_t imageJImGetZ(const char* fileName){
     return 0;
 }
 
-uint64_t* getImageSize(const char* fileName){
+uint32_t getImageSizeZ(const char* fileName){
     TIFFSetWarningHandler(DummyHandler);
     TIFF* tif = TIFFOpen(fileName, "r");
     if(!tif) printf("File \"%s\" cannot be opened",fileName);
 
-    uint64_t x = 1,y = 1,z = 1;
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &x);
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &y);
-    uint16_t s = 0, m = 0, t = 1;
+    uint32_t s = 0, m = 0, t = 1, z = 1;
     while(TIFFSetDirectory(tif,t)){
         s = t;
         t *= 8;
         if(s > t){
-            t = 65535;
-            printf("Number of slices > 32768\n");
+            t = 4294967295;
+            printf("Number of slices > 1073741824\n");
             break;
         }
     }
@@ -142,8 +141,21 @@ uint64_t* getImageSize(const char* fileName){
         }
     }
     z = s+1;
-
     TIFFClose(tif);
+    return z;
+}
+
+uint64_t* getImageSize(const char* fileName){
+    TIFFSetWarningHandler(DummyHandler);
+    TIFF* tif = TIFFOpen(fileName, "r");
+    if(!tif) printf("File \"%s\" cannot be opened",fileName);
+
+    uint64_t x = 1,y = 1,z = 1;
+    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &x);
+    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &y);
+    z = getImageSizeZ(fileName);
+    TIFFClose(tif);
+
     uint64_t* dims = (uint64_t*)malloc(3*sizeof(uint64_t));
     dims[0] = y;
     dims[1] = x;
