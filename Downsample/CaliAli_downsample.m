@@ -28,7 +28,7 @@ opt = CaliAli_options.downsampling;
 % If 'input_files' is set to 'pickup', prompt the user to select files
 
 if isempty(opt.input_files)
-    opt.input_files = uipickfiles('REFilter','\.avi$|\.m4v$|\.mp4$|\.tif$|\.tiff$|\.isxd$');
+    opt.input_files = uipickfiles('REFilter','\.h5$|\.avi$|\.m4v$|\.mp4$|\.tif$|\.tiff$|\.isxd$');
 end
 % Loop through each selected file
 for k = 1:length(opt.input_files)
@@ -52,6 +52,8 @@ for k = 1:length(opt.input_files)
                 temp = ISXD2h5(inputFilePath);
             case contains(ext,'.tif','IgnoreCase',true)
                 temp=tiff_reader_fast(fullFileName);  
+            case contains(ext,'.h5','IgnoreCase',true)
+                temp=h5read(fullFileName,'/Object');  
             otherwise
                 error('Unsupported file format. Supported formats are: .avi, .m4v, .mp4, .isxd, .tif, .tiff');
         end

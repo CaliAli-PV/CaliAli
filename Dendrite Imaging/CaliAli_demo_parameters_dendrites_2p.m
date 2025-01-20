@@ -21,7 +21,7 @@ params.background_model='svd';
 % Dendrite parameters
 params.structure='dendrite';
 params.dendrite_size=2.5:0.4:4;
-params.dendrite_theta=15;        % 0 is 90 degree, 10 is 85 to 95, 20 is 80 to 100
+params.dendrite_theta=30;        % 0 is 90 degree, 10 is 85 to 95, 20 is 80 to 100
 params.fastPNR=true;
 params.do_alignment=false;
 params.remove_BV=false;

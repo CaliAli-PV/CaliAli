@@ -1,6 +1,5 @@
 % Load the demo parameters. 
 CaliAli_options=CaliAli_demo_parameters(); % <-- Modifiy this function to analyze your own data.
-
 % Do downsampling:
 CaliAli_options=CaliAli_downsample(CaliAli_options);  
 % Do motion correction
