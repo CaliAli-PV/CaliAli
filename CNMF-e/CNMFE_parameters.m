@@ -59,6 +59,10 @@ addParameter(inp, 'use_parallel', true, @islogical);    % use parallel computati
 addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when the background fluctuation is large (usually 1p data)
 addParameter(inp, 'seed_mask', []);  % set the value as true when the background fluctuation is large (usually 1p data)
 
+% ----------------------DENDRITE INITIALIZATION   -------------------------  %
+addParameter(inp,'min_dendrite_size',10)    % Shortest dendrite length in pixels
+addParameter(inp,'dendrite_initialization_threshold',0.1)    % Shortest dendrite length in pixels
+
 %% Parse Inputs
 varargin=varargin{:};
 if isstruct(varargin)

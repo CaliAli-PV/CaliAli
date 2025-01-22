@@ -6,6 +6,7 @@ d1=neuron.options.d1;
 d2=neuron.options.d2;
 F=get_batch_size(neuron);
 fn=[0,cumsum(F)];
+Ymean=cell(1,size(fn,2)-1);
 for i=progress(1:size(fn,2)-1)
     Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
     Ymean{i}=double(median(Y,3));
@@ -18,20 +19,33 @@ for i=progress(1:size(fn,2)-1)
     end
 
     %% Intialize variables
-    seed_all=get_seed_dendrites(neuron);
+
+    [labeled_all,~] = segmentAndColorVessels(neuron.CaliAli_options.inter_session_alignment.Cn, ...
+        neuron.CaliAli_options.cnmf.min_dendrite_size, ...
+        neuron.CaliAli_options.cnmf.dendrite_initialization_threshold, ...
+        neuron.CaliAli_options.cnmf.seed_mask);
     A=[];
     C=[];
     C_raw=[];
     S=[];
     while true
-        seed=get_far_neighbors(seed_all,neuron);
-        seed_all(ismember(seed_all,seed))=[];
-        [Y_box,ind_nhood,center,sz,Cn_in]=get_mini_videos_dendrite(Y,seed,neuron,neuron.CaliAli_options.inter_session_alignment.Cn);
+        try
+        seed=get_far_neighbors_dendrite(labeled_all,neuron);
+
+        % Set non-matching pixels to 0
+        mask = ismember(labeled_all, seed);
+        current = labeled_all; % Initialize with the original image
+        current(~mask) = 0;
+        labeled_all=labeled_all-current;
+
+        labeled_all=adjust_seed(labeled_all);
+
+        [Y_box,ind_nhood,comp_mask,sz,Cn_in]=get_mini_videos_dendrite(Y,current,neuron,neuron.CaliAli_options.inter_session_alignment.Cn);
         if isempty(Y_box)
             break
         end
 
-        [a,c_raw]=estimate_components_dendrite(Y_box,center,sz,size(Y,2),neuron.CaliAli_options,Cn_in);
+        [a,c_raw]=estimate_components_dendrite(Y_box,comp_mask,sz,size(Y,2),neuron.CaliAli_options,Cn_in);
 
         [c,s]=deconv_PV(c_raw,neuron.CaliAli_options.cnmf.deconv_options);
 
@@ -52,8 +66,11 @@ for i=progress(1:size(fn,2)-1)
         C_raw=cat(1,C_raw,c_raw);
         S=cat(1,S,s);
 
-        if isempty(seed_all)
+        if sum(labeled_all)==0
             break
+        end
+        catch
+            fummy=1
         end
     end
 
@@ -91,6 +108,18 @@ C_raw(kill,:)=[];
 S(kill,:)=[];
 
 
+
+end
+
+function labeled_all=adjust_seed(labeled_all)
+
+uniqueLabels = unique(labeled_all(:));
+
+% Create a mapping from old labels to new labels
+mapping = containers.Map(uniqueLabels, 0:length(uniqueLabels)-1);
+
+% Apply the mapping to scale the labels
+labeled_all= arrayfun(@(x) mapping(x), labeled_all);
 
 end
 

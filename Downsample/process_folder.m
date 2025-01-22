@@ -6,7 +6,7 @@ CaliAli_options=CaliAli_downsample(opt);
 
 folders = strsplit(CaliAli_options.downsampling.output_files{1, 1}, filesep);
 
-outpath=[filesep,fullfile(folders{1:end-2}),filesep,folders{end-1},'_con.mat'];
+outpath=[fullfile(folders{1:end-2}),filesep,folders{end-1},'_con.mat'];
 CaliAli_concatenate_files(outpath,CaliAli_options.downsampling.output_files);
 
 

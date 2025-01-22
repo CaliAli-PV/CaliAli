@@ -26,7 +26,7 @@ if ~isfile(outpath)
         vid{k}=CaliAli_load(fullFileName,'Y');     
     end
     Y=cat(3,vid{:});
-    CaliAli_save(outpath,Y,CaliAli_options);
+    CaliAli_save(outpath(:),Y,CaliAli_options);
 else
     fprintf(1, 'File %s already exist in destination folder!\n', out);
 end

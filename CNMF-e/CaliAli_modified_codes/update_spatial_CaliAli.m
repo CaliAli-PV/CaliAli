@@ -372,9 +372,9 @@ end
 %% post-process results
 out_A = obj.post_process_spatial(obj.reshape(A_new, 2));
 % obj.A = A_new;
-if strcmp(obj.CaliAli_options.preprocessing.structure,'dendrite')  
-out_A=filter_vessel_spatial(out_A,obj.options.d1,obj.options.d2);
-end
+% if strcmp(obj.CaliAli_options.preprocessing.structure,'dendrite')  
+% out_A=filter_vessel_spatial(out_A,obj.options.d1,obj.options.d2);
+% end
 
 %% upadte b0
 if strcmpi(bg_model, 'ring')

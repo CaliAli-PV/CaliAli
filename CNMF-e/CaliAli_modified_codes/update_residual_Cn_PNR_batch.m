@@ -19,15 +19,15 @@ for i=progress(1:size(fn,2)-1)
     Y(isnan(Y)) = 0;    % remove nan values
     %% substract neurons
 
-    Y=single(Y)-single(full(neuron.A)*neuron.C(:,fn(i)+1:fn(i+1)));
+    Y=single(Y)-single(full(neuron.A)*neuron.C_raw(:,fn(i)+1:fn(i+1)));
 
     Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
     if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
         [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(reshape(Y,d1,d2,[]),gSig,[],[],n_enhanced);
     elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
-        [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_fast(reshape(Y,d1,d2,[]));
+        [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_dendrite(reshape(Y,d1,d2,[]),neuron.CaliAli_options);
     end
 end
-Cn=mat2gray(max(Cn_all,[],3));
+Cn=max(Cn_all,[],3)./neuron.CaliAli_options.inter_session_alignment.Cn_scale;
 PNR=max(pnr_all,[],3);
 end

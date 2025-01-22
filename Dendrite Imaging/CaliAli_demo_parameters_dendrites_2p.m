@@ -2,8 +2,8 @@ function params=CaliAli_demo_parameters_dendrites_2p()
 % CaliAli_parameters  Defines parameters for CaliAli.
 
 % --- Data Preprocessing ---
-params.gSig = [3,200];             % Gaussian filter size for dendrite (pixels)
-params.sf = 30;                 % Frame rate (fps)
+params.gSig = [3,50];             % Gaussian filter size for dendrite (pixels)
+params.sf = 100;                 % Frame rate (fps)
 params.BVsize = [0.5,1.5];             % Size of blood vessels (pixels), 
                                  %  [min diameter, max diameter]. 
                                  %  Default is calculated based on gSig.
@@ -13,19 +13,20 @@ params.temporal_ds = 1;          % Temporal downsampling factor
 params.neuron_enhance = true;    % Enhance neurons using MIN1PIE background subtraction
 params.noise_scale = false;      % Scale noise for each pixel
 params.detrend = 0;              % Detrending window (seconds). 0 = no detrending
-
+params.file_extension = 'tif';  % if a folder is selected instead of a single video file, 
 % 2p parameters:
 params.background_model='svd';
 
 
 % Dendrite parameters
 params.structure='dendrite';
-params.dendrite_size=2.5:0.4:4;
+params.dendrite_filter_size=1.5:0.4:3;
 params.dendrite_theta=30;        % 0 is 90 degree, 10 is 85 to 95, 20 is 80 to 100
-params.fastPNR=true;
+params.fastPNR=false;
 params.do_alignment=false;
 params.remove_BV=false;
 params.median_filtering=[3,1];  %Apply median filtering. Leave empty for no filtering. We use 7x1 to filter vertical elongated structures
+params.min_dendrite_size = 10;  % Shortest dendrite length in pixels
 
 
 % --- Motion Correction ---

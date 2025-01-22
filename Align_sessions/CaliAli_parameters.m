@@ -75,7 +75,7 @@ addParameter(inp,'detrend',1)                 %Detrending of slow fluctuation. T
 addParameter(inp,'remove_BV',false)       %Remove BV from the neuron-filtered projection]
 %% Dendrite processing codes. This section is experimental. This is not used unless structure is set to 'dendrite'
 addParameter(inp,'structure','neuron')      % Set up this to 'dendrite' to extract dendrites instead of neurons
-addParameter(inp,'dendrite_size',0.5:0.1:0.8) % Dendrites filtering size
+addParameter(inp,'dendrite_filter_size',0.5:0.1:0.8) % Dendrites filtering size
 addParameter(inp, 'dendrite_theta', 30);    % Filter dendrites based on their orientation (degrees).
                                             % 0: No filtering.
                                             % Positive value (0 to +90): Filter out dendrites with orientation < dendrite_theta.

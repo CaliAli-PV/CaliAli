@@ -1,23 +1,25 @@
-function [Y,p,R,opt]=get_projections_and_detrend(Y,opt)
+function [Y,p,R,CaliAli_options]=get_projections_and_detrend(Y,CaliAli_options)
 S = class(Y);
-[Y,opt.Mask]=remove_borders(Y,0);
+[Y,CaliAli_options.Mask]=remove_borders(Y,0);
 M=median(Y,3);
-BV=CaliAli_get_blood_vessels(M,opt);
-Y=CaliAli_remove_background(Y,opt);
-if opt.preprocessing.remove_BV
+BV=CaliAli_get_blood_vessels(M,CaliAli_options);
+Y=CaliAli_remove_background(Y,CaliAli_options);
+if CaliAli_options.preprocessing.remove_BV
     Y=remove_BV(Y,BV); %Remove BV from the nueron filtered projections
 end
 
-if opt.preprocessing.fastPNR
+if strcmp(CaliAli_options.preprocessing.structure,'dendrite')
+    [Cn,PNR]=get_PNR_Cn_dendrite(Y,CaliAli_options);
+elseif CaliAli_options.preprocessing.fastPNR
     [Cn,PNR]=get_PNR_Cn_fast(Y);
 else
-    [~,Cn,PNR]=get_PNR_coor_greedy_PV(Y,opt.gSig,[],[],opt.preprocessing.neuron_enhance);
+    [~,Cn,PNR]=get_PNR_coor_greedy_PV(Y,CaliAli_options.gSig,[],[],CaliAli_options.preprocessing.neuron_enhance);
 end
 
 
-if ~isempty(opt.preprocessing.median_filtering)
-Cn=medfilt2(Cn,opt.preprocessing.median_filtering);
-PNR=medfilt2(PNR,opt.preprocessing.median_filtering);
+if ~isempty(CaliAli_options.preprocessing.median_filtering)
+    Cn=medfilt2(Cn,CaliAli_options.preprocessing.median_filtering);
+    PNR=medfilt2(PNR,CaliAli_options.preprocessing.median_filtering);
 end
 
 

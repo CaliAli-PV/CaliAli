@@ -1,4 +1,4 @@
-function [Y_box, ind_nhood, center, sz,Cn_out] = get_mini_videos_dendrite(Y, seed, neuron,Cn)
+function [Y_box, ind_nhood, comp_mask, sz,Cn_out] = get_mini_videos_dendrite(Y, segments, neuron,Cn)
 %GET_MINI_VIDEOS_DENDRITE Extracts mini-videos around seed points on a dendrite.
 %
 %   [Y_box, ind_nhood, center, sz] = get_mini_videos_dendrite(Y, seed, neuron)
@@ -33,52 +33,79 @@ end
 % Initialize output cell arrays
 Y_box = {};
 ind_nhood = {};
-center = {};
+comp_mask = {};
 sz = {};
 
 if ~exist('Cn','var')
     Cn=zeros(d1,d2);
 end
 
+u=unique(segments)';
+u(u==0)=[];
+
 % Loop through each seed point
-for k = 1:length(seed)
-    ind_p = seed(k);  % Get linear index of the seed point
-    y0 = Y(ind_p, :); % Get the fluorescence trace at the seed point
-    % 
-    % % Check if the signal at the seed point is weak
-    % P = max(y0) / (median(abs(y0)) / 0.6745 * 3) < 1;
-    % if P  % If signal is weak, skip this seed point
-    %     ind_nhood{k} = [];
-    %     HY_box{k} = [];
-    %     Y_box{k} = [];
-    %     center{k} = [];
-    %     sz{k} = [];
-    %     continue;
-    % end
-
-    % Convert linear index to row and column subscripts
-    [r, c] = ind2sub([d1, d2], ind_p);
-
-    % Define the neighborhood boundaries
-    rsub = max(1, -gSiz(2) + r):min(d1, gSiz(2) + r);
-    csub = max(1, -gSiz(1) + c):min(d2, gSiz(1) + c);
-
-    % Create grid of row and column indices for the neighborhood
-    [cind, rind] = meshgrid(csub, rsub);
-    [nr, nc] = size(cind); 
-
-    % Store neighborhood size
-    sz{k} = [nr, nc];
-    Cn_out{k}=Cn(rsub,csub);
+for k = 1:numel(u)
+    [squareMask,comp_mask{k}] = getBoundingSquareMask(segments==u(k), gSiz);
+    sz{k}=[max(sum(squareMask,1)),max(sum(squareMask,2))];
+    Cn_out{k}=reshape(Cn(squareMask),max(sum(squareMask,1)),max(sum(squareMask,2)));
 
     % Calculate linear indices of pixels in the neighborhood
-    ind_nhood{k} = sub2ind([d1, d2], rind(:), cind(:));
+    ind_nhood{k} = find(squareMask);
 
     % Extract pixel values (fluorescence traces) within the neighborhood
-    Y_box{k} = single(Y(ind_nhood{k}, :)); 
-
-    % Calculate linear index of the center pixel within the neighborhood
-    center{k} = sub2ind([nr, nc], r - rsub(1) + 1, c - csub(1) + 1); 
+    Y_box{k} = single(Y(squareMask(:), :)); 
 end
+
+end
+
+
+function [squareMask,comp_mask] = getBoundingSquareMask(binaryImage, minBoxSize)
+%getBoundingSquareMask Creates a binary mask with a square that surrounds 
+%                      a blob in a binary image, with a minimum box size.
+%
+%   squareMask = getBoundingSquareMask(binaryImage, minBoxSize)
+%
+%   Inputs:
+%       binaryImage: The input binary image containing a single blob.
+%       minBoxSize:  A 2-element vector specifying the minimum width and 
+%                    height of the bounding box [minWidth, minHeight].
+%
+%   Output:
+%       squareMask:  A binary mask with a square that encloses the blob 
+%                    and satisfies the minimum box size constraint.
+
+
+% Find the bounding box of the blob
+[rows, cols] = find(binaryImage);
+minRow = min(rows);
+maxRow = max(rows);
+minCol = min(cols);
+maxCol = max(cols);
+
+% Calculate the bounding box dimensions
+width = maxCol - minCol + 1;
+height = maxRow - minRow + 1;
+
+% Adjust dimensions to meet the minimum size
+width = max(width, minBoxSize(1));
+height = max(height, minBoxSize(2));
+
+% Calculate the center of the bounding box
+centerRow = round((minRow + maxRow) / 2);
+centerCol = round((minCol + maxCol) / 2);
+
+% Calculate the coordinates of the square with adjusted dimensions
+halfWidth = floor(width / 2);
+halfHeight = floor(height / 2);
+rowStart = max(1, centerRow - halfHeight); % Handle borders
+rowEnd = min(size(binaryImage, 1), centerRow + halfHeight);
+colStart = max(1, centerCol - halfWidth);
+colEnd = min(size(binaryImage, 2), centerCol + halfWidth);
+
+% Create the square mask
+squareMask = false(size(binaryImage));
+squareMask(rowStart:rowEnd, colStart:colEnd) = true;
+comp_mask=binaryImage(rowStart:rowEnd, colStart:colEnd);
+
 
 end

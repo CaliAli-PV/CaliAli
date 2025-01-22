@@ -51,7 +51,7 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             
             %% start updating the background
             Ybg = zeros(d1, d2, T);
-            for mpatch=1:(nr_patch*nc_patch)
+            for mpatch=progress(1:(nr_patch*nc_patch))
                 tmp_patch = patch_pos{mpatch};
                 if strcmpi(bg_model, 'ring')
                     W_ring = obj.W{mpatch};

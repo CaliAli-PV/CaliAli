@@ -1,11 +1,12 @@
 % Load the demo parameters. 
 CaliAli_options=CaliAli_demo_parameters(); % <-- Modifiy this function to analyze your own data.
+CaliAli_options=CaliAli_demo_parameters_dendrites_2p()
 % Do downsampling:
 CaliAli_options=CaliAli_downsample(CaliAli_options);  
 % Do motion correction
 CaliAli_options=CaliAli_motion_correction(CaliAli_options);
 
-% Align sessions
+% Align session　　
 CaliAli_align_sessions(CaliAli_options);
 % If only one file
 % opt=detrend_batch_and_calculate_projections(CaliAli_options);
@@ -15,6 +16,9 @@ CNMFe_app
 
 %Run CNMF-E
 CaliAli_cnmfe()
+
+
+CaliAli_update_parameters('gSig',[3,50]);
 
 
 
