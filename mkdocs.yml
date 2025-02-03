@@ -43,9 +43,8 @@ extra:
     - icon: fontawesome/solid/file-lines
       link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
   version:
-    default: stable
     provider: mike
-    alias: true
+
      
 
 markdown_extensions:
