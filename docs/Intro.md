@@ -19,7 +19,7 @@ CaliAli includes the following functions:
 
 ## Version History <a id="vh"></a> 
 
-### CaliAli 1.0.1 Release Notes
+### CaliAli 1.1 Release Notes
 **April 22nd 2024**
 
 - Introduced a new app for determining optimal blood vessel (BV) size.
