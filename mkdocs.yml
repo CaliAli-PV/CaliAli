@@ -1,5 +1,5 @@
 site_name: CaliAli
-site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
+site_url: https://caliali-pv.github.io/CaliAli/
 theme:
   name: material
   features:
@@ -11,6 +11,8 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
+    - version-dropdown   # The dropdown in your navigation
+    - version-badge     # The “badge” near the title
   language: en
   palette:
   
@@ -31,6 +33,7 @@ theme:
 plugins:
   - search
   - tags
+  - mike
 
   
 
@@ -40,6 +43,10 @@ extra:
       link: https://github.com/CaliAli-PV/CaliAli
     - icon: fontawesome/solid/file-lines
       link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
+  version:
+    provider: mike
+    alias: true
+     
 
 markdown_extensions:
   - pymdownx.highlight:
