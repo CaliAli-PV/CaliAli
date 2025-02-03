@@ -1,5 +1,5 @@
 # Welcome to CaliAli Documentation
-test
+
 ## Introduction
 
 - [About CaliAli](Intro.md)
