@@ -26,6 +26,7 @@ for k = 1:length(seed)
         HY_box{k} = [];
         Y_box{k} = [];
         center{k} = [];
+        sz{k} = [];
         continue;
     end
 

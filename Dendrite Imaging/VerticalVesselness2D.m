@@ -1,62 +1,81 @@
-function vesselness = VerticalVesselness2D(I, sigmas, spacing, tetha_threshold,brightondark,norm)
-% calculates the vesselness probability map (local tubularity) of a 2D
-% input image
+function vesselness = VerticalVesselness2D(I, sigmas, spacing, tetha_threshold, brightondark, norm)
+%VerticalVesselness2D Calculates the vesselness probability map (local 
+%                    tubularity) of a 2D input image, emphasizing vertical 
+%                    structures.
 %
-% vesselness = vesselness2D(I, sigmas, spacing, tau, brightondark)
+%   vesselness = VerticalVesselness2D(I, sigmas, spacing, tetha_threshold, brightondark, norm)
 %
-% inputs,
-%   I : 2D image
-%   sigmas : vector of scales on which the vesselness is computed
-%   spacing : input image spacing resolution - during hessian matrix
-%       computation, the gaussian filter kernel size in each dimension can
-%       be adjusted to account for different image spacing for different
-%       dimensions
-%   tau : (between 0.5 and 1) : parameter that controls response uniformity
-%       - lower tau -> more intense output response
-%   brightondark: (true/false) : are vessels (tubular structures) bright on
-%       dark background or dark on bright (default for 2D is false)
+%   Inputs:
+%       I :                2D input image.
+%       sigmas :           Vector of scales on which the vesselness is computed.
+%       spacing :          Input image spacing resolution (e.g., [1;1] for 
+%                          isotropic resolution). Used to adjust Gaussian 
+%                          filter kernel size.
+%       tetha_threshold:   Angle threshold in degrees for emphasizing 
+%                          vertical structures.
+%       brightondark:      (true/false) True if vessels are bright on a dark 
+%                          background, false if dark on bright. Default is false.
+%       norm:              (true/false) True for normalized vesselness response, 
+%                          false for additive response. Default is true.
 %
-% outputs,
-%   vesselness: maximum vesselness response over scales sigmas
+%   Outputs:
+%       vesselness: Maximum vesselness response over scales sigmas.
 %
-% example:
-%   V = vesselness2D(I, 1:5, [1;1], 1, false);
+%   Example:
+%       V = VerticalVesselness2D(I, 1:5, [1;1], 10, false, true); 
 %
-% Function written by T. Jerman, University of Ljubljana (October 2014)
-% Based on code by D. Kroon, University of Twente (May 2009)
+%   Notes:
+%       - The 'tetha_threshold' parameter controls the emphasis on vertical 
+%         structures. A smaller angle emphasizes vertical structures more 
+%         strongly.
+%       - The 'norm' parameter determines how the vesselness response is 
+%         combined across scales. 'true' uses the maximum response, while 
+%         'false' sums the responses.
 
-verbose = 0;
 
-if nargin<5
-    brightondark = false; % default mode for 2D is dark vessels compared to the background
+% Set default values for optional inputs
+if nargin < 6
+    norm = true;  % Default is to normalize the vesselness response
+end
+if nargin < 5
+    brightondark = false; % Default is dark vessels on a bright background
+end
+if nargin < 4
+    tetha_threshold = 10; % Default angle threshold (degrees)
 end
 
+% Convert image to single precision
 I = single(I);
-vesselness=zeros(size(I,1),size(I,2));
+
+% Initialize vesselness map
+vesselness = zeros(size(I, 1), size(I, 2));
+
+% Loop through each scale (sigma)
 for j = 1:length(sigmas)
-
-    if verbose
-        disp(['Current filter scale (sigma): ' num2str(sigmas(j)) ]);
-    end
-
-    [~, Lambda2] = imageEigenvalues(I,sigmas(j),spacing,brightondark,tetha_threshold);
+    [~, Lambda2] = imageEigenvalues(I, sigmas(j), spacing, brightondark, tetha_threshold);
+    
+    % Invert response if vessels are bright on dark background
     if brightondark == true
         Lambda2 = -Lambda2;
     end
-    %max response over multiple scales
-    if norm
-        vesselness=max(cat(3,vesselness,mat2gray(Lambda2)) , [] ,3 );
-    else
-        vesselness=vesselness+Lambda2; %% modified by PV
-    end
 
-    clear response Lambda2 Lambda3
+    % Combine vesselness response across scales
+    if norm==1
+        vesselness = max(cat(3, vesselness, mat2gray(Lambda2)), [], 3); % Normalized maximum response
+    elseif norm==0
+        vesselness = vesselness + Lambda2;  % Additive response
+    elseif norm==2
+         vesselness = max(cat(3, vesselness, Lambda2), [], 3); % Normalized maximum response without scaling
+    end
+    
+    clear response Lambda2 Lambda3  % Clear temporary variables
 end
 
 % vesselness = vesselness ./ max(vesselness(:)); % should not be really needed
 % vesselness(vesselness < 1e-2) = 0;
+end
 
-function [Lambda1, Lambda2] = imageEigenvalues(I,sigma,spacing,brightondark,tetha_threshold)
+function [Lambda1, Lambda2] = imageEigenvalues(I,sigma,spacing,brightondark,theta_threshold)
 % calculates the two eigenvalues for each voxel in a volume
 
 % Calculate the 2D hessian
@@ -94,15 +113,17 @@ Hyy = Hyy(indeces);
 Hxy = Hxy(indeces);
 
 % Calculate eigen values
-[Lambda1i,Lambda2i]=eigvalOfHessian2D(Hxx,Hxy,Hyy,tetha_threshold);
+[Lambda1i,Lambda2i,theta]=eigvalOfHessian2D(Hxx,Hxy,Hyy,theta_threshold);
 
 clear Hxx Hyy Hxy;
 
 Lambda1 = zeros(size(T));
 Lambda2 = zeros(size(T));
+Th = zeros(size(T));
 
 Lambda1(indeces) = Lambda1i;
 Lambda2(indeces) = Lambda2i;
+Th(indeces) = theta;
 
 % some noise removal
 Lambda1(~isfinite(Lambda1)) = 0;
@@ -110,6 +131,9 @@ Lambda2(~isfinite(Lambda2)) = 0;
 
 Lambda1(abs(Lambda1) < 1e-4) = 0;
 Lambda2(abs(Lambda2) < 1e-4) = 0;
+
+Lambda2=medfilt2(mat2gray(Th),round([c,c])+1).*Lambda2;
+end
 
 
 function [Dxx, Dyy, Dxy] = Hessian2D(I,Sigma,spacing)
@@ -145,6 +169,7 @@ Dx=gradient2(F,'x');
 Dxx=(gradient2(Dx,'x'));
 Dxy=(gradient2(Dx,'y'));
 clear Dx;
+end
 
 function D = gradient2(F,option)
 % Example:
@@ -167,6 +192,7 @@ switch lower(option)
         D(:,2:l-1) = (F(:,3:l)-F(:,1:l-2))/2;
     otherwise
         disp('Unknown option')
+end
 end
 
 function I=imgaussian(I,sigma,spacing,siz)
@@ -205,14 +231,15 @@ if(sigma>0)
 
     I=imfilter(imfilter(I,Hx, 'same' ,'replicate'),Hy, 'same' ,'replicate');
 end
+end
 
-function [Lambda1,Lambda2]=eigvalOfHessian2D(Dxx,Dxy,Dyy,tetha_threshold)
+function [Lambda1,Lambda2,x]=eigvalOfHessian2D(Dxx,Dxy,Dyy,theta_threshold)
 % This function calculates the eigen values from the
 % hessian matrix, sorted by abs value
 
 % Compute the eigenvectors of J, v1 and v2
 tmp = sqrt((Dxx - Dyy).^2 + 4*Dxy.^2);
-tetha = 0.5 * atan2(2 * Dxy, Dxx - Dyy);
+theta = 0.5 * atan2(2 * Dxy, Dxx - Dyy);
 % Compute the eigenvalues
 mu1 = 0.5*(Dxx + Dyy + tmp);
 mu2 = 0.5*(Dxx + Dyy - tmp);
@@ -224,15 +251,13 @@ Lambda1=mu1; Lambda1(check)=mu2(check);
 
 Lambda2=mu2; Lambda2(check)=mu1(check);
 
-if abs(tetha)>0
-    x=1-mat2gray(abs(tetha));
-    x=x+(1-deg2rad(abs(tetha_threshold)));
-    if tetha_threshold>0
-        x(x>1)=1;
-    else
-        x(x<1)=1;
-    end
-    x=x.^10;
-    Lambda2=Lambda2.*x;
+if abs(theta_threshold)>0
+    x=rad2deg(abs(theta));
+    x=(x-theta_threshold);
+    x(x<0)=0;
+    x=1-rescale(x);
+    % x=x.^2;
+    % Lambda2=Lambda2.*x;
+end
 end
 

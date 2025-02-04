@@ -2,11 +2,12 @@ function neuron  = merge_fibers(neuron, show_merge, merge_thr)
 %% merge neurons if they have high temporal correlations
 
 %% variables & parameters
-fprintf('--------MERGE CORRELATED FIBER wit similar orientation-------\n\n');
+fprintf('--------Merge correlated dendrites with similar orientation-------\n\n');
 
 
-A_=neuron.A;
+A_=full(neuron.A);
 
+distanceMatrix = calculateVesselDistances_A(A_,[neuron.options.d1,neuron.options.d2]);
 % spatial components
 if isempty(neuron.C_raw)
     neuron.C_raw = neuron.C;
@@ -23,11 +24,8 @@ if show_merge
     h_fig = figure('position', [1,1, 1200, 600]);
     stop_show = false;
 end
-if ~exist('merge_thr', 'var') || isempty(merge_thr) || numel(merge_thr)~=3
-    merge_thr = neuron.options.merge_thr;
-end
-if length(merge_thr)==1
-    merge_thr = [0, merge_thr, 0];
+if ~exist('merge_thr', 'var') || isempty(merge_thr) || numel(merge_thr)~=4
+    merge_thr = neuron.CaliAli_options.cnmf.merge_thr_fiber  ;
 end
 
 C_thr = merge_thr(3);
@@ -42,7 +40,7 @@ for i=1:size(A_,2)
     [centroids(i,:), angles(i)] = collapse_to_line(reshape(A_(:,i),neuron.options.d1,neuron.options.d2),0);
 end
 
-parallel_lines = find_parallel_lines(centroids, angles,merge_thr(2),merge_thr(1));
+parallel_lines = find_parallel_lines(centroids, angles,merge_thr(3),merge_thr(2));
 
  %%
 S_ = neuron.S;
@@ -59,7 +57,7 @@ end
 C_corr = corr(C_')-eye(K);
 
 %% using merging criterion to detect paired neurons
-flag_merge = parallel_lines&(C_corr>=merge_thr(3));
+flag_merge = parallel_lines&(C_corr>=merge_thr(4))&(distanceMatrix<=merge_thr(1));
 
 [l,c] = graph_connected_comp(sparse(flag_merge));     % extract connected components
 
@@ -153,10 +151,8 @@ while m <= n2merge
     k_merged = k_merged+1;
     k_neurons = k_neurons+length(IDs);
     merged_ROIs{k_merged} = IDs;
-    
     % determine searching area
     active_pixel = (sum(A_(:,IDs), 2)>0);
-    
     % update spatial/temporal components of the merged neuron
     if ~isempty(neuron.A_batch)
         F=get_batch_size(neuron,0);
@@ -228,7 +224,7 @@ end
 
 function [A_,C_raw_]=update_tempo_spatial(A_,C_raw_)
     data = A_*C_raw_;
-    ci = max(C_raw_);
+    ci = max(C_raw_,[],1);
     for miter=1:10
         ai = data*ci'/(ci*ci');
         ci = ai'*data/(ai'*ai);

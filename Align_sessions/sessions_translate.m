@@ -1,56 +1,97 @@
-function [P,T,Mask]=sessions_translate(P,opt)
+function [P, CaliAli_options] = sessions_translate(P, CaliAli_options)
+% SESSIONS_TRANSLATE Aligns video data by applying translations based on a reference projection (BV or Neurons).
+%   This function computes translations between frames of the session data and applies the necessary shifts.
+%   The reference for alignment is chosen based on whether the projections are BV (blood vessels) or Neurons.
+%   The resulting shifts are then applied to the projections in the session data.
+%
+%   Input:
+%       P             - A cell array containing the session data (projections).
+%       CaliAli_options - A structure containing configuration options for the alignment process.
+%
+%   Output:
+%       P             - The updated cell array with the translated projections.
+%       CaliAli_options - The updated configuration options with the applied translation shifts.
 
-if contains(opt.projections,'BV')
-    ref=cell2mat(P{1,2}); % Blood vessels
+% Determine the reference projection (Blood vessels or Neurons) based on the configuration options
+if contains(CaliAli_options.inter_session_alignment.projections, 'BV')
+    ref = cell2mat(P{1,2}); % Blood vessels
 else
-    ref=cell2mat(P{1,3}); % Neurons
+    ref = cell2mat(P{1,3}); % Neurons
 end
 
-ref=mat2gray(ref);
-[d1,d2,d3] = size(ref);bound1=20;bound2=20;
+% Normalize the reference image for alignment
+ref = mat2gray(ref);
+[d1, d2, d3] = size(ref);
+bound1 = 20;  % Boundary padding size in the first dimension
+bound2 = 20;  % Boundary padding size in the second dimension
 
-if ~opt.do_alignment
-    Mask=true(d1,d2);
-    T=zeros(d3,2);
+% If alignment is not enabled, return a mask with no shifts
+if ~CaliAli_options.inter_session_alignment.do_alignment
+    Mask = true(d1, d2);
+    T = zeros(d3, 2); % No translation applied
     return
 end
 
+% Notify the user that alignment is starting
+fprintf(1, 'Aligning video by translation ...\n');
 
-options_r = NoRMCorreSetParms('d1',d1-bound1,'init_batch',1,...
-    'd2',d2-bound2,'bin_width',2,'max_shift',[1000,1000,1000],...
-    'iter',5,'correct_bidir',false,'shifts_method','fft','boundary','NaN');
+% Set the parameters for NoRMCorre alignment
+options_r = NoRMCorreSetParms('d1', d1-bound1, 'init_batch', 1, ...
+    'd2', d2-bound2, 'bin_width', 2, 'max_shift', [1000, 1000, 1000], ...
+    'iter', 5, 'correct_bidir', false, 'shifts_method', 'fft', 'boundary', 'NaN');
 
-[M,shifts,~] = normcorre_batch(ref(bound1/2+1:end-bound1/2,bound2/2+1:end-bound2/2,:),options_r);
-%% use center as reference:
+% Perform the NoRMCorre batch alignment
+[M, shifts, ~] = normcorre_batch(ref(bound1/2+1:end-bound1/2, bound2/2+1:end-bound2/2, :), options_r);
 
-C1=mean([shifts(:).shifts],2);
-C2=mean([shifts(:).shifts_up],2);
-for i=1:size(shifts,1)
-    shifts(i).shifts=shifts(i).shifts-C1;
-    shifts(i).shifts_up=shifts(i).shifts_up-C2;
+% Adjust the shifts to center them around the mean shift for each session
+C1 = mean([shifts(:).shifts], 2);
+C2 = mean([shifts(:).shifts_up], 2);
+for i = 1:size(shifts, 1)
+    shifts(i).shifts = shifts(i).shifts - C1;
+    shifts(i).shifts_up = shifts(i).shifts_up - C2;
 end
 
-%% Apply shifts to projections
-for i=1:size(P,2)-1
-    temp = apply_shifts(cell2mat(P{1,i}),shifts,options_r);
-    [temp,Mask]=remove_borders(temp);
-    P{1,i}={temp};
-end
-P=scale_Cn(P);
-
-for i=1:size(shifts,1)
-    T(i,:)=flip(squeeze(shifts(i).shifts)');
-end
+% Apply the computed shifts to the projections in P
+for i = 1:size(P, 2) - 1
+    temp = apply_shifts(cell2mat(P{1, i}), shifts, options_r);
+    [temp, Mask] = remove_borders(temp);  % Remove borders (optional step to improve alignment quality)
+    P{1, i} = {temp};  % Update the projection with the shifted data
 end
 
-function P=scale_Cn(P)
-C=v2uint8(mat2gray(P.(3){1,1}));
-ref=v2uint8(P.(2){1,1});
-for k=1:size(C,3)
-    X(:,:,:,k)=imfuse(C(:,:,k),ref(:,:,k),'Scaling','joint','ColorChannels',[1 2 0]);
+% Apply scaling to the projections
+P = scale_Cn(P);
+
+% Store the calculated shifts in the transformation matrix (T)
+for i = 1:size(shifts, 1)
+    T(i, :) = flip(squeeze(shifts(i).shifts)');
 end
-P.(5){1,1}=X;
+
+% Update the CaliAli_options structure with the applied shifts and mask
+CaliAli_options.inter_session_alignment.T = T;
+CaliAli_options.inter_session_alignment.T_Mask = Mask;
+
 end
 
+function P = scale_Cn(P)
+% SCALE_Cn Scales the projections to a uint8 format with joint scaling for comparison.
+%   This function takes the projections and scales them to a uint8 format while preserving relative intensities.
+%   The resulting projections are fused for visual comparison.
+%
+%   Input:
+%       P - The projections data.
+%
+%   Output:
+%       P - The updated projections with scaled and fused visual comparison data.
 
+% Convert the reference projection (Neurons or BV) to uint8 format
+C = v2uint8(mat2gray(P.(3){1, 1}));
+ref = v2uint8(P.(2){1, 1});
 
+% Fuse the projections and the reference using joint scaling and color channels
+for k = 1:size(C, 3)
+    X(:,:,:,k) = imfuse(C(:,:,k), ref(:,:,k), 'Scaling', 'joint', 'ColorChannels', [1 2 0]);
+end
+
+% Store the fused projections in the fifth field of P for visualization
+P.(5){1, 1} = X;
+end

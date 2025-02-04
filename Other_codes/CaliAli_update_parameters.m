@@ -26,7 +26,7 @@ function s = update_field(s, field_name, new_value)
   fields = fieldnames(s);
   for i = 1:numel(fields)
     field = fields{i};
-    if isstruct(s.(field))
+    if isstruct(s.(field))&~isstruct(new_value)
       % If the field is a nested structure, recursively call the function
       s.(field) = update_field(s.(field), field_name, new_value);
     elseif strcmp(field, field_name)

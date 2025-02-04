@@ -241,17 +241,24 @@ classdef Sources2D < handle
                 memory_size_to_use = 16.0;  %GB
                 memory_size_per_patch = 1.0;  % GB;
                 patch_dims = [64, 64];
+                w_overlap = obj.options.ring_radius;
             else
                 memory_size_to_use = pars_env.memory_size_to_use;
                 memory_size_per_patch = pars_env.memory_size_per_patch;
                 patch_dims = pars_env.patch_dims;
+                if ~isfield(pars_env,'w_overlap') || isempty(pars_env. w_overlap)
+                    w_overlap = obj.options.ring_radius;
+                else
+                    w_overlap = pars_env.w_overlap ;
+                end
+
             end
 
             if ~exist('filter_kernel', 'var')
                 filter_kernel = [];
             end
             % overlapping area
-            w_overlap = obj.options.ring_radius;
+           
 
             % distribute data
             [data, dims, obj.P.folder_analysis] = distribute_data(nam,...
@@ -1707,14 +1714,9 @@ classdef Sources2D < handle
                 min_pnr = 3;
             end
             S_ = obj.S;
-            if size(obj.A,3)>1
-                weights=get_weights_spatial(obj);
-                for i=1:size(weights,1)
-                    A_(:,i)=sum(squeeze(obj.A(:,i,1:end)).*weights(i,:),2);
-                end
-            else
-                A_=obj.A;
-            end
+
+            A_=obj.A;
+
             K = size(A_, 2);
             tags_ = zeros(K, 1, 'like', uint16(0));
             min_pixel = obj.options.min_pixel;

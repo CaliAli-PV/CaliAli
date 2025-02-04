@@ -1,4 +1,5 @@
-function [labeledImage,overlayedImage] = segmentAndColorVessels(originalImage, minArea,thr, mask, plotme)
+function [labeledImage,overlayedImage] = segmentAndColorVessels(Cn, minArea,thr, mask, plotme)
+% [labeledImage,overlayedImage] = segmentAndColorVessels(Cn,50,0.1,[],1);
 %segmentAndColorVessels  Segments vessels in an image within a specified
 %                        mask and labels them with different colors.
 %                        Optionally displays the result.
@@ -28,33 +29,32 @@ if ~exist('plotme','var')
     plotme = false;
 end
 if ~exist('mask','var')
-    mask = true(size(originalImage)); % Default mask includes the whole image
+    mask = true(size(Cn)); % Default mask includes the whole image
 end
 
 % Apply the mask to the original image
-originalImage(~mask) = 0;
-
-% Apply the mask to the original image
-originalImage(~mask) = 0;
+Cn(~mask) = 0;
 
 % Preprocessing
-enhancedImage = imadjust(originalImage);
-filteredImage = medfilt2(enhancedImage);
-
-% Thresholding
-binaryImage = imbinarize(filteredImage, adaptthresh(filteredImage,thr ...
-    , 'NeighborhoodSize', [51 51]));
-
-% Morphological Operations to remove small objects (using minArea)
-cleanedImage = bwareaopen(binaryImage, minArea);
-
-% Label connected components (each vessel gets a unique label)
-labeledImage = bwlabel(cleanedImage);
+labeledImage=zeros(size(Cn));
+filteredImage = medfilt2(Cn);
+while 1
+    % binaryImage = imbinarize(filteredImage,adaptthresh(filteredImage,thr...
+    %     , 'NeighborhoodSize', [31 31]));
+    binaryImage=filteredImage >thr;
+    cleanedImage = bwareaopen(binaryImage, minArea);
+    temp = bwlabel(cleanedImage);
+    labeledImage(temp>0)=temp(temp>0)+max(labeledImage,[],'all');
+    filteredImage(binaryImage)=0;
+    if sum(cleanedImage,'all')==0
+        break
+    end
+end
 
 % --- Conditional Color and Overlay ---
 
     numVessels = max(labeledImage(:));
-    coloredContours = zeros(size(originalImage, 1), size(originalImage, 2), 3);
+    coloredContours = zeros(size(Cn, 1), size(Cn, 2), 3);
 
     for k = 1:numVessels
         % Get the contour of the current vessel
@@ -62,7 +62,7 @@ labeledImage = bwlabel(cleanedImage);
         vesselBoundary = bwboundaries(vesselMask); 
 
         % Assign a random color to this vessel's contour
-        randomColor = rand(1, 3);
+        randomColor = [0.8 + (1.0 - 0.8) * rand(), 0.2 + (0.6 - 0.2) * rand(), 0.0 + (0.3 - 0.0) * rand()]; % Assign random redish color.
         
         % Overlay the contour on the coloredContours image
         for j = 1:length(vesselBoundary)
@@ -75,7 +75,7 @@ labeledImage = bwlabel(cleanedImage);
         end
     end
 
-    overlayedImage = gray2rgb(originalImage);
+    overlayedImage = gray2rgb(Cn,'parula');
     overlayedImage(coloredContours > 0) = coloredContours(coloredContours > 0);
 if plotme
     imshow(overlayedImage); 

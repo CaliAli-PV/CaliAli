@@ -7,7 +7,7 @@ params.sf = 10;                 % Frame rate (fps)
 params.BVsize = [];             % Size of blood vessels (pixels), 
                                  %  [min diameter, max diameter]. 
                                  %  Default is calculated based on gSig.
-params.spatial_ds = 2;          % Spatial downsampling factor
+params.spatial_ds = 1;          % Spatial downsampling factor
 params.temporal_ds = 1;         % Temporal downsampling factor
 
 params.neuron_enhance = true;   % Enhance neurons using MIN1PIE background subtraction
@@ -64,8 +64,8 @@ params.dmin = 5;                     % Minimum distance between neurons
 params.merge_thr_spatial = ...       % Spatial merging threshold
     [0.8, 0.4, -inf];                 
 
-params.min_corr = 0.1;               % Minimum correlation for seeding
-params.min_pnr = 6;                  % Minimum peak-to-noise ratio for seeding
+params.min_corr = 0.2;               % Minimum correlation for seeding
+params.min_pnr = 4;                  % Minimum peak-to-noise ratio for seeding
 
 
 params=CaliAli_parameters(params);

@@ -1,0 +1,8 @@
+Data: C:\Users\SakaBrain\Documents\GitHub\CaliAli\Demo\v4_mc_ds_Aligned_source_extraction\data_67_67_32.mat
+
+--------03-Feb_18_57_57--------
+[18:57:57]Start running source extraction......
+The collection of options are saved as intermediate_results.options_0
+
+[18:57:57]Start initializing neurons from frame 1 to frame 4000
+

@@ -23,11 +23,15 @@ end
 %% post-process the results automatically
 neuron.remove_false_positives();
 
-neuron=update_residual_Cn_PNR(neuron);
+neuron=update_residual_Cn_PNR_batch(neuron);
 
 %% Optional post-process
 scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.Fs*2,neuron.C_raw);
-justdeconv(neuron,'thresholded','ar2',0);
-denoise_thresholded(neuron,3);
+neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
+neuron = postprocessDeconvolvedTraces(neuron, 'foopsi','ar2',-5);
+
+%% Save results
+neuron.orderROIs('snr');
+save_workspace(neuron);
+
 

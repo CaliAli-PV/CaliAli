@@ -1,4 +1,4 @@
-function [Y_box, ind_nhood, comp_mask, sz,Cn_out] = get_mini_videos_dendrite(Y, segments, neuron,Cn)
+function [Y_box, ind_nhood, comp_mask, sz,Cn_out] = get_mini_videos_dendrite(Y, segments, neuron,Cn,seed)
 %GET_MINI_VIDEOS_DENDRITE Extracts mini-videos around seed points on a dendrite.
 %
 %   [Y_box, ind_nhood, center, sz] = get_mini_videos_dendrite(Y, seed, neuron)
@@ -40,12 +40,9 @@ if ~exist('Cn','var')
     Cn=zeros(d1,d2);
 end
 
-u=unique(segments)';
-u(u==0)=[];
-
 % Loop through each seed point
-for k = 1:numel(u)
-    [squareMask,comp_mask{k}] = getBoundingSquareMask(segments==u(k), gSiz);
+for k = 1:numel(seed)
+    [squareMask,comp_mask{k}] = getBoundingSquareMask(segments==seed(k), gSiz);
     sz{k}=[max(sum(squareMask,1)),max(sum(squareMask,2))];
     Cn_out{k}=reshape(Cn(squareMask),max(sum(squareMask,1)),max(sum(squareMask,2)));
 

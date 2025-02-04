@@ -15,8 +15,7 @@ tic
 neuron =initComponents_parallel_PV(neuron,[],[], 0, 1,0);
 toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
-Initialization=neuron;
-CaliAli_save(in(:),Initialization);
+
 
 
 %% Update components
@@ -102,7 +101,7 @@ end
 % neuron.delete(ix);
 % save_workspace(neuron);
 %% update residuals
-% neuron=manually_update_residuals(neuron,use_parallel);
+% neuron=manually_update_residuals(neuron,1);
 
 
 

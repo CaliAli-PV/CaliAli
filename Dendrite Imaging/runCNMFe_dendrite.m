@@ -16,17 +16,11 @@ neuron =initComponents_parallel_PV(neuron,[],[], 0, 1,0);
 toc
 save_workspace(neuron);
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
- neuron.merge_high_corr(neuron.show_merge, [0.7, -inf, -inf]);
- neuron.merge_high_corr(neuron.show_merge, neuron.CaliAli_options.cnmf.merge_thr_spatial);
 
-neuron = merge_fibers(neuron,neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_fiber);
-
-save_workspace(neuron);
-
-
-%% Update components
+%% Update components First CNMF iterations
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
+
 for loop=1:10
     % estimate the background components
     neuron=CNMF_CaliAli_update('Background',neuron);
@@ -37,8 +31,8 @@ for loop=1:10
     neuron.merge_neurons_dist_corr(neuron.show_merge);
     neuron.merge_high_corr(neuron.show_merge, [0.7, -inf, -inf]);
     neuron.merge_high_corr(neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_spatial);
-    neuron = merge_fibers(neuron,neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_fiber);
-
+    % neuron = merge_fibers(neuron,neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_fiber);
+    % neuron = delete_circular(0,neuron, 2); %% need to define this parameter in options
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     fprintf('Disimilarity with previous iteration is %.3f\n', dis);
 
@@ -50,9 +44,20 @@ for loop=1:10
         break
     end
 end    %% save the workspace for future analysis
-neuron=update_residual_Cn_PNR_batch(neuron);
-save_workspace(neuron);
 
+neuron=update_residual_Cn_PNR_batch(neuron);
+% mask=neuron.A./max(neuron.A,[],1);
+% mask( mask<0.1)=0;
+% mask=reshape(max( mask,[],2),neuron.options.d1,neuron.options.d2)>0;
+% 
+% Cnr=neuron.CaliAli_options.inter_session_alignment.Cn;
+% Cnr(mask)=0;
+% 
+% neuron.Cnr=Cnr;
+% save_workspace(neuron);
+% if k<2
+% neuron = initilize_from_residuals(neuron);
+% end
 
 
 %% Optional post-process

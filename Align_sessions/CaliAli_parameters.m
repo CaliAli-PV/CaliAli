@@ -155,6 +155,7 @@ valid_v = @(x) isnumeric(x);
 %% General variables
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
+addParameter(inp,'out_aligned_sessions',[])                 %Path to store the aligned video
 addParameter(inp,'gSig',2.5,valid_v)          %Neuron Filter size. 2.5 default.
 addParameter(inp,'sf',10,valid_v)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
@@ -167,7 +168,6 @@ addParameter(inp,'projections', ...
 addParameter(inp,'final_neurons',0)             % Add an extra alignment iteration utilizing only neuron shapes after CaliAli
 addParameter(inp,'Force_BV',0)                  % Force the use of BVz for alignment, even if BVz stability score is low.
 addParameter(inp,'batch_sz',0)                  % Number of frames to use per batch. If batch_sz=0, then the number of frame per batch is equal to the number of frames per_session.
-addParameter(inp,'out_path',[])                 %Path to store the aligned video
 %% Internal variables
 
 addParameter(inp,'alignment_metrics',[]) % Alignment_metrics

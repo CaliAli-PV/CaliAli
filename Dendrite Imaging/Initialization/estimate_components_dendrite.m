@@ -1,13 +1,11 @@
-function [A,C_raw]=estimate_components_dendrite(Y_box,comp_mask,sz,f,CaliAli_options,Cn)
+function [A,C_raw]=estimate_components_dendrite(Y_box,comp_mask,sz,f)
 
 A=cell(1,size(Y_box,2));
 C_raw=zeros(size(Y_box,2),f);
-BVsz=CaliAli_options.preprocessing.dendrite_filter_size;
-BVtheta=CaliAli_options.preprocessing.dendrite_theta;
 
-for k=1:size(Y_box,2) % this is parfor
+parfor k=1:size(Y_box,2) % this is parfor
         if ~isempty(Y_box{k})
-            [ai, ci_raw, ~] = extract_ac_dendrite(Y_box{k},comp_mask{k},sz{k},BVsz,BVtheta,Cn{k});
+            [ai, ci_raw, ~] = extract_ac_dendrite(Y_box{k},comp_mask{k},sz{k});
             if ~isnan(sum(ci_raw))
                 A{k}=ai;
                 C_raw(k,:)=ci_raw;
@@ -20,7 +18,7 @@ for k=1:size(Y_box,2) % this is parfor
 end
 end
 
-function [ai, ci, ind_success, sn] = extract_ac_dendrite(Y, I, sz, BVsz, BVtheta, Cn)
+function [ai, ci, ind_success, sn] = extract_ac_dendrite(Y, I, sz)
 %EXTRACT_AC_DENDRITE Extracts dendritic signals from calcium imaging data.
 %   [ai, ci, ind_success, sn] = EXTRACT_AC_DENDRITE(Y, ind_ctr, sz, BVsz, BVtheta, Cn)
 %   extracts the spatial component (ai) and temporal component (ci) of 

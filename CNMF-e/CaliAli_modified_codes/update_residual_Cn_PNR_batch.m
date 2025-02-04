@@ -18,16 +18,21 @@ for i=progress(1:size(fn,2)-1)
     if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
     Y(isnan(Y)) = 0;    % remove nan values
     %% substract neurons
-
-    Y=single(Y)-single(full(neuron.A)*neuron.C_raw(:,fn(i)+1:fn(i+1)));
-
+    A=full(neuron.A);
+    Y=single(Y);
+    Y=Y-single(A*neuron.C_raw(:,fn(i)+1:fn(i+1)));
     Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
+
+    % labeledImage=spatial2labeledImage(neuron.A,[d1,d2]);
+    %  Y(labeledImage(:)>0,:)=0;
+    Y=reshape(Y,d1,d2,[]);
+
     if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
-        [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(reshape(Y,d1,d2,[]),gSig,[],[],n_enhanced);
+        [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(Y,gSig,[],[],n_enhanced);
     elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
-        [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_dendrite(reshape(Y,d1,d2,[]),neuron.CaliAli_options);
+        [Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_Cn_dendrite(Y,neuron.CaliAli_options);
     end
 end
-Cn=max(Cn_all,[],3)./neuron.CaliAli_options.inter_session_alignment.Cn_scale;
+Cn=max(Cn_all,[],3).*(max(Cn_all,[],'all')./neuron.CaliAli_options.inter_session_alignment.Cn_scale);
 PNR=max(pnr_all,[],3);
 end

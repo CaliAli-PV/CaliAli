@@ -6,6 +6,9 @@ Cn=neuron.CaliAli_options.inter_session_alignment.Cn;
 PNR=neuron.CaliAli_options.inter_session_alignment.PNR;
 ind = (v_max==Cn.*PNR);
 
+if isempty(neuron.CaliAli_options.cnmf.seed_mask)
+    neuron.CaliAli_options.cnmf.seed_mask=ones(size(Cn));
+end
 Cn_ind = ind & (Cn>=neuron.CaliAli_options.cnmf.min_corr & neuron.CaliAli_options.cnmf.seed_mask);
 PNR_ind = ind & (PNR>=neuron.CaliAli_options.cnmf.min_pnr   & neuron.CaliAli_options.cnmf.seed_mask);
 

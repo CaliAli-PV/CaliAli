@@ -5,17 +5,14 @@ inp.KeepUnmatched = true; % Keep unmatched parameters
 
 %% General variables
 % -------------------------    COMPUTATION    -------------------------  %
-addParameter(inp, 'pars_envs', struct(...
-    'memory_size_to_use', 256, ...   % GB, memory space you allow to use in MATLAB
-    'memory_size_per_patch', 16, ...   % GB, space for loading data within one patch
-    'patch_dims', [64, 64]), @isstruct);  % Patch dimensions
+addParameter(inp, 'pars_envs', pars_envs_parse(varargin{:}), @isstruct);  % Patch dimensions
 
 % -------------------------      SPATIAL      -------------------------  %
 addParameter(inp, 'gSig', 2.5, @isnumeric);          % pixel, gaussian width of a gaussian kernel for filtering the data. usually 1/3 of neuron diameter
 addParameter(inp, 'gSiz', [], @isnumeric);          % This will be calculated later
 addParameter(inp, 'ssub', 1, @isnumeric);           % spatial downsampling factor
 addParameter(inp, 'with_dendrites', true, @islogical);   % with dendrites or not
-addParameter(inp, 'search_method', 'dilate', @ischar);  % method to determine search locations ('dilate' or 'ellipse')
+addParameter(inp, 'search_method', 'dilate', @ischar);  % method to determine search locations ('dilate','ellipse' or 'grow (for dendrites)')
 addParameter(inp, 'bSiz', 5, @isnumeric);
 addParameter(inp, 'dist', [], @isnumeric);           % This will be set conditionally later
 addParameter(inp, 'spatial_constraints', struct('connected', false, 'circular', false), @isstruct);  % you can include following constraints: 'circular'
@@ -47,7 +44,7 @@ addParameter(inp, 'merge_thr', 0.65, @isnumeric);     % thresholds for merging n
 addParameter(inp, 'method_dist', 'max', @ischar);   % method for computing neuron distances {'mean', 'max'}
 addParameter(inp, 'dmin', 5, @isnumeric);       % minimum distances between two neurons. it is used together with merge_thr
 addParameter(inp, 'merge_thr_spatial', [0.8, 0.4, -inf], @isnumeric);  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
-addParameter(inp, 'merge_thr_fiber', [5, 15,0.4], @isnumeric);  % merge close fiber with similar orientation. [distance,angle, temporal correlation.
+addParameter(inp, 'merge_thr_fiber', [30, 5,15,0.4], @isnumeric);  % merge close fiber with similar orientation. [distance, paralle distance,angle, temporal correlation].
 
 % -------------------------  INITIALIZATION   -------------------------  %
 addParameter(inp, 'K', [], @isnumeric);             % maximum number of neurons per patch. when K=[], take as many as possible.
@@ -57,7 +54,7 @@ addParameter(inp, 'min_pixel', [], @isnumeric);      % This will be calculated l
 addParameter(inp, 'bd', 0, @isnumeric);             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 addParameter(inp, 'use_parallel', true, @islogical);    % use parallel computation for parallel computing
 addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when the background fluctuation is large (usually 1p data)
-addParameter(inp, 'seed_mask', []);  % set the value as true when the background fluctuation is large (usually 1p data)
+addParameter(inp, 'seed_mask', []);  % Used internally
 
 % ----------------------DENDRITE INITIALIZATION   -------------------------  %
 addParameter(inp,'min_dendrite_size',10)    % Shortest dendrite length in pixels
@@ -87,11 +84,33 @@ end
 
 %% Conditional Parameter Setting
 if pars.with_dendrites
-    pars.search_method = 'dilate';  % Use 'search_method'
     pars.bSiz = 5;
 else
-    pars.search_method = 'ellipse';  % Use 'search_method'
     pars.dist = 5;
 end
+end
+
+
+function pars=pars_envs_parse(varargin)
+%% INTIALIZE VARIABLES
+inp = inputParser;
+inp.KeepUnmatched = true;  % Keep unmatched parameters
+
+[~,systemview] = memory;
+total_system_memory_GB = systemview.PhysicalMemory.Total/ (1024^3);
+
+
+addParameter(inp,'memory_size_to_use', total_system_memory_GB, @isnumeric);  % GB, memory space you allow to use in MATLAB
+addParameter(inp,'memory_size_per_patch',16, @isnumeric);                    % GB, space for loading data within one patch
+addParameter(inp,'patch_dims', [64, 64], @isnumeric);                        % Patch dimensions
+addParameter(inp,'w_overlap', 32, @isnumeric); 
+
+
+varargin=varargin{:};
+if isstruct(varargin)
+    varargin = [fieldnames(varargin), struct2cell(varargin)]';
+end
+parse(inp, varargin{:});
+pars = inp.Results;
 end
 

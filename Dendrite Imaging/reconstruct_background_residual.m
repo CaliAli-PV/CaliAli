@@ -36,7 +36,7 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
                 frame_shift = 0;
             else
 %                 frame_shift = 1 - obj.frame_range(1);
-                    frame_shift=0 % PV;
+                    frame_shift=0; % PV;
             end
             % frames to be loaded for initialization
             T = diff(frame_range) + 1;
@@ -51,7 +51,7 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             
             %% start updating the background
             Ybg = zeros(d1, d2, T);
-            for mpatch=progress(1:(nr_patch*nc_patch))
+            for mpatch=progress(1:(nr_patch*nc_patch),'Title','Reconstructing background')
                 tmp_patch = patch_pos{mpatch};
                 if strcmpi(bg_model, 'ring')
                     W_ring = obj.W{mpatch};

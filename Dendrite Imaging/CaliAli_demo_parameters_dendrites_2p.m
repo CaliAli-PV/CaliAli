@@ -10,9 +10,9 @@ params.BVsize = [0.5,1.5];             % Size of blood vessels (pixels),
 params.spatial_ds = 1;           % Spatial downsampling factor
 params.temporal_ds = 1;          % Temporal downsampling factor
 
-params.neuron_enhance = true;    % Enhance neurons using MIN1PIE background subtraction
+params.neuron_enhance = false;    % Enhance neurons using MIN1PIE background subtraction
 params.noise_scale = false;      % Scale noise for each pixel
-params.detrend = 0;              % Detrending window (seconds). 0 = no detrending
+params.detrend = 2;              % Detrending window (seconds). 0 = no detrending
 params.file_extension = 'tif';  % if a folder is selected instead of a single video file, 
 % 2p parameters:
 params.background_model='svd';
@@ -20,13 +20,14 @@ params.background_model='svd';
 
 % Dendrite parameters
 params.structure='dendrite';
-params.dendrite_filter_size=1.5:0.4:3;
+params.dendrite_filter_size=1.5:0.2:3;
 params.dendrite_theta=30;        % 0 is 90 degree, 10 is 85 to 95, 20 is 80 to 100
 params.fastPNR=false;
 params.do_alignment=false;
 params.remove_BV=false;
 params.median_filtering=[3,1];  %Apply median filtering. Leave empty for no filtering. We use 7x1 to filter vertical elongated structures
-params.min_dendrite_size = 10;  % Shortest dendrite length in pixels
+params.min_dendrite_size = 50;  % Shortest dendrite length in pixels
+params.dendrite_initialization_threshold = 0.01;
 
 
 % --- Motion Correction ---
@@ -44,17 +45,18 @@ params.Force_BV = false;              % Force BV use even if deemed unusable
 
 
 % --- Neuronal Extraction (CNMF-E) ---
+params.batch_sz = 3000;
 params.frames_per_batch = 0;          % Number of frames per batch. 0 = process each session as a single batch
-params.memory_size_to_use = 256;      % Memory allowed for MATLAB (GB)
-params.memory_size_per_patch = 64;    % Memory for each patch (GB)
-params.patch_dims = [400, 64];         % Patch dimensions
+params.memory_size_per_patch = 16;    % Memory for each patch (GB)
+params.patch_dims = [800, 100];         % Patch dimensions
+params.w_overlap = 50;
 
 params.min_pixel=20;
 params.with_dendrites = true;        % Include dendrites in the model
-params.search_method = 'dilate';     % Search method ('dilate' or 'ellipse')
+params.search_method = 'grow';     % Search method ('dilate' or 'ellipse')
 params.spatial_constraints = ...     % Spatial constraints
-    struct('connected', false, 'circular', false);  
-params.spatial_algorithm = 'hals_thresh'; % Spatial extraction algorithm
+    struct('connected', true, 'circular', false);  
+params.spatial_algorithm = 'hals'; % Spatial extraction algorithm
 
 params.deconv_options = struct(...    % Deconvolution options
     'type', 'ar1', ...               % Calcium trace model ('ar1' or 'ar2')
@@ -66,7 +68,7 @@ params.deconv_options = struct(...    % Deconvolution options
 
 params.background_model = 'svd';    % Background model
 params.nb = 1;                       % Number of background components
-params.bg_neuron_factor = 1.5;       % 
+params.bg_neuron_factor = 3;       % 
 params.ring_radius = [];             % Will be calculated later
 params.num_neighbors = [];           % Number of neighbors for each neuron
 params.bg_ssub = 2;                  % Background downsampling factor
@@ -76,10 +78,10 @@ params.method_dist = 'max';          % Distance calculation method
 params.dmin = 5;                     % Minimum distance between neurons
 
 params.merge_thr_spatial = ...       
-                  [0.6 0.4 -inf];    % Spatial merging threshold 
+                  [0.6 0.4 -inf];    % Spatial merging threshold [spatial, temporal (raw), temporal (spikes)]
 
 params.merge_thr_fiber = ...       
-                  [10 15 0.4];        % fiber merging threshold
+                  [30 10 15 0.8];        % fiber merging threshold  [distance, paralle distance,angle, temporal correlation]
 
 
 params.min_corr = 0.1;               % Minimum correlation for seeding
