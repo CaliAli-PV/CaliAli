@@ -1,4 +1,4 @@
-function [obj,Cn_update,ma] = initComponents_parallel_PV(obj, K, frame_range, save_avi, use_parallel, use_prev)
+function [neuron,Cn_update] = initComponents_parallel_PV(neuron, K, frame_range, save_avi, use_parallel, use_prev)
 %% initializing spatial/temporal components for calcium imaging data
 %% input:
 %   K:  scalar, maximum number of neurons
@@ -15,21 +15,22 @@ function [obj,Cn_update,ma] = initComponents_parallel_PV(obj, K, frame_range, sa
 %% email: zhoupc1988@gmail.com
 
 %% process parameters
+use_parallel=neuron.use_parallel;
 try
     % map data
-    mat_data = obj.P.mat_data;
+    mat_data = neuron.P.mat_data;
     mat_file = mat_data.Properties.Source;
-    
+
     % dimension of data
     dims = mat_data.dims;
     d1 = dims(1);
     d2 = dims(2);
     T = dims(3);
-    obj.options.d1 = d1;
-    obj.options.d2 = d2;
+    neuron.options.d1 = d1;
+    neuron.options.d2 = d2;
     % frames to be loaded for initialization
     if ~exist('frame_range', 'var')
-        frame_range = obj.frame_range;
+        frame_range = neuron.frame_range;
     end
     if isempty(frame_range)
         frame_range = [1, T];
@@ -38,8 +39,8 @@ try
         frame_range(frame_range>T) = T;
     end
     T = diff(frame_range) + 1;
-    obj.frame_range = frame_range;
-    
+    neuron.frame_range = frame_range;
+
     % folders and files for saving the results
     tmp_dir = sprintf('%s%sframes_%d_%d%s', fileparts(mat_file),filesep, frame_range(1), frame_range(2), filesep);
     if ~exist(tmp_dir, 'dir')
@@ -48,11 +49,11 @@ try
     log_folder = [tmp_dir,  'LOGS_', get_date(), filesep];
     log_file = [log_folder, 'logs.txt'];
     log_data_file = [log_folder, 'intermediate_results.mat'];
-    obj.P.log_folder = log_folder;
-    obj.P.log_file = log_file;
-    obj.P.log_data = log_data_file;
+    neuron.P.log_folder = log_folder;
+    neuron.P.log_file = log_file;
+    neuron.P.log_data = log_data_file;
     log_data = matfile(log_data_file, 'Writable', true);
-    
+
     % scan the previous initialization results
     temp = dir(tmp_dir);
     previous_folder = cell(length(temp),1);
@@ -63,10 +64,10 @@ try
             previous_folder{k} = temp(m).name;
         end
     end
-    
+
     % create a folder for new log
     mkdir(log_folder);
-    
+
     % manually check whether to re-use the previous results
     if ~exist('use_prev', 'var') || isempty(use_prev)
         use_prev = true;
@@ -81,7 +82,7 @@ try
         fprintf('\ttype -i to remove some previous results from your hard drive\n');
         fprintf('\ttype anything if you want to start a new initialization\n');
         fprintf('\t--------------------------  END  --------------------------\n');
-        
+
         while true
             choice = input('* make your choice:    ');
             if (choice>0) && (choice<=k)
@@ -90,18 +91,18 @@ try
                     % copy the previous log file
                     log_old = fopen(fullfile(tmp_dir, previous_folder{choice}, 'logs.txt'), 'r');
                     flog = fopen(log_file, 'a');
-                    
+
                     while true
                         temp = fgets(log_old);
                         fprintf(flog, '%s',temp);
-                        
+
                         if strfind(temp, 'Finished the initialization procedure.') %#ok<*STRIFCND>
                             fclose(log_old);
                             break;
                         end
                     end
                     fclose(flog);
-                    
+
                     % copy the previous results
                     data = matfile(fullfile(tmp_dir, previous_folder{1}, 'intermediate_results.mat'));
                     log_data.initialization = data.initialization;
@@ -111,37 +112,37 @@ try
                     Cn = previous_init.Cn;
                     PNR = previous_init.PNR;
                     neuron = previous_init.neuron;
-                    obj.A = neuron.A;
-                    obj.C = neuron.C;
-                    obj.C_raw = neuron.C_raw;
-                    obj.S = neuron.S;
-                    obj.P = neuron.P;
-                    obj.Cn = neuron.Cn;
-                    obj.W = neuron.W;
-                    obj.b0 = neuron.b0;
-                    obj.b = neuron.b;
-                    obj.f = neuron.f;
-                    obj.P.log_folder = log_folder;
-                    obj.P.log_file = log_file;
-                    obj.P.log_data = log_data_file;
-                    obj.ids = neuron.ids;
-                    obj.tags = neuron.tags;
+                    neuron.A = neuron.A;
+                    neuron.C = neuron.C;
+                    neuron.C_raw = neuron.C_raw;
+                    neuron.S = neuron.S;
+                    neuron.P = neuron.P;
+                    neuron.Cn = neuron.Cn;
+                    neuron.W = neuron.W;
+                    neuron.b0 = neuron.b0;
+                    neuron.b = neuron.b;
+                    neuron.f = neuron.f;
+                    neuron.P.log_folder = log_folder;
+                    neuron.P.log_file = log_file;
+                    neuron.P.log_data = log_data_file;
+                    neuron.ids = neuron.ids;
+                    neuron.tags = neuron.tags;
                 catch
                     continue;
                 end
                 try
-                    obj.frame_range = neuron.frame_range;
+                    neuron.frame_range = neuron.frame_range;
                 catch
-                    obj.frame_range = [];
+                    neuron.frame_range = [];
                 end
                 % write this operation to the log file
                 flog = fopen(log_file, 'a');
-                
+
                 fprintf(flog, '\n--------%s--------\n', get_date());
                 fprintf(flog, '[%s]\b', get_minute());
                 fprintf(flog, 'Continue the analysis from the previous initialization results:\n\t%s \n\n', previous_folder{choice});
                 %                 fprintf('\tContinue the previous initialization  \n\n');
-                
+
                 return;
             elseif (choice<0) && (choice>=-k)
                 % delete the folder
@@ -154,14 +155,14 @@ try
                 break;
             end
         end
-        
+
     end
     %
-    
+
     % parameters for patching information
     patch_pos = mat_data.patch_pos;
     block_pos = mat_data.block_pos;
-    
+
     % number of patches
     [nr_patch, nc_patch] = size(patch_pos);
 catch
@@ -188,15 +189,15 @@ if ~exist('use_parallel', 'var')||isempty(use_parallel)
 end
 
 % parameters for detrending the data before the initialization.
-if isfield(obj.options, 'nk') % number of knots for creating spline basis
-    nk = obj.options.nk;
+if isfield(neuron.options, 'nk') % number of knots for creating spline basis
+    nk = neuron.options.nk;
 else
     nk = 1;
 end
-detrend_method = obj.options.detrend_method;
+detrend_method = neuron.options.detrend_method;
 
 % parameter for avoiding using boundaries pixels as seed pixels
-options = obj.options;
+options = neuron.options;
 if ~isfield(options, 'bd') || isempty(options.bd')
     options.bd = options.gSiz;   % boundary pixesl to be ignored during the process of detecting seed pixels
 end
@@ -204,14 +205,14 @@ bd = options.bd;
 bg_ssub = options.bg_ssub;
 
 %% preallocate spaces for saving model variables relating to background components
-bg_model = obj.options.background_model;
+bg_model = neuron.options.background_model;
 W = cell(nr_patch, nc_patch);    % matrix for saving the weight matrix within each block
 b0 = cell(nr_patch, nc_patch);   % constant baselines for all pixels
 b = cell(nr_patch, nc_patch);
 f = cell(nr_patch, nc_patch);
 if strcmpi(bg_model, 'ring')
-    rr = ceil(obj.options.ring_radius/bg_ssub);    % radius of the ring
-    [r_shift, c_shift] = get_nhood(rr, obj.options.num_neighbors);    % shifts used for acquiring the neighboring pixels on the ring
+    rr = ceil(neuron.options.ring_radius/bg_ssub);    % radius of the ring
+    [r_shift, c_shift] = get_nhood(rr, neuron.options.num_neighbors);    % shifts used for acquiring the neighboring pixels on the ring
     parfor mpatch=1:(nr_patch*nc_patch)
         tmp_patch = patch_pos{mpatch};    % patch position
         tmp_block = block_pos{mpatch};    % block position
@@ -220,7 +221,7 @@ if strcmpi(bg_model, 'ring')
         nr_block = diff(tmp_block(1:2))+1;
         nc_block = diff(tmp_block(3:4))+1;
         b0{mpatch} = zeros(nr*nc, 1);
-        
+
         if bg_ssub==1
             [csub, rsub] = meshgrid(tmp_patch(3):tmp_patch(4), tmp_patch(1):tmp_patch(2));
             csub = reshape(csub, [], 1);
@@ -230,13 +231,13 @@ if strcmpi(bg_model, 'ring')
             rsub = bsxfun(@plus, rsub, r_shift);
             ind = and(and(csub>=1, csub<=d2), and(rsub>=1, rsub<=d1));
             jj = (csub-tmp_block(3)) * (diff(tmp_block(1:2))+1) + (rsub-tmp_block(1)+1);
-            
+
             temp = sparse(ii(ind), jj(ind), 1, nr*nc, nr_block*nc_block);
             W{mpatch} = bsxfun(@times, temp, 1./sum(temp, 2));
         else
             d1s = ceil(nr_block/bg_ssub);
             d2s = ceil(nc_block/bg_ssub);
-            
+
             [csub, rsub] = meshgrid(1:d2s, 1:d1s);
             csub = reshape(csub, [], 1);
             rsub = reshape(rsub, [], 1);
@@ -251,7 +252,7 @@ if strcmpi(bg_model, 'ring')
         end
     end
 elseif strcmpi(bg_model, 'nmf')
-    nb = obj.options.nb;
+    nb = neuron.options.nb;
     for mpatch=1:(nr_patch*nc_patch)
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);   % patch ind
         tmp_patch = patch_pos{r, c};    % patch position
@@ -262,7 +263,7 @@ elseif strcmpi(bg_model, 'nmf')
     end
 else
     %default, SVD model
-    nb = obj.options.nb;
+    nb = neuron.options.nb;
     for mpatch=1:(nr_patch*nc_patch)
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);   % patch ind
         tmp_patch = patch_pos{r, c};    % patch position
@@ -274,10 +275,10 @@ else
     end
 end
 
-obj.W = W;
-obj.b0 = b0;
-obj.b = b;
-obj.f = f;
+neuron.W = W;
+neuron.b0 = b0;
+neuron.b = b;
+neuron.f = f;
 clear W b0 b f;    % remove these variables for saving RAM space
 
 %% start initialization
@@ -291,28 +292,32 @@ fprintf(flog, 'Start running source extraction......\nThe collection of options 
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_range(1), frame_range(2));
 
-[A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(obj);
+if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
+    [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron);
+elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
+    [A,C_raw,C,S,Ymean] = int_temp_batch_dendrite(neuron);
+end
 %% export the results
-obj.A = A;
-obj.C = C;
-obj.C_raw = C_raw;
-obj.S = sparse(S);
-K = size(obj.A, 2);
-obj.P.k_ids = K;
-obj.ids = (1:K);
-obj.tags = zeros(K,1, 'like', uint16(0));
-obj.P.Ymean = Ymean;
+neuron.A = A;
+neuron.C = C;
+neuron.C_raw = C_raw;
+neuron.S = sparse(S);
+K = size(neuron.A, 2);
+neuron.P.k_ids = K;
+neuron.ids = (1:K);
+neuron.tags = zeros(K,1, 'like', uint16(0));
+neuron.P.Ymean=Ymean;
 
-if size(obj.A,3)>1
-    obj.A_batch=obj.A;
-    obj.A=Ato2d(obj);
+if size(neuron.A,3)>1
+    neuron.A_batch=neuron.A;
+    neuron.A=Ato2d(neuron);
 end
 
 %% save the results to log
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, '\tIn total, %d neurons were initialized. \n', K);
 % if obj.options.save_intermediate
-initialization.neuron = obj.obj2struct();
+initialization.neuron = neuron.obj2struct();
 log_data.initialization = initialization;
 fprintf(flog, '\tThe initialization results were saved as intermediate_results.initialization\n\n');
 % end

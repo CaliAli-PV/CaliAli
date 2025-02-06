@@ -42,8 +42,8 @@ gSiz = obj.options.gSiz;        % maximum size of a neuron
 % time
 T = size(obj.C, 2);
 t = 1:T;
-if ~isnan(obj.Fs)
-    t = t/obj.Fs;
+if ~isnan(obj.sf)
+    t = t/obj.sf;
     str_xlabel = 'Time (Sec.)';
 else
     str_xlabel = 'Frame';

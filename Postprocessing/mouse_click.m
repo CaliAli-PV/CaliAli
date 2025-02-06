@@ -3,7 +3,13 @@ B=event.Button;
 t=str2double(get(line,'Tag'));
 if B==1
     if ~ismember(t,app.cur)  %% add
-        [~,C]=get_spat(app.neuron,t);
+        try
+        sn=app.neuron.P.neuron_sn(t);
+        catch
+        sn=1;
+        end
+
+        [~,C]=get_spat(app.neuron,t,sn);
         plot_c(app,C,length(app.cur),t)
         for i=1:length(app.cur)
             set(findobj(app.mainAx,'Tag',num2str(app.cur(i))),'Color', 'k');
@@ -40,12 +46,12 @@ end
 
 end
 
-function [A,C]=get_spat(in,t)
+function [A,C]=get_spat(in,t,sn)
 A=full(in.A(:,t));
 dims=[in.options.d1  in.options.d2];
 A = extract_patch(A,dims,[50,50]);
 C=in.C_raw(t,:);
-
+C=C./sn;
 end
 
 % function plot_a(app,A)

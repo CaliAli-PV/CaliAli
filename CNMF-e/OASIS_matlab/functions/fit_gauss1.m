@@ -42,7 +42,7 @@ logy = log(y);
 y2logy = y2.*logy;
 vec1 = ones(1, length(y));
 
-warning('off','MATLAB:nearlySingularMatrix'); 
+warning('off','all'); 
 warning('off','MATLAB:SingularMatrix'); 
 %% fit the curve
 if mu_fix % fix the mu to be 0 
@@ -79,5 +79,5 @@ else
     A = exp(p(1)-0.25*p(2)^2/p(3));
 end
 
-warning('on','MATLAB:nearlySingularMatrix'); 
+warning('on','all'); 
 warning('on','MATLAB:SingularMatrix'); 

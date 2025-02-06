@@ -124,9 +124,10 @@ Names = [
     'Cnr                '  
     'PNRr               '  
     'ind                '
-    'CaliAli_opt        '
-    'Spatial_stability  '
-    'Unstable_components'
+    'CaliAli_options    '
+    'pars_envs          '
+    'show_merge         '
+    'merge_thr_spatial  '
     ];              %PV
 
 [m,n] = size(Names);
@@ -316,6 +317,7 @@ Values = [
     {'hals'}
     {false}
     {false}
+    {[]}  %PV
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV

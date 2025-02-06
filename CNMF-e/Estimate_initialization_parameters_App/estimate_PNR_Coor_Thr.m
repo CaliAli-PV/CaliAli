@@ -1,48 +1,41 @@
-function [pnr_out,cn_out,mask,ind]=estimate_PNR_Coor_Thr(Gsig,inF,min_corr,min_pnr)
+function neuron=estimate_PNR_Coor_Thr(inF)
 
-% estimate_PNR_Coor_Thr(4)
-if ~exist('Gsig','var')
-Gsig=4;
+CaliAli_options=CaliAli_load(inF,'CaliAli_options');
+neuron=CaliAli_options.cnmf;
+
+m=CaliAli_options.inter_session_alignment;
+if isempty(neuron.seed_mask)
+    neuron.seed_mask=ones(size(m.Cn));
 end
 
-if ~exist('min_corr','var')
-min_corr=0.5;
-end
-
-if ~exist('min_pnr','var')
-min_pnr=7;
-end
-
-if ~exist('inF','var')
-    warning('..._CnPNR.mat file does not exist!')
-    warning('Run ''get_CnPNR_from_video(gSig)'' ')
-    return
+if strcmp(CaliAli_options.preprocessing.structure,'dendrite')
+    app=estimate_Corr_PNR_dendrite(m.Cn,m.PNR, ...
+        neuron.min_dendrite_size,...
+        neuron.dendrite_initialization_threshold,...
+        logical(neuron.seed_mask));
+    app.done=0;
+    while app.done == 0  % polling
+        pause(0.05);
+    end
+    neuron.seed_mask=app.mask;
+    neuron.min_dendrite_size=app.MindendritelengthSpinner.Value;
+    neuron.dendrite_initialization_threshold=app.IntensityThresholdSpinner.Value;
+    delete(app);
 else
-    [path,file]=fileparts(inF);
-    file2=[path,filesep,file,'.mat'];
+    v_max=CaliAli_get_local_maxima(CaliAli_options);
+    app=estimate_Corr_PNR(m.Cn,m.PNR,v_max,neuron.min_corr,neuron.min_pnr,logical(neuron.seed_mask));
+    app.done=0;
+    while app.done == 0  % polling
+        pause(0.05);
+    end
+    neuron.seed_mask=app.mask;
+    neuron.Cn=app.cn;
+    neuron.PNR=app.pnr;
+    neuron.ind=app.tmp_ind;
+    neuron.min_pnr=app.PNRSpinner.Value;
+    neuron.min_cn=app.corrSpinner.Value;% get the values set in the parameter window
+    delete(app);
 end
-m=load(file2);
-
-
-if ~isfield(m,'Mask')
-    m.Mask=ones(size(m.Cn,1),size(m.Cn,2));
-    Mask=m.Mask;
-    save(file2,'Mask','-append');
-end
-
-
-
-app=estimate_Corr_PNR(m.Cn,m.PNR,Gsig,min_corr,min_pnr,logical(m.Mask));
-app.done=0;
-while app.done == 0  % polling
-    pause(0.05);
-end
-mask=app.mask;
-ind=app.tmp_ind;
-pnr_out=app.PNRSpinner.Value;
-cn_out=app.corrSpinner.Value;% get the values set in the parameter window
-delete(app);
-
 
 
 

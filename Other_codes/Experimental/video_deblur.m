@@ -1,8 +1,8 @@
 function V=video_deblur(V)
-V=double(V);
+V=mat2gray(V);
 INITPSF = ones(4,'single');
-taperedImage = edgetaper(double(V(:,:,1)),INITPSF);
-[~,P] = deconvblind(taperedImage,INITPSF,15,.01);
+taperedImage = edgetaper(mat2gray(V(:,:,1)),INITPSF);
+[temp,P] = deconvblind(taperedImage,INITPSF,20,.1);
 parfor i=1:size(V,3)
 taperedImage = edgetaper(V(:,:,i),P);
 V(:,:,i) = deconvlucy(taperedImage,P);

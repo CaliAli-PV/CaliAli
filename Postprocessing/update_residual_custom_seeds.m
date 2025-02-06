@@ -5,9 +5,20 @@ d2=neuron.options.d2;
 gSig=neuron.options.gSig;
 n_enhanced=neuron.n_enhanced;
 gSiz=gSig*4;
-fn=[0,cumsum(neuron.options.F)];
+F=get_batch_size(neuron);
+fn=[0,cumsum(F)];
 for i=progress(1:size(fn,2)-1)
     Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
+    if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
+    Y(isnan(Y)) = 0;    % remove nan values
+    %% substract neurons
+    A=full(neuron.A);
+    Y=single(Y);
+    Y=Y-single(A*neuron.C_raw(:,fn(i)+1:fn(i+1)));
+    Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
+
+    Y=uint16(reshape(Y,d1,d2,[]));
+
 
     if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
     Y(isnan(Y)) = 0;    % remove nan values
@@ -52,32 +63,32 @@ for i=progress(1:size(fn,2)-1)
     A=[];
     C=[];
     C_raw=[];
-    S=[];    
+    S=[];
     seed_all=seed_all_M;
     while true
         % fprintf('%2d seed remaining. \n', length(seed_all));
-        seed=get_far_neighbors(seed_all,d1,d2,gSiz*1.5,Cn,PNR);
+        seed=get_far_neighbors(seed_all,neuron);
         % [row,col] = ind2sub([d1,d2],seed);
         % plot(col,row,'.r');drawnow;
 
         seed_all(ismember(seed_all,seed))=[];
         Mask(seed)=0;
 
-        [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,d1,d2,gSiz);
+        [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,neuron);
         if isempty(Y_box)
             break
         end
-        [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron.options.spatial_constraints,size(Y,2));
+         [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron,size(Y,2));
         [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
         %% Filter a
         af=a;
         if n_enhanced==0
             parfor k=1:size(a,2)
                 if ~isempty(a{k})
-                temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
-                af{1,k}=temp(:);
+                    temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
+                    af{1,k}=temp(:);
                 else
-                af{1,k}=[];
+                    af{1,k}=[];
                 end
             end
         end
@@ -112,7 +123,7 @@ end
 I=cellfun(@(x) mean(x,2),S_T,'UniformOutput',false);
 I=cat(2,I{:});
 I=I./sum(I,2);
-A=A_T{1, 1}*0;  
+A=A_T{1, 1}*0;
 for i=1:size(I,2)
     A=A+A_T{1, i}.*I(:,i)';
 end

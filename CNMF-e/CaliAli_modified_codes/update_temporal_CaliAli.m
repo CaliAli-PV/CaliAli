@@ -1,14 +1,51 @@
 function obj=update_temporal_CaliAli(obj, use_parallel,F)
+%% update_temporal_CaliAli - Updates the temporal components of extracted neuronal signals.
+%
+% This function refines the temporal dynamics of detected neuronal components
+% by processing the data in multiple batches. It updates the neuronal activity 
+% traces while accounting for residual background activity, ensuring robust 
+% deconvolution and denoising.
+%
+% Inputs:
+%   - obj: CNMF object containing spatial and temporal components.
+%   - use_parallel: Boolean flag for enabling parallel processing.
+%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%     it is determined using get_batch_size(obj).
+%
+% Outputs:
+%   - obj: Updated CNMF object with refined temporal components.
+%
+% Features:
+%   - Supports batch processing to handle large datasets efficiently.
+%   - Utilizes Hierarchical Alternating Least Squares (HALS) for optimization.
+%   - Performs optional deconvolution and denoising of calcium traces.
+%   - Handles various CNMF-E background models (`ring`, `nmf`, `svd`).
+%
+% Notes:
+%   - Running this function is **essential** after modifying the spatial or 
+%     residual components to maintain consistency in CNMF iterations.
+%   - If this function is run, **temporal traces will be altered**, and further 
+%     CNMF iterations must be performed using update_temporal_CaliAli.
+%
+% Usage:
+%   neuron = update_temporal_CaliAli(neuron, true);
+%   neuron = update_temporal_CaliAli(neuron, false, batch_frames);
+%
+% Author: Pablo Vergara  
+% Contact: pablo.vergara.g@ug.uchile.cl  
+% Date: 2025
+
+
 fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj,0);
+    F=get_batch_size(obj);
 end
 batch=[0,cumsum(F)];
 C_raw=[];
 
 div=length(batch)-1;
 for i=progress(1:div)
-    C_raw_temp =update_temporal_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
+    C_raw_temp =update_temporal_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
     C_raw=catpad(2,C_raw,C_raw_temp);
 end
 obj.C_raw=C_raw;
@@ -25,7 +62,7 @@ fprintf('Done!\n');
 end
 
 
-function C_raw=update_temporal_in(obj, use_parallel, max_frame,use_c_hat)
+function C_raw=update_temporal_in(obj, use_parallel, max_frame,idx,use_c_hat)
 %% update the the temporal components for all neurons
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -98,6 +135,9 @@ ind_neurons = cell(nr_patch, nc_patch);
 
 AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
+if isempty(obj.A_prev)
+obj.A_prev=obj.A;
+end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')
         tmp_block = block_pos{mpatch};
@@ -314,7 +354,7 @@ C_raw = bsxfun(@times, C_new, 1./aa);
 %% upadte b0
 if strcmpi(bg_model, 'ring')
     % fprintf('Update the constant baselines for all pixels..\n');
-    obj.b0_new = cell2mat(obj.P.Ymean)-obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
+    obj.b0_new = obj.P.Ymean{idx}-obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
     % fprintf('Done!\n');
 end
 

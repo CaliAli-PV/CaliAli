@@ -11,7 +11,9 @@ end
 d1 = info(1).Height;
 d2 = info(1).Width;
 
-Y = zeros(d1,d2,T);
-for t = 1:T
+x=round(linspace(0,T,round(T/6000)))
+
+Y = zeros(d1,d2,T,'uint8');
+for t = progress(1:T)
     Y(:,:,t) = imread(name, t, 'Info',info);
 end

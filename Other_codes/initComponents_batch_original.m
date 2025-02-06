@@ -41,6 +41,7 @@ for mbatch=1:nbatches
     fprintf('\nprocessing batch %d/%d\n', mbatch, nbatches);
     neuron_k.CaliAli_opt =obj.CaliAli_opt ;
     neuron_k.CaliAli_opt.F=neuron_k.frame_range(end);
+    neuron_k.n_enhanced=1;
     if mbatch==1
         % initialization neurons from nothing
         [neuron_k,Cn_update]=initComponents_parallel_PV(neuron_k,K, neuron_k.frame_range, save_avi, use_parallel);  

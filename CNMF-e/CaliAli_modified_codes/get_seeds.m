@@ -1,12 +1,16 @@
-function seed=get_seeds(Cn,PNR,gSig,min_corr,min_PNR,Mask)
+function seed=get_seeds(neuron)
 
+v_max=CaliAli_get_local_maxima(neuron.CaliAli_options);
 
-tmp_d = max(1,round(gSig));
-v_max = ordfilt2(Cn.*PNR, tmp_d^2, true(tmp_d));
+Cn=neuron.CaliAli_options.inter_session_alignment.Cn;
+PNR=neuron.CaliAli_options.inter_session_alignment.PNR;
 ind = (v_max==Cn.*PNR);
 
-Cn_ind = ind & (Cn>=min_corr & Mask) ;
-PNR_ind = ind & (PNR>=min_PNR & Mask) ;
+if isempty(neuron.CaliAli_options.cnmf.seed_mask)
+    neuron.CaliAli_options.cnmf.seed_mask=ones(size(Cn));
+end
+Cn_ind = ind & (Cn>=neuron.CaliAli_options.cnmf.min_corr & neuron.CaliAli_options.cnmf.seed_mask);
+PNR_ind = ind & (PNR>=neuron.CaliAli_options.cnmf.min_pnr   & neuron.CaliAli_options.cnmf.seed_mask);
 
 seed = Cn_ind & PNR_ind;
 
@@ -16,8 +20,8 @@ seed=seed(I);
 
         % [d1,d2]=size(Cn);
         % [row,col] = ind2sub([d1,d2],seed);
-        %close all;imagesc(v_max);hold on;
-        % plot(col,row,'.r');drawnow;
+        % close all;imagesc(Cn);hold on;
+        % plot(col,row,'or');drawnow;
 
 
 

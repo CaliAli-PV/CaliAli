@@ -1,12 +1,12 @@
 function BV_app()
 
-theFiles = uipickfiles('REFilter','\.h5*$','num',1);
-V=h5read(theFiles{1, 1}  ,'/Object');
+theFiles = uipickfiles('REFilter','\.mat*$','num',1);
+V=CaliAli_load(theFiles{1, 1}  ,'Y');
 
 if contains(theFiles{1, 1},'_mc')
     M=median(V,3);
 else
-    M=V(:,:,1);
+    M=V(:,:,round(size(V,3)/2));
 end
 
 [M,opt.Mask]=remove_borders(M,0);
@@ -28,8 +28,6 @@ end
 C=C+randn(size(C))/10000;
 
 BV= BV_stack(C,0.1:0.05:6, [1;1],false);
-
-BV=mat2gray(BV);
 
 app=BV_app_in(BV);
 app.done=0;

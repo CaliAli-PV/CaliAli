@@ -48,7 +48,7 @@ elseif strcmpi(ext, '.mat')
     data_info = whos(data);
     if length(data_info)>1
         % if there is one variable storing the image size
-        dims = data.Ysiz;
+        dims = data_info(strcmp({data_info.name}, 'Y')).size;
     else
         % only a 3D/4D video is stored in the video
         dims = data_info.size;

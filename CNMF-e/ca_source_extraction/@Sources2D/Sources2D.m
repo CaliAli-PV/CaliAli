@@ -30,7 +30,7 @@ classdef Sources2D < handle
         options;    % options for model fitting
         P;          % some estimated parameters or parameters relating to data
         % data info
-        Fs = nan;    % frame rate
+        sf = nan;    % frame rate
         file = '';
         frame_range;  % frame range of the data
         %quality control
@@ -65,9 +65,11 @@ classdef Sources2D < handle
         Cnr;% Modification done by PV
         PNRr ;% Modification done by PV
         ind ;% Modification done by PV
-        CaliAli_opt;% Modification done by PV
-        Spatial_stability;
-        Unstable_components;
+        CaliAli_options;% Modification done by PV
+        pars_envs;
+        show_merge;
+        merge_thr_spatial;
+        use_parallel;
     end
 
     %% methods
@@ -226,7 +228,8 @@ classdef Sources2D < handle
             Ypatch(isnan(Ypatch)) = 0;
         end
         %% distribute data and be ready to run source extraction
-        function getReady(obj, pars_envs, filter_kernel)
+        function getReady(obj, filter_kernel)
+            pars_env=obj.pars_envs;
             % data and its extension
             if iscell(obj.file)
                 nam = obj.file{1};
@@ -234,21 +237,28 @@ classdef Sources2D < handle
                 nam = obj.file;
             end
             % parameters for scaling things
-            if ~exist('pars_envs', 'var') || isempty(pars_envs)
+            if ~exist('pars_env', 'var') || isempty(pars_env)
                 memory_size_to_use = 16.0;  %GB
                 memory_size_per_patch = 1.0;  % GB;
                 patch_dims = [64, 64];
+                w_overlap = obj.options.ring_radius;
             else
-                memory_size_to_use = pars_envs.memory_size_to_use;
-                memory_size_per_patch = pars_envs.memory_size_per_patch;
-                patch_dims = pars_envs.patch_dims;
+                memory_size_to_use = pars_env.memory_size_to_use;
+                memory_size_per_patch = pars_env.memory_size_per_patch;
+                patch_dims = pars_env.patch_dims;
+                if ~isfield(pars_env,'w_overlap') || isempty(pars_env. w_overlap)
+                    w_overlap = obj.options.ring_radius;
+                else
+                    w_overlap = pars_env.w_overlap ;
+                end
+
             end
 
             if ~exist('filter_kernel', 'var')
                 filter_kernel = [];
             end
             % overlapping area
-            w_overlap = obj.options.ring_radius;
+           
 
             % distribute data
             [data, dims, obj.P.folder_analysis] = distribute_data(nam,...
@@ -883,8 +893,8 @@ classdef Sources2D < handle
             end
             if exist('avi_nm', 'var') && ischar(avi_nm)
                 avi_file = VideoWriter(avi_nm);
-                if ~isnan(obj.Fs)
-                    avi_file.FrameRate = obj.Fs;
+                if ~isnan(obj.sf)
+                    avi_file.FrameRate = obj.sf;
                 end
                 avi_file.open();
                 avi_flag = true;
@@ -903,10 +913,10 @@ classdef Sources2D < handle
             for t=1:size(Y,3)
                 imagesc(Y(:, :, t), min_max); colormap(col_map);
                 axis equal; axis off tight;
-                if isnan(obj.Fs)
+                if isnan(obj.sf)
                     title(sprintf('Frame %d', t));
                 else
-                    text(1, 10, sprintf('Time = %.2f', t/obj.Fs), 'fontsize', 15, 'color', 'w');
+                    text(1, 10, sprintf('Time = %.2f', t/obj.sf), 'fontsize', 15, 'color', 'w');
                 end
                 pause(t_pause);
                 if avi_flag
@@ -1639,7 +1649,7 @@ classdef Sources2D < handle
             % play
             if nargin>1
                 fp = VideoWriter(avi_file);
-                fp.FrameRate = obj.Fs;
+                fp.FrameRate = obj.sf;
                 fp.open();
             end
 
@@ -1649,7 +1659,7 @@ classdef Sources2D < handle
                 img = obj.reshape(img, 2)/cmax*1000;
                 imagesc(uint8(img));
                 axis equal off tight;
-                text(5, 10, sprintf('Time: %.2f seconds',(m-indt(1))/obj.Fs), 'color', 'w',...
+                text(5, 10, sprintf('Time: %.2f seconds',(m-indt(1))/obj.sf), 'color', 'w',...
                     'fontsize', 16);
                 pause(.01);
                 if exist('fp', 'var')
@@ -1704,14 +1714,9 @@ classdef Sources2D < handle
                 min_pnr = 3;
             end
             S_ = obj.S;
-            if size(obj.A,3)>1
-                weights=get_weights_spatial(obj);
-                for i=1:size(weights,1)
-                    A_(:,i)=sum(squeeze(obj.A(:,i,1:end)).*weights(i,:),2);
-                end
-            else
-                A_=obj.A;
-            end
+
+            A_=obj.A;
+
             K = size(A_, 2);
             tags_ = zeros(K, 1, 'like', uint16(0));
             min_pixel = obj.options.min_pixel;
@@ -1719,8 +1724,10 @@ classdef Sources2D < handle
             % check the number of nonzero pixels
             nz_pixels = full(sum(A_>0, 1));
             tags_ = tags_ + uint16(nz_pixels'<min_pixel);
-            kill = remove_sparse_PV(A_,obj.options.d1,obj.options.d2); %% PV
-            tags_(kill)=1;  %PV
+            if strcmp(obj.CaliAli_options.preprocessing.structure,'neuron')
+                kill = remove_sparse_PV(A_,obj.options.d1,obj.options.d2); %% PV
+                tags_(kill)=1;  %PV
+            end
             % check the number of calcium transients after the first frame
             if obj.options.deconv_flag
                 nz_spikes = full(sum(S_(:,2:end)>0, 2));
@@ -1807,7 +1814,7 @@ classdef Sources2D < handle
             end
 
             if ~exist('w', 'var')||isempty(w)
-                w = obj.Fs;
+                w = obj.sf;
             end
             E =obj.C;    % event detection
             Emin = ordfilt2(E, 1, ones(1, w));
@@ -1832,7 +1839,7 @@ classdef Sources2D < handle
             end
 
             try
-                evalin('caller', sprintf('save(''%s'',''merge_thr_tempospatial'', ''neuron'', ''show_*'', ''use_parallel'', ''with_*'', ''-v7.3''); ', file_path)); %% modified by PV
+                evalin('caller', sprintf('save(''%s'',''neuron'', ''-v7.3''); ', file_path)); %% modified by PV
                 log_file = obj.P.log_file;
                 fp = fopen(log_file, 'a');
                 fprintf(fp, '\n--------%s--------\n[%s]\bSave the current workspace into file \n\t%s\n\n', get_date(), get_minute(), file_path);
@@ -1967,7 +1974,7 @@ classdef Sources2D < handle
                 neuron.f = obj.f;
                 neuron.W = obj.W;
                 neuron.b0 = obj.b0;
-                neuron.Fs = obj.Fs;
+                neuron.sf = obj.sf;
                 neuron.frame_range = obj.frame_range;
                 neuron.kernel = obj.kernel;
                 neuron.file = obj.kernel;
