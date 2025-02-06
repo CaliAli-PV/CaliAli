@@ -14,7 +14,12 @@ if sum(rem_pixels)>0
     [l1,l2]=size(temp.Cn);
     new_mask=~reshape(rem_pixels(logical(temp.Mask(:))),l1,l2);
     %% reshape video with new mask
+<<<<<<< HEAD
     V=h5read(fullFileName,'/Object');
+=======
+    vid_in=strcat(filepath,filesep,name,'_det','.h5');
+    V=h5read(vid_in,'/Object');
+>>>>>>> main
     [d1,d2,~]=size(V);
     V=reshape(V,d1*d2,[]);
     new_d1=sum(sum(new_mask,2)>0,1);
@@ -38,10 +43,21 @@ if sum(rem_pixels)>0
     %% replace old mask
     temp.Mask=new_mask;
     %% Save Variables
+<<<<<<< HEAD
     opt=temp;
     saveh5(V,fullFileName,'rootname','Object');
     saveh5(opt,fullFileName,'append',1,'rootname','CaliAli_options');
 end
 
+=======
+    P=temp.P;
+    F=temp.F;
+    opt=temp.opt;
+    Cn=temp.Cn;
+    PNR=temp.PNR;
+    save(strcat(filepath,filesep,name,'_det','.mat'),'P','F','opt','Cn','PNR','-append');
+    delete(vid_in);
+    saveash5(V,vid_in);
+>>>>>>> main
 end
 
