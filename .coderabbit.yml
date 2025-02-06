@@ -1,0 +1,4 @@
+reviews:
+  max_file_size: 5000  # Allow review of large files
+  skip_large_files: false  # Force review of long scripts
+  review_status: false  # Hide skipped file warnings
