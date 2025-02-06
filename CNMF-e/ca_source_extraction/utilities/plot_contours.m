@@ -45,7 +45,7 @@ end
 %handle = title('Correlation image and identified spatial footprints','fontweight','bold','fontsize',14,'fontname',fontname);
 hold on;
 if ~exist('cmap', 'var') || isempty(cmap)
-cmap = hsv(1*size(Coor,1));
+cmap = hsv(1*size(Aor,2));
 else
     cmap = hot(3*size(Aor,2));
 end
@@ -69,7 +69,7 @@ else
         temp =  cumsum(temp);
         ff = find(temp > (1-thr)*temp(end),1,'first');
         if ~isempty(ff)
-            CC{i} = contour(reshape(A_temp,d1,d2),[0,0]+A_temp(ind(ff)),'LineColor',cmap(i+size(Aor,2),:), 'linewidth', ln_wd);
+            CC{i} = contour(reshape(A_temp,d1,d2),[0,0]+A_temp(ind(ff)),'LineColor',cmap(i,:), 'linewidth', ln_wd);
             fp = find(A_temp >= A_temp(ind(ff)));
             [ii,jj] = ind2sub([d1,d2],fp);
             CR{i,1} = [ii,jj]';

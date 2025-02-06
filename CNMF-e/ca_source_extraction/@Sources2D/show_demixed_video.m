@@ -126,7 +126,7 @@ for tt=t_begin:kt:t_end
     axes(ax_mix); cla;
     imagesc(obj.reshape(Y_mixed(:, m,:),2));  hold on;
     title('Demixed');
-    text(1, 10, sprintf('Time: %.2f second', (tt)/obj.Fs), 'color', 'w', 'fontweight', 'bold');
+    text(1, 10, sprintf('Time: %.2f second', (tt)/obj.sf), 'color', 'w', 'fontweight', 'bold');
     
     axis equal tight off;
     %     box on; set(gca, 'xtick', []);

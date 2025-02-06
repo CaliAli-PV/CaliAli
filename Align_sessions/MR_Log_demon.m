@@ -14,7 +14,7 @@ nlevel=size(X1,3):-1:1;
 %% Multiresolution
 it=0;
 for k=nlevel
-    if size(opt,1)>1
+    if length(opt)>1
         t_opt=opt{nlevel(k)};
     else
         t_opt=opt;

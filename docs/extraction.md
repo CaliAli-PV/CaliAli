@@ -7,77 +7,25 @@ This process involves two steps:
 1. **Select Extraction Parameters for Each Session**: Utilize a graphical user interface to set initialization thresholds.
    
 2. **Run the CaliAli Extraction Module**: Execute the CaliAli extraction module to extract neural signals.
+<a id="gui"></a>
 
+???+ info "A GUI for Parameter Selection" 
+    The extraction of calcium signals relies on an initial estimation of neuron locations based on two key projections: the correlation image (showing pixel correlations) and the peak-to-noise ratio (PNR) image (highlighting active neurons in the video). To accurately identify candidate neurons, specific minimum correlation and PNR thresholds must be defined. These thresholds are essential for distinguishing genuine neuron activity from background noise and signal fluctuations.
 
-## A GUI for Parameter Selection <a id="gui"></a>
+    ***CaliAli offers a graphical user interface (GUI) for setting these thresholds visually.***
 
-The extraction of calcium signals relies on an initial estimation of neuron locations based on two key projections: the correlation image (showing pixel correlations) and the peak-to-noise ratio (PNR) image (highlighting active regions in the video). To accurately identify candidate neurons, specific minimum correlation and PNR thresholds must be defined. These thresholds are essential for distinguishing genuine neuron activity from background noise and signal fluctuations.
+    You can use this GUI by running the following code:  ['CaliAli_set_initialization_parameters()'](Functions_doc/CaliAli_set_initialization_parameters.md#CaliAli_set_initialization_parameters)
 
-CaliAli offers a graphical user interface (GUI) for setting these thresholds visually.
-
-You can use this GUI by running the following code:
-
-```CNMFe_app```
-
-This will open a window that allows the user to choose one or more `.h5` file for processing:
-
-![load_cnmf_app](files/load_cnmf_app.gif)
-
-For each loaded file the user can modify the following parameters:
-
-1.	PNR threshold (PNR)
-2.	Correlation threshold (Corr)
-3.	Neuron Filter size(gSig) (1).
-	{ .annotate }
-	
-	1.	This parameter should match the settings used in previous steps. This will not be needed in future updates.
-	
-4.	Frame rate
-
-???+ Info
-	You can process several files at the same time.
-
-## Adjusting PNR and Corr. Thresholds <a id="adjust_pnr"></a>
-
-To visually set the PNR and Corr. threshold press the `Get` button higlighted in green.
-
-![load_cnmf_app_thr](files/load_cnmf_app_thr.gif)
-
-???+ Bug
-	Sometimes, the MATLAB AppDesigner app may not render panels correctly. This is a MATLAB bug. If this happens, just close and reopen the window to fix the issue.
-
-In the opened window, you will find three images displayed: the PNR image, the correlation image, and their point-wise product. Red dots overlaid on these images represent candidate neurons or "seed pixels". Below these images, there are two spinners that control the PNR and correlation thresholds. Adjusting these thresholds will change the number of seed pixels detected.
-
-
-![adjust_thr](files/adjust_thr.gif)
-
-Additionally, you have the option to manually draw a mask to exclude specific regions within the field of view:
-
-![draw_mask](files/draw_mask.gif)
-
-???+ Note
-	Currently you can only draw the mask in the correlation image.
-	
-???+ Danger "Important"
-	Please note that the initialization of neurons depends solely on the third panel, which is the point-wise product of the correlation and PNR (peak-to-noise ratio). Even if some seeds appear above non-neuronal structures in either the correlation or PNR images, this will not compromise the extraction process as long as those seeds do not appear in the point-wise product image
-	
-Once satisfied with the results press the `Ok!` button.
-This will automatically update the parameters for the chosen file with the new thresholds. 
-
-After setting the PNR, Corr, gSig, and Frame rate parameters press `Done!`
-This will create a table named `parin` (parameters inputs) in the matlab workspace. 
-
-???+ Info
-	Some parameters specific to CNMF-E are pre-defined in the `runCNMFe.mat` code and typically do not require modifications.  Refer to the original [CNMF-E documentation](https://github.com/zhoupc/CNMF_E/wiki/Pipeline#step-1-parameter-specification) for details.
-
-## Extracting Calcium Signals <a id="ecs"></a>
+#### Extracting Calcium Signals <a id="ecs"></a>
 
 After defining input parameters perform neuronal extraction by running the following command:
 
 ```matlab
-CNMFe_batch(parin)
+CaliAli_cnmfe()
 ```
-This will start processing each file in the parin table using the specified parameters.
+This will open a file selector dialog and start the neuronal extraction process one file at a time.
+
+#### Overview of the Calcium extraction process
 
 The neuronal extraction process can be described by the following diagram:
 
@@ -116,7 +64,7 @@ style L stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
 style M stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
 style O stroke:#E04C3B, color:#7A6A68,  stroke-width:2px;
 ```
-During the execution of this code, you will see messages in the command window reflecting the steps depicted above. For example:
+During the execution of this code, you will see messages in the command window reflecting the steps depicted above:
 
 ```
 ----------------UPDATE BACKGROUND---------------------------
@@ -132,8 +80,6 @@ Deconvolve and denoise all temporal traces again...
 
 ??? question "How does CaliAli deconvolve calcium signals?"
 	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, a thresholded FOOPSI approach with an AR(2) model is utilized (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
-
-
 
 Note that there are three checkpoints during this process: one after Initialization, another after CNMF iterations, and a third after Post-processing of Calcium Traces.
 
@@ -181,8 +127,37 @@ Loading any of these checkpoint files will load a `neuron` object containing the
 	{ .annotate }
 	
 	1. This dataset contains the same information as dataset C, excluding the calculated rise and decay times of the calcium signals. S is recommended for most analyses.
+	
+!!! tip "You can easily monitor the extracted calcium transients by running [view_traces(neuron)](Functions_doc/view_traces.md)"
+	
+	
+#### Post-processing detected components
 
-=== "Next"	
-After reaching the third checkpoint, the corresponding `.mat` file needs to be loaded into `MATLAB` to [post-process and verify the quality of the extracted signals](Post.md).
+CaliAli incorporates a GUI to facilitate the identification of false-positive detections.  After loading the `neuron` object stored in the [Checkpoint files](extraction.md#chk), execute the following function to call this GUI:  [ix=postprocessing_app()](Functions_doc/postprocessing_app.md#postprocessing_app).
+
+This will create a variable `ix` holding the indices of the labeled false-positives.
+
+You can delete these components by running `neuron.delete(ix);`. Alternatively, you can monitor each of these components with `neuron.viewNeurons(find(ix), neuron.C_raw);`.
+
+#### Merging components
+
+After deleting false positives, you can consider merging neurons by manually monitoring neurons that are close by. For this, run`neuron.merge_high_corr(1, [0.1, 0.3, -inf]);`
+
+!!! tip "Note that you can create a new checkpoint at any point running `save_workspace(neuron);`"
+
+#### Picking Neurons from Residual <a id="residual"></a>
+
+Some neurons may remain un-extracted after the initial processing. To extract potentially missed neurons run: [`manually_update_residuals()`](Functions_doc/manually_update_residuals.md#manually_update_residuals)
+
+#### Preparing extracted signals for analysis
+
+CaliAli performs a final detrending and noise scaling of the signals which facilitates posterior analysis. We recommend familiarizing with these two following functions which are executed automatically at the end of the pipeline:
+
+- [detrend_Ca_traces()](Functions_doc/detrend_Ca_traces.md#detrend_Ca_traces) 
+- [scale_to_noise()](Functions_doc/scale_to_noise.md#scale_to_noise) 
+- [postprocessDeconvolvedTraces()](Functions_doc/postprocessDeconvolvedTraces.md#postprocessDeconvolvedTraces) 
+
+=== "CONGRATULATIONS!"
+You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`
 	
 

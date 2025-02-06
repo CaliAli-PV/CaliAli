@@ -1,5 +1,29 @@
-function plot_alignment_scores(T,opt)
+function plot_alignment_scores(CaliAli_options)
+%% plot_alignment_scores: Visualize alignment scores across sessions.
+%
+% Inputs:
+%   CaliAli_options - Structure containing inter-session alignment data.
+%                     Details can be found in CaliAli_demo_parameters().
+%
+% Outputs:
+%   None (generates a plot of alignment scores and prints misalignment statistics).
+%
+% Usage:
+%   plot_alignment_scores(CaliAli_options);
+%
+% Notes:
+%   - Plots neuron correlation scores before and after alignment.
+%   - Computes and prints the amplitude of non-rigid misalignment relative to neuron size.
+%   - Estimates the percentage contribution of non-rigid misalignment.
+%   - Uses `plot_darkmode` for improved visibility in dark mode.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
+
+T=CaliAli_options.inter_session_alignment.alignment_metrics;
+opt=CaliAli_options.inter_session_alignment;
 figure;
 plot(T.(4){1,1}, '-k', 'DisplayName', 'Original');  % First trace
 hold on;

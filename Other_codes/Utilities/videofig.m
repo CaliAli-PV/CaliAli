@@ -102,6 +102,11 @@ function [fig_handle, axes_handle, scroll_bar_handles, scroll_func] = ...
 	
 	%main drawing axes for video display
 	axes_handle = axes('Position',[0 0.03 1 0.97]);
+    
+    % Add a button to call the contrast window
+    uicontrol('Style', 'pushbutton', 'String', 'Contrast', ...
+        'Units', 'normalized', 'Position', [0.005 0.97 0.1 0.02], ...
+        'Callback', @open_contrast_window);
 	
 	%return handles
 	scroll_bar_handles = [scroll_axes_handle; scroll_handle];
@@ -135,9 +140,7 @@ function [fig_handle, axes_handle, scroll_bar_handles, scroll_func] = ...
     			play(1/play_fps)
     		case 'backspace',
     			play(0.1/play_fps)
-            case 'c',
-                hfig_imcontrast = imcontrast(gca);
-                set(hfig_imcontrast, 'CloseRequestFcn', @(s,e)getValues(s))
+            % Removed 'c' case to avoid conflict with the button
     		otherwise, 
     			if ~isempty(key_func),
     				key_func(event.Key);  %#ok, call custom key handler
@@ -224,13 +227,18 @@ function [fig_handle, axes_handle, scroll_bar_handles, scroll_func] = ...
 		assert(isempty(a) || strcmp(class(a), 'function_handle'), ...
 			[upper(inputname(1)) ' must be a valid function handle.'])
     end
-
 %%%%%%%%%%%%%%%%
     function getValues(hfig)
         window_min = str2double(get(findobj(hfig, 'tag', 'window min edit'), 'String'));
         window_max = str2double(get(findobj(hfig, 'tag', 'window max edit'), 'String'));
         c=[window_min,window_max];
         close(hfig);
+        % Redraw the current frame with the new contrast values
+        scroll(f); 
+    end
+
+    function open_contrast_window(~,~)
+        hfig_imcontrast = imcontrast(gca);
+        set(hfig_imcontrast, 'CloseRequestFcn', @(s,e)getValues(s))
     end
 end
-

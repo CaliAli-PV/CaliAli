@@ -1,5 +1,5 @@
 site_name: CaliAli
-site_url: https://caliali-pv.github.io/CaliAli/
+site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 theme:
   name: material
   features:
@@ -11,8 +11,7 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
-    - version-dropdown   # The dropdown in your navigation
-    - version-badge     # The “badge” near the title
+    - content.tooltips
   language: en
   palette:
   
@@ -42,10 +41,6 @@ extra:
       link: https://github.com/CaliAli-PV/CaliAli
     - icon: fontawesome/solid/file-lines
       link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
-  version:
-    provider: mike
-
-     
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -74,19 +69,24 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   
 nav:
-
-      - Index: index.md    
-      - About CaliAli: Intro.md
-      - Installation and system requirements: Usage.md
-      - Getting started: demo_data.md
-      - Downsampling and Motion correction: Prep.md
+      - Home: index.md    
+      - Getting Started: Getting_started.md
+      - Installation and System Requirements: Installation.md
+      - Setting CaliAli Parameters: Parameters.md
+      - Downsampling: Downsampling.md
+      - Motion Correction: Motion_correction.md
       - Inter-session Alignment: alignment.md
       - Calcium Signal extraction with CaliAli: extraction.md
-      - Post Processing: Post.md
-      - Utilities: Utilities.md
-      - TL;DR: TLDR.md
+      - Whats new?: Version_History.md
+      - Usage Agreement: License.md
+      - CaliAli Parameters Overview: Parameters_index.md
+      - List of Relevant functions: function_index.md
+
+
+extra_css:
+  - overrides/main.css
 
 
 copyright: |
-  &copy; 2024 <a href="https://github.com/CaliAli-PV/CaliAli"  target="_blank" rel="noopener">CaliAli</a>
+  &copy; 2025 <a href="License"  target="_blank" rel="noopener">CaliAli</a>
 

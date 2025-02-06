@@ -16,6 +16,7 @@ function [M_final,shifts_g,template,options,col_shift] = normcorre_batch(Y,optio
 % template:         calculated template
 
 %% first determine filetype
+warning('off', 'all');
 
 if isa(Y,'char')
     [~,~,ext] = fileparts(Y);
@@ -291,7 +292,6 @@ for it = 1:iter
         lY = length(Ytc);
         %buffer = cell(length(xx_us),length(yy_us),length(zz_us),size(Ytm,ndims(Ytm)));
         shifts = struct('shifts',cell(lY,1),'shifts_up',cell(lY,1),'diff',cell(lY,1));
-        %buf = struct('Mf',cell(lY,1));
         parfor ii = 1:lY
             Yt = Ytc{ii};
             minY = min(Yt(:));
@@ -404,6 +404,7 @@ for it = 1:iter
             Mf{ii}(Mf{ii}<minY)=minY;
             Mf{ii}(Mf{ii}>maxY)=maxY;
         end
+        warning('on', 'parallel:variableClearInParfor');
 
         shifts_g(t:min(t+bin_width-1,T)) = shifts;
         Mf = cell2mat(Mf);

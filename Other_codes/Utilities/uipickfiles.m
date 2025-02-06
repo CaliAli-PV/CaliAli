@@ -254,7 +254,8 @@ csdata = set_cmenu_style(cmenu_style_pref);
 jUserDir = java.lang.System.setProperty('user.dir',pwd);
 if any(prop.filterspec == '*')
     jFile = java.io.File(prop.filterspec).getAbsoluteFile;
-    current_dir  = char(jFile.getParentFile().getCanonicalPath());
+    current_dir = pwd;
+    %current_dir  = char(jFile.getParentFile().getCanonicalPath());
     filter = char(jFile.getName());
 else
     jFile = java.io.File(prop.filterspec).getCanonicalFile();

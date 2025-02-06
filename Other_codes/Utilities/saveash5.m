@@ -1,38 +1,56 @@
-function saveash5(data, path_to_file, options)
-
+function saveash5(data, path_to_file,groupname)
 % save the variable stored in data in a h5 file named path_to_file (includes the
 % path to the directory). The file is saved with the same class as data.
-% options.groupname: the name of the group (default: /Object)
-% options.append: append to existing file if it exists (default: True)
+% Set default values
+if ~exist('path_to_file','var');path_to_file = 'data.h5';end
+if ~exist('groupname','var');groupname = '/Object';end
 
-if ~exist('path_to_file','var'); path_to_file = 'data.h5'; end
-[pathstr, name, ~] = fileparts(path_to_file);
-path_to_file = fullfile(pathstr,[name,'.h5']); % make sure file has an h5 extension
 data_type = class(data);
-
 sizY = size(data);
-nd = ndims(data)-1;
+sizY(end)=inf;
+nd = numel(sizY)-1;
 
-defoptions.groupname = '/Object';
-defoptions.append = true;
+[fileExists,groupExists] = checkH5Group(path_to_file, groupname);
 
-if ~exist('options','var'); options = defoptions; end
-if ~isfield(options,'groupname'); options.groupname = defoptions.groupname; end
-if ~isfield(options,'groupname'); options.append = defoptions.append; end
-
-if ~exist(path_to_file,'file') || ~options.append
-    if ~options.append && exist('path_to_file','file')
-        warning('Rewriting existing file')
-    end
-%     h5create(path_to_file,options.groupname,[sizY(1:nd),Inf],'Chunksize',[sizY(1:nd),100],'Datatype',data_type);
-	sizY(3)=inf;
-    h5create(path_to_file,options.groupname,sizY,'Datatype',data_type,'ChunkSize',[sizY(1),sizY(2),1]);
-    start_point = ones(1,nd+1);
+if ~groupExists
+    h5create(path_to_file,groupname,sizY,'Datatype',data_type,'ChunkSize',[sizY(1:end-1),1]);
+    start_point = ones(1,nd+1); 
 else
     fprintf('Appending to existing file \n')
     info = h5info(path_to_file);
-    options.groupname = defoptions.groupname;
+    strcmp({info.Datasets.Name},groupName(2:end))
+
     start_point = [ones(1,nd),info.Datasets.Dataspace.Size(end)+1];
 end
+  
+h5write(path_to_file,groupname,data,start_point,size(data));
 
-h5write(path_to_file,options.groupname,data,start_point,size(data));
+end
+
+function [fileExists,groupExists] = checkH5Group(filename, groupName)
+% Checks if an HDF5 file exists and if it contains a specific group.
+%
+% Inputs:
+%   filename:  Name of the HDF5 file.
+%   groupName: Name of the group to check for.
+%
+% Outputs:
+%   groupExists: True if the file and group exist, false otherwise.
+
+groupExists = false; % Default to false
+fileExists=exist(filename, 'file') == 2;
+if fileExists % Check if the file exists
+    try
+        info = h5info(filename); % Get file information
+        groupNames = {info.Datasets.Name}; % Extract group names
+        
+        % Check if the specified group exists within the group names
+        if any(strcmp(groupNames,groupName(2:end))) 
+            groupExists = true;
+        end
+    catch
+        % Handle potential errors in accessing HDF5 file
+        fprintf('Error accessing HDF5 file: %s\n', filename);
+    end
+end
+end

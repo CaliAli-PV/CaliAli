@@ -1,18 +1,22 @@
 function [cY,mY,ng] = motion_metrics(Y,bnd,batch_size,var_name)
-
-% computes several metrics for the quantitative assessment of the registration
-
-% INPUTS
-% Y:            registered time series in a loaded or memory mapped array
-% bnd:          number of pixels to be exluded to avoid NaN effects 
-%                   [x_beg,x_end,y_be,y_end,z_beg,z_end]
-% batch_size:   size of batch to be read for memory mapped files
-% var_name:     in case of memory mapped files use this variable
-
-% OUTPUTS
-% cY:           correlation coefficient of each frame with the mean
-% mY:           mean image
-% ng:           norm of gradient of mean image
+%% motion_metrics: Compute correlation and gradient metrics for motion assessment.
+%
+% Inputs:
+%   Y          - Registered time series (3D or 4D array) or memory-mapped array.
+%   bnd        - (Optional) Number of pixels to exclude at borders to avoid NaN effects. 
+%                Format: [x_beg, x_end, y_beg, y_end, z_beg, z_end].
+%   batch_size - (Optional) Batch size for processing memory-mapped files. Default: 1000.
+%   var_name   - (Optional) Variable name for memory-mapped files.
+%
+% Outputs:
+%   cY - Correlation coefficient of each frame with the mean image.
+%   mY - Mean image computed from all frames.
+%   ng - Norm of the gradient of the mean image.
+%
+% Usage:
+%   [cY, mY, ng] = motion_metrics(Y);
+%   [cY, mY, ng] = motion_metrics(Y, [10,10,10,10,0,0], 500);
+%
 
 if nargin == 1 || isempty(bnd); bnd = zeros(6,1); end
 if nargin < 3|| isempty(batch_size); batch_size = 1000; end

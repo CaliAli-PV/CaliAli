@@ -1,14 +1,39 @@
 function obj=update_spatial_CaliAli(obj, use_parallel,F)
+%% update_spatial_CaliAli - Updates the spatial components of extracted neuronal signals.
+%
+% This function refines the spatial footprints of detected neurons by processing 
+% data in multiple batches. It updates the spatial maps (A) based on activity 
+% levels while accounting for spatial variability, ensuring robust separation 
+% of overlapping components.
+%
+% Inputs:
+%   - obj: CNMF object containing spatial and temporal components.
+%   - use_parallel: Boolean flag for enabling parallel processing.
+%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%     it is determined using get_batch_size(obj).
+%
+% Outputs:
+%   - obj: Updated CNMF object with refined spatial components.
+%
+%
+% Usage:
+%   neuron = update_spatial_CaliAli(neuron, true);
+%   neuron = update_spatial_CaliAli(neuron, false, batch_frames);
+%
+% Author: Pablo Vergara  
+% Contact: pablo.vergara.g@ug.uchile.cl  
+% Date: 2025
+
 fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj,0);
+    F=get_batch_size(obj);
 end
 batch=[0,cumsum(F)];
 A_temp=obj.A.*0;
 div=length(batch)-1;
 obj.A_prev=obj.A;
 for i=progress(1:div)
-    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
+    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
     Ca(:,i)=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     %      A=max(cat(3,full(A),full(out_A)),[],3);
     A_temp=cat(3,full(A_temp),full(out_A));
@@ -26,7 +51,7 @@ end
 
 
 
-function out_A=update_spatial_in(obj, use_parallel,max_frame, update_sn)
+function out_A=update_spatial_in(neuron, use_parallel,max_frame,idx, update_sn)
 %% update the the spatial components for all neurons
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -40,20 +65,20 @@ function out_A=update_spatial_in(obj, use_parallel,max_frame, update_sn)
 
 try
     % map data
-    mat_data = obj.P.mat_data;
+    mat_data = neuron.P.mat_data;
 
     % folders and files for saving the results
-    log_file =  obj.P.log_file;
+    log_file =  neuron.P.log_file;
     flog = fopen(log_file, 'a');
-    log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
+    log_data = matfile(neuron.P.log_data, 'Writable', true); %#ok<NASGU>
 
     % dimension of data
     dims = mat_data.dims;
     d1 = dims(1);
     d2 = dims(2);
     T = dims(3);
-    obj.options.d1 = d1;
-    obj.options.d2 = d2;
+    neuron.options.d1 = d1;
+    neuron.options.d2 = d2;
 
     % parameters for patching information
     patch_pos = mat_data.patch_pos;
@@ -68,6 +93,9 @@ end
 % frames to be loaded
 frame_range = max_frame;
 T = diff(frame_range) + 1;
+if isempty(neuron.C_prev)
+neuron.C_prev=neuron.C;
+end
 
 % threshold for detecting large residuals
 % thresh_outlier = obj.options.thresh_outlier;
@@ -81,7 +109,7 @@ if ~exist('update_sn', 'var')||isempty(update_sn)
     update_sn = false; %don't save initialization procedure
 end
 % options
-options = obj.options;
+options = neuron.options;
 bg_model = options.background_model;
 bg_ssub = options.bg_ssub;
 method = options.spatial_algorithm;
@@ -89,10 +117,14 @@ method = options.spatial_algorithm;
 %% determine search location for each neuron
 search_method = options.search_method;
 if strcmpi(search_method, 'dilate')
-    obj.options.se = [];
+    neuron.options.se = [];
 end
-IND = sparse(logical(determine_search_location(obj.A, search_method, options)));
 
+if strcmpi(search_method, 'grow')
+IND = sparse(active_contour_grow(neuron));
+else
+IND = sparse(logical(determine_search_location(neuron.A, search_method, options)));
+end
 %% identify existing neurons within each patch
 A = cell(nr_patch, nc_patch);
 C = cell(nr_patch, nc_patch);
@@ -113,35 +145,35 @@ for mpatch=1:(nr_patch*nc_patch)
     mask(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4)) = 2;
     % find neurons within the patch
     ind = find(reshape(mask(:)==2, 1, [])* full(double(IND))>0);
-    A{mpatch}= obj.A((mask>0), ind);
+    A{mpatch}= neuron.A((mask>0), ind);
     IND_search{mpatch} = IND(mask==2, ind);
-    sn{mpatch} = obj.P.sn(mask==2);
-    C{mpatch} = obj.C(ind, max_frame(1):max_frame(2));
+    sn{mpatch} = neuron.P.sn(mask==2);
+    C{mpatch} = neuron.C(ind, max_frame(1):max_frame(2));
     ind_neurons{mpatch} = ind;    % indices of the neurons within each patch
     with_neuron{mpatch} = ~isempty(ind);
 
     if strcmpi(bg_model, 'ring')
-        ind = find(reshape(mask(:)==1, 1, [])* full(obj.A_prev)>0);
-        A_prev{mpatch}= obj.A_prev((mask>0), ind);
-        C_prev{mpatch} = obj.C_prev(ind, max_frame(1):max_frame(2));
+        ind = find(reshape(mask(:)==1, 1, [])* full(neuron.A_prev)>0);
+        A_prev{mpatch}= neuron.A_prev((mask>0), ind);
+        C_prev{mpatch} = neuron.C_prev(ind, max_frame(1):max_frame(2));
     end
 end
 if update_sn
     sn_new = sn;
 end
 %% prepare for the variables for computing the background.
-bg_model = obj.options.background_model;
-W = obj.W;
-b0 = obj.b0;
-b = obj.b;
-f = obj.f;
+bg_model = neuron.options.background_model;
+W = neuron.W;
+b0 = neuron.b0;
+b = neuron.b;
+f = neuron.f;
 
 %% start updating spatial components
 A_new = A;
 tmp_obj = Sources2D();
-tmp_obj.options = obj.options;
+tmp_obj.options = neuron.options;
 if use_parallel
-    parfor mpatch=1:(nr_patch*nc_patch)
+    parfor mpatch=1:(nr_patch*nc_patch) % this is parfor
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
 
         % no neurons, no need to update sn
@@ -152,12 +184,10 @@ if use_parallel
         end
         % prepare for updating model variables
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
+        
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
-        if strcmpi(bg_model, 'ring')
-            tmp_block = block_pos{mpatch};
-        else
-            tmp_block = patch_pos{mpatch};
-        end
+        tmp_block = block_pos{mpatch};
+
         A_patch = A{mpatch};
         C_patch = C{mpatch};                % previous estimation of neural activity
         IND_patch = IND_search{mpatch};
@@ -259,11 +289,8 @@ else
         end
         % prepare for updating model variables
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
-        if strcmpi(bg_model, 'ring')
-            tmp_block = block_pos{mpatch};
-        else
-            tmp_block = patch_pos{mpatch};
-        end
+        tmp_block = block_pos{mpatch};
+        
         A_patch = A{mpatch};
         C_patch = C{mpatch};                % previous estimation of neural activity
         IND_patch = IND_search{mpatch};
@@ -349,7 +376,7 @@ else
 end
 
 %% collect results
-K = size(obj.A, 2);
+K = size(neuron.A, 2);
 A_ = zeros(d1, d2, K);
 for mpatch=1:(nr_patch*nc_patch)
     A_patch = A_new{mpatch};
@@ -362,26 +389,29 @@ for mpatch=1:(nr_patch*nc_patch)
         A_(tmp_pos(1):tmp_pos(2), tmp_pos(3):tmp_pos(4), k) = reshape(A_patch(:, m), nr, nc, 1);
     end
 end
-A_new = sparse(obj.reshape(A_, 1));
+A_new = sparse(neuron.reshape(A_, 1));
 if update_sn
-    obj.P.sn = cell2mat(sn_new);
+    neuron.P.sn = cell2mat(sn_new);
 end
 %% post-process results
-out_A = obj.post_process_spatial(obj.reshape(A_new, 2));
+out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2));
 % obj.A = A_new;
+if strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')  
+out_A=filter_vessel_spatial(reshape(full(out_A),d1,d2,[]),neuron.CaliAli_options);
+end
 
 %% upadte b0
 if strcmpi(bg_model, 'ring')
-    obj.b0_new = cell2mat(obj.P.Ymean)-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
+    neuron.b0_new = neuron.P.Ymean{idx}-neuron.reshape(neuron.A*mean(neuron.C,2), 2); %-obj.reconstruct();
 end
 
 
 %% save the results to log
 
-if obj.options.save_intermediate
-    spatial.A = obj.A;
-    spatial.ids = obj.ids;
-    temporal.b0 = obj.b0;
+if neuron.options.save_intermediate
+    spatial.A = neuron.A;
+    spatial.ids = neuron.ids;
+    temporal.b0 = neuron.b0;
     tmp_str = get_date();
     tmp_str=strrep(tmp_str, '-', '_');
     eval(sprintf('log_data.spatial_%s = spatial;', tmp_str));

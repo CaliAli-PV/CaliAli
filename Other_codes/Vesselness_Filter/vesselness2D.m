@@ -44,10 +44,12 @@ for j = 1:length(sigmas)
         Lambda2 = -Lambda2;
     end  
     %max response over multiple scales   
-    if norm
-        vesselness=max(cat(3,vesselness,mat2gray(Lambda2)) , [] ,3 );
-    else
-        vesselness=vesselness+Lambda2; %% modified by PV
+    if norm==1
+        vesselness = max(cat(3, vesselness, mat2gray(Lambda2)), [], 3); % Normalized maximum response
+    elseif norm==0
+        vesselness = vesselness + Lambda2;  % Additive response
+    elseif norm==2
+         vesselness = max(cat(3, vesselness, Lambda2), [], 3); % Normalized maximum response without scaling
     end
         
     clear response Lambda2 Lambda3
@@ -69,9 +71,9 @@ Hxy = c*Hxy;
 Hyy = c*Hyy;
 
 % reduce computation by computing vesselness only where needed
-% S.-F. Yang and C.-H. Cheng, “Fast computation of Hessian-based
-% enhancement filters for medical images,” Comput. Meth. Prog. Bio., vol.
-% 116, no. 3, pp. 215–225, 2014.
+% S.-F. Yang and C.-H. Cheng, ï¿½Fast computation of Hessian-based
+% enhancement filters for medical images,ï¿½ Comput. Meth. Prog. Bio., vol.
+% 116, no. 3, pp. 215ï¿½225, 2014.
 B1 = - (Hxx+Hyy);
 B2 = Hxx .* Hyy - Hxy.^2;
 

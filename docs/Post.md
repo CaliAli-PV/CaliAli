@@ -58,7 +58,7 @@ After deleting false positives, you can consider merging neurons by manually mon
 
 ### Picking Neurons from Residual <a id="residual"></a>
 
-Some neurons may remain unextracted after the initial processing. To extract potentially missed neurons run: `neuron=manually_update_residuals(neuron,use_parallel);`
+Some neurons may remain un-extracted after the initial processing. To extract potentially missed neurons run: `neuron=manually_update_residuals(neuron,use_parallel);`
 
 This will open a GUI displaying the PNR, Corr., and PNR*Corr. images(1). These images will be shown in their original form (top panels) and also after subtracting the current neuron detections from the video (Residual video) (bottom panels).
 { .annotate }
@@ -79,7 +79,7 @@ After extracting the residual data, you may want to consider redoing the post-pr
 	In most cases picking neurons is not necessary.
 
 
-???+ Info
+???+ Info "If you ever change the location of the videos"
 	If you ever change the location of the videos and files generated during the analysis be sure to run [this steps](Utilities.md#update_path) after
 
 ---	

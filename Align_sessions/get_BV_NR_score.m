@@ -1,4 +1,26 @@
 function out=get_BV_NR_score(P,k)
+%% get_BV_NR_score: Compute blood vessel non-rigid alignment stability score.
+%
+% Inputs:
+%   P - Table containing projection data from session alignment.
+%   k - (Optional) Index of the projection to evaluate. Default is 3 (Neurons).
+%
+% Outputs:
+%   out - Stability score indicating the reliability of blood vessel alignment.
+%
+% Usage:
+%   score = get_BV_NR_score(P);
+%   score = get_BV_NR_score(P, 2);
+%
+% Notes:
+%   - Compares alignment variability across multiple randomized non-rigid motion perturbations.
+%   - Uses correlation distance to quantify alignment consistency.
+%   - Ensures reproducibility by setting a fixed random seed.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 if ~exist('k','var')
 k=3;
 end

@@ -1,31 +1,19 @@
-function F=get_batch_size(neuron,print_v)
+function F=get_batch_size(neuron)
 
-if ~exist('print_v','var')
-    print_v=1;
+F=neuron.CaliAli_options.inter_session_alignment.F;
+
+if isempty(F)
+    F=neuron.frame_range(2);
 end
-F=neuron.CaliAli_opt.F;
+if sum(F)<neuron.CaliAli_options.inter_session_alignment.batch_sz
 
-if neuron.CaliAli_opt.batch_sz>0
-    F=diff( round(  linspace(0,sum(F),round(sum(F)/neuron.CaliAli_opt.batch_sz)+1)  )  );
+fprintf(1, 'The defined batch size (%d) is larger than the number of frames in the video (%d). Processing the entire video in a single batch.\n', ...
+   neuron.CaliAli_options.inter_session_alignment.batch_sz,sum(F));
+    neuron.CaliAli_options.inter_session_alignment.batch_sz=F;
 end
 
-if neuron.CaliAli_opt.dynamic_spatial==1
-    ses=20;
-    if length(F)<ses
-        if print_v==1
-            fprintf('---Minimun number of sessions for dynamic spatial is 20.\n');
-            fprintf('Sessions will be split to achive this number!----------\n');
-        end
-        div=ceil(ses./length(F));
-        T=[];
-        for i=1:numel(F)
-            sz=floor(F(i)./div);
-            f=[repelem(sz,div-1),sz+F(i)-sz*div];
-            T=[T,f];
-        end
-        if print_v==1
-            fprintf('The smallest number of frame per batch will be: %d\n', min(T));
-        end
-        F=T;
-    end
+if neuron.CaliAli_options.inter_session_alignment.batch_sz>0
+    F=diff( round(  linspace(0,sum(F),round(sum(F)/neuron.CaliAli_options.inter_session_alignment.batch_sz)+1)  )  );
+end
+
 end
