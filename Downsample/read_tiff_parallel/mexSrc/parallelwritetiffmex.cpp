@@ -7,6 +7,40 @@
 #include "../src/parallelwritetiff.h"
 
 
+/**
+ * @brief Entry point for the MATLAB MEX function that writes image data to a TIFF file.
+ *
+ * This function processes input arguments from MATLAB, validates and converts file paths and image
+ * data, and writes the image data to a TIFF file using parallelized I/O. The function requires at least
+ * two input arguments:
+ * - The first argument must be a string or character array representing the output file name.
+ * - The second argument must be the image data, which should be a 2D or 3D array with all dimensions of size at least 1.
+ *
+ * Optionally, the third argument specifies the file writing mode (default is "w"), and the fourth argument
+ * specifies the compression type (default is "lzw"). On non-Windows systems, if the file name contains a tilde (~),
+ * it is expanded to the full home directory path. The function also ensures that the directory for the output file exists,
+ * creating it recursively if necessary.
+ *
+ * The function determines the bit depth based on the data type of the image input:
+ * - UINT8 maps to 8 bits
+ * - UINT16 maps to 16 bits
+ * - SINGLE maps to 32 bits
+ * - DOUBLE maps to 64 bits
+ *
+ * Afterwards, it calls writeTiffParallelWrapper with the computed dimensions, file name, image data pointer, bit depth,
+ * and compression type. If any error occurs during validation or the TIFF writing process, the function will report the error
+ * using mexErrMsgIdAndTxt.
+ *
+ * @param nlhs Number of expected output arguments.
+ * @param plhs Array of pointers to output mxArray structures.
+ * @param nrhs Number of input arguments.
+ * @param prhs Array of pointers to input mxArray structures.
+ *
+ * @note For 2D image data, the third dimension is set to 1.
+ * @note Supported image data types are UINT8, UINT16, SINGLE, and DOUBLE.
+ * @note When provided, the fourth argument must be a string (or character array) indicating the compression type.
+ * @see writeTiffParallelWrapper
+ */
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[])
 {

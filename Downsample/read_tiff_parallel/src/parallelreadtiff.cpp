@@ -80,6 +80,38 @@ uint8_t readTiffParallelBak(uint64_t x, uint64_t y, uint64_t z, const char* file
 	return err;
 }
 
+/**
+ * @brief Reads TIFF image data in parallel.
+ *
+ * This function opens a TIFF file and reads its image data concurrently using OpenMP.
+ * It divides the total number of slices into batches and assigns each batch to a separate
+ * thread. Each thread opens the TIFF file, sets the appropriate directory for each slice,
+ * and reads the image data in strips. If the flipXY flag is set, the function remaps the
+ * image data by swapping the X (width) and Y (height) dimensions to accommodate specific
+ * layout requirements (e.g., for MATLAB).
+ *
+ * Error handling is performed by retrying file opening and directory setting operations up
+ * to three times per operation. Critical sections ensure thread-safe modifications of the
+ * shared error flag and error messages. In case of persistent errors, the function may call
+ * readTiffParallelBak as a fallback.
+ *
+ * @param x          Image width (number of columns).
+ * @param y          Image height (number of rows).
+ * @param z          Total number of slices to be read.
+ * @param fileName   Path to the TIFF file.
+ * @param tiff       Pointer to the pre-allocated buffer for storing the image data.
+ * @param bits       Bit depth per pixel (supported values: 8, 16, 32, or 64).
+ * @param startSlice Starting slice (directory) index in the TIFF file.
+ * @param stripSize  Number of rows per strip to be read in each TIFF scan.
+ * @param flipXY     Non-zero value indicates that the X and Y axes should be flipped during data storage.
+ *
+ * @return uint8_t   Returns 0 on successful read; non-zero error code indicates that an error occurred.
+ *
+ * @note This function utilizes OpenMP for parallel processing and includes thread-safe error
+ *       reporting using critical sections.
+ * @note If an error related to reading a strip is detected (errBak flag set), the function falls
+ *       back to using readTiffParallelBak.
+ */
 uint8_t readTiffParallel(uint64_t x, uint64_t y, uint64_t z, const char* fileName, void* tiff, uint64_t bits, uint64_t startSlice, uint64_t stripSize, uint8_t flipXY){
     int32_t numWorkers = omp_get_max_threads();
     int32_t batchSize = (z-1)/numWorkers+1;
@@ -267,6 +299,36 @@ uint8_t readTiffParallel2DBak(uint64_t x, uint64_t y, uint64_t z, const char* fi
 }
 
 
+/**
+ * @brief Reads a 2D TIFF image using parallel processing.
+ *
+ * This function opens a TIFF file and reads its 2D image data into a provided buffer. It supports both compressed
+ * and uncompressed files, and it can flip the X and Y dimensions (commonly for MATLAB compatibility). When multiple
+ * threads are available or when the file is compressed, the image is read in strips in parallel using OpenMP.
+ * In the event of errors during file opening, directory setting, or strip reading, an error code is returned and a
+ * backup reading method may be invoked.
+ *
+ * The caller must ensure that the output buffer pointed to by @a tiff is pre-allocated with sufficient space to hold
+ * the image data.
+ *
+ * @param x          The width of the image in pixels.
+ * @param y          The height of the image in pixels.
+ * @param z          The number of image slices (depth) for 3D images; used for additional buffering when flipping.
+ * @param fileName   The path to the TIFF file to be read.
+ * @param tiff       Pointer to the pre-allocated buffer where the image data will be stored.
+ * @param bits       The bit depth of the image (commonly 8, 16, 32, or 64).
+ * @param startSlice The starting slice (directory index) in the TIFF file; for 3D images, typically 0.
+ * @param stripSize  The number of rows per strip used for reading the image data.
+ * @param flipXY     Flag indicating whether to flip the X and Y dimensions (non-zero to flip).
+ *
+ * @return uint8_t  Returns 0 on success; returns a non-zero error code if an error occurs during the reading process.
+ *
+ * @note The function employs OpenMP for parallel processing; each thread reads a batch of strips.
+ * @note Error handling includes retries for file opening and directory setting, and critical sections are used to safely
+ *       update shared error information across threads.
+ * @note If an error occurs during parallel processing, the function may invoke a backup reading method (readTiffParallel2DBak)
+ *       to attempt to recover.
+ */
 uint8_t readTiffParallel2D(uint64_t x, uint64_t y, uint64_t z, const char* fileName, void* tiff, uint64_t bits, uint64_t startSlice, uint64_t stripSize, uint8_t flipXY){
     int32_t numWorkers = omp_get_max_threads();
     uint64_t stripsPerDir = (uint64_t)ceil((double)y/(double)stripSize);
@@ -565,7 +627,31 @@ uint8_t readTiffParallelImageJ(uint64_t x, uint64_t y, uint64_t z, const char* f
 }
 
 
-// tiff pointer guaranteed to be NULL or the correct size array for the tiff file
+/**
+ * @brief Initializes and dispatches the appropriate parallel TIFF reading routine.
+ *
+ * This function sets a custom TIFF warning handler, opens the TIFF file specified by @a fileName,
+ * and retrieves essential image parameters such as width, length, number of slices (z-dimension),
+ * bits per sample, and rows per strip. Based on these parameters, it determines whether the TIFF file
+ * is an ImageJ image and selects the corresponding parallel reading function:
+ * - For ImageJ images, it calls readTiffParallelImageJ.
+ * - For 2D images (z <= 1), it calls readTiffParallel2D.
+ * - Otherwise, it calls readTiffParallel for multi-slice images.
+ *
+ * If the provided @a tiff pointer is NULL, the function allocates a buffer of the correct size based
+ * on the image dimensions and bit depth. If @a tiff is non-NULL, it is assumed to already point to a
+ * correctly sized buffer that will be filled with the TIFF image data.
+ *
+ * If the file cannot be opened, or if the bit depth is unsupported, the function returns NULL.
+ *
+ * @param fileName The path to the TIFF file.
+ * @param tiff Pointer to a preallocated buffer or NULL to allocate a new buffer.
+ * @param flipXY Flag indicating whether to flip the XY dimensions in the output (non-zero to flip).
+ *
+ * @return Pointer to the buffer containing the TIFF image data on success, or NULL if an error occurs.
+ *
+ * @note The caller is responsible for freeing the allocated memory in the returned buffer.
+ */
 void* readTiffParallelWrapperHelper(const char* fileName, void* tiff, uint8_t flipXY)
 {
 	TIFFSetWarningHandler(DummyHandler);

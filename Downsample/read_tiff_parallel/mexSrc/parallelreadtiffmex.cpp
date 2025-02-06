@@ -6,6 +6,55 @@
 #include "../src/parallelreadtiff.h"
 
 
+/**
+ * @brief MATLAB MEX entry point for reading TIFF image files.
+ *
+ * This function serves as the interface between MATLAB and the TIFF file reading routines.
+ * It validates inputs, extracts the filename from the first input argument, opens the TIFF file,
+ * and reads the image data into a MATLAB numeric array compatible with different bit depths (8, 16, 32, or 64 bits).
+ * The function supports both standard TIFF files and ImageJ formatted files. For files with a single input argument,
+ * the number of image slices (z-dimension) is determined by calling getImageSizeZ. When two input arguments are provided,
+ * the second argument specifies a slice range [start, end], and the function verifies that this range is within bounds.
+ *
+ * The function performs the following operations:
+ * - Validates that the number of input arguments is either 1 or 2.
+ * - Checks that the first argument is either a MATLAB string or a character array, converting it to a C-style string.
+ * - On non-Windows systems, expands the tilde character in the filename if present.
+ * - Opens the TIFF file using TIFFOpen, retrieves image width (x) and height (y) using TIFFGetField, and extracts
+ *   the bits per sample (bit depth) and rows per strip.
+ * - Determines the number of image slices (z):
+ *   - If only one argument is provided, calls getImageSizeZ to get the slice count.
+ *   - If a second argument is provided, interprets it as a range, validates that it contains exactly two elements,
+ *     and calculates the starting slice and the total number of slices.
+ * - Checks for ImageJ compatibility and adjusts the slice count if the file conforms to ImageJ specifications.
+ * - Allocates the MATLAB output array using mxCreateNumericArray based on the determined dimensions and bit depth.
+ * - Reads the TIFF image data using one of the following functions:
+ *   - readTiffParallelImageJ for ImageJ formatted data,
+ *   - readTiffParallel2D for 2D images,
+ *   - readTiffParallel for 3D images.
+ * - Reports errors via mexErrMsgIdAndTxt if any of the validation checks fail or if an error occurs during reading.
+ *
+ * @param nlhs Number of expected output mxArray pointers.
+ * @param plhs Array of pointers to the output mxArray; the first element is set to the numeric array containing the image data.
+ * @param nrhs Number of input mxArray pointers, which must be either 1 or 2.
+ * @param prhs Array of pointers to the input mxArray; the first element must be the filename (string or char array),
+ *             while the optional second element, if provided, specifies a two-element range for slice selection.
+ *
+ * @exception Throws an error if:
+ *             - The number of input arguments is not 1 or 2.
+ *             - The first argument is neither a string nor a character array.
+ *             - The TIFF file cannot be opened.
+ *             - The provided slice range does not consist of exactly two elements or is out of bounds.
+ *             - An unsupported bit depth is encountered.
+ *             - An error is encountered during the image read operation.
+ *
+ * @see TIFFOpen
+ * @see mxCreateNumericArray
+ * @see getImageSizeZ
+ * @see readTiffParallelImageJ
+ * @see readTiffParallel2D
+ * @see readTiffParallel
+ */
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[])
 {

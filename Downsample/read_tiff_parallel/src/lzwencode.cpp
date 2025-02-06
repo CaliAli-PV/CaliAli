@@ -82,8 +82,19 @@ typedef struct {
     outcount += nbits;					\
     }
 
-/*
- * Reset encoding hash table.
+/**
+ * @brief Resets the encoding hash table for LZW compression.
+ *
+ * This function clears the provided hash table by setting every entry's hash value to -1,
+ * marking them as empty. It does so in two steps:
+ * - First, it processes the table in blocks of eight entries using a do-while loop for optimal
+ *   performance.
+ * - Then, it cleans up any remaining entries using a for loop.
+ *
+ * @param enc_hashtab Pointer to an array of hash_t elements representing the hash table.
+ *
+ * @note The macro HSIZE must define the total number of entries in the hash table, and the table
+ *       must have at least HSIZE elements.
  */
 static void
 cl_hash(hash_t* enc_hashtab)
@@ -108,6 +119,29 @@ cl_hash(hash_t* enc_hashtab)
 }
 
 
+/**
+ * @brief Encodes uncompressed data using the LZW algorithm tailored for TIFF files.
+ *
+ * This function implements the Lempel-Ziv-Welch (LZW) encoding algorithm for TIFF compression. It reads the uncompressed input
+ * byte by byte, dynamically builds a dictionary using a hash table, and outputs corresponding variable-length codes into the
+ * provided output buffer. The algorithm adjusts the number of bits per code as new dictionary entries are added, emits a clear code
+ * when the hash table is full, and periodically checks the compression ratio to decide if a reset is needed. Any remaining bits are
+ * flushed at the end of the encoding process.
+ *
+ * @param unCompr Pointer to the buffer containing uncompressed input data.
+ * @param compr Pointer to the buffer where compressed output data will be written.
+ * @param cc Number of bytes in the uncompressed input data.
+ *
+ * @return The total number of bytes written to the output buffer after encoding, rounded up to the nearest whole byte.
+ *
+ * @note The caller must ensure that the output buffer (compr) is large enough to store the compressed data.
+ * @note The function allocates memory for an internal hash table using _TIFFmalloc; this memory is freed before the function returns.
+ * @note Assertions are used to ensure that the current bit length does not exceed the maximum allowed (BITS_MAX).
+ * @note The function relies on macros and constants such as CODE_CLEAR, CODE_EOI, CODE_FIRST, CODE_MAX, BITS_MIN, BITS_MAX, HSIZE, and HSHIFT.
+ *
+ * @see cl_hash()
+ * @see PutNextCode()
+ */
 uint64_t lzwEncode(uint8_t* unCompr, uint8_t* compr, tmsize_t cc){
     hash_t* enc_hashtab = (hash_t*)_TIFFmalloc(HSIZE*sizeof (hash_t));
     //compr = (uint8_t*)malloc(cc);
