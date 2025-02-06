@@ -1,4 +1,27 @@
 function CaliAli_update_parameters(varargin)
+%% CaliAli_update_parameters: Update parameters in multiple CaliAli session files.
+%
+% Inputs:
+%   varargin - Key-value pairs specifying parameter names and new values,
+%              or a structure array containing multiple parameters.
+%
+% Outputs:
+%   None (updates and saves modified parameters in selected .mat files).
+%
+% Usage:
+%   CaliAli_update_parameters('sf', 15, 'detrend', 2);
+%   CaliAli_update_parameters(CaliAli_options);
+%
+% Notes:
+%   - Uses `uipickfiles` to allow user selection of session files (*.mat).
+%   - Recursively updates all matching fields in `CaliAli_options`.
+%   - Calls `CaliAli_save` to overwrite updated files.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
+
 theFiles = uipickfiles('FilterSpec','*.mat');
 
 if ~isempty(varargin)

@@ -1,5 +1,22 @@
 function params=CaliAli_demo_parameters()
-% CaliAli_parameters  Defines parameters for CaliAli.
+%% CaliAli_demo_parameters: Define demo parameters for CaliAli processing pipeline.
+%
+% This function initializes and returns a structure containing default parameters 
+% for data preprocessing, motion correction, inter-session alignment, and neuronal 
+% extraction using CNMF-E.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   params - Structure containing all default parameters for CaliAli processing.
+%
+% Usage:
+%   params = CaliAli_demo_parameters();
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % --- Data Preprocessing ---
 params.gSig = 2.5;              % Gaussian filter size for neurons (pixels)

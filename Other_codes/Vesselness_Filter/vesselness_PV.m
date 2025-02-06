@@ -1,4 +1,30 @@
 function vid=vesselness_PV(vid,use_parallel,sz,norm)
+%% vesselness_PV: Apply vesselness filtering to enhance blood vessels in an image or video.
+%
+% This function enhances blood vessels in an input image or video using 
+% vesselness filtering. It supports both sequential and parallel processing.
+%
+% Inputs:
+%   vid         - Input image or video as a 2D or 3D array.
+%   use_parallel - (Optional) Boolean flag to enable parallel processing (default: 1).
+%   sz          - (Optional) Scale range for the vesselness filter (default: 0.5:0.5:2).
+%   norm        - (Optional) Normalization flag for vesselness filtering (default: 0).
+%
+% Outputs:
+%   vid - Image or video with enhanced blood vessels.
+%
+% Usage:
+%   vid_filtered = vesselness_PV(vid);  % Default parameters with parallel processing
+%   vid_filtered = vesselness_PV(vid, 0, 0.5:0.5:2, 1);  % Sequential processing with normalization
+%
+% Notes:
+%   - Uses vesselness filtering to enhance tubular structures in images.
+%   - Parallel processing is available for large videos to improve efficiency.
+%   - Normalization ensures that vessel structures are highlighted consistently.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 if ~exist('sz','var')
     sz=0.5:0.5:2;

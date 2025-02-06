@@ -1,4 +1,31 @@
 function opt=CaliAli_parameters(varargin)
+%% CaliAli_parameters: Initialize and configure parameters for CaliAli processing.
+%
+% This function initializes and returns a structured set of parameters for 
+% different stages of the CaliAli processing pipeline, including downsampling, 
+% preprocessing, motion correction, inter-session alignment, and CNMF-E.
+%
+% Inputs:
+%   varargin - Variable input arguments, which can be an existing structure 
+%              or key-value pairs specifying parameters.
+%
+% Outputs:
+%   opt - Structure containing all processing parameters.
+%
+% Usage:
+%   opt = CaliAli_parameters();  % Default parameter initialization
+%   opt = CaliAli_parameters(existing_opt);  % Use existing parameter structure
+%
+% Notes:
+%   - Each processing module (downsampling, preprocessing, motion correction, 
+%     inter-session alignment, and CNMF-E) has its own sub-structure with 
+%     configurable parameters.
+%   - The details of these structures can be found in CaliAli_demo_parameters().
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 %% INTIALIZE VARIABLES
 inp = inputParser;
 %% General variables
@@ -132,8 +159,7 @@ opt_nr{3,1} = struct('stop_criterium',0.001,'imagepad',1.2,'niter',10, 'sigma_fl
 addParameter(inp,'non_rigid_options',opt_nr)
 
 addParameter(inp, ...
-    'non_rigid_batch_size',[20,60])             % Posible range of a batch for non-rigid correction. CaliAli while finde the optimal size within this range.
-%Detrending of slow fluctuation. Temporal window (in seconds) in which local minima is search. 0 means no detrending.
+    'non_rigid_batch_size',[20,60])             % Possible range of a batch for non-rigid correction. CaliAli while find the optimal size within this range.
 varargin=varargin{:};
 if isstruct(varargin)
     varargin = [fieldnames(varargin), struct2cell(varargin)]';

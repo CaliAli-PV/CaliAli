@@ -1,27 +1,27 @@
 function CaliAli_options=CaliAli_downsample(varargin)
-% CaliAli_downsample downsamples video files spatially and temporally.
+%% CaliAli_downsample: Downsample input video files in time and space.
 %
-%   out = CaliAli_downsample(varargin)
+% This function performs temporal and spatial downsampling on selected video files.
+% Supported formats include .avi, .m4v, .mp4, .tif, .tiff, .isxd, and .h5.
 %
-%   This function allows you to downsample video files (AVI, MP4, ISXD,
-%   TIFF) by specifying spatial and temporal downsampling factors. It uses
-%   the `downsampling_parameters` function to handle input arguments and
-%   provides flexibility in specifying downsampling options.
+% Inputs:
+%   varargin - Variable input arguments, which are parsed into CaliAli_options.
+%              The details of the CaliAli_options structure can be found in 
+%              CaliAli_demo_parameters().
 %
-%   Example usage:
-%       out = CaliAli_downsample('spatial_ds', 2, 'temporal_ds', 2);
-%       This will downsample the video by a factor of 2 in both spatial
-%       dimensions and temporally (taking every other frame).
+% Outputs:
+%   CaliAli_options - Updated structure containing the downsampling parameters.
+%   Saved output files - Downsampled video files are saved as .mat files with
+%                        the suffix "_ds" in the original file directory.
 %
-%   Inputs (using Parameter-Value pairs):
-%       'spatial_ds'    - Spatial downsampling factor (default: 1)
-%       'temporal_ds'   - Temporal downsampling factor (default: 1)
-%       'input_files'  - Cell array of input video file paths
-%                         (default: 'pickup' - prompts user to select files)
-%       'out_path'       - Output directory (default: same as input file)
+% Usage:
+%   CaliAli_options = CaliAli_downsample();  % Interactive file selection
+%   CaliAli_options = CaliAli_downsample(CaliAli_options);  % Using predefined options
 %
-%   Outputs:
-%       out             - Cell array of output file paths
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 % Parse input arguments
 CaliAli_options= CaliAli_parameters(varargin{:});
 opt = CaliAli_options.downsampling;

@@ -1,16 +1,21 @@
 function [P, CaliAli_options] = sessions_translate(P, CaliAli_options)
-% SESSIONS_TRANSLATE Aligns video data by applying translations based on a reference projection (BV or Neurons).
-%   This function computes translations between frames of the session data and applies the necessary shifts.
-%   The reference for alignment is chosen based on whether the projections are BV (blood vessels) or Neurons.
-%   The resulting shifts are then applied to the projections in the session data.
+%% sessions_translate: Align session data by applying translation corrections.
 %
-%   Input:
-%       P             - A cell array containing the session data (projections).
-%       CaliAli_options - A structure containing configuration options for the alignment process.
+% Inputs:
+%   P               - Cell array containing the session projections.
+%   CaliAli_options - Structure containing configuration options for alignment.
+%                     Details can be found in CaliAli_demo_parameters().
 %
-%   Output:
-%       P             - The updated cell array with the translated projections.
-%       CaliAli_options - The updated configuration options with the applied translation shifts.
+% Outputs:
+%   P               - Updated cell array with translated projections.
+%   CaliAli_options - Updated structure with applied translation shifts.
+%
+% Usage:
+%   [P, CaliAli_options] = sessions_translate(P, CaliAli_options);
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Determine the reference projection (Blood vessels or Neurons) based on the configuration options
 if contains(CaliAli_options.inter_session_alignment.projections, 'BV')

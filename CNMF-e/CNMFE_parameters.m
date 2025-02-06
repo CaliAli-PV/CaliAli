@@ -1,4 +1,31 @@
 function pars=CNMFE_parameters(varargin)
+%% CNMFE_parameters: Define and configure parameters for CNMF-E processing.
+%
+% This function initializes and returns a structured set of parameters for 
+% constrained non-negative matrix factorization (CNMF-E), including spatial, 
+% temporal, background, and merging constraints for neuronal extraction.
+%
+% Inputs:
+%   varargin - Variable input arguments, which can be an existing structure 
+%              or key-value pairs specifying parameters.
+%
+% Outputs:
+%   pars - Structure containing all CNMF-E processing parameters.
+%
+% Usage:
+%   pars = CNMFE_parameters();  % Default parameter initialization
+%   pars = CNMFE_parameters(existing_pars);  % Use existing parameter structure
+%
+% Notes:
+%   - This function includes parameters for spatial filtering, deconvolution, 
+%     background modeling, merging constraints, initialization settings, and 
+%     dendrite processing (in progress).
+%   - Dependent parameters such as Gaussian filter size and background radius 
+%     are computed based on other user-defined values.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 %% INTIALIZE VARIABLES
 inp = inputParser;
 inp.KeepUnmatched = true; % Keep unmatched parameters
@@ -96,8 +123,8 @@ function pars=pars_envs_parse(varargin)
 inp = inputParser;
 inp.KeepUnmatched = true;  % Keep unmatched parameters
 
-[~,systemview] = memory;
-total_system_memory_GB = systemview.PhysicalMemory.Total/ (1024^3);
+[total_system_memory_GB,~] = getSystemMemory;
+
 
 
 addParameter(inp,'memory_size_to_use', total_system_memory_GB, @isnumeric);  % GB, memory space you allow to use in MATLAB
@@ -113,4 +140,6 @@ end
 parse(inp, varargin{:});
 pars = inp.Results;
 end
+
+
 

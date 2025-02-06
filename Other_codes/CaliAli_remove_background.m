@@ -1,4 +1,32 @@
 function Y=CaliAli_remove_background(Y,CaliAli_options)
+%% CaliAli_remove_background: Preprocess video by removing background noise and enhancing features.
+%
+% This function applies background removal techniques to enhance neuronal 
+% or dendritic structures in an image or video. It supports detrending, 
+% noise scaling, and feature enhancement using the MIN1PIPE algorithm.
+%
+% Inputs:
+%   Y               - Input image or video as a 3D array.
+%   CaliAli_options - Structure containing preprocessing parameters.
+%                     The details of this structure can be found in 
+%                     CaliAli_demo_parameters().
+%
+% Outputs:
+%   Y - Background-corrected image or video.
+%
+% Usage:
+%   Y = CaliAli_remove_background(Y, CaliAli_options);
+%
+% Notes:
+%   - Detrending removes slow fluctuations in brightness.
+%   - Noise scaling adjusts pixel noise levels for consistency.
+%   - Neuronal and dendritic enhancement is performed based on the specified 
+%     structure type ('neuron' or 'dendrite').
+%   - A second noise scaling pass is applied after background removal.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 if CaliAli_options.preprocessing.detrend>0
     Y=detrend_vid(Y,CaliAli_options);

@@ -1,7 +1,26 @@
 function [Mr,Ref]=Rigid_mc(Y,opt)
-% Motion corrects the image volume Y using NoRMCorre.
-% Y: 3D image volume.
-% opt: Options for motion correction.
+%% Rigid_mc: Perform rigid motion correction using NoRMCorre.
+%
+% This function applies rigid motion correction to a 3D image volume using 
+% the NoRMCorre algorithm. The correction is based on a reference projection 
+% that can be computed using blood vessel extraction or background removal.
+%
+% Inputs:
+%   Y   - 3D image volume to be motion corrected.
+%   opt - Structure containing motion correction options.
+%
+% Outputs:
+%   Mr  - Motion-corrected 3D image volume.
+%   Ref - Reference projection used for motion correction.
+%
+% Usage:
+%   [Mr, Ref] = Rigid_mc(Y, opt);
+%
+% Author: Written by Pablo Vergara utilizing the codes of Eftychios A. Pnevmatikakis
+%            Simons Foundation, 2016
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 fprintf('Appling translation motion correction...\n');
 % Generate reference projection based on specified option.
 if strcmp(opt.reference_projection_rigid,'BV')

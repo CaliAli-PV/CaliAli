@@ -1,4 +1,41 @@
 function obj=update_temporal_CaliAli(obj, use_parallel,F)
+%% update_temporal_CaliAli - Updates the temporal components of extracted neuronal signals.
+%
+% This function refines the temporal dynamics of detected neuronal components
+% by processing the data in multiple batches. It updates the neuronal activity 
+% traces while accounting for residual background activity, ensuring robust 
+% deconvolution and denoising.
+%
+% Inputs:
+%   - obj: CNMF object containing spatial and temporal components.
+%   - use_parallel: Boolean flag for enabling parallel processing.
+%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%     it is determined using get_batch_size(obj).
+%
+% Outputs:
+%   - obj: Updated CNMF object with refined temporal components.
+%
+% Features:
+%   - Supports batch processing to handle large datasets efficiently.
+%   - Utilizes Hierarchical Alternating Least Squares (HALS) for optimization.
+%   - Performs optional deconvolution and denoising of calcium traces.
+%   - Handles various CNMF-E background models (`ring`, `nmf`, `svd`).
+%
+% Notes:
+%   - Running this function is **essential** after modifying the spatial or 
+%     residual components to maintain consistency in CNMF iterations.
+%   - If this function is run, **temporal traces will be altered**, and further 
+%     CNMF iterations must be performed using update_temporal_CaliAli.
+%
+% Usage:
+%   neuron = update_temporal_CaliAli(neuron, true);
+%   neuron = update_temporal_CaliAli(neuron, false, batch_frames);
+%
+% Author: Pablo Vergara  
+% Contact: pablo.vergara.g@ug.uchile.cl  
+% Date: 2025
+
+
 fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);

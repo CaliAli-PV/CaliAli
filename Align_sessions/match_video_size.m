@@ -1,13 +1,36 @@
 function CaliAli_options = match_video_size(CaliAli_options)
-% MATCH_VIDEO_SIZE Matches the video dimensions across sessions by cropping borders.
-%   This function ensures that the video dimensions across different sessions are consistent.
-%   It calculates a mask for each session, centers them, and matches the sizes across the sessions.
+%% match_video_size: Ensure consistent video dimensions across sessions.
 %
-%   Input:
-%       CaliAli_options - A structure containing the configuration options, including session files and existing data.
+% This function aligns video dimensions across multiple sessions by cropping 
+% borders to match a common mask. It ensures that session data is properly 
+% aligned before performing inter-session alignment.
 %
-%   Output:
-%       CaliAli_options - The updated structure with the mask and video dimensions matched across sessions.
+% Inputs:
+%   CaliAli_options - Structure containing configuration options for alignment.
+%                     The details of this structure can be found in 
+%                     CaliAli_demo_parameters().
+%
+% Outputs:
+%   CaliAli_options - Updated structure with matched video dimensions.
+%
+% Usage:
+%   CaliAli_options = match_video_size(CaliAli_options);
+%
+% Steps:
+%   1. Loads session data and retrieves frame information.
+%   2. Creates and aligns masks for all sessions.
+%   3. Ensures mask consistency across sessions.
+%   4. If necessary, crops session data to match the common mask.
+%   5. Updates and saves modified session data and projections.
+%
+% Notes:
+%   - The function ensures that different sessions have the same spatial dimensions.
+%   - Cropping is performed based on the combined mask of all sessions.
+%   - If all session masks match in size, no modifications are made.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Loop through each session and load the necessary data (F and Cn projections)
 for i = 1:size(CaliAli_options.inter_session_alignment.output_files, 2)

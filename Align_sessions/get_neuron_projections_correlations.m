@@ -1,4 +1,27 @@
 function [out,W]=get_neuron_projections_correlations(P,k)
+%% get_neuron_projections_correlations: Compute correlation metrics for neuron projections.
+%
+% Inputs:
+%   P - Table containing neuron projection data.
+%   k - (Optional) Index of the projection to evaluate. Default is 3.
+%
+% Outputs:
+%   out - Minimum correlation deviation across projections.
+%   W   - Weighting factor based on projection correlation.
+%
+% Usage:
+%   [out, W] = get_neuron_projections_correlations(P);
+%   [out, W] = get_neuron_projections_correlations(P, 2);
+%
+% Notes:
+%   - Uses normalized cross-correlation to compare neuron projections across sessions.
+%   - Computes mean and standard deviation of correlation within a limited region.
+%   - Flags sessions with low correlation for further inspection.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 if ~exist('k','var')
 k=3;
 end

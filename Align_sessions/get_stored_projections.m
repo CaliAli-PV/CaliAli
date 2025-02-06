@@ -1,13 +1,20 @@
 function T = get_stored_projections(CaliAli_options)
-% GET_STORED_PROJECTIONS Retrieves and combines the stored projections from session files.
-%   This function loads the projections from multiple session files, concatenates them into
-%   a table, and scales the projections for visualization.
+%% get_stored_projections: Retrieve and combine stored projections from session files.
 %
-%   Input:
-%       CaliAli_options - A structure containing configuration options, including the paths to the session files.
+% Inputs:
+%   CaliAli_options - Structure containing configuration options, including 
+%                     session file paths. Details can be found in 
+%                     CaliAli_demo_parameters().
 %
-%   Output:
-%       T - A table containing the combined projections from all the session files.
+% Outputs:
+%   T - Table containing the combined projections from all session files.
+%
+% Usage:
+%   T = get_stored_projections(CaliAli_options);
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Extract the configuration options related to inter-session alignment
 opt = CaliAli_options.inter_session_alignment;

@@ -1,22 +1,37 @@
 function CaliAli_align_sessions(varargin)
-% CALIALI_ALIGN_SESSIONS Aligns session data for the CaliAli analysis pipeline.
-%   This function processes input files, performs inter-session alignment, 
-%   calculates projections, and saves the transformed data.
-%   
-%   Usage:
-%       CaliAli_align_sessions(CaliAli_options);
-%       where CaliAli_options is a structure containing various settings
-%       for alignment and processing.
+%% CaliAli_align_sessions: Perform inter-session alignment for CaliAli analysis.
 %
-%   The function includes the following steps:
+% This function processes input files, performs inter-session alignment, 
+% calculates projections, and saves the transformed data.
+%
+% Inputs:
+%   varargin - Variable input arguments, which are parsed into CaliAli_options.
+%              The details of the CaliAli_options structure can be found in 
+%              CaliAli_demo_parameters().
+%
+% Outputs:
+%   None (aligned session data is saved to disk).
+%
+% Usage:
+%   %   CaliAli_align_sessions(CaliAli_options);  % Using predefined options
+%
+% Steps:
 %   1. Loads and processes the input files.
 %   2. Detrends the data and calculates projections.
 %   3. Performs session alignment by translating and shifting the sessions.
-%   4. Evaluates the blood vessel (BV) similarity score and may switch to neuron-based alignment if necessary.
+%   4. Evaluates blood vessel (BV) similarity and switches to neuron-based 
+%      alignment if necessary.
 %   5. Saves the relevant variables and aligned session data.
 %
-%   Author: Pablo Vergara
-%   Date:2025
+% Notes:
+%   - The function supports both rigid and non-rigid alignment.
+%   - If blood vessel alignment is not reliable, neuron-based alignment is used.
+%   - Alignment metrics and final transformations are saved for further analysis.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+
 
 % Process options and input parameters
 CaliAli_options = CaliAli_parameters(varargin{:});
@@ -43,7 +58,8 @@ P1 = get_stored_projections(CaliAli_options);
 [P2, CaliAli_options] = sessions_translate(P1, CaliAli_options);
 [P3, CaliAli_options] = sessions_non_rigid(P2, CaliAli_options);
 
-% If final neuron alignment is enabled, apply additional shifts
+% If final neuron alignment is enabled, apply additional non rigid
+% registration utilizing only neurons data.
 if CaliAli_options.inter_session_alignment.final_neurons
     [P4, CaliAli_options] = sessions_non_rigid(P3, CaliAli_options, true);
     P = table(P1, P2, P3, P4, 'VariableNames', {'Original', 'Translations', 'CaliAli', 'CaliAli+neurons'});

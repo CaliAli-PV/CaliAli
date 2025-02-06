@@ -1,32 +1,45 @@
-% Load the demo parameters. 
+%% Load the demo parameters. 
 CaliAli_options=CaliAli_demo_parameters(); % <-- Modifiy this function to analyze your own data.
-CaliAli_options=CaliAli_demo_parameters_dendrites_2p();
-% Do downsampling:
+
+%% Do downsampling:
 CaliAli_options=CaliAli_downsample(CaliAli_options);  
-% Do motion correction
-CaliAli_options=CaliAli_motion_correction(CaliAli_options);
 
-% Align session　　
+%% Do motion correction
+CaliAli_options=CaliAli_motion_correction(CaliAli_options); % You don't need to run this with the Demo files as they are already motion corrected.
+
+%% Align session　　
 CaliAli_align_sessions(CaliAli_options);
-% If only one file
-% opt=detrend_batch_and_calculate_projections(CaliAli_options);
 
-% Estiamte CNMFe initialization parameters
- CaliAli_set_initialization_parameters(CaliAli_options)
+% **Note**:If only one session require to be analyzed run instead of CaliAli_align_sessions(CaliAli_options);
+% detrend_batch_and_calculate_projections(CaliAli_options);
 
-%Run CNMF-E
+%% Evaluating alignment performance
+
+CaliAli_options = CaliAli_load('v4_mc_ds_Aligned.mat','CaliAli_options');  % Replace 'v4_mc_ds_Aligned.mat' with the path to your file.
+
+% Get BV-score:
+fprintf('BV Score: %.4f\n', CaliAli_options.inter_session_alignment.BV_score);
+% Get alignment metrics: Mean Correlation score and Crispness (Higher the
+% better)
+Alignment_metrics = CaliAli_options.inter_session_alignment.alignment_metrics
+plot_alignment_scores(CaliAli_options)
+
+% View aligned projections:
+P = CaliAli_options.inter_session_alignment.P;  %extract the aligned projections
+frame=plot_P(P); %Create video of the projections.
+
+%% Run CNMF-E
+
+% Estiamte CNMFe initialization parameters using CaliAli app before neuronal extraction (Recomended):
+% CaliAli_set_initialization_parameters(CaliAli_options)
+
+% Or directly extract neurons used the pre-defined parameters
 CaliAli_cnmfe()
 
 
-CaliAli_update_parameters('batch_sz',500);
-
-CaliAli_update_parameters('min_corr',0.2);
-
-
-
-%% Optional post-process
+%% Optional post-process (Run this after loading the nueron object produced by CNMF-E
 %Manually abel component with post-processing app:
-% ix=postprocessing_app(neuron,0.6);
+ix=postprocessing_app(neuron,0.6);
 
 % Review labeled components:
 % neuron.viewNeurons(find(ix), neuron.C_raw);
@@ -45,11 +58,6 @@ CaliAli_update_parameters('min_corr',0.2);
 %% USEFULL COMMANDS
 %% to visualize temporal traces
 %   view_traces(neuron);
-
-%%  To manually inspect spatial and temporal components of each neuron
-%   neuron.orderROIs('sparsity_spatial');   % order neurons in different ways {'snr', 'decay_time', 'mean', 'circularity','sparsity_spatial','sparsity_temporal','pnr'}
-%   neuron.viewNeurons([], neuron.C_raw);
-%   neuron.viewNeurons([10,13,20], neuron.C_raw);
 
 %% To save results in a new path run these lines a choose the new 'source_extraction' folder:
 %   neuron=update_folder_path(neuron);

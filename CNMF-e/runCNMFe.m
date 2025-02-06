@@ -1,4 +1,50 @@
 function runCNMFe(in)
+%% runCNMFe: Runs CNMF-E for source extraction from calcium imaging data.
+%
+% Inputs:
+%   in - Path to the .mat file containing the imaging data and CNMF-E parameters.
+%
+% Outputs:
+%   This function does not return an output but saves the extracted neuron components 
+%
+% Usage:
+%   runCNMFe('path_to_mat_file.mat');
+%
+% Description:
+%   - Loads CNMF-E parameters stored in the input file.
+%   - Initializes CNMF-E with spatial and temporal components extracted from the video.
+%   - Iteratively updates the spatial, temporal, and background components 
+%     until convergence is reached based on a dissimilarity threshold (0.05).
+%   - Performs automatic and manual merging of components based on spatial and 
+%     temporal correlations.
+%   - Updates residuals to refine extracted signals.
+%   - Applies optional post-processing steps, including:
+%       - False positive removal.
+%       - Noise scaling and trace detrending.
+%       - Ordering ROIs based on SNR.
+%   - Saves the updated neuron structure for future analysis.
+%
+% Features:
+%   - Iterative CNMF-E optimization with automated stopping criterion.
+%   - Adaptive merging of highly correlated components.
+%   - Integration with CaliAli preprocessing for improved residual analysis.
+%   - Multiple visualization options for spatial and temporal components.
+%
+% Notes:
+%   - The function uses several CNMF-E and CaliAli helper functions, including:
+%     - `initComponents_parallel_PV`
+%     - `CNMF_CaliAli_update`
+%     - `update_residual_Cn_PNR_batch`
+%     - `postprocessDeconvolvedTraces`
+%     - `save_workspace`
+%     - `viewNeurons`
+%     - `show_contours`
+%   - To manually inspect and classify neurons, use `postprocessing_app(neuron, 0.6)`.
+%   - To visualize extracted traces, use `view_traces(neuron)`.
+%
+% Author: Pablo Vergara  
+% Contact: pablo.vergara.g@ug.uchile.cl  
+% Date: 2025
 
 neuron = Sources2D();
 pars=CaliAli_load(in,'CaliAli_options.cnmf');

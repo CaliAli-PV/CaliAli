@@ -1,18 +1,39 @@
-% Function to post-process deconvolved calcium traces
-% 
-% This function applies deconvolution to calcium traces and performs post-processing
-% to denoise the traces based on specified options.
+function neuron = postprocessDeconvolvedTraces(neuron, method, type, smin)
+
+%% postprocessDeconvolvedTraces: Refines deconvolved calcium traces after CNMF iterations.
 %
 % Inputs:
-%   neuron - A struct containing the raw calcium traces (neuron.C_raw)
-%   method - (Optional) The deconvolution method to use (default is 'foopsi')
-%   type - (Optional) The type of deconvolution (default is 'ar2')
-%   smin - (Optional) Minimum threshold for deconvolution (default is -5)
+%   neuron - A struct containing the raw calcium traces (neuron.C_raw).
+%   method - (Optional) The deconvolution method to use (default is 'foopsi').
+%   type   - (Optional) The type of deconvolution (default is 'ar2').
+%   smin   - (Optional) Minimum threshold for deconvolution (default is -5).
 %
 % Outputs:
-%   neuron - Updated struct with processed calcium traces (neuron.C and neuron.S)
+%   neuron - Updated struct with processed calcium traces (neuron.C and neuron.S).
+%
+% Usage:
+%   neuron = postprocessDeconvolvedTraces(neuron);
+%   neuron = postprocessDeconvolvedTraces(neuron, 'thresholded', 'ar1', -3);
+%
+% Description:
+%   - This function applies deconvolution to calcium traces and performs post-processing
+%     to denoise the traces based on specified options.
+%   - It allows users to change the autoregressive model (`ar1`, `ar2`, etc.) at the end 
+%     of CNMF iterations for refined neuronal activity estimation.
+%   - This is particularly useful if a fast deconvolution method (e.g., `foopsi`) was used 
+%     during CNMF iterations, and a more precise but slower thresholded method is desired 
+%     for final processing.
+%
+% Features:
+%   - Supports multiple deconvolution methods (Foopsi, constrained Foopsi, thresholded).
+%   - Allows for fine-tuning spike detection sensitivity with `smin`.
+%   - Improves signal quality by denoising traces with adaptive thresholding.
+%   - Parallelized execution for faster processing of large datasets.
 
-function neuron = postprocessDeconvolvedTraces(neuron, method, type, smin)
+%
+% Author: Pablo Vergara  
+% Contact: pablo.vergara.g@ug.uchile.cl  
+% Date: 2025
 
     % Default values for optional parameters
     if ~exist('method', 'var')

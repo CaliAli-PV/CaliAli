@@ -1,21 +1,26 @@
 function V = Non_rigid_mc(V, ref, opt)
-% Non_rigid_mc performs non-rigid motion correction on a video.
+%% Non_rigid_mc: Perform non-rigid motion correction using multi-level registration.
 %
-%   V = Non_rigid_mc(V, ref, opt)
+% This function applies non-rigid motion correction to an input video using a 
+% multi-level registration approach. It constructs a pyramid of images (e.g., 
+% blood vessel and neuron projections) and applies log-domain demons registration 
+% to align frames while preserving fine details.
+%% Note: This code is experimental and may introduce undesired deformations when adjusting for non-rigid deformation.
 %
-%   This function performs non-rigid motion correction on an input video 
-%   using a multi-level registration approach. It utilizes a pyramid of 
-%   images (e.g., blood vessel and neuron projections) and applies 
-%   log-domain demons registration to align the frames.
+% Inputs:
+%   V   - Input video as a 3D array (height x width x frames).
+%   ref - Reference image for initial alignment.
+%   opt - Structure containing registration options.
 %
-%   Inputs:
-%       V   - Input video as a 3D array (height x width x frames).
-%       ref - Reference image for initial alignment.
-%       opt - Structure containing registration options.
+% Outputs:
+%   V   - Motion-corrected video.
 %
-%   Outputs:
-%       V   - Motion-corrected video.
-
+% Usage:
+%   V_corrected = Non_rigid_mc(V, ref, opt);
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Get a pyramid of images (e.g., blood vessel and neuron projections)
 fprintf('Appling non-rigid motion correction...\n');

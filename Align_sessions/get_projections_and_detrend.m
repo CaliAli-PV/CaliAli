@@ -1,16 +1,37 @@
 function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options)
-% GET_PROJECTIONS_AND_DETREND Processes and detrends the session data, computes projections for various structures (e.g., neurons, blood vessels),
-%   and returns the results along with updated options.
+%% get_projections_and_detrend: Process session data by detrending and computing projections.
 %
-%   Input:
-%       Y              - The session data (video frames) to be processed.
-%       CaliAli_options - A structure containing the configuration options, including preprocessing steps.
+% This function processes video session data by applying detrending, removing 
+% background noise, and calculating projections such as blood vessels, 
+% neuron activity, peak-to-noise ratio (PNR), and correlation images.
 %
-%   Output:
-%       Y              - The processed (detrended) session data.
-%       p              - A table containing various projections (mean, blood vessels, neurons, etc.).
-%       R              - The range of the data after detrending.
-%       CaliAli_options - The updated configuration structure after processing.
+% Inputs:
+%   Y               - Input video session data as a 3D array (height x width x frames).
+%   CaliAli_options - Structure containing configuration options for processing.
+%                     The details of this structure can be found in 
+%                     CaliAli_demo_parameters().
+%
+% Outputs:
+%   Y               - Detrended and background-corrected video data.
+%   p               - Table containing projections: mean image, blood vessels,
+%                     neuron projection, PNR, and a fused BV-neuron image.
+%   R               - Data range after detrending, used for normalization.
+%   CaliAli_options - Updated options structure after processing.
+%
+% Usage:
+%   [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options);
+%
+% Notes:
+%   - Detrending removes slow intensity fluctuations.
+%   - Blood vessels are extracted separately and can be removed from neuron projections.
+%   - Projection methods vary depending on the structure type ('neuron' or
+%   'dendrite'). Dendrites is currently work in progress
+%   - Normalization is applied based on the calculated data range.
+%   - A fused blood vessel-neuron image is generated for visualization.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Store the original class of Y for later use (used to handle different data types)
 S = class(Y);

@@ -1,82 +1,56 @@
 classdef progress < handle
-    %PROGRESS Wrapper class to provide an iterator object for loop creation
-    % -------------------------------------------------------------------------
-    % This class provides the possibility to create an iterator object in
-    % MATLAB to make the handling of ProgressBar() even easier. The following
-    % example shows the usage. Although no ProgressBar() is called by the user,
-    % a progress bar is shown. The input arguments are the same as for
-    % ProgressBar(), so please refer to the documentation of ProgressBar().
-    %
-    % Note that this implementation is slower than the conventional
-    % ProgressBar() class since the subsref() method is called with
-    % non-optimized values in every iteration.
-    %
-    % =========================================================================
-    % Example:
-    %
-    % for k = progress(1:100)
-    %     % do some processing
-    % end
-    %
-    % Or with additional name-value pairs:
-    %
-    % for k = progress(1:100, 'Title', 'Computing')
-    %     % do some processing
-    % end
-    %
-    % =========================================================================
-    %
-    % progress Properties:
-    %	none
-    %
-    % progress Methods:
-    %	progress - class constructor
-    %
-    %
-    % Author :  J.-A. Adrian (JA) <jensalrik.adrian AT gmail.com>
-    %
-    
-    
     properties (Access = private)
         IterationList;
         ProgressBar;
     end
-    
-    methods
+
+    methods (Access = public)
         % Class Constructor
         function obj = progress(in, varargin)
             if ~nargin
                 return;
             end
-            
+
             obj.IterationList = in;
-            
-            % pass all varargins to ProgressBar()
+
+            % Pass all varargins to ProgressBar() and create the progress bar.
             obj.ProgressBar = ProgressBar(length(in), varargin{:});
+            
+            % Force initialization of the ProgressBar.
+            % This calls the public 'setup' method inherited from matlab.System,
+            % which in turn calls setupImpl, setting TicObject and printing the bar.
+            setup(obj.ProgressBar);
+            
+            % (No need to call printProgressBar() here because setupImpl already did)
         end
-        
+
         % Class Destructor
         function delete(obj)
-            % call the destructor of the ProgressBar() object
             if ~isempty(obj.ProgressBar)
                 obj.ProgressBar.release();
             end
         end
-        
+
         function [varargout] = subsref(obj, S)
-            % This method implements the subsref method and only calls the update()
-            % method of ProgressBar. The actual input 'S' is passed to the default
-            % subsref method of the class of obj.IterationList.
-            
-            obj.ProgressBar.step([], [], []);
+            % Check if this is a parenthesis indexing call.
+            if strcmp(S(1).type, '()') && ~isempty(S(1).subs)
+                % For example, if you index as k = progress(1:100),
+                % MATLAB passes S(1).subs = {1:100}. (If you index like A(3), S{1}.subs{1} is used.)
+                %
+                % Here we assume that the second element of S(1).subs gives the current iteration index.
+                % (Adjust the index extraction if your indexing is different.)
+                idx = S(1).subs{2};
+                if isnumeric(idx) && (idx > 1)
+                    % For iteration indices greater than 1, update the bar.
+                    obj.ProgressBar.step([], [], []);
+                end
+            end
+            % Return the requested element from the wrapped iteration list.
             varargout = {subsref(obj.IterationList, S)};
         end
-        
+
         function [m, n] = size(obj)
-            % This method implements the size() function for the progress() class.
-            
             [m, n] = size(obj.IterationList);
         end
     end
 end
-

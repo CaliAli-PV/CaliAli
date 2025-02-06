@@ -1,4 +1,27 @@
 function obj=update_background_CaliAli(obj, use_parallel,F)
+%% update_background_CaliAli - Updates background estimation in multiple batches.
+%
+% This function refines the background estimation in a CNMF pipeline by processing 
+% the data in multiple batches. It ensures efficient memory usage and robust 
+% background modeling by iteratively aggregating and normalizing results from 
+% each batch. The final background components are used to improve neuronal 
+% activity extraction.
+%
+% Inputs:
+%   - obj: The CNMF object containing spatial and temporal components.
+%   - use_parallel: Boolean flag indicating whether to use parallel processing.
+%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%     it is determined using get_batch_size(obj).
+%
+% Outputs:
+%   - obj: Updated CNMF object with refined background components.
+%
+% Usage:
+%   obj = update_background_CaliAli(obj, true);
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);

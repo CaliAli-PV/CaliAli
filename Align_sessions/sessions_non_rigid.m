@@ -1,16 +1,23 @@
 function [P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options, neurons_only)
-% SESSIONS_NON_RIGID Computes non-rigid alignments for session data and applies the calculated shifts to the projections.
-%   This function performs non-rigid image registration using transformation matrices and weights.
-%   It applies the computed shifts to the projections and updates the CaliAli_options structure.
+%% sessions_non_rigid: Perform non-rigid alignment for session data.
 %
-%   Input:
-%       P              - The projections data that will be aligned.
-%       CaliAli_options - A structure containing configuration options, including alignment settings.
-%       neurons_only    - A flag indicating whether to only align neurons (default is false).
+% Inputs:
+%   P               - Cell array containing the session projections.
+%   CaliAli_options - Structure containing configuration options for alignment.
+%                     Details can be found in CaliAli_demo_parameters().
+%   neurons_only    - (Optional) Boolean flag indicating whether to align only neuron data. Default is false.
 %
-%   Output:
-%       P              - The projections data with applied non-rigid shifts.
-%       CaliAli_options - The updated configuration structure after applying the shifts.
+% Outputs:
+%   P               - Updated cell array with applied non-rigid shifts.
+%   CaliAli_options - Updated structure with computed non-rigid transformations.
+%
+% Usage:
+%   [P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options);
+%   [P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options, true); % Align neurons only
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % If "neurons_only" is not provided, set it to false
 if ~exist('neurons_only','var')

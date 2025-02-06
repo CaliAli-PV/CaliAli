@@ -1,21 +1,32 @@
 function M=CaliAli_get_blood_vessels(M,opt)
-% CaliAli_get_blood_vessels enhances blood vessels in an image or video.
+%% CaliAli_get_blood_vessels: Enhance blood vessels in an image or video.
 %
-%   M = CaliAli_get_blood_vessels(M, opt)
+% This function enhances the visibility of blood vessels in an input image 
+% or video using a combination of vignetting removal, vesselness filtering, 
+% and median filtering.
 %
-%   This function enhances the visibility of blood vessels in an input image 
-%   or video (3D array). It uses a combination of vignetting removal, 
-%   vesselness filtering, and median filtering to achieve this.
+% Inputs:
+%   M   - Input image or video as a 2D or 3D array (grayscale or color).
+%   opt - (Optional) Structure containing processing parameters:
+%         opt.BVsize - 2-element vector specifying the range of vessel 
+%                      scales (in pixels) for the vesselness filter 
+%                      (default: [1.5, 2.25]).
 %
-%   Inputs:
-%       M    - Input image or video (grayscale or color) as a 2D or 3D array.
-%       opt  - (Optional) Structure with parameters:
-%              opt.BVz - 2-element vector specifying the range of vessel 
-%                        scales (in pixels) for the vesselness filter 
-%                        (default: [1.5, 2.25]).
+% Outputs:
+%   M   - Processed image or video with enhanced blood vessels.
 %
-%   Outputs:
-%       M    - Processed image or video with enhanced blood vessels.
+% Usage:
+%   M = CaliAli_get_blood_vessels(M, opt);
+%
+% Notes:
+%   - For videos (3D arrays), parallel processing is used for efficiency.
+%   - Vignetting removal is performed using morphological opening and 
+%     anisotropic diffusion filtering.
+%   - Vesselness filtering is applied to enhance blood vessel structures.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Set default parameters if 'opt' is not provided
 if ~exist('opt','var')
@@ -52,7 +63,7 @@ else  % Sequential processing for single images
     fprintf('Calculating blood vessels...\n');
     [M,~,~] = remove_vignetting(M,se,gradThresh,numIter);  % Remove vignetting
     M = M + randn(size(M))/10000;  % Add small noise to avoid artifacts
-    M = mat2gray(vesselness_PV(M,0,linspace(opt.BVsize(1),opt.BVsize(2),10),0)); % Apply vesselness filter
+    M = mat2gray(vesselness_PV(M,0,linspace(opt.BVsize(1),opt.BVsize(2),10),2)); % Apply vesselness filter
     M = medfilt2(M,'symmetric');  % Apply median filtering
 end
 end

@@ -1,14 +1,19 @@
 function CaliAli_options = apply_transformations(CaliAli_options)
-% APPLY_TRANSFORMATIONS Applies translation and non-rigid shifts to session data.
-%   This function performs transformations such as translations and non-rigid shifts 
-%   to session data (Y) based on the stored transformations (T, shifts, etc.) in the 
-%   CaliAli_options structure. The results are saved to the specified output file.
+%% apply_transformations: Apply translation and non-rigid shifts to session data.
 %
-%   Input:
-%       CaliAli_options - A structure containing configuration options and transformation data.
-%   
-%   Output:
-%       CaliAli_options - The updated structure with applied transformations.
+% Inputs:
+%   CaliAli_options - Structure containing configuration options and transformation data.
+%                     Details can be found in CaliAli_demo_parameters().
+%
+% Outputs:
+%   CaliAli_options - Updated structure with applied transformations.
+%
+% Usage:
+%   CaliAli_options = apply_transformations(CaliAli_options);
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Normalize the range by dividing by the maximum range value
 R = CaliAli_options.inter_session_alignment.range;

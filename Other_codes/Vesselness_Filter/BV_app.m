@@ -29,8 +29,6 @@ C=C+randn(size(C))/10000;
 
 BV= BV_stack(C,0.1:0.05:6, [1;1],false);
 
-BV=mat2gray(BV);
-
 app=BV_app_in(BV);
 app.done=0;
 while app.done == 0  % polling

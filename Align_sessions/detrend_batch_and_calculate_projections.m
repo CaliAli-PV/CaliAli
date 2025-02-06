@@ -1,13 +1,36 @@
 function CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options)
-% DETREND_BATCH_AND_CALCULATE_PROJECTIONS Detrends and calculates projections for a batch of input files.
-%   This function loads input files, detrends the data, calculates projections, and saves the results.
-%   It also updates the relevant fields in the CaliAli_options structure with the calculated results.
+%% detrend_batch_and_calculate_projections: Perform detrending and projection calculations for batch processing.
 %
-%   Input:
-%       CaliAli_options - A structure containing configuration options for the alignment process.
-%   
-%   Output:
-%       CaliAli_options - The updated structure with the calculated projections and other results.
+% This function processes a batch of input files by applying detrending, 
+% calculating projections, and saving the transformed data. It updates the 
+% CaliAli_options structure with the computed results.
+%
+% Inputs:
+%   CaliAli_options - Structure containing configuration options for the alignment process.
+%                     The details of this structure can be found in 
+%                     CaliAli_demo_parameters().
+%
+% Outputs:
+%   CaliAli_options - Updated structure with calculated projections and other results.
+%
+% Usage:
+%   CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options);
+%
+% Steps:
+%   1. Loads input files and checks for existing processed files.
+%   2. Applies detrending and calculates projections if not already done.
+%   3. Computes key features such as maximum projections, PNR, and correlation images.
+%   4. Saves the detrended data and calculated projections for further alignment.
+%
+% Notes:
+%   - If projections and detrending have already been performed for a file, 
+%     the function skips redundant processing.
+%   - Detrended data is stored in separate output files with the suffix '_det.mat'.
+%   - The function supports batch processing of multiple input files.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 % Extract the options related to inter-session alignment
 opt = CaliAli_options.inter_session_alignment;

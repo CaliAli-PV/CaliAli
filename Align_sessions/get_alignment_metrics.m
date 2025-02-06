@@ -1,4 +1,23 @@
 function T=get_alignment_metrics(P)
+%% get_alignment_metrics: Compute alignment quality metrics for different transformations.
+%
+% Inputs:
+%   P - Table containing different alignment transformations and their projections.
+%
+% Outputs:
+%   T - Table containing alignment metrics such as correlation scores and crispness.
+%
+% Usage:
+%   T = get_alignment_metrics(P);
+%
+% Notes:
+%   - Evaluates alignment quality using correlation and sharpness metrics.
+%   - Computes alignment metrics for neuron projections.
+%   - Supports additional metrics for blood vessel projections (commented in the code).
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
 
 T=table();
 Name={'Non-aligned','Translations','CaliAli','CaliAli+Neuron alignment'};
