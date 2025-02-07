@@ -12,6 +12,8 @@ theme:
     - content.code.annotation
     - content.code.copy
     - content.tooltips
+    - navigation.instant
+    
   language: en
   palette:
   
@@ -41,6 +43,8 @@ extra:
       link: https://github.com/CaliAli-PV/CaliAli
     - icon: fontawesome/solid/file-lines
       link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
+  version:
+    provider: mike
 
 markdown_extensions:
   - pymdownx.highlight:

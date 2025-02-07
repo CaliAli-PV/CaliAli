@@ -15,7 +15,7 @@ This update focuses on increasing the modularity of the CaliAli pipeline by rest
 
 Because of these significant changes, the previous workflow used to analyze data is no longer compatible, and older procedures will not work in the updated environment.
 
-For detailed information about the latest changes and updates, please refer to the new [Online Documentation](https://caliali-pv.github.io/CaliAli/1.2/).
+For detailed information about the latest changes and updates, please refer to the new [Online Documentation](https://caliali-pv.github.io/CaliAli/).
 
 ---
 
