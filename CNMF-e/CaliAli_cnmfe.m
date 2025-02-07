@@ -1,4 +1,4 @@
-function CaliAli_cnmfe()
+function file_path = CaliAli_cnmfe()
 %% CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.
 %
 % Inputs:
@@ -42,20 +42,20 @@ function CaliAli_cnmfe()
 
 input_files = uipickfiles('FilterSpec','*_ds*.mat');
 
-
+file_path=cell(size(input_files,1),1);
 for i=1:size(input_files,1)
     try
         temp=input_files{i};
         CaliAli_options=CaliAli_load(temp,'CaliAli_options');
         if strcmp(CaliAli_options.preprocessing.structure,'neuron')
-            runCNMFe(temp);
+            file_path{i}=runCNMFe(temp);
         elseif strcmp(CaliAli_options.preprocessing.structure,'dendrite')
-            runCNMFe_dendrite(temp);
+            file_path{i}=runCNMFe_dendrite(temp);
         end
     catch ME
         m=input_files{i};
         fprintf(['fail to process ',m,'\n'])
         rethrow(ME)
     end
-    clearvars -except parin i
+    clearvars -except file_path i input_files
 end

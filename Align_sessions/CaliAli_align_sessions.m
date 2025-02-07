@@ -1,4 +1,4 @@
-function CaliAli_align_sessions(varargin)
+function CaliAli_options = CaliAli_align_sessions(varargin)
 %% CaliAli_align_sessions: Perform inter-session alignment for CaliAli analysis.
 %
 % This function processes input files, performs inter-session alignment, 

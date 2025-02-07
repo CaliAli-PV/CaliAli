@@ -4,7 +4,7 @@ app=manual_residuals_PNR(neuron.CaliAli_options.inter_session_alignment.Cn,neuro
 
 app.done=0;
 while app.done == 0  % polling
-    pause(0.05);neuron.CaliAli_options.inter_session_alignment
+    pause(0.05);
 end
 seed_all=find(app.seed);
 delete(app);

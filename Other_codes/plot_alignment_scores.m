@@ -45,3 +45,4 @@ fprintf('The amplitude of non-rigid misalignment is %.1f%% of the average neuron
 NRp=(1-mat2gray(T.('Mean Corr. Score')))*100;
 
 fprintf('Non-rigid misalignment accounts for %.1f%% of the total.\n',NRp(2));
+drawnow;
