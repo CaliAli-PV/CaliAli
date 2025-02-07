@@ -12,7 +12,7 @@ First follow the CaliAli installation notes [Installation and System Requirement
 This guide is based on 'Demo_pipeline.mlx'. Execute in the Matlab command windows `open(Demo_pipeline)` to open the code.
 
 ??? Info "How long it takes to process the Demo data?"
-	Processing the demo data is expected to take approximately 5-10 minutes on a standard desktop computer. This includes steps 2 to 4.
+	Processing the demo data is expected to take approximately 5 minutes on a standard desktop computer. This includes the steps bellow:
 
 In principle CaliAli operate in 5 steps:
 
