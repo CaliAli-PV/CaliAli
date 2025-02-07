@@ -2,6 +2,7 @@ site_name: CaliAli
 site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 theme:
   name: material
+  custom_dir: docs/overrides
   features:
     - navigation.sections
     - toc.integrate
