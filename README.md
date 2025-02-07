@@ -9,9 +9,13 @@ CaliAli is a powerful software suite designed to extract neural signals from one
 Read the full [Online Documentation](https://caliali-pv.github.io/CaliAli/).
 ### Important Notice: CaliAli Update
 
-CaliAli has undergone a major update! The previous version of the code described in the [BioRxiv preprint](https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1) is now deprecated. If you need to access that version of the code, please switch to the [BioRxiv branch](https://github.com/CaliAli-PV/CaliAli/tree/Biorxiv-Version).
+CaliAli has undergone a major update! The previous version of the code described in the is now deprecated.
 
-For detailed information about the latest changes and updates, please refer to the new [Online Documentation](https://caliali-pv.github.io/CaliAli/).
+This update focuses on increasing the modularity of the CaliAli pipeline by restructuring how parameters and functions are handled.
+
+Because of these significant changes, the previous workflow used to analyze data is no longer compatible, and older procedures will not work in the updated environment.
+
+For detailed information about the latest changes and updates, please refer to the new [Online Documentation](https://caliali-pv.github.io/CaliAli/1.2/).
 
 ---
 
