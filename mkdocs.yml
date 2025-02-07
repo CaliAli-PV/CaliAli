@@ -2,7 +2,7 @@ site_name: CaliAli
 site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
 theme:
   name: material
-  custom_dir: docs/overrides
+  custom_dir: overrides
   features:
     - navigation.sections
     - toc.integrate
@@ -46,6 +46,7 @@ extra:
       link: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
   version:
     provider: mike
+    warning: true
 
 markdown_extensions:
   - pymdownx.highlight:
