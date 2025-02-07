@@ -48,6 +48,8 @@
       
     
     
+      <link rel="stylesheet" href="../overrides/main.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -88,6 +90,14 @@
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
               
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var outdatedBanner = document.querySelector("[data-md-component=outdated]");
+      if (outdatedBanner) {
+        outdatedBanner.hidden = false;
+      }
+    });
+  </script>
   <div class="admonition warning">
     <p><strong>Warning:</strong> You are viewing an outdated version of the documentation.</p>
     <a href="../.."><strong>Go to the latest version</strong></a>
