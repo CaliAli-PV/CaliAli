@@ -39,9 +39,9 @@ end
 
 [filepath,name]=fileparts(inputh{end});
 if isempty(outpath)
-    out=strcat(filepath,filesep,name,'_con','.mat');
+    outpath=strcat(filepath,filesep,name,'_con','.mat');
 end
-
+out=outpath;
 vid=[];
 if ~isfile(outpath)
     for k=progress(1:length(inputh))

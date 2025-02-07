@@ -38,13 +38,13 @@ params.file_extension = 'avi';  % if a folder is selected instead of a single vi
 % --- Motion Correction ---
 params.do_non_rigid = false;       % Perform non-rigid motion correction?
 params.reference_projection_rigid = 'BV';  % Use blood vessels as reference for rigid correction
-params.non_rigid_pyramid = {'BV', 'BV', 'neuron'}; % Multi-level registration pyramid
+params.non_rigid_pyramid = {'BV', 'neuron', 'neuron'}; % Multi-level registration pyramid
 params.non_rigid_batch_size = [20, 60]; % Frame range for parallel processing
 
 
 % --- Inter-session Alignment ---
 params.projections = 'BV+neuron';     % Use both blood vessels and neurons for alignment
-params.final_neurons = 0;              % Perform an extra neuron alignment iteration? 
+params.final_neurons = false;         % Perform an extra neuron alignment iteration? 
 params.Force_BV = false;              % Force BV use even if deemed unusable
 
 

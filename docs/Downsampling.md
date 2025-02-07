@@ -30,8 +30,16 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
 	Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos. Instead of selecting individual `.avi` files, you can choose an entire folder. CaliAli will automatically search for all files matching the [file_extension](Parameters_index.md) defined in the `CaliAli_options` structure within the selected folder and treat them as segments of the same session. These files will then be concatenated into a single `.mat` file for streamlined processing.
 	
 ??? Question "Can I automate this process without manually selecting files?"
-    Yes! Each subfield in the `CaliAli_options` structure includes the parameters `input_files` and `output_files`. You can pass a cell array of file paths to `input_files` and use the output cell array from `output_files` to programmatically automate this process. This is a good approach if you need to process multiple files overnight 😴.
-    
+    Yes! The `CaliAli_options` structure contains subfields like `input_files` and `output_files`, which allow you to programmatically automate file processing. You can pass a cell array of file paths to `input_files` and use the cell array from `output_files` as input for the next module.
+    For example, running:
+    	
+    ```matlab
+     CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;
+     ```
+     
+     will automatically set the downsampling output files as the input for the motion correction module, skipping the file selection dialog entirely. This approach is especially useful when processing multiple files overnight 😴.
+
+
 ??? Question "What if want to change parameters in the middle of the analysis?" 
        You can change parameters with [CaliAli_update_parameters()](Functions_doc/CaliAli_update_parameters.md#CaliAli_update_parameters) 
 

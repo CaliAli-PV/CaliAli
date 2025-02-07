@@ -9,7 +9,7 @@ First follow the CaliAli installation notes [Installation and System Requirement
 	
 #### CaliAli Processing Steps Overview <a id="ps"></a>
 
-This guide is based on 'Demo_pipeline.m'. Execute in the Matlab command windows 'open(Demo_pipeline)' to open the code.
+This guide is based on 'Demo_pipeline.mlx'. Execute in the Matlab command windows `open(Demo_pipeline)` to open the code.
 
 ??? Info "How long it takes to process the Demo data?"
 	Processing the demo data is expected to take approximately 5-10 minutes on a standard desktop computer. This includes steps 2 to 4.
@@ -26,6 +26,30 @@ In principle CaliAli operate in 5 steps:
 
 5. [Signal Extraction From Concatenated Sessions](extraction.md)
 
+##### Workflow:
+
+``` mermaid
+sequenceDiagram
+    participant U as User
+    participant DS as CaliAli_downsample()
+    participant MC as CaliAli_motion_correction()
+    participant AT as CaliAli_align_sessions()
+    participant CN as CaliAli_cnmfe()
+    participant PP as Postprocessing
+
+    U->>DS: Select input video(s)
+    DS->>U: Downsampled .mat files output
+    U->>MC: Provide downsampled files for motion correction
+    MC->>U: Motion corrected video saved
+    U->>AT: Initiate inter-session alignment
+    AT->>U: Updated transformation parameters
+    U->>CN: Run CNMF‐e extraction on aligned videos
+    CN->>U: Neuronal components extracted and saved
+    U->>PP: Launch postprocessing for residual updates and manual review
+    PP->>U: Updated neuron data ready for further analysis
+``` 
+<small>*Schematic of the CaliAli pipeline for neuronal imaging analysis. The user (U) supplies raw videos to the downsampling module (DS), which are then motion-corrected (MC) and aligned (AT). CNMF-e extraction (CN) identifies neuronal components, and postprocessing (PP) refines and reviews these outputs. Arrows denote the flow of data and user interactions.*</small>
+
 In principle, the entire CaliAli pipeline can be run on the demo data using just the following lines of code:
 
 ```matlab
@@ -40,7 +64,6 @@ CaliAli_align_sessions(CaliAli_options);
 %Run Signal extraction from concatenated sessions
 CaliAli_cnmfe()
 ```
-Execute in the Matlab command windows 'open(Demo_pipeline)' to open the code.
 
 === "We will now navigate into each of the main steps in the CaliAli pipeline"
 Proceed to [Setting CaliAli Parameters](Parameters.md)

@@ -1,4 +1,4 @@
-function runCNMFe(in)
+function file_path=runCNMFe(in)
 %% runCNMFe: Runs CNMF-E for source extraction from calcium imaging data.
 %
 % Inputs:
@@ -103,7 +103,7 @@ neuron = postprocessDeconvolvedTraces(neuron, 'foopsi','ar2',-5);
 
 %% Save results
 neuron.orderROIs('snr');
-save_workspace(neuron);
+file_path=save_workspace(neuron);
 
 %% show neuron contours
 fclose('all');

@@ -13,7 +13,7 @@ fig = figure('Visible', 'off');
 set(fig, 'Position', [745 49.8 1247.2 828.8]);
 
 for i = progress(1:size(P.(1)(1,:).(5){1,1}, 4))
-    tiledlayout(3, 4, "TileSpacing", "compact");
+    tiledlayout(size(P,2), 4, "TileSpacing", "compact");
     for j = 1:size(P,2)
         nexttile;
         imshow(P.(j)(1,:).(1){1,1}(:,:,:,i));
@@ -31,6 +31,7 @@ for i = progress(1:size(P.(1)(1,:).(5){1,1}, 4))
         nexttile;
         imshow(P.(j)(1,:).(5){1,1}(:,:,:,i));
         if j == 1; title("BV+Neurons"); end
+        plot_darkmode
     end
 
     % Capture frame without displaying it
