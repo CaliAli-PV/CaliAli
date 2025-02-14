@@ -99,7 +99,9 @@ addParameter(inp,'sf',10,valid_v)             %Frame rate. Defualt 10 fps
 addParameter(inp,'neuron_enhance',true)       %MIN1PIE background substraciton. True is recommended. default True
 addParameter(inp,'noise_scale',true)          %Noise scaling of each pixel. True is recommended. default True
 addParameter(inp,'detrend',1)                 %Detrending of slow fluctuation. Temporal window (in seconds) in which local minima is search. 0 means no detrending.
-addParameter(inp,'remove_BV',false)       %Remove BV from the neuron-filtered projection]
+addParameter(inp,'remove_BV',false)           %Remove BV from the neuron-filtered projection]
+
+addParameter(inp,'force_non_negative',1)       %Remove negative values after detrending
 %% Dendrite processing codes. This section is experimental. This is not used unless structure is set to 'dendrite'
 addParameter(inp,'structure','neuron')      % Set up this to 'dendrite' to extract dendrites instead of neurons
 addParameter(inp,'dendrite_filter_size',0.5:0.1:0.8) % Dendrites filtering size
@@ -111,7 +113,9 @@ addParameter(inp, 'dendrite_theta', 30);    % Filter dendrites based on their or
 addParameter(inp,'fastPNR',false)           % Avoid calculating the correlation image 
                                             % and use Laplaciang filtering instead (Faster by accuracy havent been tested.)
 
- addParameter(inp,'median_filtering',[])    % Apply median filtering to the image                                      
+addParameter(inp,'median_filtering',[])    % Apply median filtering to the image 
+
+
 
 varargin=varargin{1, :};
 if isstruct(varargin)

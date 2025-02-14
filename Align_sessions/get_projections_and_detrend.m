@@ -53,11 +53,11 @@ if CaliAli_options.preprocessing.remove_BV
     Y = remove_BV(Y, BV); % Remove blood vessel projections from Y
 end
 
-% Choose the appropriate method for computing the projections based on the structure type
-if strcmp(CaliAli_options.preprocessing.structure, 'dendrite')
-    [Cn, PNR] = get_PNR_Cn_dendrite(Y, CaliAli_options); % Use dendrite method for projections
-elseif CaliAli_options.preprocessing.fastPNR
+if CaliAli_options.preprocessing.fastPNR
     [Cn, PNR] = get_PNR_Cn_fast(Y); % Use fast PNR method for projections
+% Choose the appropriate method for computing the projections based on the structure type
+elseif strcmp(CaliAli_options.preprocessing.structure, 'dendrite')
+    [Cn, PNR] = get_PNR_Cn_dendrite(Y, CaliAli_options); % Use dendrite method for projections
 else
     % Default: use greedy approach for calculating projections (with optional neuron enhancement)
     [~, Cn, PNR] = get_PNR_coor_greedy_PV(Y, CaliAli_options.gSig, [], [], CaliAli_options.preprocessing.neuron_enhance);

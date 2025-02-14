@@ -31,6 +31,10 @@ obj=reshape(single(Y),d1*d2,d3);
 temp=movmedian(obj,CaliAli_options.preprocessing.sf*CaliAli_options.preprocessing.detrend,2);
 temp=movmin(temp,CaliAli_options.preprocessing.sf*CaliAli_options.preprocessing.detrend*5,2);
 Y=double(obj-temp);
+
+if CaliAli_options.preprocessing.force_non_negative
 Y(Y<0)=0;
+end
+
 Y=gather(reshape(Y,d1,d2,d3));
 end
