@@ -27,6 +27,8 @@ for i=progress(1:size(fn,2)-1)
     %  Y(labeledImage(:)>0,:)=0;
     Y=reshape(Y,d1,d2,[]);
 
+     Y=detrend_vid(Y,neuron.CaliAli_options);
+
     if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
         [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(Y,gSig,[],[],n_enhanced);
     elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
