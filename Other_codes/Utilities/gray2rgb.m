@@ -1,4 +1,4 @@
-function rgbVideo=gray2rgb(grayVideo,colormapName)
+function rgbVideo=gray2rgb(grayVideo,colormapName,thr)
 
 % grayToColormap converts a grayscale video to RGB using the specified colormap.
 %
@@ -12,7 +12,13 @@ function rgbVideo=gray2rgb(grayVideo,colormapName)
 if ~exist('colormapName','var')
     colormapName= 'gray';
 end
-grayVideo=v2uint8(grayVideo);
+
+if ~exist('thr', 'var')
+    grayVideo=v2uint8(grayVideo);
+else
+    grayVideo=v2uint8(grayVideo,thr);
+end
+
 
 
 % Get the size of the input grayscale video
@@ -20,7 +26,7 @@ grayVideo=v2uint8(grayVideo);
 
 % Get the colormap function based on the provided colormap name
 if ischar(colormapName)
-cmap = feval(colormapName, 256);  % Create a 256-level colormap
+    cmap = feval(colormapName, 256);  % Create a 256-level colormap
 else
     cmap=linspace(0,1,256)'*colormapName;
 end
@@ -33,4 +39,5 @@ for i = 1:numFrames
     % Convert the indexed image to RGB using the chosen colormap
     rgbVideo(:,:,:,i) = ind2rgb(grayVideo(:,:,i), cmap);
 end
+rgbVideo=v2uint8(rgbVideo);
 end

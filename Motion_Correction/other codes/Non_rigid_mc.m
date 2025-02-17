@@ -129,7 +129,7 @@ function V = MC_in(MS, G, V, opt)
 % Perform motion correction within each batch in parallel
 disp('Performing non-rigid motion correction...');
 parfor k = 1:length(MS)
-    [D{k}, V{k}] = batch_register(G{k}, V{k}, opt, MS{k});  % Register the batch
+    D{k} = batch_register(G{k},opt, MS{k});  % Register the batch
 end
 
 % Warp the video frames based on the calculated displacement fields
@@ -148,7 +148,7 @@ end
 end
 
 
-function [D, V] = batch_register(G, V, opt, MS)
+function [D] = batch_register(G,opt, MS)
 % batch_register registers a batch of images to a reference image.
 %
 %   [O, D, V] = batch_register(G, V, opt, T)
@@ -172,10 +172,13 @@ function [D, V] = batch_register(G, V, opt, MS)
 ref=G(:,:,:,ix);
 [d1,d2,~,d4]=size(G);
 D=zeros(d1,d2,2,d4);
+thr=prctile(G(G>0),5);
+[~,order]=sort(abs((1:d4)-ix),'ascend');
 
-for i = 1:size(G,4)
-    [~, temp(:,:,:,i), D(:,:,:,i)] = MR_Log_demon(ref,G(:,:,:,i), opt);
-    ref=mean(temp,3);
+for i = 1:numel(order)
+    [~, temp(:,:,:,i), D(:,:,:,order(i))] = MR_Log_demon(ref,G(:,:,:,order(i)), opt);
+    temp(temp<thr)=nan;
+    ref=mean(temp,4,'omitnan');
 end
 
 end
@@ -203,9 +206,7 @@ order = opt.non_rigid_pyramid;  % Get the desired order of projections
 % If the reference projection used during translation is 'BV'
 if strcmp(opt.reference_projection_rigid, 'BV')
     BV = ref;  % Assign the reference image to BV
-    if ismember('neuron', order)  % If 'neuron' is in the order
-        opt.preprocessing.detrend=0;
-        opt.preprocessing.noise_scale=0;
+    if ismember('neuron', order)|| ismember('centroid', order)  % If 'neuron' is in the order
         Neu = CaliAli_remove_background(Y, opt);  % Calculate neuron projection
         se=strel("disk",2);
         Neu=v2uint8(Neu);
@@ -234,6 +235,24 @@ elseif strcmp(opt.reference_projection_rigid, 'neuron')
     clear ref;    % Delete the original reference image
 end
 
+if  ismember('centroid', order)
+    Neu=v2uint8(Neu);
+    thr=prctile(Neu(Neu>0),5);
+    for i=progress(1:size(Neu,3),'Title','Getting centroids')
+        img=Neu(:,:,i)>thr;
+        stats = regionprops(img, 'Centroid'); % Get centroids of blobs
+
+        % Create an empty image and mark centroids
+        dot_img = false(size(img));
+
+        for k = 1:length(stats)
+            centroid = round(stats(k).Centroid); % Get integer centroid
+            dot_img(centroid(2), centroid(1)) = 1; % Mark as a dot
+        end
+        centroid_img(:,:,i) = adapthisteq(imgaussfilt(single(dot_img),2),'NumTiles',[4 4],'ClipLimit',0.8);
+    end
+end
+
 X = [];  % Initialize the image pyramid
 order=flip(order);
 % Construct the pyramid based on the specified order
@@ -243,6 +262,8 @@ for i = 1:numel(order)
             X = cat(4, X, v2uint8(BV));  % Concatenate BV along the 4th dimension
         case 'neuron'
             X = cat(4, X,Neu);  % Concatenate Neu along the 4th dimension
+        case 'centroid'
+            X = cat(4,X,v2uint8(centroid_img));
     end
 end
 

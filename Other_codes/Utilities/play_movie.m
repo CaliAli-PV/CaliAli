@@ -1,4 +1,4 @@
-function Mov=play_movie(neuron,batch_num)
+function Mov=play_movie(neuron,thr,batch_num)
 % Function to display results of calcium imaging analysis
 % This function plays a movie of neuronal activity, reconstructing
 % the background and subtracting neuron signals.
@@ -11,7 +11,7 @@ function Mov=play_movie(neuron,batch_num)
 if ~exist("batch_num","var")
     batch_num=1;
 end
-
+neuron=CNMF_CaliAli_update('Temporal',neuron);
 % Extract spatial dimensions from neuron options
 d1=neuron.options.d1;
 d2=neuron.options.d2;
@@ -34,7 +34,8 @@ A=full(neuron.A);
 Y=single(Y); % Convert data type to single precision for efficiency
 
 % Compute the neuronal signal from calcium traces
-ns=single(A*neuron.C_raw(:,fn(batch_num)+1:fn(batch_num+1)));
+C=neuron.C_raw(:,fn(batch_num)+1:fn(batch_num+1));
+ns=single(A*C);
 
 % Reconstruct and reshape background signal
 bg=single(reshape(reconstruct_background_residual(neuron,[fn(batch_num)+1,fn(batch_num+1)]), [], size(Y,2)));
@@ -51,6 +52,21 @@ res=reshape(res,d1,d2,[]);
 % Display the concatenated results using implay
 % Order: Raw data | Background
 %         Neuronal signal | Residual signal
-Mov=v2uint8(cat(2,Y,ns,res));
+
+% tmp = mod((1:K)', 6)+1;
+Y_mixed = zeros(d1*d2,size(C,2));
+temp = prism;
+% temp = bsxfun(@times, temp, 1./sum(temp,2));
+col = temp(randi(64, size(A,2),1), :);
+for m=1:3
+    Y_mixed(:, :, m) = A* (diag(col(:,m))*C);
+end
+if ~exist('thr','var')
+    thr=[0,256];
+end
+Y_mixed=v2uint8(permute(reshape(Y_mixed,d1,d2,[],3),[1,2,4,3]),thr);
+
+
+Mov=v2uint8(cat(2,gray2rgb(Y,'hot',thr),Y_mixed,gray2rgb(res,'hot',thr)));
 implay(Mov);
 end
