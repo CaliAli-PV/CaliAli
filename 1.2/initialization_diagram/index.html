@@ -8,13 +8,9 @@
       
       
       
-        <link rel="canonical" href="https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1/1.2/Downsampling/">
+        <link rel="canonical" href="https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1/1.2/initialization_diagram/">
       
       
-        <link rel="prev" href="../Parameters/">
-      
-      
-        <link rel="next" href="../Motion_correction/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +18,7 @@
     
     
       
-        <title>Downsampling - CaliAli</title>
+        <title>hola - CaliAli</title>
       
     
     
@@ -76,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#i-downsampling-and-conversion-to-mat-format" class="md-skip">
+        <a href="#hola" class="md-skip">
           Skip to content
         </a>
       
@@ -128,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Downsampling
+              hola
             
           </span>
         </div>
@@ -328,28 +324,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Downsampling
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Downsampling/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -358,48 +336,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#i-downsampling-and-conversion-to-mat-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      I. Downsampling and Conversion to .mat Format
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="I. Downsampling and Conversion to .mat Format">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#running-caliali_downsample-would-call-a-file-selection-windows-allowing-to-process-multiple-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running CaliAli_downsample() would call a file selection windows allowing to process multiple files:
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -559,64 +495,21 @@
                   
 
 
-  <h1>Downsampling</h1>
-
-<h4 id="i-downsampling-and-conversion-to-mat-format">I. Downsampling and Conversion to .mat Format <a id="downsampling"></a></h4>
-<p>The first step in the CaliAli pipeline is to convert the raw video format into the .mat format used by CaliAli. This step is done together with spatial and temporal downsampling.</p>
-<h5 id="running-caliali_downsample-would-call-a-file-selection-windows-allowing-to-process-multiple-files">Running  <a href="../Functions_doc/CaliAli_downsample/#CaliAli_downsample">CaliAli_downsample()</a>  would call a file selection windows allowing to process multiple files:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">=</span><span class="n">CaliAli_downsample</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span><span class="w">  </span>
-</code></pre></div>
-<div class="admonition success">
-<p class="admonition-title">Output File</p>
-<p>Running this function produces a <code>.mat</code> file with the <code>_ds</code> tag, containing both the video data and the <code>CaliAli_options</code> structure. By default, the output file name matches the input video, and the save path defaults to the location of the input video.</p>
-</div>
-<details class="question">
-<summary>What formats are supported by CaliAli</summary>
-<p>CaliAli supports <code>.avi / .m4v / .mp4 / .mkv / .tiff / .isdx (Inscopix)</code>. However there are some limitations and requirements depending on the operative system that you are using:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Mac</label><label for="__tabbed_1_3">Linux</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p>Matlab does not have the necessary codecs to process <code>.avi</code> files in windows. You need to download and install the <a href="https://codecguide.com/download_kl.htm">K-lite Codec Pack</a> to be able to run this code.</p>
-<details class="warning">
-<summary>Inscopix Users: Please note the following system-specific instructions</summary>
-<p>This requires installing the Inscopix Data Processing software. By default, the function searches for the Inscopix path in  <code>C:\Program Files\Inscopix\Data Processing</code>.  If that path is not found, a folder selection dialog box will appear.</p>
-</details>
-</div>
-<div class="tabbed-block">
-<ul>
-<li>At present, CaliAli is unable to convert Inscopix '.isdx' data into '.h5' format on ARM machines. Please convert your data into a compatible format (.h5 , uncompressed avi, mp4) using the Inscopix software. </li>
-<li>MATLAB cannot process compressed avi format. Be sure to save your videos in uncompressed format. You can convert your videos to .mp4 with <a href="../Functions_doc/batchConvertVideos/">batchConvertVideos()</a></li>
-</ul>
-</div>
-<div class="tabbed-block">
-<p>We have not tested CaliAli in Linux system yet but it is in our to do list.</p>
-</div>
-</div>
-</div>
-</details>
-<details class="question">
-<summary>What if my video is split into multiple video files?</summary>
-<p>Data acquired with the UCLA Miniscope is often divided into multiple <code>.avi</code> videos. Instead of selecting individual <code>.avi</code> files, you can choose an entire folder. CaliAli will automatically search for all files matching the <a href="../Parameters_index/">file_extension</a> defined in the <code>CaliAli_options</code> structure within the selected folder and treat them as segments of the same session. These files will then be concatenated into a single <code>.mat</code> file for streamlined processing.</p>
-</details>
-<details class="question">
-<summary>Can I automate this process without manually selecting files?</summary>
-<p>Yes! The <code>CaliAli_options</code> structure contains subfields like <code>input_files</code> and <code>output_files</code>, which allow you to programmatically automate file processing. You can pass a cell array of file paths to <code>input_files</code> and use the cell array from <code>output_files</code> as input for the next module.
-For example, running:</p>
-<p><code>matlab
- CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;</code></p>
-<p>will automatically set the downsampling output files as the input for the motion correction module, skipping the file selection dialog entirely. This approach is especially useful when processing multiple files overnight 😴.</p>
-</details>
-<details class="question">
-<summary>What if want to change parameters in the middle of the analysis?</summary>
-<p>You can change parameters with <a href="../Functions_doc/CaliAli_update_parameters/#CaliAli_update_parameters">CaliAli_update_parameters()</a> </p>
-</details>
-<hr />
-<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Next</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block"></div>
-</div>
-</div>
-<p>After finishing downsampling you can proceed to <a href="../Motion_correction/">Motion Correction</a>       </p>
+<h1 id="hola">hola</h1>
+<pre class="mermaid"><code>graph TD;
+    D[Filtered Maximum projection];
+    D --&gt; E[Binarization];
+    E --&gt; F[Remove Small Objects using Area Filter];
+    F --&gt; G[Label Connected Components];
+    G --&gt; H[Select Largest Dendritic Structure];
+    H --&gt; I[Active Contour Refinement using Chan-Vese];
+    I --&gt; J[Main Branch Isolation];
+    J --&gt; K[Remove dendrite from binary image ];
+    K --&gt; L[Decrease Binarization threshold];
+    L --&gt;|Valid Dendrite Segments| M[Relabel and Assign IDs];
+    K--&gt;|Repeat until empty| H;
+    L--&gt;|Repeat| E;</code></pre>
+<p>hola</p>
 
 
 
