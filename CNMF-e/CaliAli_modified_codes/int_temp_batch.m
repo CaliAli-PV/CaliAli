@@ -83,7 +83,12 @@ for i=progress(1:size(fn,2)-1)
             break
         end
         [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron,size(Y,2));
+        if neuron.options.deconv_flag
         [c,s]=deconv_PV(c_raw,neuron.CaliAli_options.cnmf.deconv_options);
+        else
+            c=c_raw;
+            s=c_raw;
+        end
         %% Filter a
         af=a;
         if n_enhanced==0
@@ -127,16 +132,16 @@ C=cat(2,C_T{:});
 C_raw=cat(2,C_raw_T{:});
 S=cat(2,S_T{:});
 
-kill=sum(S,2)==0;
+kill=sum(C,2)==0;
 C(kill,:)=[];
 C_raw(kill,:)=[];
 S(kill,:)=[];
 ix=true(size(S_T{1},1),1);
 ix(kill)=false;
-S_T=cellfun(@(x) x(ix,:),S_T,'UniformOutput',false);
+C_T=cellfun(@(x) x(ix,:),C_T,'UniformOutput',false);
 A_T=cellfun(@(x) x(:,ix,:),A_T,'UniformOutput',false);
 
-weights=cellfun(@(x) mean(x,2),S_T,'UniformOutput',false);
+weights=cellfun(@(x) max(x,[],2),C_T,'UniformOutput',false);
 weights=cat(2,weights{:});
 weights=weights.^2;
 weights=weights./sum(weights,2);

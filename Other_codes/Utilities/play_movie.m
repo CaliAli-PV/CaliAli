@@ -45,14 +45,12 @@ res=Y-ns-bg;
 
 % 3reshape stuff
 Y=reshape(Y,d1,d2,[]);
-ns=reshape(ns,d1,d2,[]);
 % bg=reshape(bg,d1,d2,[]);
 res=reshape(res,d1,d2,[]);
 
 % Display the concatenated results using implay
 % Order: Raw data | Background
 %         Neuronal signal | Residual signal
-
 % tmp = mod((1:K)', 6)+1;
 Y_mixed = zeros(d1*d2,size(C,2));
 temp = prism;
@@ -64,9 +62,10 @@ end
 if ~exist('thr','var')
     thr=[0,256];
 end
-Y_mixed=v2uint8(permute(reshape(Y_mixed,d1,d2,[],3),[1,2,4,3]),thr);
+Y_mixed=v2uint8(permute(reshape(Y_mixed,d1,d2,[],3),[1,2,4,3]),thr/2);
 
+res=gray2rgb([Y,res],'hot',thr);
 
-Mov=v2uint8(cat(2,gray2rgb(Y,'hot',thr),Y_mixed,gray2rgb(res,'hot',thr)));
+Mov=cat(2,res(:,1:d2,:,:),Y_mixed,res(:,d2+1:end,:,:));
 implay(Mov);
 end
