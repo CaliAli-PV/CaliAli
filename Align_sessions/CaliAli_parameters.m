@@ -46,6 +46,8 @@ opt.preprocessing=preprocessing_parameters(check_CaliAli_structure(varargin,'pre
 %% Motion correction parameters
 opt.motion_correction=motion_correction_parameters(check_CaliAli_structure(varargin,'motion_correction'));
 opt.motion_correction.preprocessing=opt.preprocessing;
+opt.motion_correction.preprocessing.detrend=false;
+opt.motion_correction.preprocessing.noise_scale=0;
 %% Inter-session alignment parameters
 opt.inter_session_alignment=inter_session_alignment_parameters(check_CaliAli_structure(varargin,'inter_session_alignment'));
 opt.inter_session_alignment.preprocessing=opt.preprocessing;
