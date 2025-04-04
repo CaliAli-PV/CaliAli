@@ -308,11 +308,6 @@ neuron.ids = (1:K);
 neuron.tags = zeros(K,1, 'like', uint16(0));
 neuron.P.Ymean=Ymean;
 
-if size(neuron.A,3)>1
-    neuron.A_batch=neuron.A;
-    neuron.A=Ato2d(neuron);
-end
-
 %% save the results to log
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, '\tIn total, %d neurons were initialized. \n', K);

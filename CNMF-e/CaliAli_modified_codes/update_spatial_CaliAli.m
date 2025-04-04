@@ -121,7 +121,7 @@ if strcmpi(search_method, 'dilate')
 end
 
 if strcmpi(search_method, 'grow')
-IND = sparse(active_contour_grow(neuron));
+IND = sparse(active_contour_grow(neuron)); %NOTE NEED TO ADD GROW PARAMETER TO CALIALI OPTIONS< NOW THIS IS FIXED TO 18 pxl
 else
 IND = sparse(logical(determine_search_location(neuron.A, search_method, options)));
 end
@@ -396,10 +396,6 @@ end
 %% post-process results
 out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2));
 % obj.A = A_new;
-if strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')  
-out_A=filter_vessel_spatial(reshape(full(out_A),d1,d2,[]),neuron.CaliAli_options);
-end
-
 %% upadte b0
 if strcmpi(bg_model, 'ring')
     neuron.b0_new = neuron.P.Ymean{idx}-neuron.reshape(neuron.A*mean(neuron.C,2), 2); %-obj.reconstruct();

@@ -30,5 +30,5 @@ parfor m=1:K
     
     A_new{m} = ai(:);
 end
-A_ = sparse(cell2mat(A_new));
+A_ = sparse(double(cell2mat(A_new)));
 end
