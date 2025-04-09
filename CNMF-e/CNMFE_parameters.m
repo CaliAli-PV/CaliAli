@@ -123,7 +123,14 @@ function pars=pars_envs_parse(varargin)
 inp = inputParser;
 inp.KeepUnmatched = true;  % Keep unmatched parameters
 
+try
 [total_system_memory_GB,~] = getSystemMemory;
+catch
+fprintf('Total physical memory could not be determined.\n');
+fprintf('Avilable memory was set to 120GB by default.\n');
+total_system_memory_GB=120;
+fprintf('Manually set available RAM with CaliAli_parameters(''memory_size_to_use'', val); to define different value\n');
+end
 
 
 
