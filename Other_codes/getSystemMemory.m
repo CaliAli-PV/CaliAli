@@ -1,15 +1,15 @@
 function [totalMemGB, freeMemGB] = getSystemMemory()
 if ispc  % Windows
-    [~, totalMem] = system('wmic OS get TotalVisibleMemorySize /Value');
-    [~, freeMem] = system('wmic OS get FreePhysicalMemory /Value');
+    % Retrieve memory details (Windows only)
+    m = memory;
 
-    % Extract numeric values from the output
-    totalMem = regexp(totalMem, 'TotalVisibleMemorySize=(\d+)', 'tokens', 'once');
-    freeMem = regexp(freeMem, 'FreePhysicalMemory=(\d+)', 'tokens', 'once');
+    % Convert the values from bytes to GiB (1 GiB = 1024^3 bytes)
+    totalMemGB = m.PhysicalMemory.Total / (1024^3);
+    freeMemGB  = m.PhysicalMemory.Available / (1024^3);
 
-    % Convert from KB to GiB
-    totalMemGB = str2double(totalMem) / (1024^2); % Convert KB to GiB
-    freeMemGB = str2double(freeMem) / (1024^2); % Convert KB to GiB
+    % Display results
+    fprintf('Total Physical Memory: %.2f GiB\n', totalMemGB);
+    fprintf('Available Physical Memory: %.2f GiB\n', freeMemGB);
 
 elseif ismac  % macOS
     % Get total system memory in bytes
