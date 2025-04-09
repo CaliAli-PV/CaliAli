@@ -3,6 +3,7 @@ function out = v2uint16(in, thr)
 %
 % This function normalizes the input array `in` to the range [0, 1] and then
 % scales it to uint16 format.
+
 % Arguments:
 %   - in: Input numeric array to be converted to uint16
 %   - thr: (Optional) Two-element vector [lower, upper] specifying the thresholds.
