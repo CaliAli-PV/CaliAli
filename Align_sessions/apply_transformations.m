@@ -26,30 +26,31 @@ if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
         % Load the current session file
         fullFileName = CaliAli_options.inter_session_alignment.output_files{k};
         fprintf(1, 'Applying shifts to %s\n', fullFileName);
-        
+
         % Load data from the file
         Y = CaliAli_load(fullFileName, 'Y');
-        
-        % Apply translations using the stored translation data (T)
-        Y = apply_translations(Y, CaliAli_options.inter_session_alignment.T(k,:), CaliAli_options.inter_session_alignment.T_Mask);
-        
-        % Apply non-rigid shifts (NR shifts) using the stored shifts
-        Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask);
-        
-        % If final neuron transformations are enabled, apply additional non-rigid shifts for neurons
-        if CaliAli_options.inter_session_alignment.final_neurons
-            Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask_n);
+        if CaliAli_options.inter_session_alignment.do_alignment
+            % Apply translations using the stored translation data (T)
+            Y = apply_translations(Y, CaliAli_options.inter_session_alignment.T(k,:), CaliAli_options.inter_session_alignment.T_Mask);
+
+            % Apply non-rigid shifts (NR shifts) using the stored shifts
+            Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask);
+
+            % If final neuron transformations are enabled, apply additional non-rigid shifts for neurons
+            if CaliAli_options.inter_session_alignment.final_neurons
+                Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask_n);
+            end
         end
-        
+
         % Scale the data based on the range (R)
         if isa(Y, 'uint16')
             Y = uint16(single(Y) .* R(k));  % For uint16, scale the data
         else
             Y = uint8(single(Y) .* R(k));   % For uint8, scale the data
         end
-        
+
         % Save the transformed data to the output file
-        CaliAli_save_chunk(CaliAli_options.inter_session_alignment.out_aligned_sessions, Y);
+        CaliAli_save_chunk(CaliAli_options, Y, k);
     end
 else
     % If the output file already exists, inform the user
@@ -60,7 +61,7 @@ end
 
 function Vid = apply_translations(Vid, T, Mask)
 % APPLY_TRANSLATIONS Applies translations to the video data.
-%   This function translates the video data (Vid) based on the translation matrix T 
+%   This function translates the video data (Vid) based on the translation matrix T
 %   and the mask provided (Mask). The resulting video is returned after translation.
 %
 %   Input:
