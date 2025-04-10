@@ -40,7 +40,7 @@ if CaliAli_options.preprocessing.neuron_enhance
     if strcmp(CaliAli_options.preprocessing.structure,'neuron')
         Y=MIN1PIPE_bg_removal(Y,CaliAli_options);
     elseif strcmp(CaliAli_options.preprocessing.structure,'dendrite')
-        Y=dendrite_bg_removal(Y,CaliAli_options);
+        Y=v2uint8(double(Y).*mat2gray(dendrite_bg_removal(Y,CaliAli_options)));
     end
 end
 

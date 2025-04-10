@@ -62,10 +62,10 @@ end
 if ~exist('thr','var')
     thr=[0,256];
 end
-Y_mixed=v2uint8(permute(reshape(Y_mixed,d1,d2,[],3),[1,2,4,3]),thr/2);
+Y_mixed=v2uint8(permute(reshape(Y_mixed,d1,d2,[],3),[1,2,4,3]),thr/4);
 
-res=gray2rgb([Y,res],'hot',thr);
+res=gray2rgb([Y,reshape(bg,d1,d2,[]),res,],'hot',thr/2);
 
-Mov=cat(2,res(:,1:d2,:,:),Y_mixed,res(:,d2+1:end,:,:));
+Mov=cat(2,res(:,1:d2*2,:,:),Y_mixed,res(:,d2*2+1:end,:,:));
 implay(Mov);
 end

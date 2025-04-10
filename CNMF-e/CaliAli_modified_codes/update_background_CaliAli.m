@@ -44,7 +44,7 @@ for i=progress(1:div)
         f=out.f;
     else
         b=cellfun(@(x,y) x+y,b,out.b,'UniformOutput',false);
-        f=cellfun(@(x,y) x+y,f,out.f,'UniformOutput',false);
+        f=cellfun(@(x,y) cat(2,x,y),f,out.f,'UniformOutput',false);
     end
     b0=cellfun(@(x,y) min(cat(3,x,y),[],3),b0,out.b0,'UniformOutput',false);
     W=cellfun(@(x,y) x+y,W,out.W,'UniformOutput',false);

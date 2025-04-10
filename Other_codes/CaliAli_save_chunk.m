@@ -1,4 +1,4 @@
-function CaliAli_save_chunk(filename, Y)
+function CaliAli_save_chunk(CaliAli_options, Y,Id)
 %% CaliAli_save_chunk: Save or append video data to a .mat file in chunks.
 %
 % Inputs:
@@ -20,12 +20,21 @@ function CaliAli_save_chunk(filename, Y)
 % Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
-  if exist(filename, 'file') == 2
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2025
+F=[0,CaliAli_options.inter_session_alignment.F];
+F=cumsum(F);
+[d1,d2,~]=size(Y);
+filename=CaliAli_options.inter_session_alignment.out_aligned_sessions;
+
+if exist(filename, 'file') == 2
     m = matfile(filename, 'Writable', true);
     fprintf('Appending to "%s"...\n', filename);
-    m.Y = cat(3, m.Y, Y);
-  else
+    m.Y(1:d1,1:d2,F(Id)+1:F(Id+1)) = Y;
+else
     fprintf('Creating "%s"...\n', filename);
     save(filename, 'Y', '-v7.3', '-nocompression');
-  end
+end
 end
