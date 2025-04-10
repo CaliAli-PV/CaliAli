@@ -2062,16 +2062,11 @@ classdef Sources2D < handle
                 % Threshold
                 bw = img > 1-thr;
 
-                % Gradually increase closing radius until single component
-                radius = 1;
-                while true
-                    bw_closed = imclose(bw, strel('disk', radius));
-                    CC = bwconncomp(bw_closed);
-                    if CC.NumObjects <= 1 || radius > 20
-                        break
-                    end
-                    radius = radius + 1;
-                end
+                % BW is your binary image
+                [y, x] = find(bw);           % Get coordinates of white pixels
+                shrinkFactor = 0.5;          % Adjust this value as needed
+                k = boundary(x, y, shrinkFactor); % Compute the boundary indices
+                bw_closed = poly2mask(x(k), y(k), size(bw,1), size(bw,2));
 
                 % Extract contour
                 B = bwboundaries(bw_closed);

@@ -26,6 +26,7 @@ classdef progress < handle
 
         % Class Destructor
         function delete(obj)
+            obj.ProgressBar.step([], [], []);
             if ~isempty(obj.ProgressBar)
                 obj.ProgressBar.release();
             end

@@ -10,6 +10,12 @@ if B==1
         end
 
         [~,C]=get_spat(app.neuron,t,sn);
+
+        if size(C,2)>=1000
+            C=C./GetSn(C);
+        else
+            C=mat2gray(C);
+        end
         plot_c(app,C,length(app.cur),t)
         for i=1:length(app.cur)
             set(findobj(app.mainAx,'Tag',num2str(app.cur(i))),'Color', 'k');
@@ -70,10 +76,10 @@ hold(app.Tr1,'on');
 h = get(app.Tr1, 'Children');
 set(h,'Color','k');
 plot(C-nu*20,'g','Parent',app.Tr1,'tag',num2str(tag));
+ylim(app.Tr1,[-20*length(app.Tr1.Children),40]);
 if length(C)>app.win
     app.Slider.Visible=1;
     xlim(app.Tr1,[0 app.win])
-    ylim(app.Tr1,[-20*length(app.Tr1.Children),40]);
 else
     app.Slider.Visible=0;
     app.Slider.Value=0;
