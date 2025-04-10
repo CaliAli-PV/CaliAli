@@ -4,12 +4,8 @@ if ispc  % Windows
     m = memory;
 
     % Convert the values from bytes to GiB (1 GiB = 1024^3 bytes)
-    totalMemGB = m.PhysicalMemory.Total / (1024^3);
-    freeMemGB  = m.PhysicalMemory.Available / (1024^3);
-
-    % Display results
-    fprintf('Total Physical Memory: %.2f GiB\n', totalMemGB);
-    fprintf('Available Physical Memory: %.2f GiB\n', freeMemGB);
+    totalMemGB = m.MaxPossibleArrayBytes/ (1024^3);
+    freeMemGB  = m.MemAvailableAllArrays  / (1024^3);
 
 elseif ismac  % macOS
     % Get total system memory in bytes
