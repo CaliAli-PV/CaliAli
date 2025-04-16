@@ -26,8 +26,9 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
     === "Linux"
          We have not tested CaliAli in Linux system yet but it is in our to do list.
 
-??? Question "What if my video is split into multiple video files?"
+!!! Danger "What if my video sessions are split into multiple video files (common for UCLA recordings)?"
 	Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos. Instead of selecting individual `.avi` files, you can choose an entire folder. CaliAli will automatically search for all files matching the [file_extension](Parameters_index.md) defined in the `CaliAli_options` structure within the selected folder and treat them as segments of the same session. These files will then be concatenated into a single `.mat` file for streamlined processing.
+	Lean more [here](Processing_split_data.md).
 	
 ??? Question "Can I automate this process without manually selecting files?"
     Yes! The `CaliAli_options` structure contains subfields like `input_files` and `output_files`, which allow you to programmatically automate file processing. You can pass a cell array of file paths to `input_files` and use the cell array from `output_files` as input for the next module.
