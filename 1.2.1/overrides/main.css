@@ -1,0 +1,13 @@
+/* Make H1 look like H2 */
+.md-content h1:first-of-type {
+    font-size: 22px;
+    font-weight: 600;
+    color: #444;
+}
+
+.md-typeset p,
+.md-typeset li,
+.md-typeset table {
+    font-size: 0.75rem; /* 14px instead of default 16px */
+    line-height: 1.6; /* Improve readability */
+}
