@@ -4,6 +4,7 @@ function CaliAli_save_chunk(CaliAli_options, Y,Id)
 % Inputs:
 %   filename - String specifying the file path to save or append data.
 %   Y        - 3D array containing the video data to be stored.
+%   Id       - Id of the sessions being saved
 %
 % Outputs:
 %   None (data is saved to the specified file).
