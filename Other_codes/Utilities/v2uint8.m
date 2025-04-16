@@ -2,7 +2,6 @@ function out = v2uint8(in, thr)
 % v2uint8: Convert an input array to uint8 with optional thresholding and memory handling
 %
 % This function normalizes the input array `in` to the range [0, 1] and then
-% scales it to uint8 format. 
 
 % Arguments:
 %   - in: Input numeric array to be converted to uint8
