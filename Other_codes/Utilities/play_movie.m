@@ -34,7 +34,7 @@ A=full(neuron.A);
 Y=single(Y); % Convert data type to single precision for efficiency
 
 % Compute the neuronal signal from calcium traces
-C=neuron.C_raw(:,fn(batch_num)+1:fn(batch_num+1));
+C=neuron.C(:,fn(batch_num)+1:fn(batch_num+1));
 ns=single(A*C);
 
 % Reconstruct and reshape background signal
