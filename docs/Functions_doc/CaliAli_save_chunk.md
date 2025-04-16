@@ -1,5 +1,5 @@
 ```matlab
-function CaliAli_save_chunk(filename, Y)
+function CaliAli_save_chunk(filename, Y,Id)
 ```
 
 #### Description
@@ -10,6 +10,7 @@ CaliAli_save_chunk: Save or append video data to a .mat file in chunks.
 |---------------|--------|-----------------------------|
 | filename      | String | String specifying the file path to save or append data. |
 | Y             | 3D Array| 3D array containing the video data to be stored. |
+| Id            | 3D Array| Id of the session being saved|
 
 ##### Function Outputs:
 | Parameter Name | Type    | Description         |
@@ -18,7 +19,7 @@ CaliAli_save_chunk: Save or append video data to a .mat file in chunks.
 
 ##### Example usage:
 ```matlab
-CaliAli_save_chunk('output.mat', Y);
+CaliAli_save_chunk('output.mat', Y, 2);
 ```
 
 Notes:

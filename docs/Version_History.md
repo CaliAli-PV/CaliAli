@@ -1,5 +1,24 @@
 # Version History <a id="vh"></a> 
 
+#### CaliAli 1.2.1 Release Notes
+
+**April 16th 2025**
+
+- Added documentation for processing split calcium imaging data files, including support for multiple video segments per session and TIFF files.
+- Fixed a bug where the text progress bar did not display the final update.
+- Fixed a bug where traces were not correctly displayed in `postprocessing_app`.
+- Disabled batch processing in `v2uint16` and `v2uint8` due to compatibility issues on some operating systems.
+- Fixed a bug where the background component was not correctly handled in batch mode when using the SVG model.
+- Improved data handling when saving concatenated files, making the new code significantly faster.
+
+---
+
+
+
+
+
+
+
 #### CaliAli 1.2 Release Notes
 
 **February 7th 2025**
