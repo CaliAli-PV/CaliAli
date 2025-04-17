@@ -245,7 +245,7 @@ if use_parallel
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_svd = f{mpatch};
+            f_svd = f{mpatch}(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
