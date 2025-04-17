@@ -12,6 +12,13 @@
     "aliases": []
   },
   {
+    "version": "1.1-temp",
+    "title": "1.1-temp",
+    "aliases": [
+      "1.1 (rebuild test)"
+    ]
+  },
+  {
     "version": "1.1",
     "title": "1.1",
     "aliases": [
