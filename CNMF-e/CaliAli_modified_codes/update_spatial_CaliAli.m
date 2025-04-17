@@ -241,7 +241,7 @@ if use_parallel
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_nmf = f{mpatch};
+            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
@@ -339,11 +339,11 @@ else
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_nmf = f{mpatch};
+            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_svd = f{mpatch};
+            f_svd = f{mpatch}(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
