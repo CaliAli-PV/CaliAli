@@ -49,7 +49,7 @@ for k = 1:length(opt.input_files)
             case contains('.avi .m4v .mp4',ext,'IgnoreCase',true)
                 temp = load_avi(fullFileName);  % Load the AVI file
             case contains('.isxd',ext,'IgnoreCase',true)
-                temp = ISXD2h5(inputFilePath);
+                temp = ISXD2h5(fullFileName);
             case contains(ext,'.tif','IgnoreCase',true)
                 temp=tiff_reader_fast(fullFileName);  
             case contains(ext,'.h5','IgnoreCase',true)

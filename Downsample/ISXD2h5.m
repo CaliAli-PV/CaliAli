@@ -1,5 +1,5 @@
 function vid=ISXD2h5(inputFilePath)
-% ISXD2h5('C:\Users\BigBrain\Desktop\Sakthi_data\test.isxd',4)
+% ISXD2h5('C:\Users\BigBrain\Desktop\Sakthi_data\test.isxd')
 
 
 % Test that Inscopix MATLAB API ISX package installed
