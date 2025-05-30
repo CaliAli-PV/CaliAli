@@ -31,8 +31,10 @@ params.neuron_enhance = true;   % Enhance neurons using MIN1PIE background subtr
 params.noise_scale = true;      % Scale noise for each pixel
 params.detrend = 1;             % Detrending window (seconds). 0 = no detrending
 params.file_extension = 'avi';  % if a folder is selected instead of a single video file, 
-% Concatenate all videos with the specified file extension within that
-% folder
+                                % Concatenate all videos with the specified 
+                                % file extension within that folder.
+params.force_non_negative = 1;               % Enforce non-negative pixels after detrending
+params.force_non_negative_tolerance = 20;    % Allow pixel values to go negative up to a tolerance of 20
 
 
 % --- Motion Correction ---

@@ -24,6 +24,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `spatial_ds`       | `1`          | Spatial downsampling factor | Increase for faster processing, decrease for higher resolution. |
 | `temporal_ds`      | `1`          | Temporal downsampling factor | Increase only if memory constraints prevent full processing. |
 | `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | [Used when sessions are split into multiple files.]("For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder. CaliAli will automatically search for all files matching file_extension within that folder and treat them as segments of the same session. These files will then be concatenated into a single .mat file for streamlined processing.")|
+| `force_non_negative ` | `1 `| Enforce non-negative pixels after detrending | Enable to clamp all negative pixel values to zero; disable to allow negatives within the specified tolerance. |
+| `force_non_negative_tolerance`  | `20` | Non-negative tolerance threshold | Allows pixel values to remain negative up to this limit before clamping occurs. |
 
 ---
 
@@ -49,7 +51,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Inter-Session Alignment Parameters**
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
-| `do_alignment`      | `true`       | Perform inter-session alignment | Always true unless sessions were pre-aligned. If false, videos will be concatenated without registration. |
+| `do_alignment_translation`      | `true`       | Perform inter-session translation| Always true unless sessions were pre-aligned. If do_alignment_non_rigid is also false, videos will be concatenated without registration. |
+| `do_alignment_non_rigid`      | `true`       | Perform inter-session alignment | Always true unless sessions were pre-aligned or non-rigid alignment is not necessary. If do_alignment_translation is also false, videos will be concatenated without registration. |
 | `projections`       | `'BV+neuron'` | Projection method used for alignment | [By default, use both blood vessels and neurons for registration. If one is unsuitable, choose either BV or neurons.]("CaliAli automatically evaluates the usability of BV and may switch to a neuron-only registration strategy if necessary, even when ‘BV+neurons’ is selected. To enforce the use of BV, set Force_BV to true.")|
 | `final_neurons`     | `false`          | Use an additional alignment iteration based on neurons | Enable if session registration was inaccurate. Often not necessary |
 | `Force_BV`         | `0`          | Force BV alignment even if stability score is low | Sometimes BV stability score may be low as results of a debris in the FOV. Setting this parameter to true would ensure that BV are used for registration |
