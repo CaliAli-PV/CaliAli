@@ -656,6 +656,14 @@ classdef Sources2D < handle
                     dd = reshape(dd, 1, []);
                     tree = linkage(dd, 'complete');
                     srt = optimalleaforder(tree, dd);
+                elseif strcmpi(srt, 'spatial_position')
+                    d1=obj.options.d1;
+                    d2=obj.options.d2;
+                    [row, col] = ndgrid(0:d1-1, 0:d2-1);
+                    D = sqrt(row.^2 + col.^2);
+                    SP=D(:)*ones(1,size(obj.A,2));
+                    [~, srt] = sort(sum(SP.*obj.A),'ascend');
+
                 else %if strcmpi(srt, 'snr')
                     snrs = var(obj.C, 0, 2)./var(obj.C_raw-obj.C, 0, 2);
                     [~, srt] = sort(snrs, 'descend');

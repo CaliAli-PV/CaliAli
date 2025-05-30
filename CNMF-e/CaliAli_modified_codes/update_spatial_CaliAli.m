@@ -1,15 +1,15 @@
 function obj=update_spatial_CaliAli(obj, use_parallel,F)
 %% update_spatial_CaliAli - Updates the spatial components of extracted neuronal signals.
 %
-% This function refines the spatial footprints of detected neurons by processing 
-% data in multiple batches. It updates the spatial maps (A) based on activity 
-% levels while accounting for spatial variability, ensuring robust separation 
+% This function refines the spatial footprints of detected neurons by processing
+% data in multiple batches. It updates the spatial maps (A) based on activity
+% levels while accounting for spatial variability, ensuring robust separation
 % of overlapping components.
 %
 % Inputs:
 %   - obj: CNMF object containing spatial and temporal components.
 %   - use_parallel: Boolean flag for enabling parallel processing.
-%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%   - F (optional): Array specifying batch sizes for processing. If not provided,
 %     it is determined using get_batch_size(obj).
 %
 % Outputs:
@@ -20,8 +20,8 @@ function obj=update_spatial_CaliAli(obj, use_parallel,F)
 %   neuron = update_spatial_CaliAli(neuron, true);
 %   neuron = update_spatial_CaliAli(neuron, false, batch_frames);
 %
-% Author: Pablo Vergara  
-% Contact: pablo.vergara.g@ug.uchile.cl  
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
 fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
@@ -94,7 +94,7 @@ end
 frame_range = max_frame;
 T = diff(frame_range) + 1;
 if isempty(neuron.C_prev)
-neuron.C_prev=neuron.C;
+    neuron.C_prev=neuron.C;
 end
 
 % threshold for detecting large residuals
@@ -113,6 +113,7 @@ options = neuron.options;
 bg_model = options.background_model;
 bg_ssub = options.bg_ssub;
 method = options.spatial_algorithm;
+ca_options=neuron.CaliAli_options;
 
 %% determine search location for each neuron
 search_method = options.search_method;
@@ -121,9 +122,9 @@ if strcmpi(search_method, 'dilate')
 end
 
 if strcmpi(search_method, 'grow')
-IND = sparse(active_contour_grow(neuron)); %NOTE NEED TO ADD GROW PARAMETER TO CALIALI OPTIONS< NOW THIS IS FIXED TO 18 pxl
+    IND = sparse(active_contour_grow(neuron)); %NOTE NEED TO ADD GROW PARAMETER TO CALIALI OPTIONS< NOW THIS IS FIXED TO 18 pxl
 else
-IND = sparse(logical(determine_search_location(neuron.A, search_method, options)));
+    IND = sparse(logical(determine_search_location(neuron.A, search_method, options)));
 end
 %% identify existing neurons within each patch
 A = cell(nr_patch, nc_patch);
@@ -173,7 +174,7 @@ A_new = A;
 tmp_obj = Sources2D();
 tmp_obj.options = neuron.options;
 if use_parallel
-    parfor mpatch=1:(nr_patch*nc_patch) % this is parfor
+   parfor mpatch=1:(nr_patch*nc_patch) % this is parfor
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
 
         % no neurons, no need to update sn
@@ -182,9 +183,9 @@ if use_parallel
             % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
-        % prepare for updating model variables
+        % prepare for updating model variablesind_patch
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
-        
+
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
         tmp_block = block_pos{mpatch};
 
@@ -259,7 +260,7 @@ if use_parallel
             % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
-        A_patch = A_patch(ind_patch, :);
+        A_patch = A_patch(ind_patch(:), :);
 
         %         temp = HALS_spatial(Ypatch, A_patch, C_patch, IND_patch, 3);
         if strcmpi(method, 'hals')
@@ -270,6 +271,8 @@ if use_parallel
             temp = lars_spatial(Ypatch, A_patch, C_patch, IND_patch, sn_patch);
             %         elseif strcmpi(method, 'nnls_thresh')&&(~isempty(IND_patch))
             %             temp = nnls_spatial_thresh(Ypatch, A_patch, C_patch, IND_patch, 5, sn_patch);
+        elseif strcmpi(method, 'hessian')
+            temp = HALS_spatial_hessian(Ypatch, A_patch, C_patch,IND_patch,5,ca_options,nr, nc);
         else
             temp = nnls_spatial(Ypatch, A_patch, C_patch, IND_patch, 20);
         end
@@ -290,7 +293,7 @@ else
         % prepare for updating model variables
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
         tmp_block = block_pos{mpatch};
-        
+
         A_patch = A{mpatch};
         C_patch = C{mpatch};                % previous estimation of neural activity
         IND_patch = IND_search{mpatch};
@@ -367,6 +370,8 @@ else
             temp = lars_spatial(Ypatch, A_patch, C_patch, IND_patch, sn_patch);
             %         elseif strcmpi(method, 'nnls_thresh')&&(~isempty(IND_patch))
             %             temp = nnls_spatial_thresh(Ypatch, A_patch, C_patch, IND_patch, 5, sn_patch);
+        elseif strcmpi(method, 'hessian')
+            temp = HALS_spatial_hessian(Ypatch, A_patch, C_patch,IND_patch,5,ca_options,nr, nc);
         else
             temp = nnls_spatial(Ypatch, A_patch, C_patch, IND_patch, 20);
         end

@@ -25,7 +25,7 @@ if ~exist('neurons_only','var')
 end
 
 % If alignment is disabled, initialize empty shift data and return early
-if ~CaliAli_options.inter_session_alignment.do_alignment
+if ~CaliAli_options.inter_session_alignment.do_alignment_non_rigid
     [d1,d2,d3] = size(P.(1){1,1});
     Mask = true(d1,d2);
     shifts = zeros(d1,d2,2,d3);

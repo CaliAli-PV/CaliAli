@@ -104,6 +104,8 @@ addParameter(inp,'detrend',1)                 %Detrending of slow fluctuation. T
 addParameter(inp,'remove_BV',false)           %Remove BV from the neuron-filtered projection]
 
 addParameter(inp,'force_non_negative',1)       %Remove negative values after detrending
+addParameter(inp,'force_non_negative_tolerance',13)       %shifts the signal up by that amount before zero-clipping, preserving negative noise fluctuations within that range.
+                                               % default value is 13 pixels which corresponds to 5% of the unit8 range
 %% Dendrite processing codes. This section is experimental. This is not used unless structure is set to 'dendrite'
 addParameter(inp,'structure','neuron')      % Set up this to 'dendrite' to extract dendrites instead of neurons
 addParameter(inp,'dendrite_filter_size',0.5:0.1:0.8) % Dendrites filtering size
@@ -192,7 +194,9 @@ addParameter(inp,'gSig',2.5,valid_v)          %Neuron Filter size. 2.5 default.
 addParameter(inp,'sf',10,valid_v)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
-addParameter(inp,'do_alignment',true)         % Do inter-session aligment. If false video will be concatenated without correcting missalignments.
+addParameter(inp,'do_alignment_translation',true)       % Do inter-session aligment. If false video will be concatenated without correcting translation missalignments.
+addParameter(inp,'do_alignment_non_rigid',true)         % Do inter-session aligment. If false video will be concatenated without correcting non-rigid missalignments.
+
 addParameter(inp,'preprocessing',[])
 %% Inter-session alignment variables
 addParameter(inp,'projections', ...

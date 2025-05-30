@@ -29,18 +29,21 @@ if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
 
         % Load data from the file
         Y = CaliAli_load(fullFileName, 'Y');
-        if CaliAli_options.inter_session_alignment.do_alignment
+        if CaliAli_options.inter_session_alignment.do_alignment_translation
             % Apply translations using the stored translation data (T)
             Y = apply_translations(Y, CaliAli_options.inter_session_alignment.T(k,:), CaliAli_options.inter_session_alignment.T_Mask);
+        end
+
+        if CaliAli_options.inter_session_alignment.do_alignment_non_rigid
 
             % Apply non-rigid shifts (NR shifts) using the stored shifts
             Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask);
-
-            % If final neuron transformations are enabled, apply additional non-rigid shifts for neurons
-            if CaliAli_options.inter_session_alignment.final_neurons
-                Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask_n);
-            end
         end
+            % If final neuron transformations are enabled, apply additional non-rigid shifts for neurons
+        if CaliAli_options.inter_session_alignment.final_neurons
+                Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask_n);
+        end
+       
 
         % Scale the data based on the range (R)
         if isa(Y, 'uint16')

@@ -295,7 +295,7 @@ fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_
 if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
     [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron);
 elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
-    [A,C_raw,C,S,Ymean] = int_temp_batch_dendrite(neuron);
+    [A,C_raw,C,S,Ymean] = int_temp_batch_dendrite_fast(neuron);
 end
 %% export the results
 neuron.A = A;

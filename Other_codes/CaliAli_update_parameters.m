@@ -26,8 +26,8 @@ theFiles = uipickfiles('FilterSpec','*.mat');
 
 if ~isempty(varargin)
     par=struct(varargin{:});
-    for i=progress(1:size(theFiles,1))
-        load(theFiles{i})
+    for i=progress(1:size(theFiles,2))
+        load(theFiles{i},'CaliAli_options');
         fn = fieldnames(par);  % Get the field names of B
         for k = 1:numel(fn)
             CaliAli_options = update_field(CaliAli_options, fn{k}, par.(fn{k}));

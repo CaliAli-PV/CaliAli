@@ -33,6 +33,7 @@ temp=movmin(temp,CaliAli_options.preprocessing.sf*CaliAli_options.preprocessing.
 Y=double(obj-temp);
 
 if CaliAli_options.preprocessing.force_non_negative
+Y=Y+CaliAli_options.preprocessing.force_non_negative_tolerance; %This makes the the forcing lets strict allowin negative noise fluctuation to part of the colordepth resolution
 Y(Y<0)=0;
 end
 

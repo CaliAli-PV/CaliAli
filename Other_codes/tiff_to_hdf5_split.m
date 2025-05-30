@@ -24,9 +24,10 @@ function out = tiff_to_hdf5_split(fullFileName, frames, out_path)
 
   % Read the TIFF image using ScanImageTiffReader (adjust if using different reader)
   out = ScanImageTiffReader(char(fullFileName));
-
+   
+  out=out-min(out,[],'all');
+  out=uint8(out./(max(out,[],'all')./256));
   % Convert data to uint8 format (adjust data type if needed)
-  out = v2uint8(out.data());
 
   % Reorder dimensions to have frames as the first dimension (adjust if order is different)
   out = permute(out, [2 1 3]);

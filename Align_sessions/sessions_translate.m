@@ -31,7 +31,7 @@ bound1 = 20;  % Boundary padding size in the first dimension
 bound2 = 20;  % Boundary padding size in the second dimension
 
 % If alignment is not enabled, return a mask with no shifts
-if ~CaliAli_options.inter_session_alignment.do_alignment
+if ~CaliAli_options.inter_session_alignment.do_alignment_translation
     Mask = true(d1, d2);
     T = zeros(d3, 2); % No translation applied
     return

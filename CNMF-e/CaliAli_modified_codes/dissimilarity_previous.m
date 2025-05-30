@@ -30,10 +30,10 @@ function dis=dissimilarity_previous(A1,A2,C1,C2)
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025
 
-sA=create_similarity_matrix_2(full(A1)',full(A2)');
+sA=full(create_similarity_matrix_2(A1',A2'));
 sC=create_similarity_matrix_2(C1,C2);
 s=sA.*sC;
-
+s(isnan(s))=0;
 [M,ixz,~] = matchpairs(s,0,'max');
 
 ind = sub2ind([size(s,1) size(s,2)],M(:,1),M(:,2));
