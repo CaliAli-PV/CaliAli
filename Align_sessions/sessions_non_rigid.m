@@ -32,6 +32,8 @@ if ~CaliAli_options.inter_session_alignment.do_alignment_non_rigid
     return
 end
 
+P=average_P_same_sessions(P,CaliAli_options.inter_session_alignment.same_ses_id);
+
 fprintf(1, 'Calculating non-rigid alignments...\n');
 
 % Pre-allocate data for parallel computation
@@ -76,6 +78,8 @@ for k = 1:size(P, 2)
     temp = P.(k){1, 1};
     P.(k){1, 1} = remove_borders(temp);  % Remove borders from each projection
 end
+
+[P,shifts]=expand_P_from_same_session_batches(P,shifts,CaliAli_options.inter_session_alignment.same_ses_id);
 
 % Update the CaliAli_options structure with the computed shifts and masks
 if neurons_only
