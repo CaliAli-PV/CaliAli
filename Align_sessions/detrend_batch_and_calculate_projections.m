@@ -50,7 +50,7 @@ for k = 1:length(opt_g.input_files)
     [filepath, name] = fileparts(fullFileName);
     
     % Create an output file name by appending '_det' to the original file name
-    if ~contains(name, {'det', 'aligned'})
+    if ~contains(name, {'det', 'Aligned'})
         out{k} = strcat(filepath, filesep, name, '_det', '.mat');
     else
         out{k} = strcat(filepath, filesep, name, '.mat');

@@ -54,6 +54,7 @@ CaliAli_options = match_video_size(CaliAli_options);
 % Get stored projections
 P1 = get_stored_projections(CaliAli_options);
 
+
 % Perform translation and non rigid session registration
 [P2, CaliAli_options] = sessions_translate(P1, CaliAli_options);
 [P3, CaliAli_options] = sessions_non_rigid(P2, CaliAli_options);

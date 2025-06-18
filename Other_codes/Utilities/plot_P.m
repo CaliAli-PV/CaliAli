@@ -1,9 +1,9 @@
 function frame = plot_P(P)
 % frame=plot_P(P);
 for i = 1:size(P,2)
-    P.(i)(1,:).(1){1,1} = gray2rgb(P.(i)(1,:).(1){1,1});
-    P.(i)(1,:).(2){1,1} = gray2rgb(P.(i)(1,:).(2){1,1}, 'bone');
-    P.(i)(1,:).(3){1,1} = gray2rgb(P.(i)(1,:).(3){1,1}, 'hot');
+    P.(i)(1,:).(1){1,1} = gray2rgb(v2uint8(P.(i)(1,:).(1){1,1}));
+    P.(i)(1,:).(2){1,1} = gray2rgb(v2uint8(P.(i)(1,:).(2){1,1}), 'bone');
+    P.(i)(1,:).(3){1,1} = gray2rgb(v2uint8(P.(i)(1,:).(3){1,1}), 'hot');
     P.(i)(1,:).(5){1,1} = mat2gray(P.(i)(1,:).(5){1,1});
 end
 names = P.Properties.VariableNames;

@@ -204,6 +204,22 @@ addParameter(inp,'projections', ...
 addParameter(inp,'final_neurons',0)             % Add an extra alignment iteration utilizing only neuron shapes after CaliAli
 addParameter(inp,'Force_BV',0)                  % Force the use of BVz for alignment, even if BVz stability score is low.
 addParameter(inp,'batch_sz',0)                  % Number of frames to use per batch. If batch_sz=0, then the number of frame per batch is equal to the number of frames per_session.
+
+
+%% Defening video batches corresponding to the same session
+% In some cases, the available memory may not be sufficient to process a full
+% individual session. To handle this, video files can be split into smaller
+% segments. When doing so, we need to inform CaliAli which files belong to
+% the same original session. For those files, non-rigid inter-session alignment
+% will be skipped. 
+%
+% Usage example:
+% If you have 4 files—2 belonging to session A and 2 to session B—
+% specify the session grouping as:
+% same_ses_id = [1, 1, 2, 2];
+
+addParameter(inp,'same_ses_id',[])        % If [], all files will be considered as different sessions.
+
 %% Internal variables
 
 addParameter(inp,'alignment_metrics',[]) % Alignment_metrics
