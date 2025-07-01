@@ -74,9 +74,9 @@ R = max(Y,[],'all');
 
 % Convert the data to the appropriate format (uint8 or uint16) based on the original class
 if strcmp(S, 'uint8')
-    Y = Y./max(Y,[],'all')*256; % Convert to uint8 format if the original data was uint8
+    Y = uint8(Y./max(Y,[],'all')*256); % Convert to uint8 format if the original data was uint8
 else
-    Y = Y./max(Y,[],'all')*65536; % Convert to uint16 format for other data types
+    Y = uint16(Y./max(Y,[],'all')*65536); % Convert to uint16 format for other data types
 end
 
 % Fuse the blood vessel projections with the neuron projections for visual comparison
