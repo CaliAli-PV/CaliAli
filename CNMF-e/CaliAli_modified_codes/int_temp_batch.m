@@ -46,9 +46,9 @@ for i=progress(1:size(fn,2)-1)
     HY = bsxfun(@minus, HY, median(HY, 2));
 
     %% Get PNR and CN PV
-    if ~isempty(neuron.Cn)
-        Cn=neuron.Cn;
-        PNR=neuron.PNR;
+    if ~isempty(neuron.CaliAli_options.inter_session_alignment.Cn)
+        Cn=neuron.CaliAli_options.inter_session_alignment.Cn;
+        PNR=neuron.CaliAli_options.inter_session_alignment.PNR;
     else
         [~,Cn,PNR]=get_PNR_coor_greedy_PV(reshape(HY,d1,d2,[]),gSig,[],[],n_enhanced);
     end

@@ -40,7 +40,7 @@ function file_path = CaliAli_cnmfe()
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025
 
-input_files = uipickfiles('FilterSpec','*_ds*.mat');
+input_files = uipickfiles('FilterSpec', '*.mat', 'REFilter', '_Aligned*\.mat$|_det*\.mat$');
 
 file_path=cell(size(input_files,1),1);
 for i=1:size(input_files,1)
