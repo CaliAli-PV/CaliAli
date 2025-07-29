@@ -147,6 +147,7 @@ end
 % neuron.delete(ix);
 % save_workspace(neuron);
 %% update residuals
+% neuron.Coor=neuron.get_contours(0.6);
 % neuron=manually_update_residuals(neuron,1);
 
 
