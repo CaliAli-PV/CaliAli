@@ -47,10 +47,11 @@ function file_path=runCNMFe(in)
 % Date: 2025
 
 neuron = Sources2D();
-pars=CaliAli_load(in,'CaliAli_options.cnmf');
+CaliAli_options=CaliAli_load(in,'CaliAli_options');
+pars=CaliAli_options.cnmf;
 neuron = fill_neuron(neuron, pars);
 neuron.options = fill_neuron(neuron.options, pars);
-neuron.CaliAli_options=CaliAli_load(in,'CaliAli_options');
+neuron.CaliAli_options=CaliAli_options;
 neuron.select_data(in);
 neuron.getReady();
 evalin( 'base', 'clearvars -except parin theFiles' );
