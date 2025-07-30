@@ -1,15 +1,16 @@
-function fsn=GetSn_fast(data,win,rep,d1,d2)
+function sn=GetSn_fast(data,win,d1,d2)
+
+
+rep=min([round(size(data,2)/win),10]);
 
 x=round(linspace(1,size(data,2),rep+1));
-s=[];
-for i=1:length(x)-1
-    temp=data(:,x(i):x(i)+win);
-    s=[s,temp];
-end
+ix=zeros(1,size(data,2));
+ix(x(1:end-1))=1;
+ix=movmax(ix,[win-1,0]);
+data=data(:,ix==1);
 
-
-sn = GetSn(s);
-
-fsn = medfilt2(reshape(sn,d1,d2), [5 5],'symmetric');
-fsn=fsn(:);
+sn = GetSn(data);
+sn = reshape(sn,d1,d2);
+sn = medfilt2(sn,[5,5],'symmetric');
+sn = sn(:);
 end

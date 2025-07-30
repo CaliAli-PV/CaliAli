@@ -60,6 +60,7 @@ elseif strcmp(CaliAli_options.preprocessing.structure, 'dendrite')
     [Cn, PNR] = get_PNR_Cn_dendrite(Y, CaliAli_options); % Use dendrite method for projections
 else
     % Default: use greedy approach for calculating projections (with optional neuron enhancement)
+    fprintf('Calculating correlation image...\n');  
     [~, Cn, PNR] = get_PNR_coor_greedy_PV(Y, CaliAli_options.gSig, [], [], CaliAli_options.preprocessing.neuron_enhance);
 end
 

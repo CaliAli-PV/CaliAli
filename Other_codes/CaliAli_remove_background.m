@@ -28,16 +28,19 @@ function Y=CaliAli_remove_background(Y,CaliAli_options)
 % Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
+fprintf('Detrending...\n');
 if CaliAli_options.preprocessing.detrend>0
     Y=detrend_vid(Y,CaliAli_options);
 end
 
 if CaliAli_options.preprocessing.noise_scale
+    fprintf('Scaling to noise level...\n');  
     Y=noise_scaling(Y);
 end
 
-if CaliAli_options.preprocessing.neuron_enhance
+if CaliAli_options.preprocessing.neuron_enhance  
     if strcmp(CaliAli_options.preprocessing.structure,'neuron')
+        fprintf('Enhanching Neurons...\n');  
         Y=MIN1PIPE_bg_removal(Y,CaliAli_options);
     elseif strcmp(CaliAli_options.preprocessing.structure,'dendrite')
         Y=v2uint8(double(Y).*mat2gray(dendrite_bg_removal(Y,CaliAli_options)));
@@ -67,7 +70,11 @@ function Y=noise_scaling(Y)
 Y=double(reshape(Y,[d1*d2,d3]));
 Y=Y./max(Y,[],'all');
 Y=Y+randn(size(Y))./10000;
+if d3>1000
+Y=Y./GetSn_fast(Y,100,d1,d2);
+else
 Y=Y./GetSn(Y);
+end
 Y(isnan(Y))=randn(sum(isnan(Y),'all'),1);
 Y(isinf(Y))=randn(sum(isinf(Y),'all'),1);
 Y=reshape(Y,[d1,d2,d3]);
