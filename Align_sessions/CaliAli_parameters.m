@@ -27,29 +27,36 @@ function opt=CaliAli_parameters(varargin)
 % Date: 2025
 
 %% INTIALIZE VARIABLES
-inp = inputParser;
-%% General variables
 
-if numel(varargin)==1&&isstruct(varargin{1})
-    varargin=varargin{1};
-    varargin = [fieldnames(varargin), struct2cell(varargin)]';
+%% INTIALIZE VARIABLES
+struct_param={};
+if isstruct(varargin{1})
+    struct_param = [fieldnames(varargin{1}), struct2cell(varargin{1})]';
+    varargin(1)=[];
+end
+NameValue_param={};
+if numel(varargin)>1
+    NameValue_param=[varargin(1:2:end), varargin(2:2:end)]';
 end
 
-inp.KeepUnmatched = true;
-parse(inp,varargin{:});
-opt=inp.Results;
+varargin=[struct_param,NameValue_param];
+
 
 %% Downsampling Parameters
-opt.downsampling=downsampling_parameters(check_CaliAli_structure(varargin,'downsampling'));
+opt.downsampling=downsampling_parameters( ...
+    check_CaliAli_structure(varargin,'downsampling'));
 %% Preporcessing parameters (Detrending and background pre-processing)
-opt.preprocessing=preprocessing_parameters(check_CaliAli_structure(varargin,'preprocessing'));
+opt.preprocessing=preprocessing_parameters( ...
+    check_CaliAli_structure(varargin,'preprocessing'));
 %% Motion correction parameters
-opt.motion_correction=motion_correction_parameters(check_CaliAli_structure(varargin,'motion_correction'));
+opt.motion_correction=motion_correction_parameters( ...
+    check_CaliAli_structure(varargin,'motion_correction'));
 opt.motion_correction.preprocessing=opt.preprocessing;
 opt.motion_correction.preprocessing.detrend=false;
 opt.motion_correction.preprocessing.noise_scale=0;
 %% Inter-session alignment parameters
-opt.inter_session_alignment=inter_session_alignment_parameters(check_CaliAli_structure(varargin,'inter_session_alignment'));
+opt.inter_session_alignment=inter_session_alignment_parameters( ...
+    check_CaliAli_structure(varargin,'inter_session_alignment'));
 opt.inter_session_alignment.preprocessing=opt.preprocessing;
 %% CNMF-E parameters
 opt.cnmf=CNMFE_parameters(check_CaliAli_structure(varargin,'cnmf'));
@@ -86,7 +93,6 @@ if isempty(opt.BVsize)
 end
 
 end
-
 
 function opt=preprocessing_parameters(varargin)
 %% INTIALIZE VARIABLES
@@ -130,7 +136,6 @@ inp.KeepUnmatched = true;
 parse(inp,varargin{:});
 opt=inp.Results;
 end
-
 
 function opt=motion_correction_parameters(varargin)
 %% INTIALIZE VARIABLES
@@ -180,7 +185,6 @@ if isempty(opt.BVsize)
     opt.BVsize=[0.6*opt.gSig,0.9*opt.gSig];
 end
 end
-
 
 function opt=inter_session_alignment_parameters(varargin)
 %% INTIALIZE VARIABLES
@@ -253,10 +257,14 @@ end
 
 function input = check_CaliAli_structure(input,field_name)
 % check_fields Checks if a structure has the specified fields.
-index = find(strcmp(input(1,:), field_name));
-if ~isempty(index)
-    input=input{2,index};
-    input = [fieldnames(input), struct2cell(input)]';
+if ~isempty(input)
+    index = find(strcmp(input(1,:), field_name));
+    if ~isempty(index)
+        struct_param=input{2,index};
+        struct_param = [fieldnames(struct_param), struct2cell(struct_param)]';
+        NameValue_param=input;
+        NameValue_param(:,index)=[];
+        input=[struct_param,NameValue_param];
+    end
 end
-
 end

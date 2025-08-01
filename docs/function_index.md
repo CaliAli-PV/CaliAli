@@ -4,6 +4,7 @@
      |---|
      | [apply_transformations()](Functions_doc/apply_transformations.md#apply_transformations) |
      | [batchConvertVideos()](Functions_doc/batchConvertVideos.md)|
+     | [BV_app](Functions_doc/BV_app.md)|
      | [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions) |
      | [CaliAli_cnmfe()](Functions_doc/CaliAli_cnmfe.md#CaliAli_cnmfe) |
      | [CaliAli_concatenate_files()](Functions_doc/CaliAli_concatenate_files.md#CaliAli_concatenate_files) |
@@ -32,6 +33,7 @@
      | [manually_update_residuals()](Functions_doc/manually_update_residuals.md#manually_update_residuals) |
      | [match_video_size()](Functions_doc/match_video_size.md#match_video_size) |
      | [motion_metrics()](Functions_doc/motion_metrics.md#motion_metrics) |
+     | [NeuronSize_app](Functions_doc/NeuronSize_app.md)|
      | [Non_rigid_mc()](Functions_doc/Non_rigid_mc.md#Non_rigid_mc) |
      | [plot_alignment_scores()](Functions_doc/plot_alignment_scores.md#plot_alignment_scores) |
      | [postprocessDeconvolvedTraces()](Functions_doc/postprocessDeconvolvedTraces.md#postprocessDeconvolvedTraces) |

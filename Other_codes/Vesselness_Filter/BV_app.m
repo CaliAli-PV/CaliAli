@@ -1,4 +1,8 @@
-function BV_app()
+function r=BV_app(lim)
+
+if ~exist('lim','var')
+lim=0.1:0.05:6;
+end
 
 theFiles = uipickfiles('REFilter','\.mat*$','num',1);
 V=CaliAli_load(theFiles{1, 1}  ,'Y');
@@ -6,30 +10,17 @@ V=CaliAli_load(theFiles{1, 1}  ,'Y');
 if contains(theFiles{1, 1},'_mc')
     M=median(V,3);
 else
-    M=V(:,:,round(size(V,3)/2));
+    M=mat2gray(V(:,:,round(size(V,3)/2))); 
+    M = imgaussfilt(M, 1); 
 end
 
-[M,opt.Mask]=remove_borders(M,0);
+[M,~]=remove_borders(M,0);
 
-if ~exist('opt','var')
-    opt.BVz=[0.6*2.5,0.9*2.5];
-end
+M = remove_vignetting_video_adaptive_batches(M);
 
-sz=round(max(size(M))/8);
-se = offsetstrel('ball',sz,0.01);
-for i=1:size(M,3)
-    R=M(:,:,i)-imopen(M(:,:,i),se);
-    if i==1
-        [gradThresh,numIter] = imdiffuseest(R,'ConductionMethod','quadratic');
-    end
-    C(:,:,i) = mat2gray(imdiffusefilt(R,'ConductionMethod','quadratic', ...
-        'GradientThreshold',gradThresh,'NumberOfIterations',numIter));
-end
-C=C+randn(size(C))/10000;
+BV= BV_stack(M,lim, [1;1],false);
 
-BV= BV_stack(C,0.1:0.05:6, [1;1],false);
-
-app=BV_app_in(BV);
+app=BV_app_in(BV,lim);
 app.done=0;
 while app.done == 0  % polling
     pause(0.05);

@@ -10,7 +10,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
-| `gSig`             | `2.5`        | Neuron filter size in pixels | Use 1/5 of the neuron diameter in pixels. If unsure, opt for smaller values.|
+| `gSig`             | `2.5`        | Neuron filter size in pixels | Utilize [NeuronSize_app](Functions_doc/NeuronSize_app.md) on a motion correction video to interactively estimate this parameter.|
 | `sf`               | `10`         | Frame rate (fps) | Set to match the acquisition frame rate. |
 | `input_files`       | `[]`         | Paths to input video files | Leave empty to manually select files. |
 | `output_files`      | `[]`         | Paths to output video files | Leave empty for default naming (recommended). |
@@ -20,7 +20,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Downsampling Parameters**
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
-| `BVsize`           | `[]`         | Size of blood vessels in pixels [min, max] | Leave empty to automatically calculate based on gSig or use `BV_app` for optimal selection.|
+| `BVsize`           | `[]`         | Size of blood vessels in pixels [min, max] | Leave empty to automatically calculate based on gSig or use [BV_app](Functions_doc/BV_app.md) (recommended).|
 | `spatial_ds`       | `1`          | Spatial downsampling factor | Increase for faster processing, decrease for higher resolution. |
 | `temporal_ds`      | `1`          | Temporal downsampling factor | Increase only if memory constraints prevent full processing. |
 | `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | [Used when sessions are split into multiple files.]("For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder. CaliAli will automatically search for all files matching file_extension within that folder and treat them as segments of the same session. These files will then be concatenated into a single .mat file for streamlined processing.")|

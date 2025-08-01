@@ -83,6 +83,7 @@ nav:
       - Motion Correction: Motion_correction.md
       - Inter-session Alignment: alignment.md
       - Calcium Signal extraction with CaliAli: extraction.md
+      - Low-Memory Processing: Low_memory.md
       - Whats new?: Version_History.md
       - Usage Agreement: License.md
       - CaliAli Parameters Overview: Parameters_index.md

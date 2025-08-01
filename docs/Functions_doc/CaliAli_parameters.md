@@ -21,6 +21,7 @@ This function initializes and returns a structured set of parameters for differe
 ```matlab
 opt = CaliAli_parameters();   % Default parameter initialization
 opt = CaliAli_parameters(existing_opt);   % Use existing parameter structure
+opt = CaliAli_parameters('sf',20);   % Set sampling frequency to 20 fps.
 ```
 
 #### Notes:

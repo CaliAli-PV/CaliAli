@@ -23,7 +23,7 @@ It is common for continuous calcium imaging data to be saved across multiple vid
 
 Treating each of these split videos as independent sessions is not ideal, as using the inter-session alignment pipeline is more computationally demanding than simply aligning and motion-correcting the concatenated chunk.
 
-The recommended approach is to select the parent folder when calling:
+The recommended approach is to select the **parent folder** when calling:
 ```matlab
 CaliAli_options = CaliAli_downsample(CaliAli_options);
 ```
