@@ -57,7 +57,7 @@ else
     % Loop through each column of the projections in P and concatenate them
     for i = 1:size(P, 2)
         % Concatenate the projections along the appropriate dimension (based on the number of dimensions)
-        T.(i){1, 1} = cat(ndims(P.(i){1, 1}) + 1, T.(i){1, 1}, P.(i){1, 1});
+        T.(i){1, 1} = single(cat(ndims(P.(i){1, 1}) + 1, T.(i){1, 1}, P.(i){1, 1}));
     end
 end
 
