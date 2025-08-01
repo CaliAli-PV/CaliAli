@@ -6,7 +6,7 @@ The **CaliAli pipeline** uses a structured approach to **initialize, configure, 
 
 #### 📌 Key Features of CaliAli Parameter Management
 
-##### 1️⃣ Modular Parameter Handling
+##### 1️⃣ CaliAli submodules:
 CaliAli organizes its processing pipeline into **separate submodules**, each with its own set of parameters:
 
 - **Downsampling**
@@ -15,46 +15,8 @@ CaliAli organizes its processing pipeline into **separate submodules**, each wit
 - **Inter-Session Alignment**
 - **CNMF-E** (Calcium  signal extraction and demixing)
 
----
+The parameters utilized by each submodule is determine on a `CaliAli_options` structure:
 
-##### 2️⃣ Flexible Input Handling
-CaliAli parameters can be set in **two ways**:
-
-1. **Default Initialization:**  
-   If no inputs are provided, default parameters are loaded:
-
-   ```matlab
-   opt = CaliAli_parameters();
-   ```
-
-2. **Custom Parameter Structure:**  
-   Users can provide an existing structure to modify specific parameters:
-
-   ```matlab
-   opt = CaliAli_parameters(existing_opt);
-   ```
-
-The function [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.md#CaliAli_demo_parameters) demonstrates how to create this structure. The recommended approach for analyzing your own data is to modify and duplicate this code to suit your needs: `open(CaliAli_demo_parameters());`
-
----
-
-#### Adjusting CaliAli Parameters.
-
-CaliAli requires setting 33 parameters. However, in practice you only need to strictly focus on three: 
-
-1. Frame rate: `sf`
-2. Neuron filtering size: `gSig` which correspond to 1/5 of the average neuron size in pixels.
-3. System Memory:
-
-| Parameter Name           | Default Value | Description | How to Choose |
-|--------------------------|--------------|-------------|--------------|
-| `memory_size_to_use`     | `total_system_memory_GB` | Total available memory for computation | Adjust based on available RAM. |
-| `memory_size_per_patch`  | `16`       | Memory allocated per patch | Adjust based on available RAM and number of patches. |
- 
-For advanced users, a detailed description of other parameters and methods for setting them can be found in: [Parameter Index](Parameters_index.md)
-
-When you run `CaliAli_options=CaliAli_demo_parameters();` you will get a structure as follow:
- 
 ```matlab
 ◼ CaliAli_options
 ├─ downsampling
@@ -71,6 +33,58 @@ When you run `CaliAli_options=CaliAli_demo_parameters();` you will get a structu
 │  └─ ...
 └─ ...
 ```
+
+The default set of parameters can be obtained with `CaliAli_demo_parameters();` function.
+
+---
+
+##### 2️⃣ Flexible Input Handling
+CaliAli parameters can be set in **Three ways**:
+
+1.    **Default Initialization:**  
+       If no inputs are provided, default parameters are loaded:
+
+       ```matlab
+       CaliAli_options = CaliAli_parameters();
+       ```
+
+2.     **Custom Parameter Structure:**  
+       Users can provide an existing structure to modify specific parameters:
+
+       ```matlab
+       param.sf=20 % custom sample frequency
+       param.gSig=3  %custom neuron filter size
+       CaliAli_options= CaliAli_parameters(param);
+       ```
+   
+   3.     **Custom name-value pairs :**  
+       Users can provide name-value pairs 
+
+       ```matlab
+       CaliAli_options = CaliAli_parameters('sf',20); % set sampling frequency to 20
+       ```
+
+The function [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.md#CaliAli_demo_parameters) demonstrates how to create this structure. The recommended approach for analyzing your own data is to modify and duplicate this code to suit your needs: `open CaliAli_demo_parameters.m`
+
+---
+
+#### Adjusting CaliAli Parameters.
+
+CaliAli requires setting 33 parameters. However, in practice you only need to strictly focus on three: 
+
+1. Frame rate: `sf`
+2. Neuron filtering size: `gSig` which correspond to 1/5 of the average neuron size in pixels.
+3. Blood vessel size: : `BVsize` which correspond to the size of blood vessels in pixels [min, max]
+
+Follow the Demo `Parameter_selection_demo.mlx` to learn how to define these parameters interactively using the [BV_app](Functions_doc/BV_app.md) and [NeuronSize_app](Functions_doc/NeuronSize_app.md):
+
+```matlab 
+    open Parameter_selection_demo.mlx
+```
+
+ 
+For advanced users, a detailed description of other parameters and methods for setting them can be found in: [Parameter Index](Parameters_index.md)
+
 
 
 === "Next"

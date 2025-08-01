@@ -41,8 +41,15 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
      will automatically set the downsampling output files as the input for the motion correction module, skipping the file selection dialog entirely. This approach is especially useful when processing multiple files overnight 😴.
 
 
-??? Question "What if want to change parameters in the middle of the analysis?" 
-       You can change parameters with [CaliAli_update_parameters()](Functions_doc/CaliAli_update_parameters.md#CaliAli_update_parameters) 
+??? Question "What if I want to change parameters in the middle of the analysis?" 
+	If you want to change parameters in the `CaliAli_options` structure, you can simply modify its values:
+			
+	`CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;`
+    
+    However, note that some parameters are used by different modules. For example, `BVsize` is utilized during both motion correction and inter-session alignment. To replace all instances of `BVsize`, you can run:  
+    `CaliAli_options = CaliAli_parameters(CaliAli_options, 'BVsize', BVsize);`
+    
+    Now, if you want to change parameters in the `CaliAli_options` stored in multiple files, you can run [CaliAli_update_parameters()](Functions_doc/CaliAli_update_parameters.md#CaliAli_update_parameters), which will update all the selected files.
 
 ---
 
