@@ -1,37 +1,61 @@
 # Version History <a id="vh"></a> 
 
+## CaliAli 1.3 Release Notes
+
+**🗓️ August 1st 2025**
+
+- 🚀 Introduced **low-memory mode** for processing sessions that exceed available RAM  
+ 	 - Allows splitting large individual sessions into smaller files  
+ 	 - Applies non-rigid alignment **only across actual sessions**, not within  
+  	 - Reduces computation time and avoids alignment redundancy  
+  	 - Demo file provided.
+
+- 🔧 Simplified BV detection pipeline  
+  	- Replaced vignetting correction with faster **Gaussian-based filtering**  
+
+- 🐛 Fixed bug in `CaliAli_parameter`  
+    - Default values now load correctly when no input is provided  
+    - Supports structure-based parameter updates:  
+    ```matlab
+    opt = CaliAli_parameter(opt, 'param_name', value);
+    ```
+
+- 📊 Added demo for **interactive parameter selection**  
+  - Includes tools for tuning **BV size** and **neuron size**  
+
+  - 🧩 Developed App Designer tool for estimating optimal **neuron size filter**
+
 
 ## CaliAli 1.2.2 Release Notes
 
-**May 30th 2025**
+**🗓️ May 30th 2025**
 
-- The `do_alignment` flag has been split into `do_alignment_translation` and `do_alignment_non_rigid`, so you can perform either alignment operation—or skip both if both flags are set to false—replicating the original `do_alignment` behavior when neither is enabled.
-- Introduced the `force_non_negative_tolerance` parameter. Previously, any negative pixel values produced after detrending were automatically trimmed; now, small negative values are permitted.
-- Substantially improved the efficiency of the `create_similarity_matrix` function used to compare extraction similarities across CNMF iterations.
-- Optimized `play_movie` for more efficient playback handling.
+- 🔧 The `do_alignment` flag has been split into `do_alignment_translation` and `do_alignment_non_rigid`, so you can perform either alignment operation—or skip both if both flags are set to false—replicating the original `do_alignment` behavior when neither is enabled.
+- ➕ Introduced the `force_non_negative_tolerance` parameter. Previously, any negative pixel values produced after detrending were automatically trimmed; now, small negative values are permitted.
+- ⚡ Substantially improved the efficiency of the `create_similarity_matrix` function used to compare extraction similarities across CNMF iterations.
+- 🎥 Optimized `play_movie` for more efficient playback handling.
 
 
-#### CaliAli 1.2.1 Release Notes
+### CaliAli 1.2.1 Release Notes
 
-**April 16th 2025**
+**🗓️ April 16th 2025**
 
-- Added documentation for processing split calcium imaging data files, including support for multiple video segments per session and TIFF files.
-- Fixed a bug where the text progress bar did not display the final update.
-- Fixed a bug where traces were not correctly displayed in `postprocessing_app`.
-- Disabled batch processing in `v2uint16` and `v2uint8` due to compatibility issues on some operating systems.
-- Fixed a bug where the background component was not correctly handled in batch mode when using the SVG model.
-- Improved data handling when saving concatenated files, making the new code significantly faster.
+- 📚 Added documentation for processing split calcium imaging data files, including support for multiple video segments per session and TIFF files.
+- 🐛 Fixed a bug where the text progress bar did not display the final update.
+- 🐛 Fixed a bug where traces were not correctly displayed in `postprocessing_app`.
+- ⚠️ Disabled batch processing in `v2uint16` and `v2uint8` due to compatibility issues on some operating systems.
+- 🐛 Fixed a bug where the background component was not correctly handled in batch mode when using the SVG model.
+- 💾 Improved data handling when saving concatenated files, making the new code significantly faster.
 
 ---
 
+### CaliAli 1.2 Release Notes
 
-#### CaliAli 1.2 Release Notes
-
-**February 7th 2025**
+**🗓️ February 7th 2025**
 
 This update focuses on increasing the modularity of the CaliAli pipeline by restructuring how parameters and functions are handled. A central CaliAli_options structure now consolidates all settings required for video processing, enabling each module to operate more independently. This refactoring lays groundwork for future support of multiple calcium imaging data types (including both 2P and 1P) and specialized tools for dendritic signal extraction.
 
-Because of these significant changes, the previous workflow used to analyze data is no longer compatible, and older procedures will not work in the updated environment.
+⚠️ Because of these significant changes, the previous workflow used to analyze data is no longer compatible, and older procedures will not work in the updated environment.
 
 ###### Other Changes
 
@@ -45,8 +69,8 @@ Because of these significant changes, the previous workflow used to analyze data
 
 ---
 
-#### CaliAli 1.0.1 Release Notes
-**April 22nd 2024**
+### CaliAli 1.0.1 Release Notes
+**🗓️ April 22nd 2024**
 
 - Introduced a new app for determining optimal blood vessel (BV) size.
 - Removed unnecessary or deprecated functions.
@@ -55,7 +79,7 @@ Because of these significant changes, the previous workflow used to analyze data
 [Full Changelog](https://github.com/CaliAli-PV/CaliAli/compare/v1.0...v1.0.1) on GitHub.
 
 #### CaliAli Stable Version 1.0 Release Notes
-**April 19th 2024**
+**🗓️ April 19th 2024**
 
 We are excited to announce the first stable version of CaliAli, featuring significant enhancements and improvements. Below are the key changes in this release:
 
@@ -79,7 +103,7 @@ We are excited to announce the first stable version of CaliAli, featuring signif
 
 ---
 
-#### CaliAli Beta Release 1.0-beta 
+### CaliAli Beta Release 1.0-beta 
 **May 19th 2023**
 
 The first beta release of CaliAli is now available, offering advanced capabilities for extracting neural signals from one-photon calcium imaging data in free-moving conditions.

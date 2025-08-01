@@ -1,10 +1,11 @@
-function neuron=manually_update_residuals(neuron,use_parallel)
+function neuron=manually_update_residuals(neuron,thr,use_parallel)
 %% manually_update_residuals: Iteratively refines residuals in CNMF-E extracted components.
 %
 % Inputs:
 %   neuron       - CNMF-E extracted neuron structure containing spatial (A) and 
 %                  temporal (C_raw) components.
 %   use_parallel - Boolean flag to enable parallel computation for speed-up.
+%   thr          - Threshold for countours drawing
 %
 % Outputs:
 %   neuron       - Updated neuron structure with refined residuals.
@@ -48,7 +49,7 @@ function neuron=manually_update_residuals(neuron,use_parallel)
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025
 
-
+neuron.Coor=neuron.get_contours(thr);
 seed_all=get_seed(neuron);
 neuron=update_temporal_CaliAli(neuron, use_parallel);
 neuron=update_residual_custom_seeds(neuron,seed_all);
