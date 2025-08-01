@@ -51,7 +51,7 @@ for k = 1:length(opt.input_files)
         if isempty(gcp('nocreate'))
             parpool
         end
-
+        disp('Calculating translation shift...')
         % Perform rigid motion correction
         [Y, ref] = Rigid_mc(Y, opt);
 
