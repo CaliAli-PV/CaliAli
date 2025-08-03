@@ -62,11 +62,8 @@ tic
 neuron =initComponents_parallel_PV(neuron,[],[], 0, 1,0);
 toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
-
-
-
+save_workspace(neuron);
 %% Update components
-
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10

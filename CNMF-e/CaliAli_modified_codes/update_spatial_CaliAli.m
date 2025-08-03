@@ -29,26 +29,23 @@ if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);
 end
 batch=[0,cumsum(F)];
-A_temp=obj.A.*0;
+A_temp={};
 div=length(batch)-1;
 obj.A_prev=obj.A;
 for i=progress(1:div)
     out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
     Ca(:,i)=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     %      A=max(cat(3,full(A),full(out_A)),[],3);
-    A_temp=cat(3,full(A_temp),full(out_A));
+    A_temp{i}=out_A;
 end
 Ca=Ca.^2;
 Ca=Ca./sum(Ca,2);
-for i=1:size(Ca,1)
-    A(:,i)=sum(squeeze(A_temp(:,i,2:end)).*Ca(i,:),2);
+A=sparse(obj.A*0);
+for i=1:size(Ca,2)
+    A=A+A_temp{i}.*Ca(:,i)';
 end
-
 obj.A=sparse(A);
 end
-
-
-
 
 
 function out_A=update_spatial_in(neuron, use_parallel,max_frame,idx, update_sn)
