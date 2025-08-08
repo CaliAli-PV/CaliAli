@@ -1,10 +1,7 @@
 name: export-traffic-to-private
 on:
-  schedule: [{cron: "23 3 * * *"}]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+  schedule: [{cron: "23 3 * * *"}]  # runs daily at 03:23 UTC
+  workflow_dispatch:                # allow manual run
 
 jobs:
   export:
@@ -14,16 +11,17 @@ jobs:
         run: |
           rm -rf out && mkdir -p out/json out/csv
 
-      - name: Fetch traffic + releases (using GITHUB_TOKEN)
+      # Use the same classic PAT for both reading and pushing
+      - name: Fetch traffic + releases via PAT
         env:
           OWNER: CaliAli-PV
           REPO: CaliAli
-          GH_TOKEN: ${{ github.token }}
+          TRAFFIC_PAT: ${{ secrets.TRAFFIC_PAT }}   # your classic PAT
         run: |
           set -e
           dt=$(date -u +%F)
           base="https://api.github.com/repos/$OWNER/$REPO"
-          auth="-H Authorization: Bearer $GH_TOKEN -H Accept: application/vnd.github+json"
+          auth="-H Authorization: Bearer $TRAFFIC_PAT -H Accept: application/vnd.github+json"
 
           curl -sS $auth "$base/traffic/views"             > "out/json/${dt}-views.json"
           curl -sS $auth "$base/traffic/clones"            > "out/json/${dt}-clones.json"
@@ -31,13 +29,13 @@ jobs:
           curl -sS $auth "$base/traffic/popular/paths"     > "out/json/${dt}-paths.json"
           curl -sS $auth "$base/releases"                  > "out/json/${dt}-releases.json"
 
-          echo "Views response head:"; head -n 5 "out/json/${dt}-views.json" || true
+          echo "Views response head:"
+          head -n 5 "out/json/${dt}-views.json" || true
 
-      - name: Convert to CSV (guard against API errors)
+      - name: Convert to CSV
         run: |
           sudo apt-get update && sudo apt-get install -y jq >/dev/null
           dt=$(date -u +%F)
-
           v="out/json/${dt}-views.json"
           c="out/json/${dt}-clones.json"
           r="out/json/${dt}-releases.json"
@@ -45,20 +43,19 @@ jobs:
           jq -e 'has("views") and (.views|type=="array")' "$v" || { echo "::error::Traffic views API error"; cat "$v"; exit 1; }
           jq -e 'has("clones") and (.clones|type=="array")' "$c" || { echo "::error::Traffic clones API error"; cat "$c"; exit 1; }
 
-          mkdir -p out/csv
           jq -r '.views[]  | [.timestamp, .count, .uniques] | @csv'  "$v" > out/csv/views-${dt}.csv
           jq -r '.clones[] | [.timestamp, .count, .uniques] | @csv'  "$c" > out/csv/clones-${dt}.csv
           jq -r --arg date "$dt" '.[]?.assets[]? | [$date, .name, .download_count] | @csv' "$r" > out/csv/downloads-${dt}.csv
 
       - name: Push into CaliAli_traffick (private)
         env:
-          PUSH_PRIVATE_PAT: ${{ secrets.PUSH_PRIVATE_PAT }}  # classic PAT with repo scope
+          TRAFFIC_PAT: ${{ secrets.TRAFFIC_PAT }}
         run: |
           set -e
           git config --global user.name "traffic-bot"
           git config --global user.email "traffic@users.noreply.github.com"
 
-          git clone https://$PUSH_PRIVATE_PAT@github.com/CaliAli-PV/CaliAli_traffick.git priv
+          git clone https://$TRAFFIC_PAT@github.com/CaliAli-PV/CaliAli_traffick.git priv
           mkdir -p priv/stats/json priv/stats
 
           cp -r out/json/* priv/stats/json/
