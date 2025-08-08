@@ -29,21 +29,18 @@ if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);
 end
 batch=[0,cumsum(F)];
-A_temp={};
+A=sparse(zeros(size(obj.A)));
 div=length(batch)-1;
 obj.A_prev=obj.A;
+Ca=0;
 for i=progress(1:div)
     out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
-    Ca(:,i)=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
-    %      A=max(cat(3,full(A),full(out_A)),[],3);
-    A_temp{i}=out_A;
+    sc=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
+    sc=sc.^2;
+    Ca=Ca+sc;
+    A=sparse(A+out_A.*sc');
 end
-Ca=Ca.^2;
-Ca=Ca./sum(Ca,2);
-A=sparse(obj.A*0);
-for i=1:size(Ca,2)
-    A=A+A_temp{i}.*Ca(:,i)';
-end
+A=A./Ca';
 obj.A=sparse(A);
 end
 
