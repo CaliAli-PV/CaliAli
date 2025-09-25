@@ -1,4 +1,4 @@
-function dims = get_data_dimension_PV(path_to_file)
+function dims = get_data_dimension(path_to_file)
 % get he dimension of a tiff file. now it only supports 2D
 
 % Author: Pengcheng Zhou, Columbia University, 2017

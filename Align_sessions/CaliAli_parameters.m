@@ -149,6 +149,7 @@ addParameter(inp,'sf',10,valid_v)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'preprocessing',[])
+addParameter(inp,'batch_sz',0)                % Batch size for chunked processing. 0 = process entire files
 %% Motion correction parameters
 addParameter(inp,'do_non_rigid',false)        %Do non-rigid registration
 addParameter(inp, ...
