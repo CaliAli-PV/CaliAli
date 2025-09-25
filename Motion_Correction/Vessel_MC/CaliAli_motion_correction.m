@@ -32,64 +32,37 @@ if isempty(opt.input_files)
     opt.input_files = uipickfiles('FilterSpec', '*_ds*.mat');
 end
 
-% Generate batch list for processing
+% Create batch list if batch_sz > 0
 if opt.batch_sz > 0
-    batch_list = create_batch_list(opt.input_files, opt.batch_sz);
-    use_batching = true;
-else
-    batch_list = create_batch_list(opt.input_files, 0);  % No batching
-    use_batching = false;
+    opt.input_files = create_batch_list(opt.input_files, opt.batch_sz);
 end
 
-if use_batching
-    % Setup output file for batched processing
-    [filepath, ~] = fileparts(opt.input_files{1});
-    opt.output_file = strcat(filepath, filesep, 'motion_corrected_concat.mat');
-    
-    % Initialize session frame counts for CaliAli_save_chunk
-    unique_sessions = unique([batch_list{:,2}]);
-    F = zeros(1, length(unique_sessions));
-    for sess = unique_sessions
-        sess_batches = batch_list([batch_list{:,2}] == sess, :);
-        F(sess) = sess_batches{end,4}; % Last frame of last batch for this session
+% Pre-allocate output files and get processing flags
+process_flags = pre_allocate_outputs(opt.input_files);
+
+% Loop through each input file/batch for motion correction
+for k = 1:length(opt.input_files)
+    if ~process_flags(k)
+        fprintf(1, 'Skipping already processed batch %d\n', k);
+        continue;
     end
-    CaliAli_options.inter_session_alignment.F = F;
-    CaliAli_options.inter_session_alignment.out_aligned_sessions = opt.output_file;
-end
-
-% Process each batch
-for k = 1:size(batch_list, 1)
-    batch_item = batch_list(k, :);
-    fullFileName = batch_item{1};
-    session_id = batch_item{2};
-    start_frame = batch_item{3}; 
-    end_frame = batch_item{4};
     
-    fprintf(1, 'Processing %s frames %d-%d (session %d)\n', ...
-            fullFileName, start_frame, end_frame, session_id);
-
-    if ~use_batching
-        % Traditional processing - one file per output
-        [filepath, name] = fileparts(fullFileName);
-        opt.output_file = strcat(filepath, filesep, name, '_mc', '.mat');
-        
-        if isfile(opt.output_file)
-            fprintf(1, 'File %s already exists!\n', opt.output_file);
-            continue;
-        end
-        
-        % Load entire file
-        Y = CaliAli_load(fullFileName, 'Y');
+    % Handle both string (original) and cell array (batch) inputs
+    if ischar(opt.input_files{k})
+        fullFileName = opt.input_files{k};
+        fprintf(1, 'Now reading %s\n', fullFileName);
     else
-        % Batched processing - check if final output exists
-        if k == 1 && isfile(opt.output_file)
-            fprintf(1, 'Batched output file %s already exists!\n', opt.output_file);
-            break;
-        end
-        
-        % Load frame range
-        Y = CaliAli_load(fullFileName, 'Y', [start_frame, end_frame]);
+        fullFileName = opt.input_files{k}{1};
+        fprintf(1, 'Processing batch from %s\n', fullFileName);
     end
+
+    % Generate output file name (same logic as original)
+    [filepath, name] = fileparts(fullFileName);
+    opt.output_file = strcat(filepath, filesep, name, '_mc', '.mat');
+    out{k} = opt.output_file;
+
+    % Load video data (handles both string and batch inputs)
+    Y = CaliAli_load(opt.input_files{k}, 'Y');
 
     % Start parallel pool if not already running
     if isempty(gcp('nocreate'))
@@ -110,20 +83,11 @@ for k = 1:size(batch_list, 1)
     % Square the borders of the video
     Y = square_borders(Y, 0);
 
-    % Save results
-    if use_batching
-        CaliAli_save_chunk(CaliAli_options, Y, session_id);
-    else
-        CaliAli_options.motion_correction = opt;
-        CaliAli_save(opt.output_file(:), Y, CaliAli_options);
-        out{session_id} = opt.output_file;
-    end
+    % Save motion-corrected video (handles both string and batch inputs)
+    CaliAli_options.motion_correction = opt;
+    CaliAli_save(opt.input_files{k}, Y, CaliAli_options);
 end
 
-if use_batching
-    out = {opt.output_file};  % Single concatenated output file
-else
-    % Store output file names in options structure
-    CaliAli_options.motion_correction.output_files = out;
-end
+% Store output file names in options structure
+CaliAli_options.motion_correction.output_files = out;
 end
