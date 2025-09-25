@@ -21,46 +21,55 @@ R = single(R ./ max(R));
 
 % If the output file for aligned sessions does not exist, apply transformations
 if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
-    % Map file indices to actual session IDs
-    if isempty(CaliAli_options.inter_session_alignment.same_ses_id)
-        session_ids = 1:length(CaliAli_options.inter_session_alignment.output_files);
-    else
-        session_ids = CaliAli_options.inter_session_alignment.same_ses_id;
-    end
+
+    TheFiles = CaliAli_options.inter_session_alignment.input_files;
     
     % Loop through each output file and apply the transformations
-    for k = 1:length(CaliAli_options.inter_session_alignment.output_files)
+    for k = 1:length(TheFiles)
+
+        if ischar(TheFiles{k})
+            fullFileName = TheFiles{k};
+            fprintf(1, 'Now reading %s\n', fullFileName);
+            ses_ix=k;
+        else
+            fullFileName = TheFiles{k}{1};
+            fprintf(1, 'Processing batch from %s\n', fullFileName);
+            ses_ix=TheFiles{k}{2};
+        end
+
+
         % Load the current session file
-        fullFileName = CaliAli_options.inter_session_alignment.output_files{k};
-        fprintf(1, 'Applying shifts to %s\n', fullFileName);
+        fullFileName = TheFiles{k};
+        fprintf(1, 'Applying shifts to %s\n', fullFileName{1});
 
         % Load data from the file
-        Y = CaliAli_load(fullFileName, 'Y');
+        Y = CaliAli_load(TheFiles{k}, 'Y');
         if CaliAli_options.inter_session_alignment.do_alignment_translation
             % Apply translations using the stored translation data (T)
-            Y = apply_translations(Y, CaliAli_options.inter_session_alignment.T(k,:), CaliAli_options.inter_session_alignment.T_Mask);
+            Y = apply_translations(Y, CaliAli_options.inter_session_alignment.T(ses_ix,:), CaliAli_options.inter_session_alignment.T_Mask);
         end
 
         if CaliAli_options.inter_session_alignment.do_alignment_non_rigid
 
             % Apply non-rigid shifts (NR shifts) using the stored shifts
-            Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask);
+            Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts(:,:,:,ses_ix), CaliAli_options.inter_session_alignment.NR_Mask);
         end
             % If final neuron transformations are enabled, apply additional non-rigid shifts for neurons
         if CaliAli_options.inter_session_alignment.final_neurons
-                Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,k), CaliAli_options.inter_session_alignment.NR_Mask_n);
+                Y = apply_NR_shifts(Y, CaliAli_options.inter_session_alignment.shifts_n(:,:,:,ses_ix), CaliAli_options.inter_session_alignment.NR_Mask_n);
         end
        
 
         % Scale the data based on the range (R)
         if isa(Y, 'uint16')
-            Y = uint16(single(Y) .* R(k));  % For uint16, scale the data
+            Y = uint16(single(Y) .* R(ses_ix));  % For uint16, scale the data
         else
-            Y = uint8(single(Y) .* R(k));   % For uint8, scale the data
+            Y = uint8(single(Y) .* R(ses_ix));   % For uint8, scale the data
         end
 
         % Save the transformed data to the output file
-        CaliAli_save_chunk(CaliAli_options, Y, session_ids(k));
+        CaliAli_save_chunk(CaliAli_options.inter_session_alignment.out_aligned_sessions, ...
+            TheFiles{k},CaliAli_options.inter_session_alignment.F,Y,ses_ix);
     end
 else
     % If the output file already exists, inform the user

@@ -1,8 +1,8 @@
-function [Mr,Ref]=Rigid_mc(Y,opt)
+function [Mr,Ref,template]=Rigid_mc(Y,opt,template)
 %% Rigid_mc: Perform rigid motion correction using NoRMCorre.
 %
-% This function applies rigid motion correction to a 3D image volume using 
-% the NoRMCorre algorithm. The correction is based on a reference projection 
+% This function applies rigid motion correction to a 3D image volume using
+% the NoRMCorre algorithm. The correction is based on a reference projection
 % that can be computed using blood vessel extraction or background removal.
 %
 % Inputs:
@@ -29,28 +29,32 @@ elseif strcmp(opt.reference_projection_rigid,'neuron')
     Ref=CaliAli_remove_background(Y,opt); % Remove background.
 end
 
-[d1,d2,~] = size(Ref); 
+[d1,d2,~] = size(Ref);
 b1=round(d1/10); % Border size for cropping.
 b2=round(d2/10);
 
 % Determine binning size for NoRMCorre.
 if size(Y,3)<200
-    binz=size(Y,3); 
+    binz=size(Y,3);
 else
-    binz=200; 
+    binz=200;
 end
 
 % Set NoRMCorre parameters.
-options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false); 
+options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false);
 
 % Perform motion correction on cropped reference.
-tic; [~,shifts,~] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc 
+if exist('template','var')
+    tic; [~,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r,template); toc
+else
+    tic; [~,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc
+end
 
 Ref=v2uint16(Ref); % Convert to uint16.
 
 % Apply shifts to each frame.
 parfor i=1:size(Y,3)
-    Mr(:,:,i) = imtranslate(Y(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0); 
-    Ref(:,:,i) = imtranslate(Ref(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0); 
+    Mr(:,:,i) = imtranslate(Y(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
+    Ref(:,:,i) = imtranslate(Ref(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
 end
 end

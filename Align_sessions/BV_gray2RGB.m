@@ -1,4 +1,4 @@
-function P=BV_gray2RGB(P)
+function P=BV_gray2RGB(P,ses_id)
 X=uint8([]);
 for i=1:size(P,2)
     Cn=P.(i)(1,:).(3){1,1}  ;
@@ -12,6 +12,7 @@ for i=1:size(P,2)
         X(:,:,:,k)=imfuse(C(:,:,k),Vf(:,:,k),'Scaling','joint','ColorChannels',[1 2 0]);
     end
     P.(i).(5){1,1}=X;
+    P.(i)=average_P_same_sessions(P.(i),ses_id);
     X=uint8([]);
 end
 

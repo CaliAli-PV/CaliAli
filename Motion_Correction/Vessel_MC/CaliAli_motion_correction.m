@@ -34,11 +34,11 @@ end
 
 % Create batch list if batch_sz > 0
 if opt.batch_sz > 0
-    opt.input_files = create_batch_list(opt.input_files, opt.batch_sz);
+    opt.input_files = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
 end
 
 % Pre-allocate output files and get processing flags
-process_flags = pre_allocate_outputs(opt.input_files);
+process_flags = pre_allocate_outputs(opt.input_files,'_mc');
 
 % Loop through each input file/batch for motion correction
 for k = 1:length(opt.input_files)
@@ -46,14 +46,20 @@ for k = 1:length(opt.input_files)
         fprintf(1, 'Skipping already processed batch %d\n', k);
         continue;
     end
-    
+
     % Handle both string (original) and cell array (batch) inputs
     if ischar(opt.input_files{k})
         fullFileName = opt.input_files{k};
         fprintf(1, 'Now reading %s\n', fullFileName);
+        intra_sess_tag= false;
     else
         fullFileName = opt.input_files{k}{1};
         fprintf(1, 'Processing batch from %s\n', fullFileName);
+        if opt.input_files{k}{3}>1
+            intra_sess_tag= true;
+        else
+            intra_sess_tag= false;
+        end
     end
 
     % Generate output file name (same logic as original)
@@ -70,7 +76,11 @@ for k = 1:length(opt.input_files)
     end
     disp('Calculating translation shift...')
     % Perform rigid motion correction
-    [Y, ref] = Rigid_mc(Y, opt);
+    if intra_sess_tag
+        [Y, ref,template] = Rigid_mc(Y, opt,template);
+    else
+        [Y, ref,template] = Rigid_mc(Y, opt);
+    end
 
     % Perform non-rigid motion correction if enabled
     if opt.do_non_rigid
@@ -85,7 +95,7 @@ for k = 1:length(opt.input_files)
 
     % Save motion-corrected video (handles both string and batch inputs)
     CaliAli_options.motion_correction = opt;
-    CaliAli_save(opt.input_files{k}, Y, CaliAli_options);
+    CaliAli_save(opt.input_files{k}(:), Y, CaliAli_options);
 end
 
 % Store output file names in options structure
