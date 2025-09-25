@@ -8,26 +8,26 @@ function corrected = remove_vignetting_video_adaptive_batches(Y, scale)
 %
 % Output:
 %   corrected - [d1 x d2 x T] vignetting-corrected video
-    Y=single(Y);
-    if nargin < 2
-        scale = 1/6;
-    end
+Y=single(Y);
+if nargin < 2
+    scale = 1/6;
+end
 
-    [d1, d2, T] = size(Y);
-    sigma = scale * min(d1, d2);
-    corrected = zeros(d1, d2, T, 'like', Y);
+[d1, d2, T] = size(Y);
+sigma = scale * min(d1, d2);
+corrected = zeros(d1, d2, T, 'like', Y);
 
-    % ---------------- SINGLE FRAME CASE ----------------
-    if T == 1
-        frame = double(Y(:,:,1));
-        background = imgaussfilt(frame, sigma);
-        norm_frame = frame ./ (background + eps);
-        corrected(:,:,1) = norm_frame / max(norm_frame(:) + eps);
-        return
-    end
+% ---------------- SINGLE FRAME CASE ----------------
+if T == 1
+    frame = double(Y(:,:,1));
+    background = imgaussfilt(frame, sigma);
+    norm_frame = frame ./ (background + eps);
+    corrected(:,:,1) = norm_frame / max(norm_frame(:) + eps);
+    return
+end
 
-    useGPU = parallel.gpu.GPUDevice.isAvailable;
-
+useGPU = parallel.gpu.GPUDevice.isAvailable;
+try
     if useGPU
         % ---------------- GPU MODE ----------------
         disp('Using GPU with batch slicing...');
@@ -40,7 +40,7 @@ function corrected = remove_vignetting_video_adaptive_batches(Y, scale)
         MB_per_frame = d1 * d2 * bytesPerElement / 1e6;
 
         % Allow ~60% of memory for data (conservative)
-        maxFramesPerBatch = floor((0.6 * freeMB) / (MB_per_frame * 2));  % x2 due to vignette replication
+        maxFramesPerBatch = floor((0.3 * freeMB) / (MB_per_frame * 2));  % x2 due to vignette replication
         maxFramesPerBatch = max(1, min(T, maxFramesPerBatch));  % safety bounds
 
         disp(['Processing in batches of ', num2str(maxFramesPerBatch), ' frames...']);
@@ -75,6 +75,16 @@ function corrected = remove_vignetting_video_adaptive_batches(Y, scale)
             corrected(:,:,t) = norm_frame / max(norm_frame(:) + eps);
         end
     end
+catch
+    disp('GPU failed, using CPU...');
+    parfor t = 1:T
+        frame = double(Y(:,:,t));
+        background = imgaussfilt(frame, sigma);
+        norm_frame = frame ./ (background + eps);
+        corrected(:,:,t) = norm_frame / max(norm_frame(:) + eps);
+    end
 
-corrected=v2uint8(corrected);    
+end
+
+corrected=v2uint8(corrected);
 end

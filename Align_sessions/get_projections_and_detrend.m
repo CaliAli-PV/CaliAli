@@ -72,7 +72,7 @@ end
 
 % Calculate the range of the session data (for normalization)
 R = max(Y,[],'all');
-
+Y=single(Y);
 % Convert the data to the appropriate format (uint8 or uint16) based on the original class
 if strcmp(S, 'uint8')
     Y = uint8(Y./max(Y,[],'all')*256); % Convert to uint8 format if the original data was uint8

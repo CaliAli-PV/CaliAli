@@ -128,8 +128,8 @@ end
 
 
 %% normalized spatial components
-% A=neuron.A;A=full(A./max(A,[],1)); A=reshape(max(A,[],2),[size(neuron.Cn,1),size(neuron.Cn,2)]);
-% neuron.show_contours(0.6, [], A, 0);
+% A=neuron.A;A=full(A./max(A,[],1)); A=reshape(max(A,[],2),[neuron.options.d1,neuron.options.d2]);
+% neuron.show_contours(0.6, [], A,true);
 
 %% to visualize temporal traces
 %   figure;strips(neuron.C_raw');

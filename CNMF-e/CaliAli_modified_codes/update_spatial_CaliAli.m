@@ -168,7 +168,7 @@ A_new = A;
 tmp_obj = Sources2D();
 tmp_obj.options = neuron.options;
 if use_parallel
-   parfor mpatch=1:(nr_patch*nc_patch) % this is parfor
+   for mpatch=1:(nr_patch*nc_patch) % this is parfor
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
 
         % no neurons, no need to update sn
