@@ -1,6 +1,7 @@
 function P=average_P_same_sessions(P,same_ses_id)
 
 if ~isempty(same_ses_id)
+    fprintf(1, 'Generating projections across batches within the same session...\n');
     M=[];
     BV=[];
     Neurons=[];

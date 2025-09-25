@@ -1,4 +1,4 @@
-function process_flags = pre_allocate_outputs(input_files)
+function process_flags = pre_allocate_outputs(input_files,tag)
 %% pre_allocate_outputs: Pre-allocate output files and determine processing flags.
 %
 % Inputs:
@@ -25,7 +25,14 @@ for k = 1:length(input_files)
         % Original format - string filename
         filename = input_files{k};
         [filepath, name] = fileparts(filename);
-        output_file = strcat(filepath, filesep, name, '_mc', '.mat');
+          
+        % Create an output file name by appending '_det' to the original file name
+        if ~contains(name, tag)
+            output_file = strcat(filepath, filesep, name, tag, '.mat');
+        else
+            output_file = strcat(filepath, filesep, name, '.mat');
+        end
+        
         
         % Check if output file already exists
         if ~isfile(output_file)
@@ -37,10 +44,6 @@ for k = 1:length(input_files)
     else
         % Batch format - cell array {filename, session_id, start_frame, end_frame, output_filename}
         batch_info = input_files{k};
-        filename = batch_info{1};
-        session_id = batch_info{2};
-        start_frame = batch_info{3};
-        end_frame = batch_info{4};
         output_file = batch_info{5};
         
         % Check if we've already processed this output file
@@ -63,7 +66,7 @@ for k = 1:length(input_files)
                         
                         % Get dimensions from first batch
                         if d1 == 0
-                            dims = get_data_dimension_PV(input_files{j}{1});
+                            dims = get_data_dimension(input_files{j}{1});
                             d1 = dims(1);
                             d2 = dims(2);
                         end
@@ -72,10 +75,8 @@ for k = 1:length(input_files)
                 
                 % Pre-allocate the file
                 if total_frames > 0
-                    % Create empty array with correct dimensions
-                    Y_empty = zeros(d1, d2, total_frames, 'uint16');  % Assume uint16 format
-                    save(output_file, 'Y_empty', '-v7.3', '-nocompression');
-                    clear Y_empty;  % Free memory
+                    m = matfile(output_file, 'Writable', true);
+                    m.Y(d1, d2, total_frames) = uint8(0);  % creates dataset on disk
                     fprintf(1, 'Pre-allocated file with dimensions [%d, %d, %d]\n', d1, d2, total_frames);
                 end
                 

@@ -41,12 +41,6 @@ if isempty(CaliAli_options.inter_session_alignment.input_files)
     CaliAli_options.inter_session_alignment.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
-% Create batch list if batch_sz > 0
-if isfield(CaliAli_options.inter_session_alignment, 'batch_sz') && CaliAli_options.inter_session_alignment.batch_sz > 0
-    CaliAli_options.inter_session_alignment.input_files = ...
-        create_batch_list(CaliAli_options.inter_session_alignment.input_files, CaliAli_options.inter_session_alignment.batch_sz);
-end
-
 % Detrend data and calculate projections
 CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options);
 
@@ -67,6 +61,7 @@ P1 = get_stored_projections(CaliAli_options);
 
 % If final neuron alignment is enabled, apply additional non rigid
 % registration utilizing only neurons data.
+ses_id=CaliAli_options.inter_session_alignment.same_ses_id;
 if CaliAli_options.inter_session_alignment.final_neurons
     [P4, CaliAli_options] = sessions_non_rigid(P3, CaliAli_options, true);
     P = table(P1, P2, P3, P4, 'VariableNames', {'Original', 'Translations', 'CaliAli', 'CaliAli+neurons'});
@@ -75,7 +70,7 @@ else
 end
 
 % Convert gray projections to RGB
-P = BV_gray2RGB(P);
+P = BV_gray2RGB(P,ses_id);
 
 % If projection type is 'BV', evaluate blood vessel similarity
 if contains(CaliAli_options.inter_session_alignment.projections, 'BV')
