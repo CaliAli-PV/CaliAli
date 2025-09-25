@@ -41,6 +41,12 @@ if isempty(CaliAli_options.inter_session_alignment.input_files)
     CaliAli_options.inter_session_alignment.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
+% Create batch list if batch_sz > 0
+if isfield(CaliAli_options.inter_session_alignment, 'batch_sz') && CaliAli_options.inter_session_alignment.batch_sz > 0
+    CaliAli_options.inter_session_alignment.input_files = ...
+        create_batch_list(CaliAli_options.inter_session_alignment.input_files, CaliAli_options.inter_session_alignment.batch_sz);
+end
+
 % Detrend data and calculate projections
 CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options);
 
