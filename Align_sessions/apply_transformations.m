@@ -21,6 +21,13 @@ R = single(R ./ max(R));
 
 % If the output file for aligned sessions does not exist, apply transformations
 if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
+    % Map file indices to actual session IDs
+    if isempty(CaliAli_options.inter_session_alignment.same_ses_id)
+        session_ids = 1:length(CaliAli_options.inter_session_alignment.output_files);
+    else
+        session_ids = CaliAli_options.inter_session_alignment.same_ses_id;
+    end
+    
     % Loop through each output file and apply the transformations
     for k = 1:length(CaliAli_options.inter_session_alignment.output_files)
         % Load the current session file
@@ -53,7 +60,7 @@ if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
         end
 
         % Save the transformed data to the output file
-        CaliAli_save_chunk(CaliAli_options, Y, k);
+        CaliAli_save_chunk(CaliAli_options, Y, session_ids(k));
     end
 else
     % If the output file already exists, inform the user
