@@ -79,8 +79,8 @@ for k = 1:length(opt_g.input_files)
             range(ses_ix)=max([range(ses_ix),R]);
             F(ses_ix)=F(ses_ix)+size(Y, 3);
             Cn_scale=max([Cn_scale,max(P2.(3){1, 1}, [], 'all')]);
-            Cn=max(cat(3,Cn,max(P2.(3){1, 1}, [], 3)),[],3);
-            PNR=max(cat(3,PNR,max(P2.(4){1, 1}, [], 3)));
+            Cn= max(cat(3, Cn,max(P2.(3){1, 1}, [], 3)),[],3);
+            PNR=max(cat(3,PNR,max(P2.(4){1, 1}, [], 3)),[],3);
             P=add_P_inner_batches(P,P2);
         else
             % Detrend the data and calculate projections
@@ -133,6 +133,6 @@ P=P1;
 for i=1:4
 P.(i){1, 1}=max(cat(3,P1.(i){1, 1},P2.(i){1, 1}), [], 3);
 end
-P.(5){1, 1}=max(cat(4,P1.(5){1, 1},P2.(5){1, 1}), [], 3);
+P.(5){1, 1}=max(cat(4,P1.(5){1, 1},P2.(5){1, 1}), [], 4);
 
 end
