@@ -14,6 +14,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `sf`               | `10`         | Frame rate (fps) | Set to match the acquisition frame rate. |
 | `input_files`       | `[]`         | Paths to input video files | Leave empty to manually select files. |
 | `output_files`      | `[]`         | Paths to output video files | Leave empty for default naming (recommended). |
+| `batch_sz`         | `0`          | **Automatic chunking for large sessions** (frames per chunk, 0 = disable) | Automatically splits large sessions into memory-friendly chunks. :material-information-outline:{ title="Set batch_sz to 3000–5000 frames when chunking is required; the Low_memory guide explains the full workflow." } |
 
 ---
 
@@ -23,7 +24,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `BVsize`           | `[]`         | Size of blood vessels in pixels [min, max] | Leave empty to automatically calculate based on gSig or use [BV_app](Functions_doc/BV_app.md) (recommended).|
 | `spatial_ds`       | `1`          | Spatial downsampling factor | Increase for faster processing, decrease for higher resolution. |
 | `temporal_ds`      | `1`          | Temporal downsampling factor | Increase only if memory constraints prevent full processing. |
-| `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | [Used when sessions are split into multiple files.]("For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder. CaliAli will automatically search for all files matching file_extension within that folder and treat them as segments of the same session. These files will then be concatenated into a single .mat file for streamlined processing.")|
+| `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | Used when sessions are split into multiple files. :material-information-outline:{ title="For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder so CaliAli finds matching files, treats them as one session, and concatenates them into a single .mat file." } |
 | `force_non_negative ` | `1 `| Enforce non-negative pixels after detrending | Enable to clamp all negative pixel values to zero; disable to allow negatives within the specified tolerance. |
 | `force_non_negative_tolerance`  | `20` | Non-negative tolerance threshold | Allows pixel values to remain negative up to this limit before clamping occurs. |
 
@@ -42,7 +43,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
 | `reference_projection_rigid` | `'BV'`  | Reference projection for rigid correction | Choose `neuron` if blood vessels are not suitable. |
-| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | [Enable only after confirming rigid correction was insufficient.]("Currently the non-rigid registration module may introduce artifacts to the FOV. We are working on Implementing a more suitable non-rigid registration module") |
+| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only after confirming rigid correction was insufficient. :material-information-outline:{ title="The current non-rigid module is experimental and may introduce field-of-view artifacts; an updated implementation is planned." } |
 | `non_rigid_pyramid` | `{'BV','BV','neuron'}` | Multi-level registration pyramid for non-rigid correction | Use default unless BV is unavailable. |
 | `non_rigid_batch_size` | `[20,60]` | Batch size range for non-rigid correction, CaliAli will optimize within this range. | Set as `[2 x sf, 6 x sf]`. |
 
@@ -53,7 +54,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 |----------------------|--------------|-------------|--------------|
 | `do_alignment_translation`      | `true`       | Perform inter-session translation| Always true unless sessions were pre-aligned. If do_alignment_non_rigid is also false, videos will be concatenated without registration. |
 | `do_alignment_non_rigid`      | `true`       | Perform inter-session alignment | Always true unless sessions were pre-aligned or non-rigid alignment is not necessary. If do_alignment_translation is also false, videos will be concatenated without registration. |
-| `projections`       | `'BV+neuron'` | Projection method used for alignment | [By default, use both blood vessels and neurons for registration. If one is unsuitable, choose either BV or neurons.]("CaliAli automatically evaluates the usability of BV and may switch to a neuron-only registration strategy if necessary, even when ‘BV+neurons’ is selected. To enforce the use of BV, set Force_BV to true.")|
+| `projections`       | `'BV+neuron'` | Projection method used for alignment | By default use both blood vessels and neurons. :material-information-outline:{ title="CaliAli automatically falls back to neuron-only registration if vessels are unreliable; set Force_BV = true to enforce blood-vessel alignment." } |
 | `final_neurons`     | `false`          | Use an additional alignment iteration based on neurons | Enable if session registration was inaccurate. Often not necessary |
 | `Force_BV`         | `0`          | Force BV alignment even if stability score is low | Sometimes BV stability score may be low as results of a debris in the FOV. Setting this parameter to true would ensure that BV are used for registration |
 
@@ -66,16 +67,15 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 |--------------------------|--------------|-------------|--------------|
 | `memory_size_to_use`     | `total_system_memory_GB` | Total available memory for computation | Adjust based on available RAM. |
 | `memory_size_per_patch`  | `16`       | Memory allocated per patch | Adjust based on available RAM and number of patches. |
-| `patch_dims`            | `[64, 64]`   | Dimensions of patches | [Larger patches improve accuracy but increase computation time.]("Note that using more patches also increases memory demands."). |
+| `patch_dims`            | `[64, 64]`   | Dimensions of patches | Larger patches improve accuracy but increase computation time and memory consumption. :material-information-outline:{ title="Using more or larger patches also increases memory usage, so scale cautiously." } |
 | `w_overlap`            | `32`         | Patch overlap width | Increase if you detect edge artifacts. |
-| `batch_sz`         | `0`          | Batch size for alignment, 0 = full session | [By default, the batch size is set to match the duration of each session. This parameter allows you to define batches in terms of the number of frames instead.]("This is particularly useful when sessions are very short (e.g., <1000 frames), making it difficult to resolve neuronal components within each session. It is also helpful when memory constraints prevent processing an entire session at once.") |
 
 ---
 
 ### **🔹 Initialization Parameters**
 | Parameter Name  | Default Value | Description | How to Choose |
 |----------------|--------------|-------------|--------------|
-| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | [In most cases, this value is overridden using `CaliAli_set_initialization_parameters(CaliAli_options)`, allowing selection via a GUI. If not using the GUI, increase it to reduce non-neuronal detections or decrease it to detect more neurons.]("Run `CaliAli_set_initialization_parameters(CaliAli_options)` before `CaliAli_cnmfe()` and after alignment. It requires correlation and PNR images, generated during detrending, and can only be used on `_det` labeled videos.") |
+| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | Usually controlled via `CaliAli_set_initialization_parameters(CaliAli_options)`. :material-information-outline:{ title="Raise the threshold to suppress non-neuronal detections; lower it to recover dim neurons when configuring manually." } |
 | `min_pnr`     | `6`          | Minimum peak-to-noise ratio for seeding | Same as `min_corr`. |
 | `min_pixel`   | `[]`         | Minimum pixel area for neurons | Automatically calculated based on gSig. |
 
@@ -84,8 +84,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Spatial Parameters**
 | Parameter Name        | Default Value | Description | How to Choose |
 |-----------------------|--------------|-------------|--------------|
-| `with_dendrites`     | `true`       | Do not assume that signals are circular during extraction |[Always enable for better CNMF convergence and proper dendrite detection.]("Disabling this applies a circular kernel filter, which may cause dendrites to appear as neurons, making their removal more difficult.")|
-| `spatial_constraints` | `{'connected': False, 'circular': False}` | Constraints for spatial filtering | [Always disable for better CNMF convergence and dendrite identification.] |
+| `with_dendrites`     | `true`       | Do not assume that signals are circular during extraction | Keep enabled for better CNMF convergence and accurate dendrite detection. :material-information-outline:{ title="Disabling applies a circular kernel that can mislabel dendrites as somas." } |
+| `spatial_constraints` | `{'connected': False, 'circular': False}` | Constraints for spatial filtering | Always disable for better CNMF convergence and dendrite identification. |
 | `spatial_algorithm`  | `'hals_thresh'` | Algorithm for spatial extraction | Use default unless alternative extraction methods are needed. |
 
 ---
@@ -99,4 +99,4 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Merging Parameters**  
 | Parameter Name       | Default Value | Description | How to Choose |  
 |----------------------|--------------|-------------|--------------|  
-| `merge_thr_spatial` | `[0.8, 0.4, -inf]` | Merge components with highly correlated spatial shapes (`corr=0.8`), moderate temporal correlations of calcium activities (`corr=0.4`), and disregard spikes correlations (`corr=-inf`). | [Increase spatial correlation threshold for stricter merging.]("Higher values ensure that only very similar spatial components merge, reducing false positives.") |  
+| `merge_thr_spatial` | `[0.8, 0.4, -inf]` | Merge components with highly correlated spatial shapes (`corr=0.8`), moderate temporal correlations of calcium activities (`corr=0.4`), and disregard spikes correlations (`corr=-inf`). | Increase the spatial correlation threshold when you need stricter merging so only very similar components combine. :material-information-outline:{ title="Higher correlation thresholds reduce false merges by requiring components to be more alike." } |  

@@ -18,9 +18,9 @@ In principle CaliAli operate in 5 steps:
 
 1. [Setting CaliAli Parameters](Parameters.md)
 
-2. [Downsampling and File Conversion](Getting_started.md #s1)
+2. [Downsampling and File Conversion](Downsampling.md)
 
-3. [Motion Correction](Getting_started.md #s1)
+3. [Motion Correction](Motion_correction.md)
 
 4. [Inter-session Alignment](alignment.md)
 

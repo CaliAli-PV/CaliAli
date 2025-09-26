@@ -1,4 +1,5 @@
-```markdown
+### detrend_batch_and_calculate_projections
+
 #### Syntax
 ```matlab
 function CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options)

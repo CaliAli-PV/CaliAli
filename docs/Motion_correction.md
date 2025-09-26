@@ -12,16 +12,14 @@ CaliAli_options=CaliAli_motion_correction(CaliAli_options);
 	This code is experimental and may introduce undesired deformations when adjusting for non-rigid deformation.
 	
 ??? Info "How long it takes to motion correct videos?"
-    - Rigid: ~ [5,000 frames in ~2 minutes on a modern CPU.]("At a resolution of 300x300 pixels")
-	- Non-rigid: [is substantially slower processing around ~10 frames per second. A new non-rigid model will be implemented soon]("At a resolution of 300x300 pixels")
+    - **Rigid**: processes ~5,000 frames in about 2 minutes on a modern CPU. :material-information-outline:{ title="Estimate based on ~300×300 pixel videos." }
+	- **Non-rigid**: substantially slower at roughly 10 frames per second. :material-information-outline:{ title="Measured on ~300×300 pixel videos; an updated module is in development." }
 
 ???+ danger "Important"
 	Ensure to visually inspect the motion-corrected video before proceeding to the next step: [**view_Ca_video()**](Functions_doc/view_Ca_video.md#view_Ca_video)
 
 === "Next"	
 After finishing downsampling and motion correction you can proceed to [Inter-session Alignment](alignment.md)
-
-
 
 
 

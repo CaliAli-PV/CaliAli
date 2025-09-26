@@ -20,14 +20,15 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
 			This requires installing the Inscopix Data Processing software. By default, the function searches for the Inscopix path in  `C:\Program Files\Inscopix\Data Processing `.  If that path is not found, a folder selection dialog box will appear.
 	
     === "Mac"
-         - At present, CaliAli is unable to convert Inscopix '.isdx' data into '.h5' format on ARM machines. Please convert your data into a compatible format (.h5 , uncompressed avi, mp4) using the Inscopix software. 
-         - MATLAB cannot process compressed avi format. Be sure to save your videos in uncompressed format. You can convert your videos to .mp4 with [batchConvertVideos()](Functions_doc/batchConvertVideos.md)
+         - CaliAli cannot convert Inscopix `.isdx` data on ARM machines—use the Inscopix software to export a compatible format. :material-information-outline:{ title="Export to .h5, uncompressed .avi, or .mp4 before running CaliAli." }
+         - MATLAB cannot process compressed `.avi` files—save videos uncompressed or convert them with [batchConvertVideos()](Functions_doc/batchConvertVideos.md). :material-information-outline:{ title="Compressed AVIs fail to load in MATLAB; converting to MP4 avoids codec issues." }
          
     === "Linux"
          We have not tested CaliAli in Linux system yet but it is in our to do list.
 
+
 !!! Danger "What if my video sessions are split into multiple video files (common for UCLA recordings)?"
-	Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos. Instead of selecting individual `.avi` files, you can choose an entire folder. CaliAli will automatically search for all files matching the [file_extension](Parameters_index.md) defined in the `CaliAli_options` structure within the selected folder and treat them as segments of the same session. These files will then be concatenated into a single `.mat` file for streamlined processing.
+	Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos—select the entire folder instead of individual files. :material-information-outline:{ title="CaliAli automatically finds every file matching the configured file_extension, treats them as segments from the same session, and concatenates them into a single .mat file for streamlined processing." }
 	Lean more [here](Processing_split_data.md).
 	
 ??? Question "Can I automate this process without manually selecting files?"
@@ -55,5 +56,3 @@ The first step in the CaliAli pipeline is to convert the raw video format into t
 
 === "Next"	
 After finishing downsampling you can proceed to [Motion Correction](Motion_correction.md)		
-
-
