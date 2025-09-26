@@ -81,7 +81,7 @@ end
 X = imfuse(mat2gray(Cn), BV, 'Scaling', 'joint', 'ColorChannels', [1 2 0]);
 
 % Create a table to store the various projections for visualization and analysis
-p = {mat2gray(M), BV, Cn, PNR, X}; % Store the projections (mean, blood vessels, neurons, PNR, fused)
+p = {mat2gray(M), single(BV), single(Cn), single(PNR), single(X)}; % Store the projections (mean, blood vessels, neurons, PNR, fused)
 p = array2table(p, 'VariableNames', {'Mean', 'BloodVessels', 'Neurons', 'PNR', 'BV+Neurons'});
 
 end
