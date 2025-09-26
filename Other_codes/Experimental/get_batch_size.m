@@ -7,9 +7,9 @@ if isempty(F)
 end
 if sum(F)<neuron.CaliAli_options.inter_session_alignment.batch_sz
 
-fprintf(1, 'The defined batch size (%d) is larger than the number of frames in the video (%d). Processing the entire video in a single batch.\n', ...
-   neuron.CaliAli_options.inter_session_alignment.batch_sz,sum(F));
-    neuron.CaliAli_options.inter_session_alignment.batch_sz=F;
+    fprintf(1, 'The defined batch size (%d) is larger than the number of frames in the video (%d). Processing the entire video in a single batch.\n', ...
+        neuron.CaliAli_options.inter_session_alignment.batch_sz,sum(F));
+    neuron.CaliAli_options.inter_session_alignment.batch_sz=sum(F);
 end
 
 if neuron.CaliAli_options.inter_session_alignment.batch_sz>0

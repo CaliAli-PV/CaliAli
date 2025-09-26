@@ -36,9 +36,6 @@ function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_opt
 % Store the original class of Y for later use (used to handle different data types)
 S = class(Y);
 
-% Remove borders from the data and obtain the binary mask for valid regions
-[Y, CaliAli_options.Mask] = remove_borders(Y, 0);
-
 % Calculate the median of the session data along the third dimension (frame dimension)
 M = median(Y, 3);
 

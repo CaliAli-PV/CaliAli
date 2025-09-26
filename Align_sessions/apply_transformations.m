@@ -23,24 +23,22 @@ R = single(R ./ max(R));
 if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
 
     TheFiles = CaliAli_options.inter_session_alignment.input_files;
-    
+    for i=1:length(TheFiles)
+        TheFiles{i}{1}=TheFiles{i}{5};
+    end
+
     % Loop through each output file and apply the transformations
     for k = 1:length(TheFiles)
 
-        if ischar(TheFiles{k})
-            fullFileName = TheFiles{k};
-            fprintf(1, 'Now reading %s\n', fullFileName);
-            ses_ix=k;
-        else
-            fullFileName = TheFiles{k}{1};
-            fprintf(1, 'Processing batch from %s\n', fullFileName);
-            ses_ix=TheFiles{k}{2};
-        end
+
+        fullFileName = TheFiles{k}{1};
+        fprintf(1, 'Processing batch from %s\n', fullFileName);
+        ses_ix=TheFiles{k}{2};
+   
 
 
         % Load the current session file
-        fullFileName = TheFiles{k};
-        fprintf(1, 'Applying shifts to %s\n', fullFileName{1});
+        fprintf(1, 'Applying shifts to %s\n', fullFileName);
 
         % Load data from the file
         Y = CaliAli_load(TheFiles{k}, 'Y');
