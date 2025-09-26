@@ -99,7 +99,7 @@ for k = 1:length(opt_g.input_files)
         opt.Cn = Cn ./ opt.Cn_scale;
         opt.PNR = PNR;
         opt.F = F(ses_ix);
-        opt.P = P;
+        opt.P = scaleP(P);
     
         % Update the CaliAli_options structure with the modified options
         CaliAli_options=CaliAli_load(opt_g.input_files{k}, 'CaliAli_options');
@@ -131,10 +131,17 @@ end
 function P=add_P_inner_batches(P1,P2)
 P=P1;
 
-P.(1){1, 1}=mean(cat(3,P1.(1){1, 1},P2.(1){1, 1}), 3);
-P.(2){1, 1}=mean(cat(3,P1.(2){1, 1},P2.(2){1, 1}), 3);
+P.(1){1, 1}=sum(cat(3,P1.(1){1, 1},P2.(1){1, 1}), 3);
+P.(2){1, 1}=sum(cat(3,P1.(2){1, 1},P2.(2){1, 1}), 3);
 P.(3){1, 1}=max(cat(3,P1.(3){1, 1},P2.(3){1, 1}), [], 3);
 P.(4){1, 1}=max(cat(3,P1.(4){1, 1},P2.(4){1, 1}), [], 3);
 P.(5){1, 1}=max(cat(4,P1.(5){1, 1},P2.(5){1, 1}), [], 4);
+
+end
+
+function P=scaleP(P)
+for i=1:5
+    P.(i){1, 1}=P.(i){1, 1}./max(P.(i){1, 1},[],'all');
+end
 
 end

@@ -2,7 +2,9 @@
      
  | Function Name |
      |---|
-     | [apply_transformations()](Functions_doc/apply_transformations.md#apply_transformations) |
+ | [apply_crop_on_disk()](Functions_doc/apply_crop_on_disk.md#apply_crop_on_disk) |
+ | [apply_crop_on_disk_backward_compatibility()](Functions_doc/apply_crop_on_disk_backward_compatibility.md#apply_crop_on_disk_backward_compatibility) |
+ | [apply_transformations()](Functions_doc/apply_transformations.md#apply_transformations) |
      | [batchConvertVideos()](Functions_doc/batchConvertVideos.md)|
      | [BV_app](Functions_doc/BV_app.md)|
      | [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions) |
@@ -17,10 +19,12 @@
      | [CaliAli_remove_background()](Functions_doc/CaliAli_remove_background.md#CaliAli_remove_background) |
      | [CaliAli_save()](Functions_doc/CaliAli_save.md#CaliAli_save) |
      | [CaliAli_save_chunk()](Functions_doc/CaliAli_save_chunk.md#CaliAli_save_chunk) |
-     | [CaliAli_set_initialization_parameters()](Functions_doc/CaliAli_set_initialization_parameters.md#CaliAli_set_initialization_parameters) |
-     | [CaliAli_update_parameters()](Functions_doc/CaliAli_update_parameters.md#CaliAli_update_parameters) |
-     | [CNMFE_parameters()](Functions_doc/CNMFE_parameters.md#CNMFE_parameters) |
-     | [detrend_Ca_traces()](Functions_doc/detrend_Ca_traces.md#detrend_Ca_traces) |
+ | [CaliAli_set_initialization_parameters()](Functions_doc/CaliAli_set_initialization_parameters.md#CaliAli_set_initialization_parameters) |
+ | [CaliAli_update_parameters()](Functions_doc/CaliAli_update_parameters.md#CaliAli_update_parameters) |
+ | [create_batch_list()](Functions_doc/create_batch_list.md#create_batch_list) |
+ | [CNMFE_parameters()](Functions_doc/CNMFE_parameters.md#CNMFE_parameters) |
+ | [detrend_batch_and_calculate_projections()](Functions_doc/detrend_batch_and_calculate_projections.md#detrend_batch_and_calculate_projections) |
+ | [detrend_Ca_traces()](Functions_doc/detrend_Ca_traces.md#detrend_Ca_traces) |
      | [detrend_vid()](Functions_doc/detrend_vid.md#detrend_vid) |
      | [dissimilarity_previous()](Functions_doc/dissimilarity_previous.md#dissimilarity_previous) |
      | [get_alignment_metrics()](Functions_doc/get_alignment_metrics.md#get_alignment_metrics) |
@@ -35,7 +39,8 @@
      | [motion_metrics()](Functions_doc/motion_metrics.md#motion_metrics) |
      | [NeuronSize_app](Functions_doc/NeuronSize_app.md)|
      | [Non_rigid_mc()](Functions_doc/Non_rigid_mc.md#Non_rigid_mc) |
-     | [plot_alignment_scores()](Functions_doc/plot_alignment_scores.md#plot_alignment_scores) |
+ | [plot_alignment_scores()](Functions_doc/plot_alignment_scores.md#plot_alignment_scores) |
+ | [pre_allocate_outputs()](Functions_doc/pre_allocate_outputs.md#pre_allocate_outputs) |
      | [postprocessDeconvolvedTraces()](Functions_doc/postprocessDeconvolvedTraces.md#postprocessDeconvolvedTraces) |
      | [postprocessing_app()](Functions_doc/postprocessing_app.md#postprocessing_app) |
      | [Rigid_mc()](Functions_doc/Rigid_mc.md#Rigid_mc) |

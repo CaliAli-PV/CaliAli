@@ -1,5 +1,44 @@
 # Version History <a id="vh"></a> 
 
+## CaliAli 1.4 Release Notes
+
+**🗓️ September 26th 2025**
+
+- 🚀 **Automatic Session Chunking** - New processing method for memory-constrained systems
+	- Introduced `batch_sz` parameter for automatic memory management
+	- Replaces manual file splitting requirements from previous versions
+	- Chunking implemented across motion correction, alignment, and projection calculation
+	- Large sessions processed automatically without workflow modification
+	- See [Processing Large Sessions](Low_memory.md) for implementation details
+
+- 🔧 **Enhanced Batch Processing Architecture**
+	- New `create_batch_list()` function for session segmentation
+	- `pre_allocate_outputs()` for memory-mapped file operations
+	- Dual input handling: processing of both traditional files and chunked sessions
+	- Template consistency maintained across chunks within sessions
+
+- 💾 **Memory Management Optimizations** 
+	- Optimized spatial component updates for reduced memory footprint
+	- Enhanced GPU failure protection with robust fallback mechanisms
+	- Improved handling of large datasets to prevent memory overflow
+
+- ⚙️ **Projection Calculation Refinements**
+	- Adaptive projection strategy: mean for initial batches, max for subsequent batches
+	- Enhanced dimension handling and calculation clarity
+	- Automatic combining of chunk results while preserving data integrity
+
+- 🔍 **Development and Version Control Tools**
+	- New `check_version_sync()` function for version status reporting
+	- Development environment configuration updates
+	- Branch and sync status detection functionality
+
+- 🎯 **Migration Support**
+	- Backward compatibility maintained with `batch_sz = 0` (default)
+	- Migration path provided from manual splitting approaches (v1.3 and earlier)
+	- No changes required to downstream analysis workflows
+
+---
+
 ## CaliAli 1.3 Release Notes
 
 **🗓️ August 1st 2025**

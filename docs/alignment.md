@@ -1,7 +1,7 @@
 #### Inter-Session Alignment and projection calculation <a id="main"></a>
 
 
-After [motion correction](Motion_correction.md) we have to [calculate relevant projections]("Projections of blood vessels and neurons. These are used for alignment and for neuronal extraction is later stages"), align and concatenate sessions. Alternatively, we can also process individual files independently:
+After [motion correction](Motion_correction.md) we have to [calculate relevant projections](Functions_doc/get_projections_and_detrend.md#get_projections_and_detrend) — projections of blood vessels and neurons used for alignment and downstream extraction — align the sessions, and then concatenate them. Alternatively, we can also process individual files independently:
 
 === "Alignment and Concatenation"
     To achieve this, CaliAli performs the following steps:
@@ -24,7 +24,7 @@ After [motion correction](Motion_correction.md) we have to [calculate relevant p
 
 			
 === "Single File Processing"
-     Even if we do not require to align sessions we still need to [calculate relevant projections]("Projections of blood vessels and neurons. These are used for alignment and for neuronal extraction is later stages") that will be used in later stages.
+     Even if we do not require to align sessions we still need to [calculate relevant projections](Functions_doc/get_projections_and_detrend.md#get_projections_and_detrend), as these frames are reused in later steps.
      This is done by executing:
       ``` matlab
         detrend_batch_and_calculate_projections(CaliAli_options);
@@ -47,14 +47,14 @@ Correlation between Neurons projections is good!
 Lowest spatial correlation: 0.491
 ``` 
 
-- [The `Blood-vessel similarity score` reflects the usefulness of blood vessels in correcting inter-session misalignments.]("If this value falls below 2.7, CaliAli will issue a warning message and align sessions without relying on blood vessels (alignment dependent on neurons only").
+- **Blood-vessel similarity score** :material-information-outline:{ title="Reflects how helpful blood vessels are for correcting inter-session misalignments. If this value falls below 2.7, CaliAli issues a warning and automatically switches to neuron-based alignment." }
 
-- [The `spatial correlation value` indicates the correlation of the aligned neurons' projections.]("If this value is below 0.2, it may suggest substantial differences in active neurons across sessions, possibly due to displacement in the z-axis.")
+- **Spatial correlation value** :material-information-outline:{ title="Indicates the correlation of the aligned neuron projections. Values below 0.2 may suggest major differences in active neurons across sessions, possibly due to z-axis displacement." }
 
 ##### Post alignment:
 To visually confirm the alignment performance, load the `*_Aligned.mat file` in MATLAB:
 First, load the alignment options from a saved `.mat` file. 
-For the [demo file]("Assuming you Matlab path is the Demo folder") this would be:
+For the demo file (assuming your MATLAB path includes the `Demo` folder) this would be:
 
 ```matlab
 CaliAli_options = CaliAli_load('v4_mc_ds_Aligned.mat', 'CaliAli_options');
