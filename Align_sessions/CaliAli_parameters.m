@@ -150,6 +150,7 @@ addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diamet
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'preprocessing',[])
 addParameter(inp,'batch_sz',0)                % Batch size for chunked processing. 0 = process entire files
+addParameter(inp,'Mask',[])                   % Motion correction Mask
 %% Motion correction parameters
 addParameter(inp,'do_non_rigid',false)        %Do non-rigid registration
 addParameter(inp, ...
@@ -228,7 +229,6 @@ addParameter(inp,'same_ses_id',[])        % If [], all files will be considered 
 %% Internal variables
 
 addParameter(inp,'alignment_metrics',[]) % Alignment_metrics
-addParameter(inp,'Mask',[])              % Motion correction Mask
 addParameter(inp,'T_Mask',[])            % Post-translation Mask
 addParameter(inp,'NR_Mask',[])           % Non-rigid registration Mask
 addParameter(inp,'NR_Mask_n',[])         % Final neuron alignment registration Mask

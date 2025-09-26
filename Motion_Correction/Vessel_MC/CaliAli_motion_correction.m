@@ -91,13 +91,22 @@ for k = 1:length(opt.input_files)
     Y = interpolate_dropped_frames(Y);
 
     % Square the borders of the video
-    Y = square_borders(Y, 0);
-
+    if intra_sess_tag
+        Y = apply_mask_square(Y, Mask);
+        [Y,m] = square_borders(Y, 0);
+        Mask(Mask>0)=m(Mask>0);
+    else
+        [Y,Mask] = square_borders(Y, 0);
+    end
+    opt.Mask=Mask;
     % Save motion-corrected video (handles both string and batch inputs)
     CaliAli_options.motion_correction = opt;
     CaliAli_save(opt.input_files{k}(:), Y, CaliAli_options);
 end
 
 % Store output file names in options structure
-CaliAli_options.motion_correction.output_files = out;
+CaliAli_options.motion_correction.output_files = unique(out);
+for i=1:length(CaliAli_options.motion_correction.output_files)
+    apply_crop_on_disk(CaliAli_options.motion_correction.output_files{i});
+end
 end

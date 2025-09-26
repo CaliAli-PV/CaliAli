@@ -40,6 +40,7 @@ if isempty(opt.input_files)
     opt.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
+apply_crop_on_disk_backward_compatibility(opt.input_files);
 
 [opt.input_files] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
 
@@ -51,7 +52,7 @@ opt_g = opt;
 % Loop over each input file
 for k = 1:length(opt_g.input_files)
     % Get the full file name and separate the file path and name
-    if ischar(opt.input_files{k})
+    if ischar(opt_g.input_files{k})
         fullFileName = opt_g.input_files{k};
         fprintf(1, 'Now reading %s\n', fullFileName);
         intra_sess_tag= false;
@@ -73,9 +74,8 @@ for k = 1:length(opt_g.input_files)
 
         % Load the data from the input file
         Y = CaliAli_load(opt_g.input_files{k}, 'Y');
-
         if intra_sess_tag
-            [Y, P2, R, opt] = get_projections_and_detrend(Y, opt_g); %#ok  
+            [Y, P2, R, opt] = get_projections_and_detrend(Y, opt_g); 
             range(ses_ix)=max([range(ses_ix),R]);
             F(ses_ix)=F(ses_ix)+size(Y, 3);
             Cn_scale=max([Cn_scale,max(P2.(3){1, 1}, [], 'all')]);
@@ -84,7 +84,7 @@ for k = 1:length(opt_g.input_files)
             P=add_P_inner_batches(P,P2);
         else
             % Detrend the data and calculate projections
-            [Y, P, range(ses_ix), opt] = get_projections_and_detrend(Y, opt_g); %#ok
+            [Y, P, range(ses_ix), opt] = get_projections_and_detrend(Y, opt_g);
             % Calculate the size of the data (number of frames)
             F(ses_ix) = size(Y, 3);
             % Calculate the maximum projections and scale them
@@ -102,17 +102,17 @@ for k = 1:length(opt_g.input_files)
         opt.P = P;
     
         % Update the CaliAli_options structure with the modified options
+        CaliAli_options=CaliAli_load(opt_g.input_files{k}, 'CaliAli_options');
         CaliAli_options.inter_session_alignment = opt;
-
         % Save the updated options to the output file
-        CaliAli_save(opt.input_files{k}(:), Y, CaliAli_options);
+        CaliAli_save(opt_g.input_files{k}(:), Y, CaliAli_options);
     else
         % If the output file already exists, load the pre-calculated options
-        temp = CaliAli_load(fullFileName, 'CaliAli_options.inter_session_alignment');
+        temp = CaliAli_load(opt_g.input_files{k}{5}, 'CaliAli_options.inter_session_alignment');
         range(ses_ix) = temp.range; %#ok
         F(ses_ix) = temp.F; 
         % Inform the user that the calculation has already been done for this file
-        fprintf(1, 'Calculation of projections and detrending is already done for file "%s".\n', fullFileName);
+        fprintf(1, 'Calculation of projections and detrending is already done for file "%s".\n', opt_g.input_files{k}{1});
     end
 end
 

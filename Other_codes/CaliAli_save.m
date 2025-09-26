@@ -36,7 +36,7 @@ if iscell(target)
         field = fn{i};
         if strcmp(field, 'Y')
             m.Y(:, :, start_frame:end_frame) = data.(field);
-            fprintf('Saved batch frames %d-%d to %s\\n', start_frame, end_frame, output_filename);
+            fprintf('Saved batch frames %d-%d to %s\n', start_frame, end_frame, output_filename);
         else
             % recurse using NAME–VALUE so the name is preserved
             CaliAli_save(output_filename, field, data.(field));
