@@ -157,7 +157,7 @@ P.(5){1, 1}=max(cat(4,P1.(5){1, 1},P2.(5){1, 1}), [], 4);
 end
 
 function P=scaleP(P)
-for i=1:5
+for i=1:2
     P.(i){1, 1}=P.(i){1, 1}./max(P.(i){1, 1},[],'all');
 end
 
