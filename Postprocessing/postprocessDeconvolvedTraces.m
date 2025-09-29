@@ -77,20 +77,10 @@ function neuron = deconv_traces(neuron, deconv_options)
     c = [];
     s = [];
 
-    b = ProgressBar(size(cr, 1), ...
-        'IsParallel', true, ...
-        'WorkerDirectory', pwd(), ...
-        'Title', 'Deconvolving' ...
-        );
-
-    % ALWAYS CALL THE SETUP() METHOD FIRST!!!
-    b.setup([], [], []);
     % Perform deconvolution for each trace using parallel processing
     parfor i = 1:size(cr, 1)
         [c(i,:), s(i,:), ~] = deconvolveCa(cr(i,:), deconv_options, 'sn', 1);
-        updateParallel([], pwd);
     end
-    b.release();
     % Denoise the deconvolved traces
     [c, s] = denoise_traces(cr, c, s, abs(deconv_options.smin), neuron.sf);
     
