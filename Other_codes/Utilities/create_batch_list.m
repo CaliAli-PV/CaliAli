@@ -20,6 +20,10 @@ function [modified_input_files,F] = create_batch_list(input_files, batch_sz,tag)
 modified_input_files = {};
 batch_idx = 1;
 
+if ischar(input_files)
+    input_files={input_files};
+end
+
 for session_id = 1:length(input_files)
     filename = input_files{session_id};
 

@@ -1,14 +1,12 @@
 
 *.asv
-*.asv
-*.asv
-*.asv
-*.asv
 "site/" 
 /site
 *.asv
-*.asv
-Align_sessions/codegen/.DS_Store
 CLAUDE.md
-.DS_Store
-.DS_Store
+*.DS_Store
+
+.vs/
+.vscode/
+.cache/
+.claude/

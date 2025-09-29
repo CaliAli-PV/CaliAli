@@ -5,6 +5,10 @@ function apply_crop_on_disk_backward_compatibility(Flist)
 % mat_path : path to .mat file containing the video variable
 % varname  : name of the video variable (default 'Y')
 
+if ischar(Flist)
+    Flist={Flist};
+end
+
 for i=1:length(Flist)
     try
         if isempty(CaliAli_load(Flist{i},'CaliAli_options.motion_correction.Mask'))
