@@ -38,21 +38,12 @@ if ~exist('use_parallel','var')
 end
 
 if use_parallel
-    b2 = ProgressBar(size(vid,3), ...
-    'IsParallel', true, ...
-    'UpdateRate', 1,...
-    'WorkerDirectory', pwd(), ...
-    'Title', 'Appling filter' ...
-    );
-    b2.setup([], [], []);
     vid = videoConvert(vid);
     parfor i=1:size(vid,2)
         temp=double(vid{i});
         temp=apply_vesselness_filter(temp,sz,norm);
         vid{i}=temp;
-        updateParallel([], pwd);
     end
-    b2.release();
     vid = videoConvert(vid);
 else
     for i=1:size(vid,3)

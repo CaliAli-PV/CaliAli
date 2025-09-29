@@ -73,7 +73,12 @@ validateattributes(workerDirName, {'char'}, {'nonempty'});
 % initialized and the worker file is created. The condition is skipped in
 % the following calls.
 if isempty(workerFileName)
-    uuid = char(java.util.UUID.randomUUID);
+    try
+        uuid = char(java.util.UUID.randomUUID);
+    catch
+        % Fallback for MATLAB sessions without a JVM (e.g., -nojvm) where Java is unavailable
+        [~, uuid] = fileparts(tempname);
+    end
     workerFileName = fullfile(workerDirName, [filePattern, uuid]);
     
     fid = fopen(workerFileName, 'wb');
@@ -92,4 +97,3 @@ if fid > 0
     
     fclose(fid);
 end
-
