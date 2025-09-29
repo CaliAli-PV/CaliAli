@@ -29,6 +29,10 @@ function opt=CaliAli_parameters(varargin)
 %% INTIALIZE VARIABLES
 
 %% INTIALIZE VARIABLES
+if isempty(varargin)
+    varargin={[]};
+end
+
 struct_param={};
 if isstruct(varargin{1})
     struct_param = [fieldnames(varargin{1}), struct2cell(varargin{1})]';
