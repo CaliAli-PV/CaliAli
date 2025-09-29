@@ -1,4 +1,4 @@
-function process_flags = pre_allocate_outputs(input_files,tag)
+function [process_flags, output_files] = pre_allocate_outputs(input_files,tag)
 %% pre_allocate_outputs: Pre-allocate output files and determine processing flags.
 %
 % Inputs:
@@ -8,15 +8,17 @@ function process_flags = pre_allocate_outputs(input_files,tag)
 %
 % Outputs:
 %   process_flags - Logical array indicating which items need processing (true = process, false = skip)
+%   output_files  - Cell array with the resolved output filename for each input entry
 %
 % Usage:
-%   process_flags = pre_allocate_outputs(opt.input_files);
+%   [process_flags, output_files] = pre_allocate_outputs(opt.input_files, tag);
 %
 % Author: Pablo Vergara
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025
 
 process_flags = false(1, length(input_files));
+output_files = cell(1, length(input_files));
 processed_outputs = {};  % Track which output files we've already handled
 
 for k = 1:length(input_files)
@@ -32,6 +34,13 @@ for k = 1:length(input_files)
         else
             output_file = strcat(filepath, filesep, name, '.mat');
         end
+        output_files{k} = output_file;
+        
+        if isfile(output_file)
+            if remove_corrupted_output(output_file)
+                fprintf(1, 'Removed corrupted file %s\n', output_file);
+            end
+        end
         
         
         % Check if output file already exists
@@ -45,7 +54,14 @@ for k = 1:length(input_files)
         % Batch format - cell array {filename, session_id, start_frame, end_frame, output_filename}
         batch_info = input_files{k};
         output_file = batch_info{5};
+        output_files{k} = output_file;
         
+        if isfile(output_file)
+            if remove_corrupted_output(output_file)
+                fprintf(1, 'Removed corrupted file %s\n', output_file);
+            end
+        end
+
         % Check if we've already processed this output file
         if ~ismember(output_file, processed_outputs)
             processed_outputs{end+1} = output_file;
@@ -84,6 +100,7 @@ for k = 1:length(input_files)
                 for j = 1:length(input_files)
                     if iscell(input_files{j}) && strcmp(input_files{j}{5}, output_file)
                         process_flags(j) = true;
+                        output_files{j} = output_file;
                     end
                 end
                 
@@ -93,6 +110,7 @@ for k = 1:length(input_files)
                 for j = 1:length(input_files)
                     if iscell(input_files{j}) && strcmp(input_files{j}{5}, output_file)
                         process_flags(j) = false;
+                        output_files{j} = output_file;
                     end
                 end
             end
@@ -101,4 +119,30 @@ for k = 1:length(input_files)
     end
 end
 
+end
+
+function removed = remove_corrupted_output(output_file)
+% remove_corrupted_output: delete pre-allocated output files that contain data
+removed = false;
+
+if ~isfile(output_file)
+    return;
+end
+
+try
+    m = matfile(output_file);
+    info = whos(m, 'Y');
+    if isempty(info) || numel(info.size) < 3 || info.size(3) < 1
+        return;
+    end
+    last_idx = info.size(3);
+    slice = m.Y(:,:,last_idx);
+    if any(slice(:))
+        delete(output_file);
+        removed = true;
+    end
+catch
+    delete(output_file);
+    removed = true;
+end
 end
