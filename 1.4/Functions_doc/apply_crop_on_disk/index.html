@@ -523,6 +523,7 @@
 </code></pre></div>
 <h4 id="description">Description</h4>
 <p><code>apply_crop_on_disk</code> trims zero-padded borders from a motion-corrected video directly on disk. It reads the stored <code>CaliAli_options.motion_correction.Mask</code>, crops <code>varname</code> (default <code>Y</code>) in streaming chunks that respect the configured <code>batch_sz</code>, and saves the result back into the same MAT-file.</p>
+<p>This helper is designed for the v1.4 chunked pipeline: once motion correction has written its <code>_mc.mat</code> outputs, <code>apply_crop_on_disk</code> removes the padded borders without ever loading the full stack into RAM. That keeps disk usage small and ensures subsequent detrending/alignment steps operate on the spatially trimmed movie.</p>
 <h5 id="function-inputs">Function Inputs</h5>
 <table>
 <thead>
@@ -547,9 +548,10 @@
 </table>
 <h5 id="notes">Notes</h5>
 <ul>
-<li>Requires <code>CaliAli_options.motion_correction.Mask</code> and <code>batch_sz</code> to be present inside the MAT-file.</li>
-<li>Performs the copy in batches to avoid loading the full dataset into memory.</li>
-<li>The original file is replaced atomically after the temporary cropped copy is written.</li>
+<li>Requires <code>CaliAli_options.motion_correction.Mask</code> and <code>batch_sz</code> to be present inside the MAT-file. When motion correction runs with <code>batch_sz&gt;0</code>, both fields are created automatically.</li>
+<li>Performs the copy in batches to avoid loading the full dataset into memory. The effective chunk size matches the frames-per-batch selected for motion correction.</li>
+<li>Rewrites the file in-place: the function streams from the existing dataset into a temporary file, then swaps it back onto disk to minimise the risk of leaving half-written outputs if the process stops unexpectedly.</li>
+<li>Detrending and inter-session alignment call this function internally, so you rarely need to invoke it manually unless you are reprocessing legacy datasets.</li>
 </ul>
 <h5 id="example-usage">Example Usage</h5>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">apply_crop_on_disk</span><span class="p">(</span><span class="s">&#39;session1_mc.mat&#39;</span><span class="p">);</span>

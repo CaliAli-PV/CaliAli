@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#description" class="md-skip">
+        <a href="#manually_update_residuals" class="md-skip">
           Skip to content
         </a>
       
@@ -517,6 +517,7 @@
 
   <h1>Manually update residuals</h1>
 
+<h3 id="manually_update_residuals">manually_update_residuals</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>neuron<span class="p">=</span><span class="nf">manually_update_residuals</span><span class="p">(</span>neuron,use_parallel<span class="p">)</span>
 </code></pre></div>
 <h4 id="description">Description</h4>
@@ -565,11 +566,11 @@
 </code></pre></div>
 This will open a GUI displaying the PNR, Corr., and PNR*Corr. images(1). These images will be shown in their original form (top panels) and also after subtracting the current neuron detections from the video (Residual video) (bottom panels).</p>
 <ol>
-<li>Refer to <a href="extraction.md#gui">Select Extraction Parameters</a> for a description of the PNR, Corr. and PNR*Corr images.</li>
+<li>Refer to <a href="../../extraction/#gui">Select Extraction Parameters</a> for a description of the PNR, Corr. and PNR*Corr images.</li>
 </ol>
 <p>Here, you can manually add initialization seeds for undetected neurons. Clicking on any of these images will place a red dot that initializes these neurons:</p>
 <p><img alt="pick_residuals" src="../../files/pick_residuals.gif" /></p>
-<p>This will initialize these neurons and repeat the CNMF process required to <a href="extraction.md#ecs">extract the Calcium signals</a>.</p>
+<p>This will initialize these neurons and repeat the CNMF process required to <a href="../../extraction/#ecs">extract the Calcium signals</a>.</p>
 <details class="tip" open="open">
 <summary>Tip</summary>
 <p>In most cases picking neurons is not necessary.</p>

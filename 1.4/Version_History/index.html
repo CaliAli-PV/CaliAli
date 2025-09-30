@@ -664,6 +664,7 @@
 <li>🚀 <strong>Automatic Session Chunking</strong>: <code>batch_sz</code> now splits oversized sessions across motion correction, alignment, and projection steps. See <a href="../Low_memory/">Processing Large Sessions</a> for the workflow.</li>
 <li>🔧 <strong>Batch Pipeline Helpers</strong>: Added <code>create_batch_list()</code> and <code>pre_allocate_outputs()</code> for chunk-aware processing while keeping templates consistent.</li>
 <li>💾 <strong>Memory &amp; Resilience Tweaks</strong>: Leaner spatial updates and better fallback behaviour when GPU jobs fail.</li>
+<li>✂️ <strong>On-Disk Cropping</strong>: New <code>apply_crop_on_disk()</code> trims motion-corrected stacks in-place, honouring <code>batch_sz</code> so long sessions stay within RAM limits without manual file splitting.</li>
 <li>⚙️ <strong>Projection Refinements</strong>: Smarter aggregation per chunk so combined projections match full-session runs.</li>
 <li>🔍 <strong>Dev Utilities</strong>: <code>check_version_sync()</code> plus environment reporting to simplify release management.</li>
 <li>🎯 <strong>Migration</strong>: <code>batch_sz = 0</code> preserves legacy behaviour; v1.3-style manual splitting can be replaced by the new chunking flow.</li>
