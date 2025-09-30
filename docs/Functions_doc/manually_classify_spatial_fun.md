@@ -1,3 +1,5 @@
+### manually_classify_spatial_fun {#manually_classify_spatial_fun}
+
 ```matlab
 function ix=manually_classify_spatial_fun(neuron,ix)
 ```

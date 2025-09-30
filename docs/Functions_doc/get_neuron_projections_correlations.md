@@ -1,3 +1,5 @@
+### get_neuron_projections_correlations {#get_neuron_projections_correlations}
+
 #### Syntax
 ```matlab
 function [out,W]=get_neuron_projections_correlations(P,k) 

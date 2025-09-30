@@ -1,3 +1,5 @@
+### sessions_translate {#sessions_translate}
+
 ```matlab
 function [P, CaliAli_options] = sessions_translate(P, CaliAli_options)
 ```

@@ -1,3 +1,5 @@
+### CaliAli_set_initialization_parameters {#CaliAli_set_initialization_parameters}
+
 ```matlab
 function CaliAli_set_initialization_parameters(CaliAli_options)
 ```
@@ -23,7 +25,7 @@ CaliAli_set_initialization_parameters(CaliAli_options);
 
 ??? note "This app can only be used with videos processed by CaliAli"
     Before using this application, files must be processed to calculate relevant projections (neurons, BV).  
-    This preprocessing step is performed when running [CaliAli_align_sessions](CaliAli_align_sessions) or  [detrend_batch_and_calculate_projections](detrend_batch_and_calculate_projections).  
+    This preprocessing step is performed when running [CaliAli_align_sessions](CaliAli_align_sessions.md) or  [detrend_batch_and_calculate_projections](detrend_batch_and_calculate_projections.md).  
     You cannot run this code on a video that has not undergone these steps, as the necessary projections will not be calculated.
 
 #### Adjusting PNR and Correlation Thresholds <a id="adjust_pnr"></a>

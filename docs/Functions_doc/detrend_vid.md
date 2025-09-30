@@ -1,3 +1,5 @@
+### detrend_vid {#detrend_vid}
+
 ```matlab
 function Y=detrend_vid(Y,CaliAli_options)
 ```
@@ -13,7 +15,7 @@ fluctuations in intensity over time.
 | Parameter Name | Type    | Description                                           |
 |----------------|---------|-------------------------------------------------------|
 | Y              | 3D array | Input video as a height x width x frames array.        |
-|  [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure| Structure containing preprocessing parameters. The details of this structure can be found in `CaliAli_demo_parameters()`. |
+|  [CaliAli_options](CaliAli_parameters.md) | Structure| Structure containing preprocessing parameters. The details of this structure can be found in `CaliAli_demo_parameters()`. |
 
 ##### Function Outputs:
 | Parameter Name | Type    | Description                                           |

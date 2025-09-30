@@ -1,3 +1,5 @@
+### BV_app {#BV_app}
+
 #### Description
 Interactive graphical interface to estimate the optimal blood vessel (BV) size for use in the CaliAli motion correction pipeline. This tool processes a single video frame to extract blood vessel candidates across a range of sizes and allows the user to manually select the optimal diameter range.
 

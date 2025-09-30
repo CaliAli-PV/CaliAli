@@ -1,9 +1,13 @@
-function apply_crop_on_disk_backward_compatibility(Flist)
+function apply_crop_on_disk_backward_compatibility(Flist,options_main)
 % Crop borders on disk by building a mask from the first frame (pixels == 0 are removed),
 % and update ONLY CaliAli_options.motion_correction.Mask without overwriting other fields.
 %
 % mat_path : path to .mat file containing the video variable
 % varname  : name of the video variable (default 'Y')
+
+if ~exist('options_main','var')
+    options_main=[];
+end
 
 if ischar(Flist)
     Flist={Flist};
@@ -15,14 +19,18 @@ for i=1:length(Flist)
             apply_crop_on_disk_in(Flist{i}) % If mask is zero, calculate.
         end
     catch
-        apply_crop_on_disk_in(Flist{i}) % If mask doesnt exist, calculate.
+        apply_crop_on_disk_in(Flist{i},options_main) % If mask doesnt exist, calculate.
     end
 end
 
 end
 
-function apply_crop_on_disk_in(mat_path)
+function apply_crop_on_disk_in(mat_path,options_main)
+try
 CaliAli_options=CaliAli_load(mat_path, 'CaliAli_options');
+catch
+CaliAli_options=options_main;
+end
 Flist=create_batch_list({mat_path}, CaliAli_options.motion_correction.batch_sz,'');
 
 for k=1:length(Flist)

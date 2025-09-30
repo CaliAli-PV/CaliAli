@@ -40,7 +40,7 @@ if isempty(opt.input_files)
     opt.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
-apply_crop_on_disk_backward_compatibility(opt.input_files);
+apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 
 [opt.input_files] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
 

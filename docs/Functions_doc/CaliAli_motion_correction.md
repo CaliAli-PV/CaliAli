@@ -1,3 +1,5 @@
+### CaliAli_motion_correction {#CaliAli_motion_correction}
+
 ```matlab
 function CaliAli_options = CaliAli_motion_correction(varargin)
 ```
@@ -12,12 +14,12 @@ saves the corrected video as a .mat file.
 ##### Function Inputs:
 | Parameter Name | Type | Description |
 |---------------|------|-------------|
-| varargin | Variable-length input argument list | Variable input arguments, which are parsed into  [CaliAli_options](../../Functions_doc/CaliAli_parameters). |
+| varargin | Variable-length input argument list | Variable input arguments, which are parsed into  [CaliAli_options](CaliAli_parameters.md). |
 
 ##### Function Outputs:
 | Parameter Name | Type | Description |
 |---------------|------|-------------|
-|  [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Updated structure containing the motion correction parameters. | - |
+|  [CaliAli_options](CaliAli_parameters.md) | Updated structure containing the motion correction parameters. | - |
 
 ##### Example usage:
 ```matlab

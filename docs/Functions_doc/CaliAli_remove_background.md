@@ -1,3 +1,5 @@
+### CaliAli_remove_background {#CaliAli_remove_background}
+
 ```matlab
 function Y = CaliAli_remove_background(Y, CaliAli_options)
 ```
@@ -11,7 +13,7 @@ This function applies background removal techniques to enhance neuronal or dendr
 | Parameter Name | Type   | Description                                                                 |
 |---------------|--------|-----------------------------------------------------------------------------|
 | Y               | 3D array | Input image or video as a 3D array.                                        |
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure | Structure containing preprocessing parameters. See `CaliAli_demo_parameters()` for details.|
+| [CaliAli_options](CaliAli_parameters.md) | Structure | Structure containing preprocessing parameters. See `CaliAli_demo_parameters()` for details.|
 
 ##### Function Outputs:
 | Parameter Name | Type   | Description                                                                 |

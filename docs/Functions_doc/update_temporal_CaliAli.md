@@ -1,3 +1,5 @@
+### update_temporal_CaliAli {#update_temporal_CaliAli}
+
 ```matlab
 function obj=update_temporal_CaliAli(obj, use_parallel,F)
 ```

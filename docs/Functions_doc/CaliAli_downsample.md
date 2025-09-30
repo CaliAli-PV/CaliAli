@@ -1,3 +1,5 @@
+### CaliAli_downsample {#CaliAli_downsample}
+
 #### Syntax
 ```matlab
 function CaliAli_options=CaliAli_downsample(varargin)
@@ -10,12 +12,12 @@ Supported formats include .avi, .m4v, .mp4, .tif, .tiff, .isxd, and .h5.
 ##### Function Inputs:
 | Parameter Name | Type   | Description                                                                 |
 |---------------|--------|-----------------------------------------------------------------------------|
-| varargin      | array  | Variable input arguments, which are parsed into [CaliAli_options](../../Functions_doc/CaliAli_parameters) .          |
+| varargin      | array  | Variable input arguments, which are parsed into [CaliAli_options](CaliAli_parameters.md) .          |
 
 ##### Function Outputs:
 | Parameter Name    | Type           | Description                                                              |
 |-------------------|----------------|--------------------------------------------------------------------------|
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters)    | structure      | Updated structure containing the downsampling parameters.            |
+| [CaliAli_options](CaliAli_parameters.md)    | structure      | Updated structure containing the downsampling parameters.            |
 
 ##### Example usage:
 ```matlab

@@ -1,5 +1,5 @@
 
-### apply_crop_on_disk_backward_compatibility
+### apply_crop_on_disk_backward_compatibility {#apply_crop_on_disk_backward_compatibility}
 
 #### Syntax
 ```matlab

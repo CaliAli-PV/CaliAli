@@ -1,3 +1,5 @@
+### get_projections_and_detrend {#get_projections_and_detrend}
+
 ```matlab
 function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options)
 ```

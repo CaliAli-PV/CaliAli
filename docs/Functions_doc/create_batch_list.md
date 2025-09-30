@@ -1,5 +1,5 @@
 
-### create_batch_list
+### create_batch_list {#create_batch_list}
 
 #### Syntax
 ```matlab

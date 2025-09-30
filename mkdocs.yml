@@ -36,6 +36,10 @@ plugins:
   - search
   - tags
 
+validation:
+  omitted_files: ignore
+  unrecognized_links: warn
+
   
 
 extra:
@@ -96,4 +100,3 @@ extra_css:
 
 copyright: |
   &copy; 2025 <a href="License"  target="_blank" rel="noopener">CaliAli</a>
-

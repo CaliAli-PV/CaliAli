@@ -1,3 +1,5 @@
+### postprocessing_app {#postprocessing_app}
+
 #### Syntac
 ```matlab
 function ix=postprocessing_app(neuron,thr)
@@ -39,7 +41,7 @@ You can label false positives by right-clicking on the neuron contours:
 ![label_fp_app](../files/label_fp_app.gif)
 
 
-### Sort Spatial Components <a id="spatial_sort"></a>
+### Sort Spatial Components <a id="spatial_sort"></a> {#Sort_Spatial_Components_<a_id="spatial_sort"></a>}
 
 CaliAli can label false positives based on the shape of the extracted spatial components. To accomplish this, CaliAli incorporates a tool that sorts spatial components by their spatial congruence. To utilize this function, press the 'Separate Spatial' button.
 

@@ -1,3 +1,5 @@
+### view_traces {#view_traces}
+
 #### Syntax
 
 ```matlab

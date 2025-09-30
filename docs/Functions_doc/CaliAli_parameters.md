@@ -1,3 +1,5 @@
+### CaliAli_parameters {#CaliAli_parameters}
+
 ```matlab
 function opt=CaliAli_parameters(varargin)
 ```

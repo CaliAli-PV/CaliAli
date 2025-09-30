@@ -1,5 +1,5 @@
 
-### pre_allocate_outputs
+### pre_allocate_outputs {#pre_allocate_outputs}
 
 #### Syntax
 ```matlab

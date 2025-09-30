@@ -1,3 +1,5 @@
+### CaliAli_demo_parameters {#CaliAli_demo_parameters}
+
 #### Syntax
 ```matlab
 function params=CaliAli_demo_parameters()

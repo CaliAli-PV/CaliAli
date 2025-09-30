@@ -1,3 +1,5 @@
+### NeuronSize_app {#NeuronSize_app}
+
 #### Description
 Interactive graphical interface to estimate the optimal neuron size for inter-session alignment and initialization in CNMF-E processing within the CaliAli pipeline. This tool processes a single representative frame to generate neuron-enhanced images across a range of filter sizes, allowing manual selection of the most appropriate size.
 

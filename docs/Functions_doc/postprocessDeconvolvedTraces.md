@@ -1,3 +1,5 @@
+### postprocessDeconvolvedTraces {#postprocessDeconvolvedTraces}
+
 ```matlab
 function neuron = postprocessDeconvolvedTraces(neuron, method, type, smin)
 ```

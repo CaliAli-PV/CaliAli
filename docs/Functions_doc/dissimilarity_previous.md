@@ -1,3 +1,5 @@
+### dissimilarity_previous {#dissimilarity_previous}
+
 ```matlab
 function dis=dissimilarity_previous(A1,A2,C1,C2)
 ```

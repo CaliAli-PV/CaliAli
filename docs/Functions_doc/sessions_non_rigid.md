@@ -1,3 +1,5 @@
+### sessions_non_rigid {#sessions_non_rigid}
+
 ```matlab
 function [P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options, neurons_only)
 ```

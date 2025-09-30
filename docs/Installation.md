@@ -9,7 +9,7 @@ CaliAli runs in `MATLAB` and requires the following toolbox:
 -	Parallel Computing Toolbox
 ```
 ??? Warning "Function requiring MATLAB 2023b"
-	One of the [utilities](Utilities.md#bv_app) included in CaliAli requires 'MATLAB 2023b' due to its use of new functions from MATLAB's AppDesigner. This function is *NOT* essential for running the CaliAli pipeline."
+	One of the [utilities](Functions_doc/BV_app.md#BV_app) included in CaliAli requires 'MATLAB 2023b' due to its use of new functions from MATLAB's AppDesigner. This function is *NOT* essential for running the CaliAli pipeline."
 	
 ##### Windows
 CaliAli has been successfully tested on MATLAB versions 2022a and 2023a running on Windows 11.

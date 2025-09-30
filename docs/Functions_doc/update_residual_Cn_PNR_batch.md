@@ -1,3 +1,5 @@
+### update_residual_Cn_PNR_batch {#update_residual_Cn_PNR_batch}
+
 ```matlab
 function neuron=update_residual_Cn_PNR_batch(neuron)
 ```

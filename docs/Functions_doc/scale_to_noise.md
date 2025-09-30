@@ -1,3 +1,5 @@
+### scale_to_noise {#scale_to_noise}
+
 ```matlab
 function scale_to_noise(neuron)
 ```

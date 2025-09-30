@@ -1,3 +1,5 @@
+### update_background_CaliAli {#update_background_CaliAli}
+
 ```matlab
 function obj=update_background_CaliAli(obj, use_parallel,F)
 ```

@@ -1,3 +1,5 @@
+### update_spatial_CaliAli {#update_spatial_CaliAli}
+
 ```matlab
 function obj=update_spatial_CaliAli(obj, use_parallel,F)
 ```

@@ -1,3 +1,5 @@
+### match_video_size {#match_video_size}
+
 ```matlab
 function CaliAli_options = match_video_size(CaliAli_options)
 ```

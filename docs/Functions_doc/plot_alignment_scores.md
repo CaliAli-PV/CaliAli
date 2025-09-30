@@ -1,3 +1,5 @@
+### plot_alignment_scores {#plot_alignment_scores}
+
 #### Syntax
 ```matlab
 function plot_alignment_scores(CaliAli_options)
@@ -9,7 +11,7 @@ Visualize alignment scores across sessions.
 
 | Parameter Name | Type | Description |
 |---------------|------|-------------|
-|  [CaliAli_options](../../Functions_doc/CaliAli_parameters.md)| Structure | Contains inter-session alignment data. |
+|  [CaliAli_options](CaliAli_parameters.md)| Structure | Contains inter-session alignment data. |
 
 ##### Function Outputs:
 

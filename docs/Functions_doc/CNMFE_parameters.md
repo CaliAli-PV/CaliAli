@@ -1,3 +1,5 @@
+### CNMFE_parameters {#CNMFE_parameters}
+
 ```matlab
 function pars=CNMFE_parameters(varargin)
 ```
@@ -12,12 +14,12 @@ temporal, background, and merging constraints for neuronal extraction.
 ##### Function Inputs:
 | Parameter Name | Type         | Description                                      |
 |----------------|--------------|--------------------------------------------------|
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure    | Contains configuration options.|
+| [CaliAli_options](CaliAli_parameters.md) | Structure    | Contains configuration options.|
 
 ##### Function Inputs:
 | Parameter Name | Type         | Description                                      |
 |----------------|--------------|--------------------------------------------------|
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure    | CaliAli_options structure parsed with CNMF parameters.|
+| [CaliAli_options](CaliAli_parameters.md) | Structure    | CaliAli_options structure parsed with CNMF parameters.|
 
 ##### Example usage:
 ```matlab

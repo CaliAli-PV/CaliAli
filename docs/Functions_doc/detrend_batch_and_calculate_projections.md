@@ -1,4 +1,4 @@
-### detrend_batch_and_calculate_projections
+### detrend_batch_and_calculate_projections {#detrend_batch_and_calculate_projections}
 
 #### Syntax
 ```matlab

@@ -1,3 +1,5 @@
+### motion_metrics {#motion_metrics}
+
 ```matlab
 function [cY,mY,ng] = motion_metrics(Y,bnd,batch_size,var_name)
 ```

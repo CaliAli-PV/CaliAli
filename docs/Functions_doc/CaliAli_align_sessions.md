@@ -1,3 +1,5 @@
+### CaliAli_align_sessions {#CaliAli_align_sessions}
+
 #### Syntax
 ```matlab
 function CaliAli_align_sessions(varargin)
@@ -8,12 +10,12 @@ This function processes input files, performs inter-session alignment, calculate
 ##### Function Inputs:
 | Parameter Name | Type         | Description                                      |
 |----------------|--------------|--------------------------------------------------|
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure    | Contains configuration options and transformation data.|
+| [CaliAli_options](CaliAli_parameters.md) | Structure    | Contains configuration options and transformation data.|
 
 ##### Function Outputs:
 | Parameter Name | Type         | Description                                      |
 |----------------|--------------|--------------------------------------------------|
-| [CaliAli_options](../../Functions_doc/CaliAli_parameters) | Structure    | Updated structure.
+| [CaliAli_options](CaliAli_parameters.md) | Structure    | Updated structure.
 | video_aligned.mat | `.mat` file    | `.mat` file with the aligned video and other alignment outputs |
 
 ##### Example usage:

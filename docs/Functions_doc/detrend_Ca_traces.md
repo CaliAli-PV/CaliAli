@@ -1,3 +1,5 @@
+### detrend_Ca_traces {#detrend_Ca_traces}
+
 ```matlab
 function out=detrend_Ca_traces(nums,obj,F)
 ```

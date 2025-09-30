@@ -1,3 +1,5 @@
+### get_BV_NR_score {#get_BV_NR_score}
+
 #### Syntax:
 
 ```matlab

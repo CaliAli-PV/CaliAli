@@ -40,7 +40,7 @@ This will generate three `.mat` files—one for each session—containing the da
 └─ Session_3_day_15_con.mat
 ```
 
-![video_app](../files/split_files.gif)
+![video_app](files/split_files.gif)
 
 
 ??? Question "What about video sessions split into multiple TIFF files?" 

@@ -1,3 +1,5 @@
+### Rigid_mc {#Rigid_mc}
+
 #### Syntax
 ```matlab
 function [Mr, Ref] = Rigid_mc(Y, opt)

@@ -1,3 +1,5 @@
+### get_alignment_metrics {#get_alignment_metrics}
+
 ```matlab
 function T=get_alignment_metrics(P)
 ```

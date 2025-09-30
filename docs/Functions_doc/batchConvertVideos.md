@@ -1,3 +1,5 @@
+### batchConvertVideos {#batchConvertVideos}
+
 # batchConvertVideos
 
 #### 📌 Syntax

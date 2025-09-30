@@ -1,3 +1,5 @@
+### CaliAli_update_parameters {#CaliAli_update_parameters}
+
 ```matlab
 function CaliAli_update_parameters(varargin)
 ```
