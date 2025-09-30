@@ -5,7 +5,7 @@
 - 🚀 **Automatic Session Chunking**: `batch_sz` now splits oversized sessions across motion correction, alignment, and projection steps. See [Processing Large Sessions](Low_memory.md) for the workflow.
 - 🔧 **Batch Pipeline Helpers**: Added `create_batch_list()` and `pre_allocate_outputs()` for chunk-aware processing while keeping templates consistent.
 - 💾 **Memory & Resilience Tweaks**: Leaner spatial updates and better fallback behaviour when GPU jobs fail.
-- ✂️ **On-Disk Cropping**: New `apply_crop_on_disk()` trims motion-corrected stacks in-place, honouring `batch_sz` so long sessions stay within RAM limits without manual file splitting.
+- ✂️ **Interactive Cropping**: Added `CaliAli_crop()` to preview multiple sessions, draw a shared region of interest, and apply on-disk cropping before motion correction for RAM-friendly processing.
 - ⚙️ **Projection Refinements**: Smarter aggregation per chunk so combined projections match full-session runs.
 - 🔍 **Dev Utilities**: `check_version_sync()` plus environment reporting to simplify release management.
 - 🎯 **Migration**: `batch_sz = 0` preserves legacy behaviour; v1.3-style manual splitting can be replaced by the new chunking flow.

@@ -10,6 +10,7 @@
      | [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions) |
      | [CaliAli_cnmfe()](Functions_doc/CaliAli_cnmfe.md#CaliAli_cnmfe) |
      | [CaliAli_concatenate_files()](Functions_doc/CaliAli_concatenate_files.md#CaliAli_concatenate_files) |
+     | [CaliAli_crop()](Functions_doc/CaliAli_crop.md#CaliAli_crop) |
      | [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.md#CaliAli_demo_parameters) |
      | [CaliAli_downsample()](Functions_doc/CaliAli_downsample.md#CaliAli_downsample) |
      | [CaliAli_get_blood_vessels()](Functions_doc/CaliAli_get_blood_vessels.md#CaliAli_get_blood_vessels) |
