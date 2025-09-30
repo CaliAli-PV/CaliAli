@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1/1.4/Functions_doc/apply_crop_on_disk/">
+        <link rel="canonical" href="https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1/1.4/Functions_doc/CaliAli_crop/">
       
       
       
@@ -18,7 +18,7 @@
     
     
       
-        <title>Apply crop on disk - CaliAli</title>
+        <title>CaliAli crop - CaliAli</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#apply_crop_on_disk" class="md-skip">
+        <a href="#CaliAli_crop" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Apply crop on disk
+              CaliAli crop
             
           </span>
         </div>
@@ -515,14 +515,14 @@
                   
 
 
-  <h1>Apply crop on disk</h1>
+  <h1>CaliAli crop</h1>
 
-<h3 id="apply_crop_on_disk">apply_crop_on_disk</h3>
+<h3 id="CaliAli_crop">CaliAli_crop</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">apply_crop_on_disk</span><span class="p">(</span>mat_path, varname<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">CaliAli_crop</span><span class="p">(</span>backup_options<span class="p">)</span>
 </code></pre></div>
 <h4 id="description">Description</h4>
-<p><code>apply_crop_on_disk</code> trims zero-padded borders from a motion-corrected video directly on disk. It reads the stored <code>CaliAli_options.motion_correction.Mask</code>, crops <code>varname</code> (default <code>Y</code>) in streaming chunks that respect the configured <code>batch_sz</code>, and saves the result back into the same MAT-file.</p>
+<p><code>CaliAli_crop</code> launches an interactive workflow to define a spatial crop that is applied across multiple motion-correction inputs. The function loads each selected MAT file, collects representative frames, shows an averaged projection in <code>crop_app</code>, and then writes the cropped data back to disk in-place. Use this tool before detrending or alignment so downstream steps operate on the trimmed field of view.</p>
 <h5 id="function-inputs">Function Inputs</h5>
 <table>
 <thead>
@@ -534,25 +534,25 @@
 </thead>
 <tbody>
 <tr>
-<td><code>mat_path</code></td>
-<td>char</td>
-<td>Path to the MAT-file that contains the video stack and <code>CaliAli_options</code>.</td>
-</tr>
-<tr>
-<td><code>varname</code></td>
-<td>char</td>
-<td>(Optional) Name of the variable to crop. Defaults to <code>'Y'</code>.</td>
+<td><code>backup_options</code></td>
+<td>struct</td>
+<td>(Optional) CaliAli options structure saved into files that do not yet contain <code>CaliAli_options</code>. Pass an empty array to skip this behaviour.</td>
 </tr>
 </tbody>
 </table>
 <h5 id="notes">Notes</h5>
 <ul>
-<li>Requires <code>CaliAli_options.motion_correction.Mask</code> and <code>batch_sz</code> to be present inside the MAT-file.</li>
-<li>Performs the copy in batches to avoid loading the full dataset into memory.</li>
-<li>The original file is replaced atomically after the temporary cropped copy is written.</li>
+<li>Works on MAT files that contain a <code>Y</code> variable (d1 × d2 × d3) and, ideally, an embedded <code>CaliAli_options</code> structure.</li>
+<li>The GUI displays the median frame of each session and lets you draw a shared crop that is applied to all files.</li>
+<li>Cropping is performed by calling the on-disk helper used during motion correction, so large stacks are processed in batches determined by <code>motion_correction.batch_sz</code>.</li>
+<li>Because cropping changes frame dimensions, run this function <strong>before</strong> computing projections, detrending, or alignment products.</li>
 </ul>
 <h5 id="example-usage">Example Usage</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">apply_crop_on_disk</span><span class="p">(</span><span class="s">&#39;session1_mc.mat&#39;</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c">% Use existing options as a fallback for files missing CaliAli_options</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">CaliAli_crop</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c">% Prompt for files and crop without providing defaults</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">CaliAli_crop</span><span class="p">([]);</span>
 </code></pre></div>
 
 
