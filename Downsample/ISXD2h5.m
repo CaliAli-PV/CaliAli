@@ -31,7 +31,7 @@ end
 inputMovieIsx = isx.Movie.read(inputFilePath);
 nFrames = inputMovieIsx.timing.num_samples;
 f=inputMovieIsx.get_frame_data(0);
-vid=zeros(size(f,1)/ds_f,size(f,2)/ds_f,nFrames,class(f));
+vid=zeros(size(f,1),size(f,2),nFrames,class(f));
 for i=progress(1:nFrames)
     vid(:,:,i)=inputMovieIsx.get_frame_data(i-1);
 end
