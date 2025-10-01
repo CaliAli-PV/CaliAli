@@ -10,7 +10,13 @@ gSiz=gSig*4;
 F=get_batch_size(neuron);
 fn=[0,cumsum(F)];
 for i=progress(1:size(fn,2)-1)
-    Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
+    try
+        Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
+    catch
+        debugCaliAli(neuron)
+        return
+
+    end
     Ymean{i}=double(median(Y,3));
 
     if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix
