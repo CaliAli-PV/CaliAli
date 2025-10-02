@@ -28,6 +28,11 @@ function CaliAli_save_chunk(out,fullFileName,F, Y,ix)
 [d1,d2,~]=size(Y);
 filename=out;
 F=cumsum([0,F]);
+expected_frames = fullFileName{4} - fullFileName{3} + 1;
+if size(Y,3) ~= expected_frames
+    warning('CaliAli:CaliAli_save_chunk:frameMismatch', ...
+        'Chunk %d has %d frames but %d were expected.', ix, size(Y,3), expected_frames);
+end
 if exist(filename, 'file') == 2
     m = matfile(filename, 'Writable', true);
     fprintf('Appending frames "%d-%d"...\n', F(ix)+fullFileName{3},F(ix)+fullFileName{4});

@@ -19,8 +19,29 @@ function CaliAli_options = apply_transformations(CaliAli_options)
 R = CaliAli_options.inter_session_alignment.range;
 R = single(R ./ max(R));
 
+flag_field = 'alignment_completed';
+out_file = CaliAli_options.inter_session_alignment.out_aligned_sessions;
+
+if isfile(out_file)
+    try
+        done_flag = CaliAli_load(out_file, flag_field);
+    catch
+        done_flag = false;
+    end
+    if ~done_flag
+        warning('CaliAli:apply_transformations:incompleteFile', ...
+            'Found incomplete aligned file. Recomputing...');
+        delete(out_file);
+    else
+        fprintf(1, 'File with name "%s" already exists.\n', out_file);
+        return
+    end
+end
+
 % If the output file for aligned sessions does not exist, apply transformations
-if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
+if ~isfile(out_file)
+
+    CaliAli_save(out_file, flag_field, false);
 
     TheFiles = CaliAli_options.inter_session_alignment.input_files;
     for i=1:length(TheFiles)
@@ -66,12 +87,31 @@ if ~isfile(CaliAli_options.inter_session_alignment.out_aligned_sessions)
         end
 
         % Save the transformed data to the output file
-        CaliAli_save_chunk(CaliAli_options.inter_session_alignment.out_aligned_sessions, ...
+        CaliAli_save_chunk(out_file, ...
             TheFiles{k},CaliAli_options.inter_session_alignment.F,Y,ses_ix);
+    end
+    try
+        m_status = matfile(out_file);
+        info = whos(m_status, 'Y');
+        expected_frames = sum(CaliAli_options.inter_session_alignment.F);
+        if isempty(info) || numel(info.size) < 3
+            actual_frames = 0;
+        else
+            actual_frames = info.size(3);
+        end
+        if actual_frames ~= expected_frames
+            warning('CaliAli:apply_transformations:frameMismatch', ...
+                'Aligned stack has %d frames but %d were expected.', ...
+                actual_frames, expected_frames);
+        else
+            CaliAli_save(out_file, flag_field, true);
+        end
+    catch ME
+        warning('CaliAli:apply_transformations:flagUpdate', 'Unable to verify aligned stack: %s', ME.message);
     end
 else
     % If the output file already exists, inform the user
-    fprintf(1, 'File with name "%s" already exists.\n', CaliAli_options.inter_session_alignment.out_aligned_sessions);
+    fprintf(1, 'File with name "%s" already exists.\n', out_file);
 end
 
 end
