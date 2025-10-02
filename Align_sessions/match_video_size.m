@@ -35,13 +35,12 @@ function CaliAli_options = match_video_size(CaliAli_options)
 % Loop through each session and load the necessary data (F and Cn projections)
 for i = 1:size(CaliAli_options.inter_session_alignment.output_files, 2)
     fullFileName = CaliAli_options.inter_session_alignment.output_files{i};
-    
+    in=h5info(fullFileName);
+    dim=in.Datasets.Dataspace.Size;
     % Load the frame data (F) and neuron projection (Cn) for each session
-    F(i) = CaliAli_load(fullFileName, 'CaliAli_options.inter_session_alignment.F');
-    temp = CaliAli_load(fullFileName, 'CaliAli_options.inter_session_alignment.Cn');
-    
+    F(i) = dim(3);    
     % Initialize masks for each session
-    Mask{i} = ones(size(temp));
+    Mask{i} = ones(dim(1),dim(2));
 end
 
 % Combine all masks across sessions, ensuring they are aligned and centered
