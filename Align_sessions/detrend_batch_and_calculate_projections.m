@@ -128,7 +128,7 @@ try
     opt = opt_g;
     opt.range = range;
     opt.F = F;
-    opt.output_files=unique(cellfun(@(x) x{1,5},opt.input_files,'UniformOutput',false));
+    opt.output_files=unique(cellfun(@(x) x{1,5},opt.input_files,'UniformOutput',false),'stable');
 
 
     % Update the CaliAli_options structure with the final options
