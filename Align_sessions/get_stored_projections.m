@@ -27,7 +27,9 @@ for k = 1:size(opt.output_files, 2)
     % Load the current session's projection data
     fullFileName = opt.output_files{k};
     temp = CaliAli_load(fullFileName, 'CaliAli_options.inter_session_alignment');
-    
+    if size(temp.P.(5){1,1},3)>1
+        temp.P.(5){1,1}=max(temp.P.(5){1,1},[],3);
+    end   
     % Concatenate the projections from the current session to the table T
     T = cat_table(T, temp.P);
 end
