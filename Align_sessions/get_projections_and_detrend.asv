@@ -36,9 +36,6 @@ function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_opt
 % Store the original class of Y for later use (used to handle different data types)
 S = class(Y);
 
-% Remove borders from the data and obtain the binary mask for valid regions
-[Y, CaliAli_options.Mask] = remove_borders(Y, 0);
-
 % Calculate the median of the session data along the third dimension (frame dimension)
 M = median(Y, 3);
 
@@ -60,10 +57,9 @@ elseif strcmp(CaliAli_options.preprocessing.structure, 'dendrite')
     [Cn, PNR] = get_PNR_Cn_dendrite(Y, CaliAli_options); % Use dendrite method for projections
 else
     % Default: use greedy approach for calculating projections (with optional neuron enhancement)
+    fprintf('Calculating correlation image...\n');  
     [~, Cn, PNR] = get_PNR_coor_greedy_PV(Y, CaliAli_options.gSig, [], [], CaliAli_options.preprocessing.neuron_enhance);
 end
-
-fprintf('Calculating Correlation Image...\n');  
 
 % Apply median filtering to the projections if specified in the options
 if ~isempty(CaliAli_options.preprocessing.median_filtering)
@@ -73,10 +69,14 @@ end
 
 % Calculate the range of the session data (for normalization)
 R = max(Y,[],'all');
-
+Y=single(Y);
 % Convert the data to the appropriate format (uint8 or uint16) based on the original class
 if strcmp(S, 'uint8')
-    Y = uint8(Y./max(Y,[],'all')*256); % Convert to uint8 format if the original data was uint8
+    mY=max(Y,[],3);
+    s=mY(:);
+    thr=prctile(s,99);
+    mI=256*thr/(256*0.99);
+    Y = uint8(Y./mI*256); % Convert to uint8 format if the original data was uint8
 else
     Y = uint16(Y./max(Y,[],'all')*65536); % Convert to uint16 format for other data types
 end
@@ -85,7 +85,7 @@ end
 X = imfuse(mat2gray(Cn), BV, 'Scaling', 'joint', 'ColorChannels', [1 2 0]);
 
 % Create a table to store the various projections for visualization and analysis
-p = {mat2gray(M), BV, Cn, PNR, X}; % Store the projections (mean, blood vessels, neurons, PNR, fused)
+p = {mat2gray(M), single(BV), single(Cn), single(PNR), single(X)}; % Store the projections (mean, blood vessels, neurons, PNR, fused)
 p = array2table(p, 'VariableNames', {'Mean', 'BloodVessels', 'Neurons', 'PNR', 'BV+Neurons'});
 
 end

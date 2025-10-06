@@ -31,8 +31,8 @@ for k = 1:length(seed)
     end
 
     [r, c]  = ind2sub([d1, d2], ind_p);
-    rsub = max(1, -gSiz(2)+r):min(d1, gSiz(2)+r);
-    csub = max(1, -gSiz(1)+c):min(d2, gSiz(1)+c);
+    rsub = round(max(1, -gSiz(2)+r):min(d1, gSiz(2)+r));
+    csub = round(max(1, -gSiz(1)+c):min(d2, gSiz(1)+c));
     [cind, rind] = meshgrid(csub, rsub);
     [nr, nc] = size(cind);
     sz{k}=[nr, nc];
