@@ -26,8 +26,8 @@ function V = Non_rigid_mc(V, ref, opt)
 
 fprintf('Appling non-rigid motion correction...\n');
 
-warning(['Non-rigid motion correction is not currenlty supported!. ', ...
-         'Usage is experimental.']);
+cprintf('*red',['Non-rigid motion correction is not currenlty supported!. ', ...
+         'Usage is experimental.\n']);
 [X] = get_video_pyramid(V, ref, opt);
 
 % Perform non-rigid motion correction in parallel

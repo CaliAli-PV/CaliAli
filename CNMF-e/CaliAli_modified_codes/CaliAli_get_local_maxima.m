@@ -1,5 +1,5 @@
 function v_max=CaliAli_get_local_maxima(CaliAli_options)
-gSig=CaliAli_options.preprocessing.gSig;
+gSig=CaliAli_options.cnmf.gSig;
 cn=CaliAli_options.inter_session_alignment.Cn;
 pnr=CaliAli_options.inter_session_alignment.PNR;
 

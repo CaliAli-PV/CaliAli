@@ -98,12 +98,12 @@ function [P, CaliAli_options] = evaluate_BV(P, CaliAli_options)
 CaliAli_options.inter_session_alignment.BV_score = get_BV_NR_score(P, 2);
 
 % Display BV similarity score
-fprintf(1, 'Blood-vessel similarity score: %1.3f \n', CaliAli_options.inter_session_alignment.BV_score);
+cprintf('-comment', 'Blood-vessel similarity score: %1.3f \n', CaliAli_options.inter_session_alignment.BV_score);
 
 % If BV score is too low, switch to neuron-based alignment
 if CaliAli_options.inter_session_alignment.BV_score < 2.7 && CaliAli_options.inter_session_alignment.Force_BV == 0
-    fprintf(2, 'Blood-vessel similarity score is too low! \n Results may not be accurate! \n');
-    fprintf(2, 'Aligning utilizing neurons data \n');
+    cprintf('*red', 'Blood-vessel similarity score is too low! \n Results may not be accurate! \n');
+    cprintf('blue', 'Aligning utilizing neurons data \n');
     
     % Switch to neuron-based projection for alignment
     CaliAli_options.inter_session_alignment.projections = 'Neuron';

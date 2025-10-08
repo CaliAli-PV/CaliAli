@@ -52,10 +52,10 @@ Sc=tril(D<4.35);
 end
 [low_correlation_sessions(:,2),low_correlation_sessions(:,1)] = ind2sub([size(Sc,1),size(Sc,1)],find(Sc));
 if ~isempty(low_correlation_sessions)
-    fprintf(2, 'Warning! \n Some %s projections display low correlation\n',P.(3)(1,:).Properties.VariableNames{k});
+    cprintf('*red', 'Warning! \n Some %s projections display low correlation\n',P.(3)(1,:).Properties.VariableNames{k});
     % low_correlation_sessions
 else
-fprintf(1, 'Correlation between %s projections is good! \n Lowest spatial correlation: %1.3f \n',P.(3)(1,:).Properties.VariableNames{k},min(Cor,[],'all'));
+cprintf('-comment', 'Correlation between %s projections is good! \n Lowest spatial correlation: %1.3f \n',P.(3)(1,:).Properties.VariableNames{k},min(Cor,[],'all'));
 end
 
 out=min(D,[],'all');

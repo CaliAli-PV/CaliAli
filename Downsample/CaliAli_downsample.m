@@ -80,7 +80,7 @@ for k = 1:length(opt.input_files)
         fprintf(1, 'File saved in %s\n',opt.output_files{k});     
     else
         % If the output file already exists, skip processing and print a message
-        fprintf(1, 'File %s already exist in destination folder!\n', opt.output_files{k});
+        cprintf('_red', 'File %s already exist in destination folder!\n', opt.output_files{k});
     end
 end
 
