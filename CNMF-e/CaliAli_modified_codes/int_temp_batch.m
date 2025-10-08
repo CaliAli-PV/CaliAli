@@ -9,7 +9,15 @@ n_enhanced=neuron.CaliAli_options.preprocessing.neuron_enhance;
 gSiz=gSig*4;
 F=get_batch_size(neuron);
 fn=[0,cumsum(F)];
-for i=progress(1:size(fn,2)-1)
+
+iter=size(fn,2)-1;
+progBar = ProgressBar(...
+    iter, ...
+    'Title', 'Processing batch:' ...
+    );    
+
+for i=1:iter
+    progBar.step([], [], []);
     try
         Y = neuron.load_patch_data([],[fn(i)+1,fn(i+1)]);
     catch
@@ -74,6 +82,12 @@ for i=progress(1:size(fn,2)-1)
     C_raw=[];
     S=[];
     Cn_update(:,:,1)=Cn;
+
+    progBar_in = ProgressBar(...
+    numel(seed_all), ...
+    'Title', 'Initialized_seeds:' ...
+    );    
+
     while true
         % fprintf('%2d seed remaining. \n', length(seed_all));
         seed=get_far_neighbors(seed_all,neuron);
@@ -127,13 +141,17 @@ for i=progress(1:size(fn,2)-1)
         if isempty(seed_all)
             break
         end
+
+        progBar_in.step(numel(seed), [], []);
     end
+    progBar_in.release()
 
     A_T{i}=A;
     C_T{i}=C;
     C_raw_T{i}=C_raw;
     S_T{i}=S;
 end
+progBar.release();
 C=cat(2,C_T{:});
 C_raw=cat(2,C_raw_T{:});
 S=cat(2,S_T{:});
