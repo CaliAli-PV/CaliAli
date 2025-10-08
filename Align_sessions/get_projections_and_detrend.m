@@ -74,8 +74,8 @@ Y=single(Y);
 
 mY=max(Y,[],3);
 s=mY(:);
-thr=prctile(s,99);
-mI=256*thr/(256*0.99);
+thr=prctile(s,99.99);
+mI=thr*256/250;
 Y = uint8(Y./mI*256); % Convert to uint8
 
 

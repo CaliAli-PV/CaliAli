@@ -70,16 +70,14 @@ end
 % Calculate the range of the session data (for normalization)
 R = max(Y,[],'all');
 Y=single(Y);
-% Convert the data to the appropriate format (uint8 or uint16) based on the original class
-if strcmp(S, 'uint8')
-    mY=max(Y,[],3);
-    s=mY(:);
-    thr=prctile(s,99);
-    mI=256*thr/(256*0.99);
-    Y = uint8(Y./mI*256); % Convert to uint8 format if the original data was uint8
-else
-    Y = uint16(Y./max(Y,[],'all')*65536); % Convert to uint16 format for other data types
-end
+% Convert the data to the appropriate format
+
+mY=max(Y,[],3);
+s=mY(:);
+thr=prctile(s,99.99);
+mI=thr/0.999;
+Y = uint8(Y./mI*256); % Convert to uint8
+
 
 % Fuse the blood vessel projections with the neuron projections for visual comparison
 X = imfuse(mat2gray(Cn), BV, 'Scaling', 'joint', 'ColorChannels', [1 2 0]);
