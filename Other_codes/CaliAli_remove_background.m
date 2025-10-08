@@ -48,8 +48,16 @@ if CaliAli_options.preprocessing.neuron_enhance
 end
 
 if CaliAli_options.preprocessing.noise_scale
+    fprintf('Scaling to noise level (post detrending)...\n'); 
     Y=noise_scaling(Y);
 end
+
+if CaliAli_options.preprocessing.force_non_negative
+    fprintf('Forcing non-negativity. Max negative value is %0d...\n',CaliAli_options.preprocessing.force_non_negative_tolerance); 
+Y=Y+CaliAli_options.preprocessing.force_non_negative_tolerance; %This makes the the forcing lets strict allowin negative noise fluctuation to part of the colordepth resolution
+Y(Y<0)=0;
+end
+
 
 
 end
