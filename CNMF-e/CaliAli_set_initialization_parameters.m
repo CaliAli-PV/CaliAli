@@ -18,10 +18,4 @@ function CaliAli_set_initialization_parameters(CaliAli_options)
 % Author: Pablo Vergara
 % Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
-
-
-if strcmp(CaliAli_options.preprocessing.structure,'dendrite')
-    CNMFe_app_dendrite;
-else
-    CNMFe_app;
-end
+CNMFe_app;

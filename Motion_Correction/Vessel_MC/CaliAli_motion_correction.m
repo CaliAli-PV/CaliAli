@@ -114,7 +114,7 @@ catch ME
     if exist(out_pre{1}, 'file') == 2
         remove_corrupted_output(out_pre);
     end
-    fprintf(1, 'Motion correction failed: %s\n', ME.message);
+    cprintf('*red', 'Motion correction failed: %s\n', ME.message);
     rethrow(ME);
 end
 end
