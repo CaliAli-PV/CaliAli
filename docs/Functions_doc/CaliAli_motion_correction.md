@@ -11,6 +11,8 @@ This function applies motion correction to a set of input video files. It perfor
 rigid and non-rigid motion correction, interpolates dropped frames, squares borders, and
 saves the corrected video as a .mat file.
 
+After motion correction, you can refine the region of interest with [`CaliAli_crop`](CaliAli_crop.md#CaliAli_crop) to remove static borders or unused regions before detrending and alignment.
+
 ##### Function Inputs:
 | Parameter Name | Type | Description |
 |---------------|------|-------------|

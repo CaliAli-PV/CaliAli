@@ -73,7 +73,7 @@ The function [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.m
 CaliAli requires setting 33 parameters. However, in practice you only need to strictly focus on three: 
 
 1. Frame rate: `sf`
-2. Neuron filtering size: `gSig` which correspond to 1/5 of the average neuron size in pixels.
+2. Neuron filtering size: `gSig` which correspond to 1/5 of the average neuron size in pixels. If left empty, CaliAli now assigns `gSig = 5 / spatial_ds`, which matches the demo data and works well for non-downsampled videos.
 3. Blood vessel size: : `BVsize` which correspond to the size of blood vessels in pixels [min, max]
 
 Follow the Demo `Parameter_selection_demo.mlx` to learn how to define these parameters interactively using the [BV_app](Functions_doc/BV_app.md) and [NeuronSize_app](Functions_doc/NeuronSize_app.md):

@@ -38,6 +38,17 @@ S=separate_sessions(neuron.S, neuron.CaliAli_opt.F,1,10);
 S=separate_sessions(neuron.C_raw, neuron.CaliAli_opt.F);
 ```
 
+## Simulate Calcium Imaging Videos <a id="simulate"></a>
+
+Use the open-source [Simulate_Ca_Imaging_video](https://github.com/vergaloy/Simulate_Ca_Imaging_video) toolbox to generate synthetic datasets that mimic one-photon miniscope recordings. With a single configuration file you can specify:
+
+- Field of view dimensions (spatial resolution) and frame count to match your target memory footprint.
+- Number of neurons, soma size distribution, firing statistics, and neuropil background.
+- Motion trajectories (rigid or drifting), intermittent occlusions, and shot/Poisson noise.
+- Acquisition parameters such as frame rate and signal-to-noise ratio.
+
+Exported videos share the same layout as CaliAli demo sessions, making them ideal for benchmarking new parameter presets, testing automatic batch sizing, or teaching the workflow without sharing animal data. Refer to the repository README for installation instructions and example scenarios (`low_memory`, `high_density`, `drift_only`, etc.).
+
 ## Other Functions <a id="of"></a>
 
 ### Save Workspace
@@ -74,4 +85,3 @@ neuron.Coor=[]
  A=neuron.A;A=full(A./max(A,[],1)); A=reshape(max(A,[],2),[size(neuron.Cn,1),size(neuron.Cn,2)]);
  neuron.show_contours(0.6, [], A, 0);
 ```
-

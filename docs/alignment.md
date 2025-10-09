@@ -37,7 +37,7 @@ After [motion correction](Motion_correction.md) we have to [calculate relevant p
 
 ##### Console outputs:
 
-While running  [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions), the command window will display output similar to the following:
+While running  [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions), the command window now uses coloured output (via `cprintf`) to highlight warnings and status information. A typical run looks like:
 
 ```
 Blood-vessel similarity score: 5.376
@@ -47,9 +47,11 @@ Correlation between Neurons projections is good!
 Lowest spatial correlation: 0.491
 ``` 
 
-- **Blood-vessel similarity score** :material-information-outline:{ title="Reflects how helpful blood vessels are for correcting inter-session misalignments. If this value falls below 2.7, CaliAli issues a warning and automatically switches to neuron-based alignment." }
+- **Blood-vessel similarity score** :material-information-outline:{ title="Reflects how helpful blood vessels are for correcting inter-session misalignments. If this value falls below 2.7, CaliAli emits a red warning and automatically switches to neuron-based alignment." }
 
 - **Spatial correlation value** :material-information-outline:{ title="Indicates the correlation of the aligned neuron projections. Values below 0.2 may suggest major differences in active neurons across sessions, possibly due to z-axis displacement." }
+
+Should CaliAli detect per-session frame size changes (for example, if a user cropped one file manually), it now raises an informative message and falls back to safe handling rather than aborting.
 
 ##### Post alignment:
 To visually confirm the alignment performance, load the `*_Aligned.mat file` in MATLAB:

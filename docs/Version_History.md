@@ -1,5 +1,16 @@
 # Version History <a id="vh"></a> 
 
+## CaliAli 1.4.5 Release Notes — October 2025
+
+- 🧮 **Smarter Defaults & Auto Sizing**: `batch_sz` accepts `'auto'`, dynamically estimating chunk size from available RAM and data dimensions; `gSig` now defaults to `5 / spatial\_ds`, keeping neuron footprints correct whether or not data are downsampled.
+- 🎨 **Coloured, Actionable Logs**: Adopted `cprintf` across the pipeline for clearer status and warning messages, including new progress bars in CNMF-E loops.
+- 🧹 **Safer Preprocessing Pipeline**: Non-negativity enforcement now happens after noise scaling in `CaliAli_remove_background`, reducing over-clipping; neuron projections are converted to `uint8` using a 99.99th percentile anchor to tame hot pixels.
+- 🧭 **Robust Alignment & File Handling**: Inter-session alignment survives per-file frame size changes, honours frame counts per chunk, and natural-sorts session pieces even when filenames are out of order; HDF5 readers query metadata directly instead of loading datasets.
+- 🐞 **Bug Fixes**: The parameter selection app now saves the chosen minimum correlation threshold, preventing overly permissive seeding; motion correction once again accepts ISXD/ISXD2 exports without extra steps; and CaliAli better handles per-session size mismatches when files were cropped outside the recommended workflow.
+- 🎥 **Enhanced Demo**: `Demo_pipeline.mlx` now simulates full-resolution data via the [Simulate_Ca_Imaging_video](https://github.com/vergaloy/Simulate_Ca_Imaging_video) toolkit, illustrating the benefits of downsampling and motion correction on configurable synthetic motion artefacts.
+
+---
+
 ## CaliAli 1.4 Release Notes — September 26th 2025
 
 - 🚀 **Automatic Session Chunking**: `batch_sz` now splits oversized sessions across motion correction, alignment, and projection steps. See [Processing Large Sessions](Low_memory.md) for the workflow.

@@ -28,4 +28,5 @@ opt = CaliAli_parameters('sf',20);   % Set sampling frequency to 20 fps.
 
 #### Notes:
 - Each processing module (downsampling, preprocessing, motion correction, inter-session alignment, and CNMF-E) has its own sub-structure with configurable parameters.
+- When `gSig` is omitted, the downsampling module now assigns `5 / spatial_ds`, ensuring appropriate neuron footprints whether or not you downsample.
 - The details of these structures can be found in CaliAli_demo_parameters().

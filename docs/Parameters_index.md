@@ -10,11 +10,11 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
-| `gSig`             | `2.5`        | Neuron filter size in pixels | Utilize [NeuronSize_app](Functions_doc/NeuronSize_app.md) on a motion correction video to interactively estimate this parameter.|
+| `gSig`             | `[] (auto)`  | Neuron filter size in pixels | Defaults to `5 / spatial_ds`. Override when your data are anisotropic or when neuron diameters differ significantly from 5 px. Use [NeuronSize_app](Functions_doc/NeuronSize_app.md) for fine tuning.|
 | `sf`               | `10`         | Frame rate (fps) | Set to match the acquisition frame rate. |
 | `input_files`       | `[]`         | Paths to input video files | Leave empty to manually select files. |
 | `output_files`      | `[]`         | Paths to output video files | Leave empty for default naming (recommended). |
-| `batch_sz`         | `0`          | **Automatic chunking for large sessions** (frames per chunk, 0 = disable) | Automatically splits large sessions into memory-friendly chunks. :material-information-outline:{ title="Set batch_sz to 3000–5000 frames when chunking is required; the Low_memory guide explains the full workflow." } |
+| `batch_sz`         | `'auto'` (demo) / `0` | **Automatic chunking for large sessions** (frames per chunk, 0 = disable) | Auto-estimates chunk size from available RAM; set a numeric value or `0` to override. :material-information-outline:{ title="See the Low_memory guide for recommended overrides when the heuristic over- or under-allocates." } |
 
 ---
 
@@ -25,8 +25,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `spatial_ds`       | `1`          | Spatial downsampling factor | Increase for faster processing, decrease for higher resolution. |
 | `temporal_ds`      | `1`          | Temporal downsampling factor | Increase only if memory constraints prevent full processing. |
 | `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | Used when sessions are split into multiple files. :material-information-outline:{ title="For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder so CaliAli finds matching files, treats them as one session, and concatenates them into a single .mat file." } |
-| `force_non_negative ` | `1 `| Enforce non-negative pixels after detrending | Enable to clamp all negative pixel values to zero; disable to allow negatives within the specified tolerance. |
-| `force_non_negative_tolerance`  | `20` | Non-negative tolerance threshold | Allows pixel values to remain negative up to this limit before clamping occurs. |
+| `force_non_negative ` | `1 `| Enforce non-negative pixels during preprocessing | When enabled, values are lifted and clipped within `CaliAli_remove_background` after noise scaling. |
+| `force_non_negative_tolerance`  | `13` | Non-negative tolerance threshold | Gap added before clipping; increase only if you observe residual bias in dark regions. |
 
 ---
 
@@ -44,7 +44,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 |----------------------|--------------|-------------|--------------|
 | `reference_projection_rigid` | `'BV'`  | Reference projection for rigid correction | Choose `neuron` if blood vessels are not suitable. |
 | `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only after confirming rigid correction was insufficient. :material-information-outline:{ title="The current non-rigid module is experimental and may introduce field-of-view artifacts; an updated implementation is planned." } |
-| `non_rigid_pyramid` | `{'BV','BV','neuron'}` | Multi-level registration pyramid for non-rigid correction | Use default unless BV is unavailable. |
+| `non_rigid_pyramid` | `{'BV','neuron','neuron'}` | Multi-level registration pyramid for non-rigid correction | Use default unless BV is unavailable. |
 | `non_rigid_batch_size` | `[20,60]` | Batch size range for non-rigid correction, CaliAli will optimize within this range. | Set as `[2 x sf, 6 x sf]`. |
 
 ---
@@ -65,8 +65,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Memory and Patch Processing Parameters**
 | Parameter Name           | Default Value | Description | How to Choose |
 |--------------------------|--------------|-------------|--------------|
-| `memory_size_to_use`     | `total_system_memory_GB` | Total available memory for computation | Adjust based on available RAM. |
-| `memory_size_per_patch`  | `16`       | Memory allocated per patch | Adjust based on available RAM and number of patches. |
+| `memory_size_to_use`     | `total_system_memory_GB` (auto) | Total available memory for computation | Override when you want MATLAB to use less than the detected RAM. |
+| `memory_size_per_patch`  | `total_system_memory_GB` (auto) | Memory allocated per patch | Defaults to the detected RAM so patching adapts to your hardware; reduce if you need smaller tiles. |
 | `patch_dims`            | `[64, 64]`   | Dimensions of patches | Larger patches improve accuracy but increase computation time and memory consumption. :material-information-outline:{ title="Using more or larger patches also increases memory usage, so scale cautiously." } |
 | `w_overlap`            | `32`         | Patch overlap width | Increase if you detect edge artifacts. |
 

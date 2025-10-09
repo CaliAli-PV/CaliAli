@@ -30,4 +30,4 @@ Y_detrended = detrend_vid(Y, CaliAli_options);
 !!! note
     - The moving median filter operates over a window size determined by the product of the sampling frequency and the detrending factor.
     - A secondary moving minimum filter is applied to further refine background fluctuations.
-    - Negative values are clipped to zero after detrending forcing non-negative data.
+    - Negative values are preserved here; any optional clipping now occurs later inside [`CaliAli_remove_background`](CaliAli_remove_background.md#CaliAli_remove_background) when `force_non_negative` is enabled.

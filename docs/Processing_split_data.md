@@ -52,3 +52,6 @@ This will generate three `.mat` files—one for each session—containing the da
 	   edit CaliAli_demo_parameters
 	  ```
       and set `params.file_extension = 'tiff';`. This will tell CaliAli to search for tiff files. 
+
+!!! tip
+    As of v1.4.5 the importer applies natural sorting even when filenames are not zero-padded (for example `2.avi` vs `10.avi`), so mixed-width numbering will no longer scramble the concatenated output.
