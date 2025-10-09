@@ -19,14 +19,14 @@ function params=CaliAli_demo_parameters()
 % Date: 2025
 
 % --- Data Preprocessing ---
-params.batch_sz = 3000;          % Maximum frames to load at each time
-params.gSig = 2.5;              % Gaussian filter size for neurons (pixels)
-params.sf = 10;                 % Frame rate (fps)
-params.BVsize = [];             % Size of blood vessels (pixels), 
+params.batch_sz = 'auto';        % Maximum frames to load at each time. Auto detect
+params.gSig = [];                % Gaussian filter size for neurons (pixels)
+params.sf = 10;                  % Frame rate (fps)
+params.BVsize = [];              % Size of blood vessels (pixels), 
                                  %  [min diameter, max diameter]. 
                                  %  Default is calculated based on gSig.
-params.spatial_ds = 1;          % Spatial downsampling factor
-params.temporal_ds = 1;         % Temporal downsampling factor
+params.spatial_ds = 2;           % Spatial downsampling factor
+params.temporal_ds = 1;          % Temporal downsampling factor
 
 params.neuron_enhance = true;   % Enhance neurons using MIN1PIE background subtraction
 params.noise_scale = true;      % Scale noise for each pixel
@@ -53,11 +53,6 @@ params.Force_BV = false;              % Force BV use even if deemed unusable
 
 
 % --- Neuronal Extraction (CNMF-E) ---
-params.frames_per_batch = 0;          % Number of frames per batch. 0 = process each session as a single batch
-params.memory_size_to_use = 256;      % Memory allowed for MATLAB (GB)
-params.memory_size_per_patch = 16;    % Memory for each patch (GB)
-params.patch_dims = [64, 64];         % Patch dimensions
-
 params.with_dendrites = true;        % Include dendrites in the model
 params.search_method = 'dilate';     % Search method ('dilate' or 'ellipse')
 params.spatial_constraints = ...     % Spatial constraints

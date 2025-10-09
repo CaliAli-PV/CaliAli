@@ -263,7 +263,7 @@ classdef Sources2D < handle
             % distribute data
             [data, dims, obj.P.folder_analysis] = distribute_data(nam,...
                 patch_dims, w_overlap, memory_size_per_patch, memory_size_to_use,...
-                [], filter_kernel);
+                [], filter_kernel,obj.CaliAli_options.inter_session_alignment.batch_sz);
             obj.P.mat_data = data;
             obj.P.mat_file = data.Properties.Source;
             obj.updateParams('d1', dims(1), 'd2', dims(2));

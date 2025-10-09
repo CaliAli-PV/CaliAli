@@ -1,5 +1,5 @@
 function [mat_data, dims, folder_analysis] = distribute_data(nam, patch_dims, ...
-    w_overlap, memory_size_per_patch, memory_size_to_use, dir_output, filter_kernel)
+    w_overlap, memory_size_per_patch, memory_size_to_use, dir_output, filter_kernel,bz)
 % divide the field of view into multiple small patches and save the data
 % into these small patches individually. There are overlaps between these
 % patches.
@@ -33,7 +33,9 @@ end
 dims = get_data_dimension(file_name);
 d1 = dims(1); d2 = dims(2); T = dims(3);
 
-fprintf('\nThe data has %d X %d pixels X %d frames. \nLoading all data (double precision) requires %.3f GB RAM\n\n', d1, d2, T, prod(dims)/(2^27));
+bz=min([bz,T]);
+
+fprintf('\nThe data has %d X %d pixels X %d frames. \nLoading each batch (double precision) requires %.3f GB RAM\n\n', d1, d2, bz, prod(dims)/(2^27)*2);
 
 max_elements = memory_size_per_patch* (500^3); % x GB data can save x*1000^3/8 dobule numbers.
 min_patch_width = [2*w_overlap+3,2*w_overlap+3];
@@ -41,7 +43,7 @@ max_patch_width = max(round(sqrt(double(round(max_elements/T))))-w_overlap*2, mi
 
 if isempty(patch_dims)
     % find the optimial batch size
-    patch_dims = [1, 1] * patch_width;
+    patch_dims = [d1, d2];
 else
     patch_dims(patch_dims< min_patch_width) = min_patch_width(patch_dims< min_patch_width);
 %     patch_dims(patch_dims>max_patch_width) = max_patch_width; 
@@ -77,15 +79,6 @@ else
     end
 end
 nc_patch = length(patch_idx_c) - 1;
-
-fprintf('The FOV is divided into %d X %d patches. \nEach patch has %d X %d pixels. \n',...
-    nr_patch, nc_patch, diff(patch_idx_r(1:2)), diff(patch_idx_c(1:2)));
-temp = prod(patch_dims+2*w_overlap)*T/(2^27);
-fprintf('It requires %.3f GB RAM for loading data related to each patch. \n\n', temp);
-if temp > memory_size_per_patch
-    fprintf('You assigned a smaller memory for each patch.\n');
-    fprintf('We suggest you process data in batch mode.\nEach batch has frames fewer than %d. \n\n', round(T*memory_size_per_patch/temp));
-end
 
 %% indices for dividing the FOV into multiple blocks.
 block_idx_r = bsxfun(@plus, patch_idx_r, [-1-w_overlap; w_overlap]);
@@ -176,7 +169,7 @@ mat_data.block_pos = block_pos;
 Tchunk = floor(memory_size_to_use * (500^3) / (d1*d2));
 t_start= 0;
 fprintf('\n-------- Loading --------\n'); 
-fprintf('Data is being loaded and distributed into multiple small blocks for easy access.\n\n'); 
+fprintf('Data is being loaded and distributed into multiple small blocks for easy access.\n'); 
 
 while t_start<T
     num2read = min(Tchunk, T-t_start);
@@ -186,7 +179,7 @@ while t_start<T
     if filter_data
         Y = cast(imfilter(double(Y), filter_kernel, 'replicate'), 'like', temp); 
     end 
-    for m=1:nr_block
+    for m=progress(1:nr_block,'Title','Blocks processed:')
         r0 = block_idx_r(m);
         r1 = block_idx_r(m+1);
         nr = r1-r0+1; %#ok<*NASGU>
@@ -196,7 +189,6 @@ while t_start<T
             nc = c1-c0+1;
             eval(sprintf('mat_data.Y_%d_%d_%d_%d(1:nr, 1:nc, %d:%d)=Y(%d:%d, %d:%d, :); ', ...
                 r0, r1, c0, c1, t_start+1, t_start+num2read, r0, r1, c0, c1));
-            fprintf('block(%2d,%2d)/(%d, %d) done\n', m, n, nr_block, nc_block); 
         end
     end
     t_start = t_start + num2read;
