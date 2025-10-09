@@ -7,7 +7,7 @@ function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_opt
 #### Description
 Process session data by detrending and computing projections.
 
-This function processes video session data by applying detrending, removing background noise, and calculating projections such as blood vessels, neuron activity, peak-to-noise ratio (PNR), and correlation images.
+This function processes video session data by applying detrending, removing background noise, and calculating projections such as blood vessels, neuron activity, peak-to-noise ratio (PNR), and correlation images. Prior to saving, the detrended stack is mapped to `uint8` using the 99.99th percentile as the reference intensity, keeping outlier pixels from dominating the colour depth.
 
 ##### Function Inputs:
 | Parameter Name | Type    | Description                                      |

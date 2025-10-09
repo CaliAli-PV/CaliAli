@@ -9,15 +9,13 @@ CaliAli v1.4 introduces automatic session chunking to handle individual imaging 
 Large imaging sessions are now processed by setting the `batch_sz` parameter, which automatically divides sessions into memory-manageable chunks:
 
 ```matlab
-CaliAli_options.motion_correction.batch_sz = 3000;        % Motion correction chunking
-CaliAli_options.inter_session_alignment.batch_sz = 3000;  % Alignment and projection chunking
+CaliAli_options.motion_correction.batch_sz = 'auto';        % Estimate from available RAM
+CaliAli_options.inter_session_alignment.batch_sz = 'auto';  % Mirrors the estimate
 ```
 
-The chunking system operates transparently across the CaliAli pipeline:
-- Motion correction maintains template consistency across chunks within each session
-- Inter-session alignment preserves spatial relationships while processing chunks independently  
-- Projection calculations combine chunk results appropriately
-- Final outputs are identical to processing the complete session
+When `'auto'` is used, CaliAli samples system memory (falling back to 18 GB if unavailable) and derives a chunk size suited for 300×300 px frames. You can still override the value with an explicit frame count.
+
+Behind the scenes, CaliAli keeps templates consistent, aligns chunks per session, and stitches projections back together. Outputs are almost identical to processing the full session at once—the only differences come from small numerical rounding.
 
 ---
 
@@ -25,14 +23,14 @@ The chunking system operates transparently across the CaliAli pipeline:
 
 Select `batch_sz` based on available system memory and video dimensions. For 512×512 pixel videos:
 
-| System RAM | Recommended batch_sz |
-|------------|---------------------|
-| 8GB        | 800-1000         |
-| 16GB       | 2000-3000          |
-| 32GB       | 5000-8000          |
-| 64GB+      | 8000+              |
+| System RAM | `'auto'` estimate | Manual override guidance |
+|------------|-------------------|--------------------------|
+| 8 GB       | ≈ 900 frames      | Stay ≤ 1000 if you see swapping |
+| 16 GB      | ≈ 1700 frames     | 1500–2500 works well     |
+| 32 GB      | ≈ 3300 frames     | 3000–5000 for faster runs |
+| 64 GB+     | ≥ 6500 frames     | Increase gradually if monitoring memory |
 
-Setting `batch_sz = 0` disables chunking. :material-information-outline:{ title="This is the default when you call CaliAli_parameters() without overrides. The demo helper CaliAli_demo_parameters enables chunking by setting batch_sz = 3000 as a ready-to-use example." }
+Setting `batch_sz = 0` disables chunking, matching legacy behaviour. :material-information-outline:{ title="CaliAli_demo_parameters now leaves `batch_sz` at `'auto'`. Set a numeric value if the heuristic overshoots for your hardware." }
 
 ---
 
@@ -44,8 +42,8 @@ Standard CaliAli processing workflow remains unchanged:
 CaliAli_options = CaliAli_demo_parameters();
 
 % Enable chunking for large sessions
-CaliAli_options.motion_correction.batch_sz = 3000;
-CaliAli_options.inter_session_alignment.batch_sz = 3000;
+CaliAli_options.motion_correction.batch_sz = 'auto';
+CaliAli_options.inter_session_alignment.batch_sz = 'auto';
 
 % Standard pipeline execution
 CaliAli_options = CaliAli_motion_correction(CaliAli_options);
@@ -61,7 +59,7 @@ When chunking is enabled:
 
 1. **Session Analysis**: File dimensions are analyzed to determine optimal chunk boundaries
 2. **Chunk Processing**: Each chunk is processed independently while maintaining session context
-3. **Result Integration**: Chunk outputs are combined into session-level results
+3. **Result Integration**: Chunk outputs are combined into session-level results, with per-session frame counts validated before writing
 4. **Output Generation**: Final outputs match those from complete session processing
 
 The chunking system handles:

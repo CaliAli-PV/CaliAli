@@ -7,7 +7,7 @@ function [modified_input_files, F] = create_batch_list(input_files, batch_sz, ta
 ```
 
 #### Description
-`create_batch_list` prepares an input file list for chunk-aware processing. It inspects each session file, computes the number of frames, and emits either the original filename (when no batching is needed) or a cell array describing each chunk. The helper also reports per-session frame counts so downstream code can size outputs correctly.
+`create_batch_list` prepares an input file list for chunk-aware processing. It inspects each session file, computes the number of frames, and emits either the original filename (when no batching is needed) or a cell array describing each chunk. The helper also reports per-session frame counts so downstream code can size outputs correctly. Frame counts are derived straight from file metadata—no data loading is required—and filenames are sorted using natural ordering so numbered segments (e.g. `0.avi`, `10.avi`, `2.avi`) stay in sequence.
 
 ##### Function Inputs
 | Parameter Name | Type    | Description |

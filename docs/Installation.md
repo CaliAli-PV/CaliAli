@@ -33,7 +33,7 @@ CaliAli automatically runs in batch mode, requiring only sufficient RAM to handl
 Installation should take a few minutes:
 
 -	Download/clone the [Git](https://github.com/CaliAli-PV/CaliAli) repository of the codes
--	Add CaliAli to the MATLAB path.
+-	Add the entire CaliAli repository to the MATLAB path (including `Other_codes/cprintf`) so coloured console messages are available during processing.
 
 
 ![Add to path](files/Add_to_path.gif)

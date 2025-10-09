@@ -41,7 +41,7 @@ params.force_non_negative_tolerance = 20;    % Allow pixel values to go negative
 % --- Motion Correction ---
 params.do_non_rigid = false;       % Perform non-rigid motion correction?
 params.reference_projection_rigid = 'BV';  % Use blood vessels as reference for rigid correction
-params.non_rigid_pyramid = {'BV', 'neuron', 'neuron'}; % Multi-level registration pyramid
+params.non_rigid_pyramid = {'BV', 'BV', 'neuron'}; % Multi-level registration pyramid
 params.non_rigid_batch_size = [20, 60]; % Frame range for parallel processing
 
 

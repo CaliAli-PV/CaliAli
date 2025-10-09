@@ -9,7 +9,10 @@ First follow the CaliAli installation notes [Installation and System Requirement
 	
 #### CaliAli Processing Steps Overview <a id="ps"></a>
 
-This guide is based on 'Demo_pipeline.mlx'. Execute in the Matlab command windows `open Demo_pipeline.mlx` to open the code.
+This guide is based on `Demo_pipeline.mlx`. Execute in the MATLAB command window `open Demo_pipeline.mlx` to explore the script. The refreshed demo now synthesises full-resolution videos using the [Simulate_Ca_Imaging_video](https://github.com/vergaloy/Simulate_Ca_Imaging_video) toolkit, shows how spatial downsampling preserves salient features, and injects motion artefacts so you can watch the motion-correction module recover a stable field of view.
+
+!!! tip "Generate your own synthetic datasets"
+	The simulator lets you control the field of view, neuron count, firing rates, motion trajectories, noise profile, and session length. By exporting different configurations you can stress-test CaliAli under varied memory budgets (frame size × frame count), experiment with chunk sizes (`batch_sz`), or benchmark extraction quality as you scale neuron density. See the repository README for detailed parameter examples.
 
 ??? Info "How long it takes to process the Demo data?"
 	Processing the demo data is expected to take approximately 5 minutes on a standard desktop computer. This includes the steps bellow:

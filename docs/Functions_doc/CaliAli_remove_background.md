@@ -31,3 +31,4 @@ Notes:
 - Noise scaling adjusts pixel noise levels for consistency.
 - Neuronal and dendritic enhancement is performed based on the specified structure type ('neuron' or 'dendrite').
 - A second noise scaling pass is applied after background removal.
+- When `force_non_negative` is enabled, the data are lifted by `force_non_negative_tolerance` and clipped after noise scaling, yielding non-negative intensities without over-suppressing dim fluctuations. Status messages are printed with coloured output.

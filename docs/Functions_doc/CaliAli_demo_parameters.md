@@ -29,15 +29,16 @@ CaliAli_Options = CaliAli_demo_parameters();
 #### 📌 Data Preprocessing Parameters
 | Parameter Name | Value | Description |
 |------------------------------------|-------|-------------|
-| `gSig` | `2.5` | Gaussian filter size for neurons (pixels) |
+| `gSig` | `[] (auto)` | Gaussian filter size for neurons (pixels); defaults to `5 / spatial_ds` |
 | `sf` | `10` | Frame rate (fps) |
 | `BVsize` | `[]` | Size of blood vessels (pixels) \[min diameter, max diameter\]. Default is calculated based on `gSig`. |
-| `spatial_ds` | `1` | Spatial downsampling factor |
+| `spatial_ds` | `2` | Spatial downsampling factor |
 | `temporal_ds` | `1` | Temporal downsampling factor |
 | `neuron_enhance`   | `true` | Enhance neurons using MIN1PIE background subtraction |
 | `noise_scale` | `true` | Scale noise for each pixel |
 | `detrend` | `1` | Detrending window (seconds). `0` = no detrending |
 | `file_extension` | `'avi'` | If a folder is selected instead of a single video file, concatenate all videos with the specified file extension within that folder. |
+| `batch_sz` | `'auto'` | Estimate chunk size from available RAM |
 
 ####📌 Motion Correction Parameters
 | Parameter Name | Value | Description |
@@ -57,9 +58,8 @@ CaliAli_Options = CaliAli_demo_parameters();
 #### 📌 Neuronal Extraction (CNMF-E) Parameters
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
-| `frames_per_batch` | `0` | Number of frames per batch. `0` = process each session as a single batch |
-| `memory_size_to_use` | `256` | Memory allowed for MATLAB (GB) |
-| `memory_size_per_patch` | `16` | Memory for each patch (GB) |
+| `memory_size_to_use` | `total_system_memory_GB` | Auto-detected RAM budget (GB) |
+| `memory_size_per_patch` | `total_system_memory_GB` | Patch memory allowance (GB) |
 | `patch_dims` | `[64, 64]` | Patch dimensions |
 | `with_dendrites` | `true` | Include dendrites in the model |
 | `search_method` | `'dilate'` | Search method (`'dilate'` or `'ellipse'`) |
@@ -69,13 +69,12 @@ CaliAli_Options = CaliAli_demo_parameters();
 #### 📌 Deconvolution Parameters
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
-| `deconv_options.type` | `'ar1'` | Calcium trace model (`'ar1'` or `'ar2'`) |
 | `deconv_options.method` | `'foopsi'` | Deconvolution method |
+| `deconv_options.type` | `'ar1'` | Calcium trace model (`'ar1'` or `'ar2'`) |
 | `deconv_options.smin` | `-5` | Minimum spike size |
 | `deconv_options.optimize_pars` | `true` | Optimize AR parameters |
 | `deconv_options.optimize_b` | `true` | Optimize baseline |
 | `deconv_options.max_tau` | `100` | Max decay time (frames) |
-
 #### 📌 Background Modeling Parameters
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
