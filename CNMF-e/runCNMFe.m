@@ -80,7 +80,7 @@ for loop=1:10
     neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
 
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
-    cprintf('-comment''Disimilarity with previous iteration is %.3f\n', dis);
+    cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
 
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
