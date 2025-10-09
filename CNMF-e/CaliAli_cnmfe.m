@@ -2,11 +2,11 @@ function file_path = CaliAli_cnmfe()
 %% CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.
 %
 % Inputs:
-%   This function prompts the user to select .mat files containing the imaging data 
+%   This function prompts the user to select .mat files containing the imaging data
 %   and CNMF-E parameters. The selected files should follow the naming pattern "*_ds*.mat".
 %
 % Outputs:
-%   This function does not return an output but processes each selected file 
+%   This function does not return an output but processes each selected file
 %   and saves the extracted neuron or dendrite components to the workspace.
 %
 % Usage:
@@ -36,8 +36,8 @@ function file_path = CaliAli_cnmfe()
 %   - For manual classification of components, use `postprocessing_app(neuron, 0.6)`.
 %   - To visualize extracted traces, use `view_traces(neuron)`.
 %
-% Author: Pablo Vergara  
-% Contact: pablo.vergara.g@ug.uchile.cl  
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
 input_files = uipickfiles('FilterSpec', '*.mat', 'REFilter', '_Aligned*\.mat$|_det*\.mat$');
@@ -46,12 +46,7 @@ file_path=cell(size(input_files,1),1);
 for i=1:size(input_files,1)
     try
         temp=input_files{i};
-        CaliAli_options=CaliAli_load(temp,'CaliAli_options');
-        if strcmp(CaliAli_options.preprocessing.structure,'neuron')
-            file_path{i}=runCNMFe(temp);
-        elseif strcmp(CaliAli_options.preprocessing.structure,'dendrite')
-            file_path{i}=runCNMFe_dendrite(temp);
-        end
+        file_path{i}=runCNMFe(temp);
     catch ME
         m=input_files{i};
         fprintf(['fail to process ',m,'\n'])

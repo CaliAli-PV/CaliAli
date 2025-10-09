@@ -28,6 +28,7 @@ function pars=CNMFE_parameters(varargin)
 % Date: 2025
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 inp.KeepUnmatched = true; % Keep unmatched parameters
 
 %% General variables
@@ -35,7 +36,7 @@ inp.KeepUnmatched = true; % Keep unmatched parameters
 addParameter(inp, 'pars_envs', pars_envs_parse(varargin{:}), @isstruct);  % Patch dimensions
 
 % -------------------------      SPATIAL      -------------------------  %
-addParameter(inp, 'gSig', 2.5, @isnumeric);          % pixel, gaussian width of a gaussian kernel for filtering the data. usually 1/3 of neuron diameter
+addParameter(inp, 'gSig', [], @isnumeric);          % pixel, gaussian width of a gaussian kernel for filtering the data. usually 1/3 of neuron diameter
 addParameter(inp, 'gSiz', [], @isnumeric);          % This will be calculated later
 addParameter(inp, 'ssub', 1, @isnumeric);           % spatial downsampling factor
 addParameter(inp, 'with_dendrites', true, @islogical);   % with dendrites or not
@@ -46,7 +47,7 @@ addParameter(inp, 'spatial_constraints', struct('connected', false, 'circular', 
 addParameter(inp, 'spatial_algorithm', 'hals_thresh', @ischar);
 
 % -------------------------      TEMPORAL     -------------------------  %
-addParameter(inp, 'sf', 10, @isnumeric);             % frame rate
+addParameter(inp, 'sf', [], @isnumeric);             % frame rate
 addParameter(inp, 'tsub', 1, @isnumeric);           % temporal downsampling factor
 addParameter(inp, 'deconv_flag', true, @islogical);     % run deconvolution or not
 addParameter(inp, 'deconv_options', struct('type', 'ar1', ... % model of the calcium traces. {'ar1', 'ar2'}
@@ -83,10 +84,6 @@ addParameter(inp, 'use_parallel', true, @islogical);    % use parallel computati
 addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when the background fluctuation is large (usually 1p data)
 addParameter(inp, 'seed_mask', []);  % Used internally
 
-% ----------------------DENDRITE INITIALIZATION   -------------------------  %
-addParameter(inp,'min_dendrite_size',10)    % Shortest dendrite length in pixels
-addParameter(inp,'dendrite_initialization_threshold',0.1)    % Shortest dendrite length in pixels
-
 %% Parse Inputs
 varargin=varargin{:};
 if isstruct(varargin)
@@ -94,6 +91,7 @@ if isstruct(varargin)
 end
 parse(inp, varargin{:});
 pars = inp.Results;
+
 
 
 %% Calculate Dependent Parameters
@@ -135,7 +133,7 @@ end
 
 
 addParameter(inp,'memory_size_to_use', total_system_memory_GB, @isnumeric);  % GB, memory space you allow to use in MATLAB
-addParameter(inp,'memory_size_per_patch',16, @isnumeric);                    % GB, space for loading data within one patch
+addParameter(inp,'memory_size_per_patch',total_system_memory_GB, @isnumeric);                    % GB, space for loading data within one patch
 addParameter(inp,'patch_dims', [64, 64], @isnumeric);                        % Patch dimensions
 addParameter(inp,'w_overlap', 32, @isnumeric); 
 

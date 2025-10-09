@@ -59,11 +59,13 @@ evalin( 'base', 'clearvars -except parin theFiles' );
 
 %% initialize neurons from the video data
 tic
+cprintf('*blue','----------------Beginning neuron initialization----------------\n');
 neuron =initComponents_parallel_PV(neuron,[],[], 0, 1,0);
 toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
 %% Update components
+cprintf('*blue','----------------Beginning neuron refinement with CMNF----------------\n');
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10
@@ -78,13 +80,13 @@ for loop=1:10
     neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
 
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
-    fprintf('Disimilarity with previous iteration is %.3f\n', dis);
+    cprintf('-comment''Disimilarity with previous iteration is %.3f\n', dis);
 
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
 
     if dis<0.05
-        fprintf('CNMF has converged to an estable Solution\n');
+        cprintf('*blue','CNMF has converged to an estable Solution\n');
         break
     end
 end    %% save the workspace for future analysis
@@ -94,6 +96,7 @@ save_workspace(neuron);
 
 
 %% Optional post-process
+cprintf('*blue','----------------Post-processing extracted traces----------------\n');
 scale_to_noise(neuron);
 neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
 neuron = postprocessDeconvolvedTraces(neuron, 'foopsi','ar2',-5);
