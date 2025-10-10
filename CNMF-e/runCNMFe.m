@@ -52,6 +52,10 @@ pars=CaliAli_options.cnmf;
 neuron = fill_neuron(neuron, pars);
 neuron.options = fill_neuron(neuron.options, pars);
 neuron.CaliAli_options=CaliAli_options;
+
+seed_all=get_seeds(neuron);
+cprintf('*Magenta','%1.0f neurons will be initialized.\n', numel(seed_all));
+pause(1) % so users dont miss this message. delete
 neuron.select_data(in);
 neuron.getReady();
 evalin( 'base', 'clearvars -except parin theFiles' );

@@ -292,11 +292,9 @@ fprintf(flog, 'Start running source extraction......\nThe collection of options 
 fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_range(1), frame_range(2));
 
-if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
-    [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron);
-elseif strcmp(neuron.CaliAli_options.preprocessing.structure,'dendrite')
-    [A,C_raw,C,S,Ymean] = int_temp_batch_dendrite_fast(neuron);
-end
+
+[A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron);
+
 %% export the results
 neuron.A = A;
 neuron.C = C;
