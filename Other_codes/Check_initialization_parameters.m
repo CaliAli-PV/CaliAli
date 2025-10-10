@@ -31,6 +31,10 @@ PNR_ind = ind & (PNR >= CaliAli_options.cnmf.min_pnr  & CaliAli_options.cnmf.see
 
 seed = Cn_ind & PNR_ind;
 I = sum(seed, 'all');
+[d1,d2]=size(Cn);
+[y,x]=ind2sub([d1,d2],find(seed));
+imagesc(Cn);
+hold on;scatter(x,y,'.r');title('Is this correct?');hold off;
 
 % --- Print color-coded summary ---
 cprintf('*magenta', 'The number of neurons to be initialized is ');
