@@ -75,7 +75,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 ### **🔹 Initialization Parameters**
 | Parameter Name  | Default Value | Description | How to Choose |
 |----------------|--------------|-------------|--------------|
-| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | Usually controlled via `CaliAli_set_initialization_parameters(CaliAli_options)`. :material-information-outline:{ title="Raise the threshold to suppress non-neuronal detections; lower it to recover dim neurons when configuring manually." } |
+| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | Usually controlled via `CaliAli_set_initialization_parameters(CaliAli_options)`. :material-information-outline:{ title="Raise the threshold to suppress non-neuronal detections; lower it to recover dim neurons when configuring manually. Use Check_initialization_parameters(CaliAli_options) to preview how many seeds pass." } |
 | `min_pnr`     | `6`          | Minimum peak-to-noise ratio for seeding | Same as `min_corr`. |
 | `min_pixel`   | `[]`         | Minimum pixel area for neurons | Automatically calculated based on gSig. |
 

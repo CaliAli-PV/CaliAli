@@ -4,7 +4,7 @@ After confirming that no errors occur during [session alignment and concatenatio
 
 This process involves two steps:
 
-1. **Select Extraction Parameters for Each Session**: Utilize a graphical user interface to set initialization thresholds.
+1. **Select Extraction Parameters for Each Session**: Utilize a graphical user interface to set initialization thresholds, then sanity-check the expected neuron count with [`Check_initialization_parameters`](Functions_doc/Check_initialization_parameters.md#Check_initialization_parameters).
    
 2. **Run the CaliAli Extraction Module**: Execute the CaliAli extraction module to extract neural signals.
 <a id="gui"></a>
@@ -12,7 +12,7 @@ This process involves two steps:
 ???+ info "A GUI for Parameter Selection" 
     The extraction of calcium signals relies on an initial estimation of neuron locations based on two key projections: the correlation image (showing pixel correlations) and the peak-to-noise ratio (PNR) image (highlighting active neurons in the video). To accurately identify candidate neurons, specific minimum correlation and PNR thresholds must be defined. These thresholds are essential for distinguishing genuine neuron activity from background noise and signal fluctuations.
 
-    ***CaliAli offers a graphical user interface (GUI) for setting these thresholds visually.***
+    ***CaliAli offers a graphical user interface (GUI) for setting these thresholds visually.*** Once satisfied, run [`Check_initialization_parameters`](Functions_doc/Check_initialization_parameters.md#Check_initialization_parameters) to confirm the number of seeds that will be passed to CNMF-E; adjust thresholds if the preview looks too sparse or too crowded.
 
     You can use this GUI by running the following code:  ['CaliAli_set_initialization_parameters()'](Functions_doc/CaliAli_set_initialization_parameters.md#CaliAli_set_initialization_parameters)
 
@@ -160,4 +160,3 @@ CaliAli performs a final detrending and noise scaling of the signals which facil
 === "CONGRATULATIONS!"
 You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`
 	
-

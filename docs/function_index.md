@@ -8,7 +8,8 @@
      | [batchConvertVideos()](Functions_doc/batchConvertVideos.md)|
      | [BV_app](Functions_doc/BV_app.md)|
      | [CaliAli_align_sessions()](Functions_doc/CaliAli_align_sessions.md#CaliAli_align_sessions) |
-     | [CaliAli_cnmfe()](Functions_doc/CaliAli_cnmfe.md#CaliAli_cnmfe) |
+    | [CaliAli_cnmfe()](Functions_doc/CaliAli_cnmfe.md#CaliAli_cnmfe) |
+    | [Check_initialization_parameters()](Functions_doc/Check_initialization_parameters.md#Check_initialization_parameters) |
      | [CaliAli_concatenate_files()](Functions_doc/CaliAli_concatenate_files.md#CaliAli_concatenate_files) |
      | [CaliAli_crop()](Functions_doc/CaliAli_crop.md#CaliAli_crop) |
      | [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.md#CaliAli_demo_parameters) |

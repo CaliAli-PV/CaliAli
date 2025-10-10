@@ -56,3 +56,5 @@ This will automatically update the parameters for the chosen file with the new t
 
 After setting the PNR, Corr, gSig, and Frame rate parameters press `Done!`
 
+!!! tip "Double-check neuron counts"
+    Before launching [`CaliAli_cnmfe`](CaliAli_cnmfe.md#CaliAli_cnmfe), call [`Check_initialization_parameters`](Check_initialization_parameters.md#Check_initialization_parameters) to preview how many neurons will be seeded with the current thresholds. If the count looks unrealistic, reopen the app and adjust `min_corr`, `min_pnr`, or the seed mask.
