@@ -4,7 +4,7 @@ total_system_memory_GB=0;
 if isAuto
     if ~exist("d","var")
         f=h5info(filename);
-        d=f.Datasets.Dataspace.Size(1:2);
+        d = f.Datasets(strcmp({f.Datasets.Name}, 'Y')).Dataspace.Size(1:2);
     end
 
     try
