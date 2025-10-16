@@ -52,6 +52,14 @@ if CaliAli_options.preprocessing.noise_scale
     Y=noise_scaling(Y);
 end
 
+
+if ~isempty(CaliAli_options.preprocessing.median_filtering)
+    fprintf('Applying median filter...\n');  
+    for i=1:size(Y,3)
+    Y(:,:,i)=medfilt2(Y(:,:,i),CaliAli_options.preprocessing.median_filtering);
+    end
+end
+
 if CaliAli_options.preprocessing.force_non_negative
     fprintf('Forcing non-negativity. Max negative value is %0d...\n',CaliAli_options.preprocessing.force_non_negative_tolerance); 
 Y=Y+CaliAli_options.preprocessing.force_non_negative_tolerance; %This makes the the forcing lets strict allowin negative noise fluctuation to part of the colordepth resolution

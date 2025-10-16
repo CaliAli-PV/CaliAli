@@ -83,5 +83,4 @@ params.merge_thr_spatial = ...       % Spatial merging threshold
 params.min_corr = 0.2;               % Minimum correlation for seeding
 params.min_pnr = 4;                  % Minimum peak-to-noise ratio for seeding
 
-
 params=CaliAli_parameters(params);

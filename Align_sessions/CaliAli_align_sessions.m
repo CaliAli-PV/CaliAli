@@ -123,7 +123,7 @@ if CaliAli_options.inter_session_alignment.BV_score < 2.7 && CaliAli_options.int
     end
     
     % Convert gray projections to RGB
-    P = BV_gray2RGB(P);
+    P = BV_gray2RGB(P,CaliAli_options.inter_session_alignment.same_ses_id);
 end
 
 % Calculate neuron projection correlations
