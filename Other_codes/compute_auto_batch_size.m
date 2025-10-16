@@ -18,7 +18,7 @@ if isAuto
     if total_system_memory_GB <= 8
         cprintf('*red','Detected %.1f GB RAM. CaliAli recommends at least 16 GB for automatic batch sizing.\n', total_system_memory_GB);
     end
-    batch_sz = floor((total_system_memory_GB*3*10^7)/(d(1)*d(2))/100)*100;
+    batch_sz = floor((total_system_memory_GB*2*10^7)/(d(1)*d(2))/100)*100;
     cprintf('-comment','Automatically set batch size to %d frames based on %.1f GB RAM and (%dx%d ) frame size.\n', ...
         batch_sz, total_system_memory_GB,d(1),d(2));
 end
