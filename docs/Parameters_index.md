@@ -36,6 +36,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `neuron_enhance`   | `true`       | Use MIN1PIE background subtraction | Keep enabled unless signal loss is observed during preprocessing. |
 | `noise_scale`      | `true`       | Enable noise scaling per pixel | Keep enabled unless signal loss is observed during preprocessing. |
 | `detrend`         | `1`          | Detrending window (seconds), 0 = no detrending | Set to the duration of calcium transients in seconds. |
+| `median_filtering` | `[]`         | Median filter window `[rows, cols]` applied per frame | Enable when noise scaling creates hot pixels near vignetted borders; `[3, 3]` is a good starting point. |
 
 ---
 
