@@ -1,4 +1,4 @@
-function [modified_input_files,F] = create_batch_list(input_files, batch_sz,tag)
+function [modified_input_files,batch_sz,F] = create_batch_list(input_files, batch_sz,tag)
 %% create_batch_list: Create batch-aware input file list for processing.
 %
 % Inputs:
@@ -23,7 +23,7 @@ batch_idx = 1;
 if ischar(input_files)
     input_files={input_files};
 end
-
+[batch_sz] = compute_auto_batch_size(batch_sz,input_files{1});
 for session_id = 1:length(input_files)
     filename = input_files{session_id};
 

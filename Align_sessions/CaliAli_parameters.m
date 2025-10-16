@@ -224,11 +224,7 @@ opt=inp.Results;
 if isstring(opt.batch_sz)
     opt.batch_sz = char(opt.batch_sz);
 end
-if ischar(opt.batch_sz) && strcmpi(opt.batch_sz,'auto')
-    [opt.batch_sz, total_mem_gb] = compute_auto_batch_size();
-else
-    total_mem_gb = [];
-end
+
 if ~isempty(opt.sf) && opt.sf <= 0
     error('CaliAli:InvalidFrameRate','motion_correction.sf must be positive.');
 end
@@ -310,9 +306,7 @@ opt=inp.Results;
 if isstring(opt.batch_sz)
     opt.batch_sz = char(opt.batch_sz);
 end
-if ischar(opt.batch_sz) && strcmpi(opt.batch_sz,'auto')
-    [opt.batch_sz, ~] = compute_auto_batch_size();
-end
+
 if ~isempty(opt.sf) && opt.sf <= 0
     error('CaliAli:InvalidFrameRate','inter_session_alignment.sf must be positive.');
 end
@@ -408,19 +402,3 @@ end
 nv_out = [out_names; out_vals];
 end
 
-function [batch_sz, total_system_memory_GB] = compute_auto_batch_size()
-try
-    [total_system_memory_GB,~] = getSystemMemory;
-catch
-    cprintf('*red','Total physical memory could not be determined.\n');
-    cprintf('red','Avilable memory was set to 18GB by default.\n');
-    total_system_memory_GB = 18;
-end
-
-if total_system_memory_GB <= 8
-    cprintf('*red','Detected %.1f GB RAM. CaliAli recommends at least 16 GB for automatic batch sizing.\n', total_system_memory_GB);
-end
-
-batch_sz = round(total_system_memory_GB * 100 + 100);
-cprintf('-comment','Automatically set batch size to %d frames based on %.1f GB RAM and (300x300) frame size.\n', batch_sz, total_system_memory_GB);
-end

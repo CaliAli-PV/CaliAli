@@ -4,9 +4,22 @@ function Check_initialization_parameters(CaliAli_options)
 %   and prints a color-coded summary of neuron initialization status.
 
 % --- Safeguard: Verify required fields ---
+
 if ~isfield(CaliAli_options, 'inter_session_alignment') || ...
-   ~isfield(CaliAli_options.inter_session_alignment, 'Cn')  || isempty(CaliAli_options.inter_session_alignment.Cn) || ...
-   ~isfield(CaliAli_options.inter_session_alignment, 'PNR') || isempty(CaliAli_options.inter_session_alignment.PNR)
+        ~isfield(CaliAli_options.inter_session_alignment, 'Cn')  || isempty(CaliAli_options.inter_session_alignment.Cn) || ...
+        ~isfield(CaliAli_options.inter_session_alignment, 'PNR') || isempty(CaliAli_options.inter_session_alignment.PNR)
+    the_file = uipickfiles('num',1,'FilterSpec', '*.mat','Prompt','Choose target .mat file');
+    try
+        CaliAli_options=CaliAli_load(the_file{1},'CaliAli_options');
+    catch
+        cprintf('*red','Chosen file is not a valid CaliAli .mat file.\n');
+    end
+end
+
+
+if ~isfield(CaliAli_options, 'inter_session_alignment') || ...
+        ~isfield(CaliAli_options.inter_session_alignment, 'Cn')  || isempty(CaliAli_options.inter_session_alignment.Cn) || ...
+        ~isfield(CaliAli_options.inter_session_alignment, 'PNR') || isempty(CaliAli_options.inter_session_alignment.PNR)
     cprintf('*red', ['Missing required fields (Cn or PNR) in CaliAli_options.inter_session_alignment.\n' ...
         'Please load a CaliAli_options structure from a ''_det'' or ''Aligned'' .mat file.\n']);
     msg = 'Error: Missing required fields.';
@@ -22,7 +35,7 @@ ind = (v_max == Cn .* PNR);
 
 % Ensure seed mask exists
 if ~isfield(CaliAli_options, 'cnmf') || ...
-   ~isfield(CaliAli_options.cnmf, 'seed_mask') || isempty(CaliAli_options.cnmf.seed_mask)
+        ~isfield(CaliAli_options.cnmf, 'seed_mask') || isempty(CaliAli_options.cnmf.seed_mask)
     CaliAli_options.cnmf.seed_mask = ones(size(Cn));
 end
 

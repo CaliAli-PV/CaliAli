@@ -6,9 +6,9 @@
 - 🎨 **Coloured, Actionable Logs**: Adopted `cprintf` across the pipeline for clearer status and warning messages, including new progress bars in CNMF-E loops.
 - 🧹 **Safer Preprocessing Pipeline**: Non-negativity enforcement now happens after noise scaling in `CaliAli_remove_background`, reducing over-clipping; neuron projections are converted to `uint8` using a 99.99th percentile anchor to tame hot pixels.
 - 🧭 **Robust Alignment & File Handling**: Inter-session alignment survives per-file frame size changes, honours frame counts per chunk, and natural-sorts session pieces even when filenames are out of order; HDF5 readers query metadata directly instead of loading datasets.
-- 🔍 **Initialization Preview**: Added `Check_initialization_parameters`, a quick sanity check that shows how many neurons will be seeded before you run CNMF-E.
+- 🔍 **Initialization Preview**: Added [`Check_initialization_parameters`](Functions_doc/Check_initialization_parameters.md) , a quick sanity check that shows how many neurons will be seeded before you run CNMF-E.
 - 🐞 **Bug Fixes**: The parameter selection app now saves the chosen minimum correlation threshold, preventing overly permissive seeding; motion correction once again accepts ISXD/ISXD2 exports without extra steps; and CaliAli better handles per-session size mismatches when files were cropped outside the recommended workflow.
-- 🎥 **Enhanced Demo**: `Demo_pipeline.mlx` now simulates full-resolution data via the [Simulate_Ca_Imaging_video](https://github.com/vergaloy/Simulate_Ca_Imaging_video) toolkit, illustrating the benefits of downsampling and motion correction on configurable synthetic motion artefacts.
+- 🎥 **Enhanced Demo**: `Demo_pipeline.mlx` now simulates full-resolution data via the [Simulate_Ca_Imaging_video](https://github.com/vergaloy/Simulate_Ca_Imaging_video) toolkit, illustrating the benefits of downsampling and motion correction on configurable synthetic motion artifacts.
 
 ---
 
@@ -21,7 +21,7 @@
 - ⚙️ **Projection Refinements**: Smarter aggregation per chunk so combined projections match full-session runs.
 - 🔍 **Dev Utilities**: `check_version_sync()` plus environment reporting to simplify release management.
 - 🎯 **Migration**: `batch_sz = 0` preserves legacy behaviour; v1.3-style manual splitting can be replaced by the new chunking flow.
-- ⏳ **Downsampling Automation**: Batch-mode automation for downsampling/conversion is still on the roadmap—open an issue if you need it prioritised.
+- ⏳ **Downsampling Automation**: Batch-mode automation for downsampling/conversion is still on the roadmap—open an issue if you need it prioritized.
 
 ---
 

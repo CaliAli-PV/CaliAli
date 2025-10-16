@@ -8,6 +8,10 @@ end
 
 dims=neuron.P.mat_data.dims;
 gF=dims(3);
+
+[neuron.CaliAli_options.inter_session_alignment.batch_sz, ~] = compute_auto_batch_size(neuron.CaliAli_options.inter_session_alignment.batch_sz,[],[dims(1),dims(2)]);
+
+
 if neuron.CaliAli_options.inter_session_alignment.batch_sz>0
 
     if gF<neuron.CaliAli_options.inter_session_alignment.batch_sz

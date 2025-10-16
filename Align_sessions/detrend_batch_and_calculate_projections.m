@@ -42,8 +42,8 @@ end
 
 apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 
-[opt.input_files] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
-
+[opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
+CaliAli_options.inter_session_alignment.batch_sz=opt.batch_sz;
 
 [process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_det');
 try

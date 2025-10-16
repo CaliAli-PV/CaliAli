@@ -33,8 +33,8 @@ if isempty(opt.input_files)
 end
 
 % Create batch list if batch_sz > 0
-opt.input_files = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
-
+[opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
+CaliAli_options.motion_correction.batch_sz=opt.batch_sz;
 
 % Pre-allocate output files and get processing flags
 [process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_mc');
