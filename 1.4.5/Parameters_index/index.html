@@ -806,6 +806,12 @@
 <td>Detrending window (seconds), 0 = no detrending</td>
 <td>Set to the duration of calcium transients in seconds.</td>
 </tr>
+<tr>
+<td><code>median_filtering</code></td>
+<td><code>[]</code></td>
+<td>Median filter window <code>[rows, cols]</code> applied per frame</td>
+<td>Enable when noise scaling creates hot pixels near vignetted borders; <code>[3, 3]</code> is a good starting point.</td>
+</tr>
 </tbody>
 </table>
 <hr />
