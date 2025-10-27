@@ -17,15 +17,15 @@ patch_pos = mat_data.patch_pos;
 [nr_patch, nc_patch] = size(patch_pos);
 if nr_patch*nc_patch>1
     try
-        mult=max(CaliAli_options.cnmf.pars_envs.patch_dims)*CaliAli_options.cnmf.pars_envs.w_overlap/prod(CaliAli_options.cnmf.pars_envs.patch_dims);
+        mult=0.1+max(CaliAli_options.cnmf.pars_envs.patch_dims)*CaliAli_options.cnmf.pars_envs.w_overlap/prod(CaliAli_options.cnmf.pars_envs.patch_dims);
     catch
-        mult=0.5;
+        mult=0.6;
     end
 else
 mult=0;
 end
 
-chunk=chunk+chunk*mult;  %adjust for overlaping patches
+chunk=chunk-chunk*mult;  %adjust for overlaping patches
 
 if chunk>0
 
