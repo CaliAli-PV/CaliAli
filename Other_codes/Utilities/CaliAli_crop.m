@@ -46,11 +46,19 @@ for i = progress(1:length(input_files),'Title','Extracting median frames...')
 end
 
 % Align and pad frames to create average projection
-P = catpad_centered(3,M{:});
+if length(M)>1
+    P = catpad_centered(3,M{:});
+else
+    P=M{1,1};
+end
 Mask_all = 1-isnan(P);
 
 % Launch interactive cropping app on normalized image
+if length(M)>1
 app = crop_app(mat2gray(P));
+else
+app = Crop_app_single(mat2gray(P));
+end
 app.done = 0;
 while app.done == 0  % wait until user finishes cropping
     pause(0.05);
@@ -62,7 +70,7 @@ delete(app);
 G = Mask_all(:,:,1)*0;
 G(ver(1,2):ver(2,2), ver(2,1):ver(3,1)) = 1;
 
-chunk = compute_auto_batch_size(opts.CaliAli_options.motion_correction.batch_sz,input_files{1});
+chunk = compute_auto_batch_size(opt.motion_correction.batch_sz,input_files{1});
 
 % Apply cropping mask to all input files
 for i = progress(1:length(input_files),'Title','Cropping...')
