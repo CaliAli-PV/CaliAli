@@ -12,20 +12,7 @@ gF=dims(3);
 [chunk, ~] = compute_auto_batch_size(neuron.CaliAli_options.inter_session_alignment.batch_sz,[],[dims(1),dims(2)]);
 
 
-mat_data = neuron.P.mat_data;
-patch_pos = mat_data.patch_pos;
-[nr_patch, nc_patch] = size(patch_pos);
-if nr_patch*nc_patch>1
-    try
-        mult=0.1+max(CaliAli_options.cnmf.pars_envs.patch_dims)*CaliAli_options.cnmf.pars_envs.w_overlap/prod(CaliAli_options.cnmf.pars_envs.patch_dims);
-    catch
-        mult=0.6;
-    end
-else
-mult=0;
-end
-
-chunk=chunk-chunk*mult;  %adjust for overlaping patches
+chunk=round(chunk*0.5); %to account for overlaping patches and other variables
 
 if chunk>0
 
