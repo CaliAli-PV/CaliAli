@@ -68,13 +68,13 @@ if ~isempty(CaliAli_options.preprocessing.median_filtering)
 end
 
 % Calculate the range of the session data (for normalization)
-R = max(Y,[],'all');
 Y=single(Y);
 % Convert the data to the appropriate format
 
 mY=max(Y,[],3);
 s=mY(:);
 thr=prctile(s,99.99);
+R = thr;
 mI=thr*256/250;
 Y = uint8(Y./mI*256); % Convert to uint8
 
