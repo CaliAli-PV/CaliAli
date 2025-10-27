@@ -74,6 +74,7 @@ end
 function opt=downsampling_parameters(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_char = @(x) ischar(x) || (isstring(x) && isscalar(x));
@@ -124,6 +125,7 @@ end
 function opt=preprocessing_parameters(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_nonneg_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0);
@@ -173,6 +175,7 @@ end
 function opt=motion_correction_parameters(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_nonneg_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0);
@@ -238,6 +241,7 @@ end
 function opt=inter_session_alignment_parameters(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_nonneg_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0);

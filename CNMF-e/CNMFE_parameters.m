@@ -119,6 +119,7 @@ end
 function pars=pars_envs_parse(varargin)
 %% INTIALIZE VARIABLES
 inp = inputParser;
+inp.PartialMatching = false;
 inp.KeepUnmatched = true;  % Keep unmatched parameters
 
 try
