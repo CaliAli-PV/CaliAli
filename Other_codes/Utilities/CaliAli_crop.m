@@ -62,17 +62,19 @@ delete(app);
 G = Mask_all(:,:,1)*0;
 G(ver(1,2):ver(2,2), ver(2,1):ver(3,1)) = 1;
 
+chunk = compute_auto_batch_size(opts.CaliAli_options.motion_correction.batch_sz,input_files{1});
+
 % Apply cropping mask to all input files
 for i = progress(1:length(input_files),'Title','Cropping...')
     [d1,d2] = size(M{i});
     mask = reshape(G(Mask_all(:,:,i)==1), d1, d2);
-    apply_crop_on_disk_in(input_files{i}, mask)
+    apply_crop_on_disk_in(input_files{i}, mask,chunk)
 end
 
 end
 
 
-function apply_crop_on_disk_in(mat_path, Mask)
+function apply_crop_on_disk_in(mat_path, Mask,chunk)
 % apply_crop_on_disk_in  Crop borders of Y in a .mat file using a mask.
 %
 % mat_path : path to .mat file containing variable Y
@@ -95,8 +97,6 @@ if ~isfield(opts,'CaliAli_options') || ...
    ~isfield(opts.CaliAli_options.motion_correction,'batch_sz')
     error('CaliAli_options.motion_correction.Mask or batch_sz not found.');
 end
-
-chunk = opts.CaliAli_options.motion_correction.batch_sz;
 
 % Open video on disk
 m  = matfile(mat_path,'Writable',true);
