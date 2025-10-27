@@ -79,13 +79,6 @@ if ~isfile(out_file)
         end
        
 
-        % Scale the data based on the range (R)
-        if isa(Y, 'uint16')
-            Y = uint16(single(Y) .* R(ses_ix));  % For uint16, scale the data
-        else
-            Y = uint8(single(Y) .* R(ses_ix));   % For uint8, scale the data
-        end
-
         % Save the transformed data to the output file
         CaliAli_save_chunk(out_file, ...
             TheFiles{k},CaliAli_options.inter_session_alignment.F,Y,ses_ix);

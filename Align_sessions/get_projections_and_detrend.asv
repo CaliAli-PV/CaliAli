@@ -68,15 +68,23 @@ if ~isempty(CaliAli_options.preprocessing.median_filtering)
 end
 
 % Calculate the range of the session data (for normalization)
-R = max(Y,[],'all');
 Y=single(Y);
 % Convert the data to the appropriate format
 
 mY=max(Y,[],3);
 s=mY(:);
 thr=prctile(s,99.99);
-mI=thr/0.999;
-Y = uint8(Y./mI*256); % Convert to uint8
+R = thr;
+mI=thr*256/250;
+Y = Y./mI*256; % Convert to uint8
+
+if CaliAli_options.preprocessing.force_non_negative
+    fprintf('Forcing non-negativity. Max negative value is %0d...\n',CaliAli_options.preprocessing.force_non_negative_tolerance); 
+Y=Y./max(Y,[],3).*(256-CaliAli_options.preprocessing.force_non_negative_tolerance);   
+Y=Y+CaliAli_options.preprocessing.force_non_negative_tolerance; %This makes the the forcing lets strict allowin negative noise fluctuation to part of the colordepth resolution
+Y(Y<0)=0;
+end
+Y=uint8(Y);
 
 
 % Fuse the blood vessel projections with the neuron projections for visual comparison

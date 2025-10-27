@@ -67,7 +67,6 @@ Y(Y<0)=0;
 end
 
 
-
 end
 
 function Y=MIN1PIPE_bg_removal(Y,CaliAli_options)
