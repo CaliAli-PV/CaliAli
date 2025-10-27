@@ -77,7 +77,7 @@ for k = 1:length(input_files)
                 % Pre-allocate the file
                 if total_frames > 0
                     m = matfile(output_file, 'Writable', true);
-                    m.Y(d1, d2, total_frames) = uint8(0);  % creates dataset on disk
+                    m.Y(d1, d2, total_frames) = uint16(0);  % creates dataset on disk
                     fprintf(1, 'Pre-allocated file with dimensions [%d, %d, %d]\n', d1, d2, total_frames);
                 end
 
