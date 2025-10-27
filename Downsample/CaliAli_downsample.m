@@ -74,6 +74,7 @@ for k = 1:length(opt.input_files)
         clear temp
         % Save the downsampled video as an HDF5 file
         % Save CaliAli parameters
+        F(k)=size(Y,3);
         Y=v2uint8(Y)+1;
         CaliAli_options.downsampling=opt; 
         CaliAli_save(opt.output_files{k}(:),Y,CaliAli_options);
@@ -82,6 +83,12 @@ for k = 1:length(opt.input_files)
         % If the output file already exists, skip processing and print a message
         cprintf('_red', 'File %s already exist in destination folder!\n', opt.output_files{k});
     end
+end
+
+if all(F==1000)
+cprintf('-comment', ['All files appear to be 1000-frame batches.\n' ...
+    'If these are split files from the same session, they need to be concatenated following the instructions below:\n']);
+cprintf('Hyperlinks', 'https://caliali-pv.github.io/CaliAli/latest/Processing_split_data/\n');
 end
 
 CaliAli_options.downsampling=opt; 
