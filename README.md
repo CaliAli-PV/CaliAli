@@ -9,6 +9,6 @@ CaliAli is a powerful software suite designed to extract neural signals from one
 Read the full [Online Documentation](https://caliali-pv.github.io/CaliAli/latest/).
 
 For detailed information about the latest changes and updates, please refer to: [Whats new?](https://caliali-pv.github.io/CaliAli/latest/Version_History/).
-.
+
 ---
 Have any question? Contact us at CaliAli.contact@gmail.com
