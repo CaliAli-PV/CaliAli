@@ -143,7 +143,7 @@ addParameter(inp,'detrend',1,valid_nonneg_scalar)                 %Detrending of
 addParameter(inp,'remove_BV',false,valid_bool_scalar)           %Remove BV from the neuron-filtered projection]
 
 addParameter(inp,'force_non_negative',1,valid_nonneg_scalar)       %Remove negative values after detrending
-addParameter(inp,'force_non_negative_tolerance',13,valid_nonneg_scalar)       %shifts the signal up by that amount before zero-clipping, preserving negative noise fluctuations within that range.
+addParameter(inp,'force_non_negative_tolerance',20,valid_nonneg_scalar)       %shifts the signal up by that amount before zero-clipping, preserving negative noise fluctuations within that range.
 
 %% Dendrite processing codes. This section is experimental. This is not used unless structure is set to 'dendrite'
 addParameter(inp,'structure','neuron',valid_char)      % Set up this to 'dendrite' to extract dendrites instead of neurons
