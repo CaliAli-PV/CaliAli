@@ -30,6 +30,7 @@ opt = CaliAli_options.downsampling;
 if isempty(opt.input_files)
     opt.input_files = uipickfiles('REFilter','\.h5$|\.avi$|\.m4v$|\.mp4$|\.tif$|\.tiff$|\.isxd$');
 end
+F=zeros(1,length(opt.input_files));
 % Loop through each selected file
 for k = 1:length(opt.input_files)
     fullFileName = opt.input_files{k};  % Get the full path of the current file
