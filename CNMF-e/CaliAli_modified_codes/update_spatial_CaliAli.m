@@ -34,7 +34,7 @@ div=length(batch)-1;
 obj.A_prev=obj.A;
 Ca=0;
 for i=progress(1:div)
-    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],i);
+    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
     sc=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     sc=sc.^2;
     Ca=Ca+sc;
@@ -42,10 +42,15 @@ for i=progress(1:div)
 end
 A=A./Ca';
 obj.A=sparse(A);
+%% upadte b0
+if strcmpi(obj.options.background_model, 'ring')
+    obj.b0_new = obj.P.Ymean{1,1}-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
+end
+
 end
 
 
-function out_A=update_spatial_in(neuron, use_parallel,max_frame,idx, update_sn)
+function out_A=update_spatial_in(neuron, use_parallel,max_frame,update_sn)
 %% update the the spatial components for all neurons
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -70,7 +75,6 @@ try
     dims = mat_data.dims;
     d1 = dims(1);
     d2 = dims(2);
-    T = dims(3);
     neuron.options.d1 = d1;
     neuron.options.d2 = d2;
 
@@ -395,21 +399,7 @@ end
 %% post-process results
 out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2));
 % obj.A = A_new;
-%% upadte b0
-if strcmpi(bg_model, 'ring')
-    neuron.b0_new = neuron.P.Ymean{idx}-neuron.reshape(neuron.A*mean(neuron.C,2), 2); %-obj.reconstruct();
-end
-
 
 %% save the results to log
-
-if neuron.options.save_intermediate
-    spatial.A = neuron.A;
-    spatial.ids = neuron.ids;
-    temporal.b0 = neuron.b0;
-    tmp_str = get_date();
-    tmp_str=strrep(tmp_str, '-', '_');
-    eval(sprintf('log_data.spatial_%s = spatial;', tmp_str));
-end
 fclose(flog);
 end
