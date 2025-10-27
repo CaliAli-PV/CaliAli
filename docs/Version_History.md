@@ -1,5 +1,13 @@
 # Version History <a id="vh"></a> 
 
+## CaliAli 1.4.6 Release Notes — November 2025
+
+- ⚡ **Parallel Processing Restored**: A bug in 1.4.5 forced runs onto a single core; multi-core execution is back.
+- 🧠 **Calmer CNMF Batches**: A CNMF memory-estimation bug made batches too large; the new sizing avoids those surprise spikes.
+- 🛠️ **Quick Fix for 1.4.5 Projects**: Option files created with 1.4.5 kept the wrong patch size; open them with `CaliAli_update_parameters('patch_dims',[64,64])` and resave before relaunching jobs.
+
+---
+
 ## CaliAli 1.4.5 Release Notes — October 2025
 
 - 🧮 **Smarter Defaults & Auto Sizing**: `batch_sz` accepts `'auto'`, dynamically estimating chunk size from available RAM and data dimensions; `gSig` now defaults to `5 / spatial\_ds`, keeping neuron footprints correct whether or not data are downsampled. The auto heuristic now uses a gentler `2 × 10^7` multiplier so 16 GB machines stay below MATLAB's crash threshold.
