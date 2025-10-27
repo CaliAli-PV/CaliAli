@@ -2,14 +2,14 @@ function obj=update_temporal_CaliAli(obj, use_parallel,F)
 %% update_temporal_CaliAli - Updates the temporal components of extracted neuronal signals.
 %
 % This function refines the temporal dynamics of detected neuronal components
-% by processing the data in multiple batches. It updates the neuronal activity 
-% traces while accounting for residual background activity, ensuring robust 
+% by processing the data in multiple batches. It updates the neuronal activity
+% traces while accounting for residual background activity, ensuring robust
 % deconvolution and denoising.
 %
 % Inputs:
 %   - obj: CNMF object containing spatial and temporal components.
 %   - use_parallel: Boolean flag for enabling parallel processing.
-%   - F (optional): Array specifying batch sizes for processing. If not provided, 
+%   - F (optional): Array specifying batch sizes for processing. If not provided,
 %     it is determined using get_batch_size(obj).
 %
 % Outputs:
@@ -22,17 +22,17 @@ function obj=update_temporal_CaliAli(obj, use_parallel,F)
 %   - Handles various CNMF-E background models (`ring`, `nmf`, `svd`).
 %
 % Notes:
-%   - Running this function is **essential** after modifying the spatial or 
+%   - Running this function is **essential** after modifying the spatial or
 %     residual components to maintain consistency in CNMF iterations.
-%   - If this function is run, **temporal traces will be altered**, and further 
+%   - If this function is run, **temporal traces will be altered**, and further
 %     CNMF iterations must be performed using update_temporal_CaliAli.
 %
 % Usage:
 %   neuron = update_temporal_CaliAli(neuron, true);
 %   neuron = update_temporal_CaliAli(neuron, false, batch_frames);
 %
-% Author: Pablo Vergara  
-% Contact: pablo.vergara.g@ug.uchile.cl  
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
 
@@ -54,8 +54,8 @@ fprintf('Deconvolve and denoise all temporal traces again...\n');
 if obj.options.deconv_flag
     obj.C = obj.deconvTemporal();
 else
-    obj.C_raw = bsxfun(@minus, obj.C_raw, min(obj.C_raw,[],2)); 
-    obj.C = obj.C_raw; 
+    obj.C_raw = bsxfun(@minus, obj.C_raw, min(obj.C_raw,[],2));
+    obj.C = obj.C_raw;
 end
 fprintf('Done!\n');
 
@@ -77,12 +77,12 @@ function C_raw=update_temporal_in(obj, use_parallel, max_frame,idx,use_c_hat)
 try
     % map data
     mat_data = obj.P.mat_data;
-    
+
     % folders and files for saving the results
     log_file =  obj.P.log_file;
     flog = fopen(log_file, 'a');
     log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
-    
+
     % dimension of data
     dims = mat_data.dims;
     d1 = dims(1);
@@ -90,11 +90,11 @@ try
     T = dims(3);
     obj.options.d1 = d1;
     obj.options.d2 = d2;
-    
+
     % parameters for patching information
     patch_pos = mat_data.patch_pos;
     block_pos = mat_data.block_pos;
-    
+
     % number of patches
     [nr_patch, nc_patch] = size(patch_pos);
 catch
@@ -127,8 +127,8 @@ maxIter = options.maxIter;
 A = cell(nr_patch, nc_patch);
 C = cell(nr_patch, nc_patch);
 % if strcmpi(bg_model, 'ring')
-    A_prev = A;
-    C_prev = C;
+A_prev = A;
+C_prev = C;
 % end
 sn = cell(nr_patch, nc_patch);
 ind_neurons = cell(nr_patch, nc_patch);
@@ -136,7 +136,7 @@ ind_neurons = cell(nr_patch, nc_patch);
 AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
 if isempty(obj.A_prev)
-obj.A_prev=obj.A;
+    obj.A_prev=obj.A;
 end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')
@@ -152,7 +152,7 @@ for mpatch=1:(nr_patch*nc_patch)
     sn{mpatch} = obj.P.sn(logical(mask));
     C{mpatch} = obj.C(ind, max_frame(1):max_frame(2));
     ind_neurons{mpatch} = find(ind);    % indices of the neurons within each patch
-    
+
     if strcmpi(bg_model, 'ring')
         ind = find(reshape(mask(:)==1, 1, [])* full(obj.A_prev)>0);
         A_prev{mpatch}= obj.A_prev((mask>0), ind);
@@ -176,7 +176,7 @@ else
     deconv_options = [];
 end
 if use_parallel
-   parfor mpatch=1:(nr_patch*nc_patch) %
+    parfor mpatch=1:(nr_patch*nc_patch) %
         % no neurons within the patch
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
@@ -186,17 +186,17 @@ if use_parallel
             tmp_block = patch_pos{mpatch};
         end
         C_patch = C{mpatch};                % previous estimation of neural activity
-        
+
         if isempty(C_patch)
             % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A{mpatch};
-        
+
         % use ind_patch to indicate pixels within the patch
         ind_patch = false(diff(tmp_block(1:2))+1, diff(tmp_block(3:4))+1);
         ind_patch((tmp_patch(1):tmp_patch(2))-tmp_block(1)+1, (tmp_patch(3):tmp_patch(4))-tmp_block(3)+1) = true;
-        
+
         % get data
         if strcmpi(bg_model, 'ring')
             % including areas outside of the patch for recorving background
@@ -206,7 +206,7 @@ if use_parallel
             Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, false);
         end
         [nr_block, nc_block, ~] = size(Ypatch);
-        
+
         % get background
         if strcmpi(bg_model, 'ring')
             A_patch_prev = A_prev{mpatch};
@@ -214,11 +214,11 @@ if use_parallel
             W_ring = W{mpatch};
             b0_ring = b0{mpatch};
             Ypatch = reshape(Ypatch, [], T);
-          if ~isempty(A_patch_prev*C_patch_prev)  %added by PV
-            tmp_Y = double(Ypatch)-A_patch_prev*C_patch_prev;  
-          else
-               tmp_Y = double(Ypatch); %added by PV
-           end
+            if ~isempty(A_patch_prev*C_patch_prev)  %added by PV
+                tmp_Y = double(Ypatch)-A_patch_prev*C_patch_prev;
+            else
+                tmp_Y = double(Ypatch); %added by PV
+            end
             if bg_ssub==1
                 Ypatch = bsxfun(@minus, double(Ypatch(ind_patch,:))- W_ring*tmp_Y, b0_ring-W_ring*mean(tmp_Y, 2));
             else
@@ -230,7 +230,7 @@ if use_parallel
                 Bf = reshape(W_ring*reshape(temp, [], T), d1s, d2s, T);
                 Bf = imresize(Bf, [nr_block, nc_block]);
                 Bf = reshape(Bf, [], T);
-                
+
                 Ypatch = bsxfun(@minus, double(Ypatch(ind_patch, :)) - Bf(ind_patch, :), b0_ring);
             end
         elseif strcmpi(bg_model, 'nmf')
@@ -243,7 +243,7 @@ if use_parallel
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
-        
+
         % using HALS to update temporal components
         if ~use_c_hat
             [AA{mpatch}, C_raw_new{mpatch}] = fast_temporal(Ypatch, A_patch(ind_patch,:));
@@ -251,8 +251,8 @@ if use_parallel
             [~, C_raw_new{mpatch}] = HALS_temporal_CaliAli(Ypatch, A_patch(ind_patch,:), C_patch, maxIter, deconv_options);
             AA{mpatch}= sum(A_patch(ind_patch,:).^2, 1);
         end
-        
-        
+
+
         % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 else
@@ -265,19 +265,19 @@ else
         else
             tmp_block = patch_pos{mpatch};
         end
-        
+
         C_patch = C{mpatch};                % previous estimation of neural activity
-        
+
         if isempty(C_patch)
             % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
             continue;
         end
         A_patch = A{mpatch};
-        
+
         % use ind_patch to indicate pixels within the patch
         ind_patch = false(diff(tmp_block(1:2))+1, diff(tmp_block(3:4))+1);
         ind_patch((tmp_patch(1):tmp_patch(2))-tmp_block(1)+1, (tmp_patch(3):tmp_patch(4))-tmp_block(3)+1) = true;
-        
+
         % get data
         if strcmpi(bg_model, 'ring')
             % including areas outside of the patch for recorving background
@@ -287,7 +287,7 @@ else
             Ypatch = get_patch_data(mat_data, tmp_patch, frame_range, false);
         end
         [nr_block, nc_block, ~] = size(Ypatch);
-        
+
         % get background
         if strcmpi(bg_model, 'ring')
             A_patch_prev = A_prev{mpatch};
@@ -307,7 +307,7 @@ else
                 Bf = reshape(W_ring*reshape(temp, [], T), d1s, d2s, T);
                 Bf = imresize(Bf, [nr_block, nc_block]);
                 Bf = reshape(Bf, [], T);
-                
+
                 Ypatch = bsxfun(@minus, double(Ypatch(ind_patch, :)) - Bf(ind_patch, :), b0_ring);
             end
         elseif strcmpi(bg_model, 'nmf')
@@ -320,7 +320,7 @@ else
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
-        
+
         % using HALS to update temporal components
         if ~use_c_hat
             [AA{mpatch}, C_raw_new{mpatch}] = fast_temporal(Ypatch, A_patch(ind_patch,:));
@@ -328,7 +328,7 @@ else
             [~, C_raw_new{mpatch}] = HALS_temporal_CaliAli(Ypatch, A_patch(ind_patch,:), C_patch, maxIter, deconv_options);
             AA{mpatch}= sum(A_patch(ind_patch,:).^2, 1);
         end
-        
+
         % fprintf('Patch (%2d, %2d) is done. %2d X %2d patches in total. \n', r, c, nr_patch, nc_patch);
     end
 end
