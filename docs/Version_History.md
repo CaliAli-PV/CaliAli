@@ -5,6 +5,7 @@
 - ⚡ **Parallel Processing Restored**: A bug in 1.4.5 forced runs onto a single core; multi-core execution is back.
 - 🧠 **Calmer CNMF Batches**: A CNMF memory-estimation bug made batches too large; the new sizing avoids those surprise spikes.
 - 🛠️ **Quick Fix for 1.4.5 Projects**: Option files created with 1.4.5 kept the wrong patch size; open them with `CaliAli_update_parameters('patch_dims',[64,64])` and resave before relaunching jobs.
+- 🗃️ **Full 16-bit Storage**: CaliAli now keeps projections in `uint16`, preserving dynamic range across long sessions without increasing runtime memory, though saved files take up more disk space.
 
 ---
 
