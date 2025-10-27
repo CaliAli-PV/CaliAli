@@ -67,11 +67,18 @@ if ~isempty(CaliAli_options.preprocessing.median_filtering)
     PNR = medfilt2(PNR, CaliAli_options.preprocessing.median_filtering); % Apply median filter to PNR
 end
 
-% Calculate the range of the session data (for normalization)
-% Convert the data to the appropriate format
-R=max(Y,[],'all');
-Y(Y>65535)=65535;
-Y=uint16(Y);
+% Calculate the range of the session data (for normalization) and clip to uint16
+R = max(Y, [], 'all');
+clipped_pixels = nnz(Y > 65535);
+if clipped_pixels > 0
+    clipped_ratio = clipped_pixels / numel(Y);
+    if clipped_ratio >= 0.01
+        cprintf('*red', ['Warning: %.2f%% of pixels saturated at uint16 ceiling. ' ...
+            'Consider revisiting preprocessing parameters.\n'], clipped_ratio * 100);
+    end
+end
+Y(Y > 65535) = 65535;
+Y = uint16(Y);
 
 
 % Fuse the blood vessel projections with the neuron projections for visual comparison
