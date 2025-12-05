@@ -68,7 +68,7 @@
 - 🔧 The `do_alignment` flag has been split into `do_alignment_translation` and `do_alignment_non_rigid`, so you can perform either alignment operation—or skip both if both flags are set to false—replicating the original `do_alignment` behavior when neither is enabled.
 - ➕ Introduced the `force_non_negative_tolerance` parameter. Previously, any negative pixel values produced after detrending were automatically trimmed; now, small negative values are permitted.
 - ⚡ Substantially improved the efficiency of the `create_similarity_matrix` function used to compare extraction similarities across CNMF iterations.
-- 🎥 Optimized `play_movie` for more efficient playback handling.
+- 🎥 Optimized [play_movie()](Functions_doc/play_movie.md#play_movie)  for more efficient playback handling.
 
 
 ### CaliAli 1.2.1 Release Notes

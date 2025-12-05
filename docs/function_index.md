@@ -54,5 +54,6 @@
      | [update_spatial_CaliAli()](Functions_doc/update_spatial_CaliAli.md#update_spatial_CaliAli) |
      | [update_temporal_CaliAli()](Functions_doc/update_temporal_CaliAli.md#update_temporal_CaliAli) |
      | [vesselness_PV()](Functions_doc/vesselness_PV.md#vesselness_PV) |
+     | [play_movie()](Functions_doc/play_movie.md#play_movie) |
      | [view_Ca_video()](Functions_doc/view_Ca_video.md#view_Ca_video) |
      | [view_traces()](Functions_doc/view_traces.md) |

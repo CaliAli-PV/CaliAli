@@ -93,7 +93,7 @@ adj = false(M);
 for i = 1:M
     DT = bwdist(Ared(:,:,i));
     for j = i+1:M
-        if any( Ared(:,:,j) & (DT==0), 'all' )
+        if any( Ared(:,:,j) & (DT<10), 'all' )
             adj(i,j) = true;
             adj(j,i) = true;
         end
