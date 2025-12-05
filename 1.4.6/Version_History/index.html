@@ -679,9 +679,10 @@
 <h1 id="version-history">Version History <a id="vh"></a></h1>
 <h2 id="caliali-146-release-notes-november-2025">CaliAli 1.4.6 Release Notes — November 2025</h2>
 <ul>
-<li>⚡ <strong>Parallel Processing Restored</strong>: A bug in 1.4.5 forced runs onto a single core; multi-core execution is back.</li>
-<li>🧠 <strong>Calmer CNMF Batches</strong>: A CNMF memory-estimation bug made batches too large; the new sizing avoids those surprise spikes.</li>
-<li>🛠️ <strong>Quick Fix for 1.4.5 Projects</strong>: Option files created with 1.4.5 kept the wrong patch size; open them with <code>CaliAli_update_parameters('patch_dims',[64,64])</code> and resave before relaunching jobs.</li>
+<li>🐞 <strong>Bug Fixes</strong> <strong>Parallel Processing Restored</strong>: A bug in 1.4.5 forced runs onto a single core; multi-core execution is back.</li>
+<li>🐞 <strong>Bug Fixes</strong> Improvements in RAM memory management**: A memory-estimation bug made batches too large during CNMF iterations; the new sizing avoids those surprise spikes.</li>
+<li>🐞 <strong>Bug Fixes</strong> <strong>Quick Fix for 1.4.5 Projects</strong>: Option files created with 1.4.5 kept the wrong patch size; open them with <code>CaliAli_update_parameters('patch_dims',[64,64])</code> and resave before relaunching jobs.</li>
+<li>🗃️ <strong>Full 16-bit Storage</strong>: CaliAli now keeps video data in <code>uint16</code>. This is necessary to keep the dynamic range of the fluorescence signal across multiple session, though saved files take up more disk space. You will have to realign your sessions to see these improvements.</li>
 </ul>
 <hr />
 <h2 id="caliali-145-release-notes-october-2025">CaliAli 1.4.5 Release Notes — October 2025</h2>
@@ -751,7 +752,7 @@
 <li>🔧 The <code>do_alignment</code> flag has been split into <code>do_alignment_translation</code> and <code>do_alignment_non_rigid</code>, so you can perform either alignment operation—or skip both if both flags are set to false—replicating the original <code>do_alignment</code> behavior when neither is enabled.</li>
 <li>➕ Introduced the <code>force_non_negative_tolerance</code> parameter. Previously, any negative pixel values produced after detrending were automatically trimmed; now, small negative values are permitted.</li>
 <li>⚡ Substantially improved the efficiency of the <code>create_similarity_matrix</code> function used to compare extraction similarities across CNMF iterations.</li>
-<li>🎥 Optimized <code>play_movie</code> for more efficient playback handling.</li>
+<li>🎥 Optimized <a href="../Functions_doc/play_movie/#play_movie">play_movie()</a>  for more efficient playback handling.</li>
 </ul>
 <h3 id="caliali-121-release-notes">CaliAli 1.2.1 Release Notes</h3>
 <p><strong>🗓️ April 16th 2025</strong></p>
