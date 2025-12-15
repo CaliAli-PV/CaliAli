@@ -87,6 +87,8 @@ addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diamet
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'spatial_ds',1,valid_pos_scalar)      %Spatial Downsampling factor
 addParameter(inp,'temporal_ds',1,valid_pos_scalar)     %Temporal Downsampling factor
+addParameter(inp,'batch_sz','auto',@(x) (isnumeric(x)&&isscalar(x)&&isfinite(x)&&x>=0) || ...
+    (ischar(x)&&strcmpi(x,'auto')) || (isstring(x)&&isscalar(x)&&strcmpi(x,'auto'))) % Batch size for downsampling (0=all at once, 'auto'=heuristic)
 
 addParameter(inp,'file_extension','avi',valid_char)      % if a folder is selected instead of a single video file,
 % Concatenate all videos with the specified file extension
@@ -405,4 +407,3 @@ end
 
 nv_out = [out_names; out_vals];
 end
-
