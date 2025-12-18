@@ -21,6 +21,14 @@ R = single(R ./ max(R));
 
 flag_field = 'alignment_completed';
 out_file = CaliAli_options.inter_session_alignment.out_aligned_sessions;
+input_F = CaliAli_options.inter_session_alignment.input_F;
+if isempty(input_F) && isfield(CaliAli_options.inter_session_alignment, 'F')
+    input_F = CaliAli_options.inter_session_alignment.F;
+end
+session_labels = ensure_labels(CaliAli_options.inter_session_alignment, numel(input_F));
+aligned_per_session = [];
+expected_cumsum = [];
+aligned_running_total = 0;
 
 if isfile(out_file)
     try
@@ -47,6 +55,13 @@ if ~isfile(out_file)
     for i=1:length(TheFiles)
         TheFiles{i}{1}=TheFiles{i}{5};
     end
+    max_ses_ix = max(cellfun(@(f) f{2}, TheFiles));
+    if numel(input_F) < max_ses_ix
+        input_F(max_ses_ix) = 0;
+        session_labels(max_ses_ix) = {''};
+    end
+    aligned_per_session = zeros(size(input_F));
+    expected_cumsum = cumsum(input_F);
 
     % Loop through each output file and apply the transformations
     for k = 1:length(TheFiles)
@@ -79,23 +94,39 @@ if ~isfile(out_file)
         end
        
 
+        frames_this_chunk = size(Y, 3);
+        aligned_per_session(ses_ix) = aligned_per_session(ses_ix) + frames_this_chunk;
+        aligned_running_total = aligned_running_total + frames_this_chunk;
+        if aligned_per_session(ses_ix) > input_F(ses_ix)
+            report_frame_issue(session_labels{ses_ix}, 'apply_transformations concatenation', input_F(ses_ix), aligned_per_session(ses_ix));
+        end
+        if aligned_per_session(ses_ix) == input_F(ses_ix)
+            expected_running_total = expected_cumsum(ses_ix);
+            if aligned_running_total ~= expected_running_total
+                report_frame_issue(session_labels{ses_ix}, 'apply_transformations cumulative check', expected_running_total, aligned_running_total);
+            end
+        end
+
         % Save the transformed data to the output file
         CaliAli_save_chunk(out_file, ...
             TheFiles{k},CaliAli_options.inter_session_alignment.F,Y,ses_ix);
     end
+    for ses_ix = 1:numel(input_F)
+        if aligned_per_session(ses_ix) ~= input_F(ses_ix)
+            report_frame_issue(session_labels{ses_ix}, 'apply_transformations final per-session check', input_F(ses_ix), aligned_per_session(ses_ix));
+        end
+    end
     try
         m_status = matfile(out_file);
         info = whos(m_status, 'Y');
-        expected_frames = sum(CaliAli_options.inter_session_alignment.F);
+        expected_frames = sum(input_F);
         if isempty(info) || numel(info.size) < 3
             actual_frames = 0;
         else
             actual_frames = info.size(3);
         end
         if actual_frames ~= expected_frames
-            warning('CaliAli:apply_transformations:frameMismatch', ...
-                'Aligned stack has %d frames but %d were expected.', ...
-                actual_frames, expected_frames);
+            report_frame_issue(out_file, 'aligned output verification', expected_frames, actual_frames);
         else
             CaliAli_save(out_file, flag_field, true);
         end
@@ -138,6 +169,30 @@ Vid = Vid(logical(Mask), :);  % Keep only the valid mask regions
 
 % Reshape the video data back to its original dimensions
 Vid = reshape(Vid, f1, f2, []);
+end
+
+function labels = ensure_labels(opt, n_sessions)
+if isfield(opt, 'input_file_labels') && ~isempty(opt.input_file_labels)
+    labels = opt.input_file_labels;
+    if numel(labels) < n_sessions
+        labels(end+1:n_sessions) = {''};
+    end
+else
+    labels = repmat({''}, n_sessions, 1);
+end
+end
+
+function report_frame_issue(session_label, stage_label, expected, actual)
+if isempty(session_label)
+    session_label = 'Unknown session';
+end
+if exist('cprintf', 'file')
+    cprintf('_red', 'Frame count mismatch for %s during %s: expected %g, found %g.\n', ...
+        session_label, stage_label, expected, actual);
+else
+    fprintf(2, 'Frame count mismatch for %s during %s: expected %g, found %g.\n', ...
+        session_label, stage_label, expected, actual);
+end
 end
 
 function Vid = apply_NR_shifts(Vid, S, Mask)

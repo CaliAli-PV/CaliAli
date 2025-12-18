@@ -43,8 +43,10 @@ for k = 1:numel(opt.input_files)
     opt.output_files{k} = outFile;
 
     if isfile(outFile)
-        warn_file_exists(outFile);
-        continue
+        if ~existing_output_needs_redo(outFile)
+            warn_file_exists(outFile);
+            continue
+        end
     end
 
     reader = build_reader(fullFileName, ext);
@@ -339,6 +341,47 @@ if ischar(batch_sz) || (isstring(batch_sz) && isscalar(batch_sz))
 end
 
 batch_size = min(Fds, 10000); % fallback default
+end
+
+
+function redo = existing_output_needs_redo(outFile)
+redo = false;
+reason = '';
+try
+    m = matfile(outFile);
+    vars = whos(m);
+    hasY = any(strcmp({vars.name}, 'Y'));
+    if ~hasY
+        redo = true;
+        reason = 'variable Y missing';
+    else
+        dims = size(m, 'Y');
+        if numel(dims) < 3 || dims(3) < 1
+            redo = true;
+            reason = 'Y is empty';
+        else
+            lastFrame = m.Y(:, :, dims(3));
+            redo = isempty(lastFrame) || sum(lastFrame,'all')==0;
+            if redo
+                reason = 'last frame is empty';
+            end
+        end
+    end
+catch err
+    redo = true;
+    reason = err.message;
+end
+
+if redo
+    if exist('cprintf', 'file')
+        cprintf('_red', 'Existing file %s is probably corrupted (%s). Re-running downsampling.\n', outFile, reason);
+    else
+        fprintf(2, 'Existing file %s is probably corrupted (%s). Re-running downsampling.\n', outFile, reason);
+    end
+    if isfile(outFile)
+        delete(outFile);
+    end
+end
 end
 
 

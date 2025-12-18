@@ -18,7 +18,7 @@ end
 Mask    = opts.CaliAli_options.motion_correction.Mask;
 chunk   = opts.CaliAli_options.motion_correction.batch_sz;
 
-
+chunk = compute_auto_batch_size(chunk,mat_path);
 % Open video for streaming
 m  = matfile(mat_path,'Writable',true);
 sz = size(m,varname);   % [d1 d2 d3]
