@@ -128,6 +128,11 @@ if ~isfile(out_file)
         if actual_frames ~= expected_frames
             report_frame_issue(out_file, 'aligned output verification', expected_frames, actual_frames);
         else
+            [isZero, errMsg] = last_frame_is_zero(out_file);
+            if isZero
+                report_frame_issue(out_file, 'aligned output last frame check', expected_frames, 0, errMsg);
+                error('CaliAli:frameCheck', 'Last frame of %s is all zeros.', out_file);
+            end
             CaliAli_save(out_file, flag_field, true);
         end
     catch ME
@@ -182,16 +187,47 @@ else
 end
 end
 
-function report_frame_issue(session_label, stage_label, expected, actual)
+function [isZero, errMsg] = last_frame_is_zero(path)
+isZero = false;
+errMsg = '';
+try
+    m = matfile(path);
+    info = whos(m, 'Y');
+    if isempty(info) || numel(info.size) < 3
+        isZero = true;
+        errMsg = 'Y is missing or empty';
+        return
+    end
+    lastFrameIdx = info.size(3);
+    if lastFrameIdx < 1
+        isZero = true;
+        errMsg = 'Y has no frames';
+        return
+    end
+    lastFrame = m.Y(:, :, lastFrameIdx);
+    isZero = ~any(lastFrame(:));
+    if isZero
+        errMsg = 'last frame is all zeros';
+    end
+catch ME
+    isZero = true;
+    errMsg = ME.message;
+end
+end
+
+function report_frame_issue(session_label, stage_label, expected, actual, errMsg)
+if nargin < 5
+    errMsg = '';
+end
 if isempty(session_label)
     session_label = 'Unknown session';
 end
 if exist('cprintf', 'file')
-    cprintf('_red', 'Frame count mismatch for %s during %s: expected %g, found %g.\n', ...
-        session_label, stage_label, expected, actual);
+    cprintf('_red', 'Frame count mismatch for %s during %s: expected %g, found %g. %s\n', ...
+        session_label, stage_label, expected, actual, errMsg);
 else
-    fprintf(2, 'Frame count mismatch for %s during %s: expected %g, found %g.\n', ...
-        session_label, stage_label, expected, actual);
+    fprintf(2, 'Frame count mismatch for %s during %s: expected %g, found %g. %s\n', ...
+        session_label, stage_label, expected, actual, errMsg);
 end
 end
 
