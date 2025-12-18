@@ -35,7 +35,7 @@ d1 = dims(1); d2 = dims(2); T = dims(3);
 
 bz=min([bz,T]);
 
-fprintf('\nThe data has %d X %d pixels X %d frames. \nLoading each batch (double precision) requires %.3f GB RAM\n\n', d1, d2, bz, prod(dims)/(2^27)*2);
+fprintf('\nEach batch has %d X %d pixels X %d frames. \nLoading each batch (double precision) requires %.3f GB RAM\n\n', d1, d2, bz, (d1*d2*bz)/(2^27)*2);
 
 max_elements = memory_size_per_patch* (500^3); % x GB data can save x*1000^3/8 dobule numbers.
 min_patch_width = [2*w_overlap+3,2*w_overlap+3];
