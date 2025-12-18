@@ -115,6 +115,11 @@ for k = 1:numel(files)
         if isempty(labels{session_id})
             labels{session_id} = src_file;
         end
+        [isZero, errMsg] = last_frame_is_zero(src_file);
+        if isZero
+            report_frame_issue(labels{session_id}, 'input last frame check', dims(3), 0, errMsg);
+            error('CaliAli:frameCheck', 'Last frame of %s is all zeros.', src_file);
+        end
     catch ME
         report_frame_issue(src_file, 'input frame count (pre-detrend)', NaN, NaN, ME.message);
     end
@@ -140,6 +145,11 @@ for k = 1:min(numel(det_files), numel(input_F))
     det_F(k) = actual_frames;
     if input_F(k) ~= actual_frames
         report_frame_issue(labels{k}, 'detrend_batch_and_calculate_projections', input_F(k), actual_frames);
+    end
+    [isZero, errMsg] = last_frame_is_zero(det_file);
+    if isZero
+        report_frame_issue(labels{k}, 'detrend_batch_and_calculate_projections last frame check', actual_frames, 0, errMsg);
+        error('CaliAli:frameCheck', 'Last frame of %s is all zeros.', det_file);
     end
 end
 
@@ -182,6 +192,34 @@ try
     end
 catch
     n_frames = 0;
+end
+end
+
+function [isZero, errMsg] = last_frame_is_zero(path)
+isZero = false;
+errMsg = '';
+try
+    m = matfile(path);
+    info = whos(m, 'Y');
+    if isempty(info) || numel(info.size) < 3
+        isZero = true;
+        errMsg = 'Y is missing or empty';
+        return
+    end
+    lastFrameIdx = info.size(3);
+    if lastFrameIdx < 1
+        isZero = true;
+        errMsg = 'Y has no frames';
+        return
+    end
+    lastFrame = m.Y(:, :, lastFrameIdx);
+    isZero = ~any(lastFrame(:));
+    if isZero
+        errMsg = 'last frame is all zeros';
+    end
+catch ME
+    isZero = true;
+    errMsg = ME.message;
 end
 end
 
