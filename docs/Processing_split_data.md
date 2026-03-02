@@ -1,4 +1,4 @@
-#### I. Processing Video Sessions Split Into Multiple Files
+# Processing Video Sessions Split Into Multiple Files
 
 It is common for continuous calcium imaging data to be saved across multiple video files for easier access. For example as follows:
 

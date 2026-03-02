@@ -2,23 +2,27 @@
 
 #### Syntax
 ```matlab
-function CaliAli_cnmfe()
+function file_path = CaliAli_cnmfe(input_files)
 ```
 
 #### Description
 CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.
 
 ##### Function Inputs:
-This function prompts the user to select .mat files containing the imaging data and CNMF-E parameters. 
-The selected files should follow the naming pattern `*_ds*.mat`.
+- `input_files` (optional): Path, string, or cell array of `.mat` files to process.
+- If omitted, CaliAli opens a file picker.
+- Typical inputs are aligned or detrended outputs (for example `*_Aligned.mat` or `*_det.mat`).
 
 
 ##### Function Outputs:
-This function does not return an output but processes each selected file 
-and saves the extracted neuron or dendrite components to the workspace.
+- `file_path`: Cell array with the processed file paths.
 
 
 ##### Example usage:
 ```matlab
 CaliAli_cnmfe();
+```
+
+```matlab
+file_path = CaliAli_cnmfe(CaliAli_options.inter_session_alignment.out_aligned_sessions);
 ```

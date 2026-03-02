@@ -15,9 +15,5 @@ The CaliAli pipeline follows the following steps
 -	Neural Signal Extraction from concatenated videos with a computationally efficient approach.
 -	Post-processing and Evaluation
 
-#### Questions about CaliAli? <a id="q"></a>
-
-We're currently developing a comprehensive Frequently Asked Questions (FAQ) section for CaliAli, coming soon! In the meantime, please don't hesitate to reach out on our [discussion board](https://github.com/CaliAli-PV/CaliAli/issues) if you have any questions or need assistance.
-
 === "Ready to test CaliAli"
 [Getting Started](Getting_started.md)

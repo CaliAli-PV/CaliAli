@@ -1,4 +1,4 @@
-#CaliAli parameter settings
+# CaliAli Parameter Settings
 
 The **CaliAli pipeline** uses a structured approach to **initialize, configure, and manage parameters** across different processing stages. The function [CaliAli_parameters()](Functions_doc/CaliAli_parameters.md#CaliAli_parameters) acts as the central hub for handling parameters, ensuring modularity and flexibility.
 
@@ -35,6 +35,18 @@ The parameters utilized by each submodule is determine on a `CaliAli_options` st
 ```
 
 The default set of parameters can be obtained with `CaliAli_demo_parameters();` function.
+
+---
+
+#### Recommended Parameter Workflow <a id="parameter-workflow"></a>
+
+The recommended way to set parameters is:
+
+1. Edit `CaliAli_demo_parameters.m` to define or update `params`.
+2. Generate the nested `CaliAli_options` structure with `CaliAli_options = CaliAli_parameters(params);`.
+3. Use the generated `CaliAli_options` in each module.
+
+This keeps parameter updates consistent across the full pipeline.
 
 ---
 

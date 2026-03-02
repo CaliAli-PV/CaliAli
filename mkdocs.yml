@@ -79,19 +79,28 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   
 nav:
-      - Home: index.md    
-      - Getting Started: Getting_started.md
-      - Installation and System Requirements: Installation.md
-      - Setting CaliAli Parameters: Parameters.md
-      - Downsampling: Downsampling.md
-      - Motion Correction: Motion_correction.md
-      - Inter-session Alignment: alignment.md
-      - Calcium Signal extraction with CaliAli: extraction.md
-      - Low-Memory Processing: Low_memory.md
-      - Whats new?: Version_History.md
-      - Usage Agreement: License.md
-      - CaliAli Parameters Overview: Parameters_index.md
-      - List of Relevant functions: function_index.md
+  - Overview: index.md
+
+  - Setup:
+    - Installation and System Requirements: Installation.md
+    - Getting Started: Getting_started.md
+    - Setting CaliAli Parameters: Parameters.md
+
+  - Pipeline:
+    - Downsampling: Downsampling.md
+    - Motion Correction: Motion_correction.md
+    - Inter-session Alignment: alignment.md
+    - Calcium Signal extraction with CaliAli: extraction.md
+    - Low-Memory Processing: Low_memory.md
+
+  - Help and Reference:
+    - Frequently Asked Questions: FAQ.md
+    - CaliAli Parameters Overview: Parameters_index.md
+    - List of Relevant functions: function_index.md
+
+  - Project:
+    - What's New?: Version_History.md
+    - Usage Agreement: License.md
 
 
 extra_css:
