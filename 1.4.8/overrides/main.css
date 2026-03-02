@@ -1,0 +1,56 @@
+/* Improve heading contrast and hierarchy in both light/dark themes */
+.md-typeset h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 800;
+    color: var(--md-default-fg-color);
+}
+
+.md-typeset h2 {
+    font-size: 1.45rem;
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--md-default-fg-color);
+}
+
+.md-typeset h3 {
+    font-size: 1.25rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--md-default-fg-color);
+}
+
+.md-typeset h4 {
+    font-size: 1.08rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--md-default-fg-color);
+}
+
+.md-typeset h5 {
+    font-size: 0.98rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--md-default-fg-color);
+}
+
+.md-typeset h6 {
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--md-default-fg-color);
+    font-weight: 700;
+}
+
+/* Keep body text readable without over-shrinking */
+.md-typeset p,
+.md-typeset li,
+.md-typeset table {
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+/* Make markdown bold text clearly stand out */
+.md-typeset strong {
+    color: var(--md-default-fg-color);
+    font-weight: 700;
+}
