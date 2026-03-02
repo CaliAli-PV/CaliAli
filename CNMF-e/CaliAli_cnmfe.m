@@ -1,4 +1,4 @@
-function file_path = CaliAli_cnmfe()
+function file_path = CaliAli_cnmfe(input_files)
 %% CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.
 %
 % Inputs:
@@ -40,8 +40,14 @@ function file_path = CaliAli_cnmfe()
 % Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
+if ~exist('input_files','var') || isempty(input_files)
 input_files = uipickfiles('FilterSpec', '*.mat', 'REFilter', '_Aligned*\.mat$|_det*\.mat$');
+end
 
+
+if isstring(input_files) || ischar(input_files)
+   input_files={input_files};
+end
 file_path=cell(size(input_files,1),1);
 for i=1:size(input_files,1)
     try

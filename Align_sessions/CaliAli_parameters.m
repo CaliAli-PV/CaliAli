@@ -338,10 +338,11 @@ end
 end
 
 function in = extend_var(in,opt)
-if isfield(opt, 'input_files')  % Prevent 'input_files' to propagate across modules
-    opt.input_files = [];
-end
 in=[in,reshape(struct2varargin(opt), 2, [])];
+% Prevent file path names from propagating across modules.
+mask = strcmpi(in(1,:), 'input_files') | strcmpi(in(1,:), 'output_files');
+in(:, mask) = [];
+
 in = uniqueNV(in);
 end
 
