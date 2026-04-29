@@ -401,6 +401,10 @@ if isempty(files)
     return
 end
 
+
+[~,index] = natsortfiles({files.name});
+files=files(index);
+
 opt_local = opt;
 opt_local.input_files = fullfile({files.folder}, {files.name})';
 
