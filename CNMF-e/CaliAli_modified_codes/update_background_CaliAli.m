@@ -1,4 +1,4 @@
-function obj=update_background_CaliAli(obj, use_parallel,F)
+function obj=update_background_CaliAli(obj, use_parallel,ret_id,F)
 %% update_background_CaliAli - Updates background estimation in multiple batches.
 %
 % This function refines the background estimation in a CNMF pipeline by processing 
@@ -26,8 +26,61 @@ function obj=update_background_CaliAli(obj, use_parallel,F)
 if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);
 end
+if ~exist('ret_id','var')
+    ret_id=[];
+end
+[ret_id, active_id]=normalize_retired_ids(obj, ret_id);
 
 batch=[0,cumsum(F)];
+div=length(batch)-1;
+fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
+
+if ~isempty(ret_id)
+    b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);
+    f=cell(size(obj.f));
+    b0=cellfun(@(x) abs(x*inf),obj.b0,'UniformOutput',false);
+    W=cellfun(@(x) x.*0,obj.W,'UniformOutput',false);
+    n_update=zeros(size(obj.b));
+    for i=progress(1:div)
+        out=update_bg_in(obj,use_parallel,[batch(i)+1 batch(i+1)],active_id,ret_id);
+        updated_patch=out.updated_patch;
+        for mpatch=1:numel(updated_patch)
+            if updated_patch(mpatch)
+                if n_update(mpatch)==0
+                    b{mpatch}=out.b{mpatch};
+                    f{mpatch}=out.f{mpatch};
+                    b0{mpatch}=out.b0{mpatch};
+                    W{mpatch}=out.W{mpatch};
+                else
+                    b{mpatch}=b{mpatch}+out.b{mpatch};
+                    f{mpatch}=cat(2,f{mpatch},out.f{mpatch});
+                    b0{mpatch}=min(cat(3,b0{mpatch},out.b0{mpatch}),[],3);
+                    W{mpatch}=W{mpatch}+out.W{mpatch};
+                end
+                n_update(mpatch)=n_update(mpatch)+1;
+            end
+        end
+    end
+    for mpatch=1:numel(n_update)
+        if n_update(mpatch)>0
+            b{mpatch}=b{mpatch}./n_update(mpatch);
+            f{mpatch}=f{mpatch}./n_update(mpatch);
+            W{mpatch}=W{mpatch}./n_update(mpatch);
+        else
+            b{mpatch}=obj.b{mpatch};
+            f{mpatch}=obj.f{mpatch};
+            b0{mpatch}=obj.b0{mpatch};
+            W{mpatch}=obj.W{mpatch};
+        end
+    end
+    obj.b=b;
+    obj.f=f;
+    obj.b0=b0;
+    obj.b0_new=obj.reconstruct_b0();
+    obj.W=W;
+    obj.C_prev=obj.C;
+    return;
+end
 
 b=cellfun(@(x) x.*0,obj.b,'UniformOutput',false);
 f=cellfun(@(x) x.*0,obj.f,'UniformOutput',false);
@@ -35,8 +88,6 @@ b0=cellfun(@(x) abs(x*inf),obj.b0,'UniformOutput',false);
 W=cellfun(@(x) x.*0,obj.W,'UniformOutput',false);
 
 b0_new=inf(size(obj.b0_new,1),size(obj.b0_new,2));
-div=length(batch)-1;
-fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
 for i=progress(1:div)
     out=update_bg_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
     if i==1
@@ -65,7 +116,7 @@ obj.W=W;
 obj.C_prev=obj.C;
 
 end
-function out=update_bg_in(in,use_parallel,f_range)
+function out=update_bg_in(in,use_parallel,f_range,active_id,ret_id)
 %% update the background related variables in CNMF framework
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -115,6 +166,14 @@ thresh_outlier = obj.options.thresh_outlier;
 if ~exist('use_parallel', 'var')||isempty(use_parallel)
     use_parallel = true; %don't save initialization procedure
 end
+K = size(obj.A, 2);
+if ~exist('ret_id','var') || isempty(ret_id)
+    ret_id=[];
+end
+if ~exist('active_id','var') || isempty(active_id)
+    active_id=1:K;
+end
+ret_mode=~isempty(ret_id);
 
 % options
 options = obj.options;
@@ -126,12 +185,15 @@ with_projection = options.bg_acceleration;
 % previous estimation
 A = cell(nr_patch, nc_patch);
 C = cell(nr_patch, nc_patch);
+A_ret = cell(nr_patch, nc_patch);
+C_ret = cell(nr_patch, nc_patch);
 sn = cell(nr_patch, nc_patch);
 W = obj.W;
 b0 = obj.b0;
 b = obj.b;
 f = obj.f;
 RSS = cell(nr_patch, nc_patch);
+updated_patch = true(nr_patch, nc_patch);
 
 %% check whether the bg_ssub was changed
 if strcmpi(bg_model, 'ring')
@@ -193,6 +255,13 @@ for mpatch=1:(nr_patch*nc_patch)
     mask(tmp_block(1):tmp_block(2), tmp_block(3):tmp_block(4)) = 1;
 
     ind = (reshape(mask(:), 1, [])* obj.A>0);
+    if ret_mode
+        ind_ret = find(ind);
+        ind_ret = intersect(ind_ret, ret_id, 'stable');
+        A_ret{mpatch}=obj.A(logical(mask), ind_ret);
+        C_ret{mpatch}=obj.C(ind_ret, f_range(1):f_range(2));
+        ind = and(ind, ismember(1:K, active_id));
+    end
     A{mpatch}= obj.A(logical(mask), ind);
     C{mpatch} = obj.C(ind, f_range(1):f_range(2));
     temp = obj.P.sn(logical(mask));
@@ -213,7 +282,7 @@ else
 end
 
 if use_parallel
-    parfor mpatch=1:(nr_patch*nc_patch) %% removed par for debuging
+    for mpatch=1:(nr_patch*nc_patch)  %this is parfor
         %         if flag_ignore{mpatch}
         %             continue;
         %         end
@@ -223,10 +292,14 @@ if use_parallel
         A_block = A{mpatch};
         sn_block = sn{mpatch};
         C_block = C{mpatch};
+        A_ret_block = A_ret{mpatch};
+        C_ret_block = C_ret{mpatch};
+        updated_patch(mpatch)=true;
 
         % stop updating B because A&C doesn't change in this area
         if isempty(A_block) && (~flag_first)
             [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
+            updated_patch(mpatch)=false;
 
             % keep the current results. this step looks rediculous, but it
             % is needed for some computer/matlab. very weird.
@@ -250,6 +323,9 @@ if use_parallel
             % get the previous estimation
             W_old = W{mpatch};
             Ypatch = reshape(Ypatch, [], T);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = single(Ypatch) - A_ret_block*C_ret_block;
+            end
 
             % run regression to get A, C, and W, b0
             if bg_ssub==1
@@ -271,11 +347,17 @@ if use_parallel
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = Ypatch - A_ret_block*C_ret_block;
+            end
             [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
         else
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = Ypatch - A_ret_block*C_ret_block;
+            end
             [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
         end
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
@@ -289,10 +371,14 @@ else
         A_block = A{mpatch};
         sn_block = sn{mpatch};
         C_block = C{mpatch};
+        A_ret_block = A_ret{mpatch};
+        C_ret_block = C_ret{mpatch};
+        updated_patch(mpatch)=true;
 
         % stop the updating B because A&C doesn't change in this area
         if isempty(A_block) && (~flag_first)
             [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
+            updated_patch(mpatch)=false;
             continue;
         end
 
@@ -308,6 +394,9 @@ else
             % get the previous estimation
             W_old = W{mpatch};
             Ypatch = reshape(Ypatch, [], T_block);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = Ypatch - A_ret_block*C_ret_block;
+            end
 
             % run regression to get A, C, and W, b0
             if bg_ssub==1
@@ -329,12 +418,18 @@ else
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = Ypatch - A_ret_block*C_ret_block;
+            end
             sn_patch = sn_block(ind_patch);
             [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
         else
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
+            if ret_mode && ~isempty(A_ret_block)
+                Ypatch = Ypatch - A_ret_block*C_ret_block;
+            end
             sn_patch = sn_block(ind_patch);
             [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_patch, ind_patch);
         end
@@ -346,6 +441,7 @@ out.b = b;
 out.f = f;
 out.b0 = b0;
 out.W = W;
+out.updated_patch = updated_patch;
 obj.W=W;
 obj.b=b;
 obj.b0=b0;

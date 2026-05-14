@@ -1,4 +1,4 @@
-function dis=dissimilarity_previous(A1,A2,C1,C2)
+function [dis,sims]=dissimilarity_previous(A1,A2,C1,C2)
 %% dissimilarity_previous: Computes the dissimilarity between spatial and temporal components.
 %
 % Inputs:
@@ -39,7 +39,8 @@ s(isnan(s))=0;
 ind = sub2ind([size(s,1) size(s,2)],M(:,1),M(:,2));
 
 %  dis=1-mean([sC(ind);zeros(length(ixz),1)]);
-dis=1-mean(sC(ind));
+sims=sC(ind);
+dis=1-mean(sims);
 
 end
 

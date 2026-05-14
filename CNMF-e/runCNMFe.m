@@ -72,20 +72,23 @@ save_workspace(neuron);
 cprintf('*blue','----------------Beginning neuron refinement with CMNF----------------\n');
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
+ret_id=[];
 for loop=1:10
     % estimate the background components
-    neuron=CNMF_CaliAli_update('Background',neuron);
-    neuron=CNMF_CaliAli_update('Spatial',neuron);
-    neuron=CNMF_CaliAli_update('Temporal',neuron);
+    neuron=CNMF_CaliAli_update('Background',neuron,ret_id);
+    neuron=CNMF_CaliAli_update('Spatial',neuron,ret_id);
+    neuron=CNMF_CaliAli_update('Temporal',neuron,ret_id);
     %% post-process the results automatically
     neuron.remove_false_positives();
     neuron.merge_neurons_dist_corr(neuron.show_merge);
     neuron.merge_high_corr(neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_spatial);
     neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
 
-    dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+    [dis,sim_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
-
+    if neuron.retreat_neurons
+        ret_id=sim_scores>0.95;
+    end
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
 

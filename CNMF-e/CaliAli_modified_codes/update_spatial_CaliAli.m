@@ -1,4 +1,4 @@
-function obj=update_spatial_CaliAli(obj, use_parallel,F)
+function obj=update_spatial_CaliAli(obj, use_parallel,ret_id,F)
 %% update_spatial_CaliAli - Updates the spatial components of extracted neuronal signals.
 %
 % This function refines the spatial footprints of detected neurons by processing
@@ -28,20 +28,37 @@ fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
     F=get_batch_size(obj);
 end
+if ~exist('ret_id','var')
+    ret_id=[];
+end
+[ret_id, active_id]=normalize_retired_ids(obj, ret_id);
+if ~isempty(ret_id) && isempty(active_id)
+    fprintf('All neurons are retired. Spatial update skipped.\n');
+    return;
+end
 batch=[0,cumsum(F)];
 A=sparse(zeros(size(obj.A)));
 div=length(batch)-1;
 obj.A_prev=obj.A;
-Ca=0;
+Ca=zeros(size(obj.A,2),1);
 for i=progress(1:div)
-    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
+    out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)],[],active_id,ret_id);
     sc=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
     sc=sc.^2;
     Ca=Ca+sc;
     A=sparse(A+out_A.*sc');
 end
-A=A./Ca';
-obj.A=sparse(A);
+if isempty(ret_id)
+    A=A./Ca';
+    obj.A=sparse(A);
+else
+    A_new=obj.A;
+    ind_valid=active_id(Ca(active_id)>0);
+    if ~isempty(ind_valid)
+        A_new(:,ind_valid)=A(:,ind_valid)./Ca(ind_valid)';
+    end
+    obj.A=sparse(A_new);
+end
 %% upadte b0
 if strcmpi(obj.options.background_model, 'ring')
     obj.b0_new = obj.P.Ymean{1,1}-obj.reshape(obj.A*mean(obj.C,2), 2); %-obj.reconstruct();
@@ -50,7 +67,7 @@ end
 end
 
 
-function out_A=update_spatial_in(neuron, use_parallel,max_frame,update_sn)
+function out_A=update_spatial_in(neuron, use_parallel,max_frame,update_sn,active_id,ret_id)
 %% update the the spatial components for all neurons
 % input:
 %   use_parallel: boolean, do initialization in patch mode or not.
@@ -106,6 +123,14 @@ end
 if ~exist('update_sn', 'var')||isempty(update_sn)
     update_sn = false; %don't save initialization procedure
 end
+K = size(neuron.A, 2);
+if ~exist('ret_id','var') || isempty(ret_id)
+    ret_id=[];
+end
+if ~exist('active_id','var') || isempty(active_id)
+    active_id=1:K;
+end
+ret_mode=~isempty(ret_id);
 % options
 options = neuron.options;
 bg_model = options.background_model;
@@ -127,6 +152,8 @@ end
 %% identify existing neurons within each patch
 A = cell(nr_patch, nc_patch);
 C = cell(nr_patch, nc_patch);
+A_ret = cell(nr_patch, nc_patch);
+C_ret = cell(nr_patch, nc_patch);
 % if strcmpi(bg_model, 'ring')
 A_prev = A;
 C_prev = C;
@@ -144,12 +171,20 @@ for mpatch=1:(nr_patch*nc_patch)
     mask(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4)) = 2;
     % find neurons within the patch
     ind = find(reshape(mask(:)==2, 1, [])* full(double(IND))>0);
+    if ret_mode
+        ind = intersect(ind, active_id, 'stable');
+    end
     A{mpatch}= neuron.A((mask>0), ind);
     IND_search{mpatch} = IND(mask==2, ind);
     sn{mpatch} = neuron.P.sn(mask==2);
     C{mpatch} = neuron.C(ind, max_frame(1):max_frame(2));
     ind_neurons{mpatch} = ind;    % indices of the neurons within each patch
     with_neuron{mpatch} = ~isempty(ind);
+    if ret_mode
+        ind_ret = ret_id((reshape(mask(:)==2, 1, [])*full(double(neuron.A(:,ret_id)>0)))>0);
+        A_ret{mpatch}=neuron.A((mask>0), ind_ret);
+        C_ret{mpatch}=neuron.C(ind_ret, max_frame(1):max_frame(2));
+    end
 
     if strcmpi(bg_model, 'ring')
         ind = find(reshape(mask(:)==1, 1, [])* full(neuron.A_prev)>0);
@@ -189,6 +224,8 @@ if use_parallel
 
         A_patch = A{mpatch};
         C_patch = C{mpatch};                % previous estimation of neural activity
+        A_ret_patch = A_ret{mpatch};
+        C_ret_patch = C_ret{mpatch};
         IND_patch = IND_search{mpatch};
         nr = diff(tmp_patch(1:2)) + 1;
         nc = diff(tmp_patch(3:4)) + 1;
@@ -248,6 +285,9 @@ if use_parallel
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
+        if ret_mode && ~isempty(A_ret_patch)
+            Ypatch = Ypatch - A_ret_patch(ind_patch(:),:)*C_ret_patch;
+        end
 
         % using HALS to update spatial components
         if update_sn
@@ -294,6 +334,8 @@ else
 
         A_patch = A{mpatch};
         C_patch = C{mpatch};                % previous estimation of neural activity
+        A_ret_patch = A_ret{mpatch};
+        C_ret_patch = C_ret{mpatch};
         IND_patch = IND_search{mpatch};
         nr = diff(tmp_patch(1:2)) + 1;
         nc = diff(tmp_patch(3:4)) + 1;
@@ -348,6 +390,9 @@ else
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
+        if ret_mode && ~isempty(A_ret_patch)
+            Ypatch = Ypatch - A_ret_patch(ind_patch(:),:)*C_ret_patch;
+        end
 
         % using HALS to update spatial components
         if update_sn
@@ -397,7 +442,11 @@ if update_sn
     neuron.P.sn = cell2mat(sn_new);
 end
 %% post-process results
-out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2));
+if ret_mode
+    out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2), active_id);
+else
+    out_A = neuron.post_process_spatial(neuron.reshape(A_new, 2));
+end
 % obj.A = A_new;
 
 %% save the results to log

@@ -125,6 +125,7 @@ Names = [
     'PNRr               '  
     'ind                '
     'CaliAli_options    '
+    'retreat_neurons    '
     'pars_envs          '
     'show_merge         '
     'merge_thr_spatial  '
@@ -325,6 +326,7 @@ Values = [
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV
+    {false}  %PV
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV

@@ -1,7 +1,7 @@
 function Mov=play_movie(neuron,batch_num)
 if nargin<2, batch_num=1; end
 d1=neuron.options.d1; d2=neuron.options.d2;
-fn=[0,1000];
+fn=[0,min(1000,neuron.frame_range(2))];
 Y = single(neuron.load_patch_data([],[fn(batch_num)+1,fn(batch_num+1)]));
 if ~ismatrix(Y), Y=reshape(Y,[],size(Y,3)); end
 Y(isnan(Y))=0;

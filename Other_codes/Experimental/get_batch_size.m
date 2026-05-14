@@ -1,4 +1,4 @@
-function F=get_batch_size(neuron)
+function [F,chunk]=get_batch_size(neuron)
 
 F=neuron.CaliAli_options.inter_session_alignment.F;
 

@@ -1,91 +1,46 @@
-function obj=update_temporal_CaliAli(obj, use_parallel,ret_id,F)
+function neuron=update_temporal_CaliAli_targeted(neuron, use_parallel)
 %% update_temporal_CaliAli - Updates the temporal components of extracted neuronal signals.
-%
-% This function refines the temporal dynamics of detected neuronal components
-% by processing the data in multiple batches. It updates the neuronal activity
-% traces while accounting for residual background activity, ensuring robust
-% deconvolution and denoising.
-%
-% Inputs:
-%   - obj: CNMF object containing spatial and temporal components.
-%   - use_parallel: Boolean flag for enabling parallel processing.
-%   - F (optional): Array specifying batch sizes for processing. If not provided,
-%     it is determined using get_batch_size(obj).
-%
-% Outputs:
-%   - obj: Updated CNMF object with refined temporal components.
-%
-% Features:
-%   - Supports batch processing to handle large datasets efficiently.
-%   - Utilizes Hierarchical Alternating Least Squares (HALS) for optimization.
-%   - Performs optional deconvolution and denoising of calcium traces.
-%   - Handles various CNMF-E background models (`ring`, `nmf`, `svd`).
-%
-% Notes:
-%   - Running this function is **essential** after modifying the spatial or
-%     residual components to maintain consistency in CNMF iterations.
-%   - If this function is run, **temporal traces will be altered**, and further
-%     CNMF iterations must be performed using update_temporal_CaliAli.
-%
-% Usage:
-%   neuron = update_temporal_CaliAli(neuron, true);
-%   neuron = update_temporal_CaliAli(neuron, false, batch_frames);
-%
-% Author: Pablo Vergara
-% Contact: pablo.vergara.g@ug.uchile.cl
-% Date: 2025
 
 
-fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
-if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj);
-end
-if ~exist('ret_id','var')
-    ret_id=[];
-end
-[ret_id, active_id]=normalize_retired_ids(obj, ret_id);
-if ~isempty(ret_id) && isempty(active_id)
-    fprintf('All neurons are retired. Temporal update skipped.\n');
-    return;
-end
-batch=[0,cumsum(F)];
-if isempty(ret_id)
-    C_raw=[];
-else
-    C_raw=obj.C_raw;
-    if isempty(C_raw) || size(C_raw,1)~=size(obj.A,2)
-        C_raw=zeros(size(obj.C));
-    end
-end
+fprintf('\n-----------------PROPAGATING COMPONENTS---------------------------\n');
+[~,chunk]=get_batch_size(neuron);
+F=neuron.CaliAli_options.inter_session_alignment.F;  % for debugging
+F=cumsum(F);
+miss_F=find(isnan(sum(neuron.C_raw,1)),1)-1;
+batch=[linspace(0,miss_F,round((miss_F)/chunk)+1),...
+    linspace(miss_F+1,F(end),round((F(end)-(miss_F))/chunk)+1)];
+
+
+miss_B=find(batch>miss_F,1)-1;
 
 div=length(batch)-1;
-for i=progress(1:div)
-    frame_idx=batch(i)+1:batch(i+1);
-    C_raw_temp =update_temporal_in(obj,use_parallel,[frame_idx(1) frame_idx(end)],i,[],active_id,ret_id);
-    if isempty(ret_id)
-        C_raw=catpad(2,C_raw,C_raw_temp);
-    else
-        C_raw(active_id,frame_idx)=C_raw_temp(active_id,:);
-    end
+if div>1
+    C_raw=neuron.C_raw(:,1:miss_F);
+    C=neuron.C_raw(:,1:miss_F);
+    S=neuron.C_raw(:,1:miss_F);
+else
+    C_raw=[];
+    C=[];
+    S=[];
 end
-obj.C_raw=C_raw;
+for i=progress(miss_B:div)
+    frame_idx=batch(i)+1:batch(i+1);
+    c_raw =update_temporal_in(neuron,use_parallel,[frame_idx(1) frame_idx(end)],i,[]);
+    C_raw=[C_raw,c_raw];
+
+    parfor k = 1:size(c_raw, 1)
+        [c(k,:), s(k,:), ~] = deconvolveCa(c_raw(k,:), neuron.options.deconv_options);
+    end
+    C=[C,c];
+    S=[S,s];
+
+end
+neuron.C_raw=C_raw;
+neuron.C=C;
+neuron.S=sparse(S);
 
 fprintf('Deconvolve and denoise all temporal traces again...\n');
-if obj.options.deconv_flag
-    if isempty(ret_id)
-        obj.C = obj.deconvTemporal();
-    else
-        obj.C = obj.deconvTemporal([], [], active_id);
-    end
-else
-    if isempty(ret_id)
-        obj.C_raw = bsxfun(@minus, obj.C_raw, min(obj.C_raw,[],2));
-        obj.C = obj.C_raw;
-    else
-        obj.C_raw(active_id,:) = bsxfun(@minus, obj.C_raw(active_id,:), min(obj.C_raw(active_id,:),[],2));
-        obj.C(active_id,:) = obj.C_raw(active_id,:);
-    end
-end
+
 fprintf('Done!\n');
 
 end
@@ -108,9 +63,6 @@ try
     mat_data = obj.P.mat_data;
 
     % folders and files for saving the results
-    log_file =  obj.P.log_file;
-    flog = fopen(log_file, 'a');
-    log_data = matfile(obj.P.log_data, 'Writable', true); %#ok<NASGU>
 
     % dimension of data
     dims = mat_data.dims;
@@ -222,7 +174,7 @@ else
     deconv_options = [];
 end
 if use_parallel
-    parfor mpatch=1:(nr_patch*nc_patch) % parfor
+    for mpatch=1:(nr_patch*nc_patch) %
         % no neurons within the patch
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location
@@ -283,13 +235,11 @@ if use_parallel
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_patch = f{mpatch};
-            f_nmf = f_patch(max_frame(1):max_frame(2));
+            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_patch = f{mpatch};
-            f_svd = f_patch(max_frame(1):max_frame(2));
+            f_svd = f{mpatch}(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
@@ -367,13 +317,11 @@ else
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_patch = f{mpatch};
-            f_nmf = f_patch(max_frame(1):max_frame(2));
+            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_patch = f{mpatch};
-            f_svd = f_patch(max_frame(1):max_frame(2));
+            f_svd = f{mpatch}(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
@@ -414,7 +362,7 @@ C_raw = bsxfun(@times, C_new, 1./aa);
 %% upadte b0
 if strcmpi(bg_model, 'ring')
     % fprintf('Update the constant baselines for all pixels..\n');
-    obj.b0_new = obj.P.Ymean{idx}-obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
+    obj.b0_new = obj.P.Ymean{1, 1} -obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
     % fprintf('Done!\n');
 end
 
@@ -433,7 +381,6 @@ if obj.options.save_intermediate
     eval(sprintf('log_data.temporal_%s = temporal;', tmp_str));
     % fprintf(flog, '\tThe results were saved as intermediate_results.temporal_%s\n\n', tmp_str);
 end
-fclose(flog);
 end
 
 function [aa, C_raw] = fast_temporal(Y, A)
@@ -466,6 +413,7 @@ aa(ind) = 0;
 %     aa(ind) = sum(tmp_A.^2, 1);
 % end
 end
+
 
 
 

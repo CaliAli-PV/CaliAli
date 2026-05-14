@@ -66,6 +66,7 @@ classdef Sources2D < handle
         PNRr ;% Modification done by PV
         ind ;% Modification done by PV
         CaliAli_options;% Modification done by PV
+        retreat_neurons;
         pars_envs;
         show_merge;
         merge_thr_spatial;
@@ -880,7 +881,7 @@ classdef Sources2D < handle
         end
 
         %% deconvolve all temporal components
-        C_ = deconvTemporal(obj, use_parallel, method_noise)
+        C_ = deconvTemporal(obj, use_parallel, method_noise, ind_update)
 
         %% decorrelate all tmeporal components
         C_ = decorrTemporal(obj, wd);
@@ -1709,7 +1710,7 @@ classdef Sources2D < handle
         end
 
         %% post process spatial component
-        A_ = post_process_spatial(obj, A_)
+        A_ = post_process_spatial(obj, A_, ind)
 
         %% merge neruons
         [merged_ROIs, newIDs, obj_bk] = merge_high_corr(obj, show_merge, merge_thr);
