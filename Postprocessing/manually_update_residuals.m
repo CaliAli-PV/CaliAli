@@ -58,7 +58,7 @@ seed_all=get_seed(neuron);
 if update_temporal
 neuron=update_temporal_CaliAli(neuron, use_parallel);
 end
-if neuron.retreat_neurons
+if neuron.fast_residual
     ret_id=1:size(neuron.A,2);
 else
     ret_id=[];
@@ -77,8 +77,15 @@ for loop=1:10
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
     [dis,sim_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+    if neuron.retreat_neurons
+        ret_id=sim_scores>0.9;
+        cprintf('-comment','%1.0f stable neurons will be retreated in the next iteration.\n', sum(ret_id));
+        dis=1-mean(sim_scores(~ret_id),'omitmissing');
+        if isnan(dis)
+            dis=0;
+        end
+    end
     cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
-    ret_id=sim_scores>0.95;
     if dis<0.05
         break
     end

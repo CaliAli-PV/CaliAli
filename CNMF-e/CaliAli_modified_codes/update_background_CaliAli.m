@@ -282,7 +282,7 @@ else
 end
 
 if use_parallel
-    for mpatch=1:(nr_patch*nc_patch)  %this is parfor
+    parfor mpatch=1:(nr_patch*nc_patch)  %this is parfor
         %         if flag_ignore{mpatch}
         %             continue;
         %         end

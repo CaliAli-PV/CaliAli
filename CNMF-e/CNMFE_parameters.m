@@ -83,6 +83,9 @@ addParameter(inp, 'bd', 0, @isnumeric);             % number of rows/columns to 
 addParameter(inp, 'use_parallel', true, @islogical);    % use parallel computation for parallel computing
 addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when the background fluctuation is large (usually 1p data)
 addParameter(inp, 'seed_mask', []);  % Used internally
+% -------------------------  General CNMF  -------------------------  %
+addParameter(inp, 'retreat_neurons', false);  % Retire stable neurons from CNMF iterations
+addParameter(inp, 'fast_residual', true);  % Retire stable neurons from CNMF iterations
 
 %% Parse Inputs
 varargin=varargin{:};

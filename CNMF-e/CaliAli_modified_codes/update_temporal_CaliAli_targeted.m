@@ -174,7 +174,7 @@ else
     deconv_options = [];
 end
 if use_parallel
-    for mpatch=1:(nr_patch*nc_patch) %
+    parfor mpatch=1:(nr_patch*nc_patch) %
         % no neurons within the patch
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
         tmp_patch = patch_pos{mpatch};     %[r0, r1, c0, c1], patch location

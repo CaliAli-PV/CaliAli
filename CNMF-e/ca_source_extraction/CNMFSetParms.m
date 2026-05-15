@@ -126,6 +126,7 @@ Names = [
     'ind                '
     'CaliAli_options    '
     'retreat_neurons    '
+    'fast_residual      '
     'pars_envs          '
     'show_merge         '
     'merge_thr_spatial  '
@@ -327,6 +328,7 @@ Values = [
     {[]}  %PV
     {[]}  %PV
     {false}  %PV
+    {true}  %PV
     {[]}  %PV
     {[]}  %PV
     {[]}  %PV

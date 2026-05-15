@@ -41,6 +41,14 @@ if isempty(CaliAli_options.inter_session_alignment.input_files)
     CaliAli_options.inter_session_alignment.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
+incremental_mode = detect_incremental_alignment_mode(CaliAli_options.inter_session_alignment.input_files);
+if incremental_mode.is_incremental
+    cprintf('*blue*', 'Aligned tag detected in input files.\n');
+    cprintf('blue', 'Files will be analyzed in incremental mode.\n');
+    CaliAli_options = run_incremental_alignment(CaliAli_options, incremental_mode);
+    return
+end
+
 % Record input frame counts prior to detrending for later verification
 CaliAli_options = record_input_frame_counts(CaliAli_options);
 

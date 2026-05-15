@@ -67,6 +67,7 @@ classdef Sources2D < handle
         ind ;% Modification done by PV
         CaliAli_options;% Modification done by PV
         retreat_neurons;
+        fast_residual; %retreat neurons before updating residual
         pars_envs;
         show_merge;
         merge_thr_spatial;
