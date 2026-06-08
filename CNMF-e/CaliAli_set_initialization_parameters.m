@@ -1,4 +1,4 @@
-function CaliAli_set_initialization_parameters(CaliAli_options)
+function CaliAli_set_initialization_parameters(in)
 %% CaliAli_set_initialization_parameters: Set initialization parameters for CNMF-E processing.
 %
 % Inputs:
