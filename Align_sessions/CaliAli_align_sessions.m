@@ -110,6 +110,8 @@ if isempty(files)
     CaliAli_options.inter_session_alignment.input_file_labels = {};
     return
 end
+src_paths = cellfun(@(f) resolve_source_file(f), files, 'UniformOutput', false);
+remove_corrupted_output(src_paths);
 num_sessions = max(cellfun(@(idx) resolve_session_id(files{idx}, idx), num2cell(1:numel(files))));
 input_F = zeros(num_sessions, 1);
 labels = cell(num_sessions, 1);
