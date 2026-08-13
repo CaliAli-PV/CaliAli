@@ -75,6 +75,7 @@ A_temp=neuron.A;
 C_temp=neuron.C_raw;
 ret_id=[];
 for loop=1:10
+    iteration_tic=tic;
     % estimate the background components
     neuron=CNMF_CaliAli_update('Background',neuron,ret_id);
     neuron=CNMF_CaliAli_update('Spatial',neuron,ret_id);
@@ -85,16 +86,20 @@ for loop=1:10
     neuron.merge_high_corr(neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_spatial);
     neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
 
-    [dis,sim_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+    [dis,similarity_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     if neuron.retreat_neurons
-        ret_id=sim_scores>0.9;
+        % similarity_scores is indexed by current component, so this logical
+        % mask lines up with the components the next iteration will update.
+        ret_id=similarity_scores>0.9;
         cprintf('-comment','%1.0f stable neurons will be retreated in the next iteration.\n', sum(ret_id));
-        dis=1-mean(sim_scores(~ret_id),'omitmissing');
+        dis=1-mean(similarity_scores(~ret_id),'omitmissing');
         if isnan(dis)
             dis=0;
         end
     end
     cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
+    cprintf('-comment','CNMF iteration %1.0f completed in %.2f seconds (%1.0f neurons).\n', ...
+        loop, toc(iteration_tic), size(neuron.A,2));
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
 

@@ -1,4 +1,4 @@
-function neuron=manually_update_residuals(neuron,thr,use_parallel,update_temporal)
+function neuron=manually_update_residuals(neuron,thr,use_parallel,update_temporal,seeds)
 %% manually_update_residuals: Iteratively refines residuals in CNMF-E extracted components.
 %
 % Inputs:
@@ -6,12 +6,20 @@ function neuron=manually_update_residuals(neuron,thr,use_parallel,update_tempora
 %                  temporal (C_raw) components.
 %   use_parallel - Boolean flag to enable parallel computation for speed-up.
 %   thr          - Threshold for countours drawing
+%   update_temporal - Optional. Update temporal components before picking
+%                  residual seeds. Default true.
+%   seeds        - Optional. Linear pixel indices to seed new components from.
+%                  When omitted, seeds are chosen interactively through
+%                  `get_seed`. Supplying them keeps the same refinement but
+%                  removes the need for a graphical session, so the residual
+%                  update can run unattended over a batch of recordings.
 %
 % Outputs:
 %   neuron       - Updated neuron structure with refined residuals.
 %
 % Usage:
 %   neuron = manually_update_residuals(neuron, true);
+%   neuron = manually_update_residuals(neuron, 0.6, 1, false, seed_indices);
 %
 % Description:
 %   - This function iteratively refines residuals in CNMF-E extracted components
@@ -50,11 +58,15 @@ function neuron=manually_update_residuals(neuron,thr,use_parallel,update_tempora
 % Date: 2025
 
 if ~exist('update_temporal','var')||isempty(update_temporal)
-    update_temporal=True;
+    update_temporal=true;
 end
 
 neuron.Coor=neuron.get_contours(thr);
-seed_all=get_seed(neuron);
+if ~exist('seeds','var')||isempty(seeds)
+    seed_all=get_seed(neuron);
+else
+    seed_all=seeds(:);
+end
 if update_temporal
 neuron=update_temporal_CaliAli(neuron, use_parallel);
 end
@@ -74,18 +86,22 @@ for loop=1:10
     neuron=update_background_CaliAli(neuron, use_parallel,ret_id);
     neuron=update_spatial_CaliAli(neuron, use_parallel,ret_id);
     neuron=update_temporal_CaliAli(neuron, use_parallel,ret_id);
-    A_temp=neuron.A;
-    C_temp=neuron.C_raw;
-    [dis,sim_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
+    % Compare against the components as they were before this iteration, then
+    % snapshot them for the next one.
+    [dis,similarity_scores]=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     if neuron.retreat_neurons
-        ret_id=sim_scores>0.9;
+        % similarity_scores is indexed by current component, so this logical
+        % mask lines up with the components the next iteration will update.
+        ret_id=similarity_scores>0.9;
         cprintf('-comment','%1.0f stable neurons will be retreated in the next iteration.\n', sum(ret_id));
-        dis=1-mean(sim_scores(~ret_id),'omitmissing');
+        dis=1-mean(similarity_scores(~ret_id),'omitmissing');
         if isnan(dis)
             dis=0;
         end
     end
     cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
+    A_temp=neuron.A;
+    C_temp=neuron.C_raw;
     if dis<0.05
         break
     end
