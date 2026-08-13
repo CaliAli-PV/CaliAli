@@ -9,7 +9,14 @@ CLAUDE.md
 .vs/
 .vscode/
 .cache/
+
+# Local AI-assistant tooling: never part of the released pipeline
 .claude/
+.claude.json
+.claude.json.backup
+CLAUDE.local.md
+.mcp.json
+
 Other_codes/Utilities/.DS_Store
 Other_codes/.DS_Store
 Motion_Correction/.DS_Store
