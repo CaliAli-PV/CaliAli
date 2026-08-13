@@ -7,42 +7,120 @@ fprintf('\n-----------------PROPAGATING COMPONENTS---------------------------\n'
 F=neuron.CaliAli_options.inter_session_alignment.F;  % for debugging
 F=cumsum(F);
 miss_F=find(isnan(sum(neuron.C_raw,1)),1)-1;
-batch=[linspace(0,miss_F,round((miss_F)/chunk)+1),...
-    linspace(miss_F+1,F(end),round((F(end)-(miss_F))/chunk)+1)];
+if isempty(miss_F)
+    % No frames are marked as missing, so there is no history to retain.
+    % Recomputing everything is the safe reading; assuming the opposite would
+    % silently compute nothing.
+    miss_F=0;
+end
 
+% Batch edges must be integers, and the two segments must JOIN rather than
+% overlap. Building them with a bare linspace produced fractional frame indices
+% whenever a range did not divide evenly (linspace(4001,6000,3) gives 5000.5),
+% a one-frame batch at the junction (the old second segment started at
+% miss_F+1, so ...4000 4001... covered a single frame), and dropped frames at
+% every rounding boundary, leaving C_raw shorter than the recording. The chunk
+% size comes from available memory, so which of those fired depended on the
+% machine rather than on the data.
+n_old = max(round(miss_F / chunk), 1);
+n_new = max(round((F(end) - miss_F) / chunk), 1);
+batch = unique([round(linspace(0, miss_F, n_old + 1)), ...
+                round(linspace(miss_F, F(end), n_new + 1))]);
 
 miss_B=find(batch>miss_F,1)-1;
 
 div=length(batch)-1;
-if div>1
+if miss_F>0
+    % Carry the already-processed frames through untouched. Each of these must
+    % come from its own variable: seeding C or S from C_raw would replace the
+    % deconvolved traces and the spike trains of every previously analysed
+    % session with raw traces.
     C_raw=neuron.C_raw(:,1:miss_F);
-    C=neuron.C_raw(:,1:miss_F);
-    S=neuron.C_raw(:,1:miss_F);
+    C=neuron.C(:,1:miss_F);
+    S=neuron.S(:,1:miss_F);
 else
     C_raw=[];
     C=[];
     S=[];
 end
+% Estimate the newly added frames first, and keep them separate from the
+% retained history until they have been put on a common scale (see below).
+C_raw_new=[];
 for i=progress(miss_B:div)
     frame_idx=batch(i)+1:batch(i+1);
     c_raw =update_temporal_in(neuron,use_parallel,[frame_idx(1) frame_idx(end)],i,[]);
-    C_raw=[C_raw,c_raw];
-
-    parfor k = 1:size(c_raw, 1)
-        [c(k,:), s(k,:), ~] = deconvolveCa(c_raw(k,:), neuron.options.deconv_options);
-    end
-    C=[C,c];
-    S=[S,s];
-
+    C_raw_new=[C_raw_new,c_raw];
 end
-neuron.C_raw=C_raw;
-neuron.C=C;
-neuron.S=sparse(S);
+
+% --- Put the new frames on the same scale as the retained ones -------------
+% The retained block comes from a completed extraction, and runCNMFe ends with
+% scale_to_noise, so those traces are expressed in NOISE UNITS (GetSn == 1).
+% The frames estimated just above come straight out of HALS, in native movie
+% units. Concatenating them leaves a scale step at the session boundary inside
+% every trace, and the deconvolution downstream applies an ABSOLUTE amplitude
+% threshold (postprocessDeconvolvedTraces uses 'sn',1 with smin = -5), so the
+% newly added session sits far below its threshold and is zeroed outright.
+% Rescaling by the ratio of noise levels removes the step; it cannot alter the
+% shape of a trace, only its gain, and gain is exactly what was inconsistent.
+if ~isempty(C_raw) && ~isempty(C_raw_new)
+    C_raw_new = C_raw_new .* noise_scale_ratio(C_raw, C_raw_new);
+end
+
+% Deconvolve the new frames once, on the corrected scale, rather than per
+% batch: a per-batch call would re-estimate the baseline and noise from a
+% fragment of the recording.
+c_new = zeros(size(C_raw_new));
+s_new = zeros(size(C_raw_new));
+deconv_options = neuron.options.deconv_options;
+parfor k = 1:size(C_raw_new, 1)
+    [c_new(k,:), s_new(k,:), ~] = deconvolveCa(C_raw_new(k,:), deconv_options);
+end
+
+neuron.C_raw=[C_raw,C_raw_new];
+neuron.C=[C,c_new];
+neuron.S=sparse([S,s_new]);
 
 fprintf('Deconvolve and denoise all temporal traces again...\n');
 
 fprintf('Done!\n');
 
+end
+
+
+function k = noise_scale_ratio(retained, added)
+%% Per-component gain that puts `added` on the noise scale of `retained`.
+% Components that are silent in either block have no usable noise estimate, so
+% they inherit the median ratio of the components that do. Falling back to 1
+% instead would leave those traces on the wrong scale, which is the failure
+% this function exists to prevent.
+K = size(retained, 1);
+k = nan(K, 1);
+for i = 1:K
+    s_old = safe_sn(retained(i,:));
+    s_new = safe_sn(added(i,:));
+    if s_old > 0 && s_new > 0
+        k(i) = s_old / s_new;
+    end
+end
+
+fallback = median(k(isfinite(k)));
+if ~isfinite(fallback) || fallback <= 0
+    fallback = 1;   % no component gave a usable estimate; leave the gain alone
+end
+k(~isfinite(k)) = fallback;
+end
+
+
+function s = safe_sn(x)
+s = 0;
+try
+    s = GetSn(full(x));
+catch
+    s = 0;
+end
+if ~isfinite(s)
+    s = 0;
+end
 end
 
 
