@@ -6,6 +6,18 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             %% email: zhoupc1988@gmail.com
             
             %% process parameters
+            % The ring background indexes C_prev by A_prev's columns, so the two
+            % must describe the same component set. Every background refit
+            % re-syncs them; when the background is only fitted first and last,
+            % merging, false-positive removal and residual seeding change the
+            % component count in between and this function -- which runs after
+            % the loop -- is reached with the pair inconsistent. Same policy as
+            % the guards in update_spatial_CaliAli and update_temporal_CaliAli:
+            % a snapshot of the wrong size is unusable, so refresh both.
+            if isempty(obj.A_prev) || size(obj.A_prev,2)~=size(obj.C_prev,1)
+                obj.A_prev = obj.A;
+                obj.C_prev = obj.C;
+            end
             
             try
                 % map data

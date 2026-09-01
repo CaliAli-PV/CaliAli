@@ -31,6 +31,17 @@ if ~exist('ret_id','var')
 end
 [ret_id, active_id]=normalize_retired_ids(obj, ret_id);
 
+% Every component frozen means there is nothing left to fit the background
+% against, so leave it as it stands. Without this, update_bg_in reads an empty
+% active set as "nothing is frozen": every component then lands in both A_ret
+% and A_block and its signal is removed twice, which corrupts the ring weights
+% (relative error 0.94) and the baseline b0 (off by 20-26 percent) and makes the
+% stage slower rather than faster. update_spatial_CaliAli and
+% update_temporal_CaliAli already return early in this case.
+if ~isempty(ret_id) && isempty(active_id)
+    return;
+end
+
 batch=[0,cumsum(F)];
 div=length(batch)-1;
 fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
@@ -339,7 +350,12 @@ if use_parallel
                 Ypatch = imresize(temp, 1./bg_ssub, 'nearest');
                 Ypatch = reshape(Ypatch, [], T_block);
 
-                [W{mpatch}, ~] = fit_ring_model(Ypatch, [], [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
+                % Pass the active footprints, downsampled to match Ypatch, so
+                % fit_ring_model can skip pixels no active component covers.
+                % C is empty, so no signal is removed here; A is used only to
+                % build that pixel mask. The rows it does fit are unchanged.
+                A_ds = ring_active_support(A_block, nr_block, nc_block, bg_ssub, size(Ypatch,1));
+                [W{mpatch}, ~] = fit_ring_model(Ypatch, A_ds, [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
                 %                 tmp_b0 = imresize(reshape(tmp_b0, size(sn_block)), [nr_block, nc_block]);
                 %                 b0{mpatch} = tmp_b0(ind_patch(:));
             end
@@ -410,7 +426,12 @@ else
                 Ypatch = imresize(temp, 1./bg_ssub, 'nearest');
                 Ypatch = reshape(Ypatch, [], T_block);
 
-                [W{mpatch}, ~] = fit_ring_model(Ypatch, [], [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
+                % Pass the active footprints, downsampled to match Ypatch, so
+                % fit_ring_model can skip pixels no active component covers.
+                % C is empty, so no signal is removed here; A is used only to
+                % build that pixel mask. The rows it does fit are unchanged.
+                A_ds = ring_active_support(A_block, nr_block, nc_block, bg_ssub, size(Ypatch,1));
+                [W{mpatch}, ~] = fit_ring_model(Ypatch, A_ds, [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
                 %                 tmp_b0 = imresize(reshape(tmp_b0, size(sn_block)), [nr_block, nc_block]);
                 %                 b0{mpatch} = tmp_b0(ind_patch(:));
             end

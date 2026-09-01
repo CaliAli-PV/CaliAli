@@ -174,8 +174,16 @@ ind_neurons = cell(nr_patch, nc_patch);
 
 AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
-if isempty(obj.A_prev)
+% The ring background indexes C_prev by A_prev's columns, so the two must
+% describe the same component set. update_background_CaliAli re-syncs them at
+% the end of every refit; when the background is only fitted first and last,
+% that refit is skipped while merging, false-positive removal and residual
+% seeding change the component count underneath. A snapshot of the wrong size
+% is as unusable as an empty one, so both are refreshed the same way.
+if isempty(obj.A_prev) || size(obj.A_prev,2)~=size(obj.A,2) ...
+        || size(obj.C_prev,1)~=size(obj.C,1)
     obj.A_prev=obj.A;
+    obj.C_prev=obj.C;
 end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')

@@ -28,6 +28,15 @@ else
     ind_active = (abs(W_old)*sum(A,2)>0);
 end
 
+% A given without C means the caller has already removed the neural signal from
+% Y and passed A only to say which pixels any active component covers. That
+% mask is now built, so drop A here: subtracting it again would remove the
+% signal twice, and a zero C of full size would be a large useless matrix.
+if isempty(C)
+    A = ones(d, 1);
+    C = zeros(1, T);
+end
+
 if ~exist('sn', 'var') || isempty(sn)
     sn = GetSn(double(Y)); 
 end

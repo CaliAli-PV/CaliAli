@@ -206,6 +206,7 @@ AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
 if isempty(obj.A_prev)
     obj.A_prev=obj.A;
+    obj.C_prev=obj.C;   % keep the pair consistent; the ring background indexes one by the other
 end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')

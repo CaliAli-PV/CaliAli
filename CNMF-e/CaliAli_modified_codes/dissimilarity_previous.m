@@ -1,4 +1,4 @@
-function [dis,similarity_per_component]=dissimilarity_previous(A1,A2,C1,C2)
+function [dis,similarity_per_component,previous_index]=dissimilarity_previous(A1,A2,C1,C2)
 %% dissimilarity_previous: Computes the dissimilarity between spatial and temporal components.
 %
 % Inputs:
@@ -14,6 +14,12 @@ function [dis,similarity_per_component]=dissimilarity_previous(A1,A2,C1,C2)
 %                  appeared in this iteration is never reported as stable.
 %                  The vector is indexed by current component number, which is
 %                  the index space expected by normalize_retired_ids.
+%   previous_index - Column vector, one entry per component of A2/C2, giving
+%                  the index of the component in A1/C1 it was matched to, or
+%                  NaN if unmatched. Merging and false-positive removal
+%                  renumber components between iterations, so any per-component
+%                  state that has to persist across an iteration must be
+%                  carried through this mapping rather than by position.
 %
 % Usage:
 %   dis = dissimilarity_previous(A1, A2, C1, C2);
@@ -58,6 +64,9 @@ dis=1-mean(matched_similarity);
 % similarity of zero.
 similarity_per_component=nan(size(s,2),1);
 similarity_per_component(M(:,2))=matched_similarity;
+
+previous_index=nan(size(s,2),1);
+previous_index(M(:,2))=M(:,1);
 
 end
 
