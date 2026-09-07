@@ -739,8 +739,8 @@
   <h1>CaliAli parameters</h1>
 
 <h3 id="CaliAli_parameters">CaliAli_parameters</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>opt<span class="p">=</span><span class="nf">CaliAli_parameters</span><span class="p">(</span>varargin<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function opt=CaliAli_parameters(varargin)</code></p>
 <h4 id="description">Description</h4>
 <p>CaliAli_parameters: Initialize and configure parameters for CaliAli processing.</p>
 <p>This function initializes and returns a structured set of parameters for different stages of the CaliAli processing pipeline, including downsampling, preprocessing, motion correction, inter-session alignment, and CNMF-E.</p>
@@ -779,10 +779,10 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">opt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">();</span><span class="w">   </span><span class="c">% Default parameter initialization</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">opt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">(</span><span class="n">existing_opt</span><span class="p">);</span><span class="w">   </span><span class="c">% Use existing parameter structure</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">opt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">(</span><span class="s">&#39;sf&#39;</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span><span class="w">   </span><span class="c">% Set sampling frequency to 20 fps.</span>
-</code></pre></div>
+<p><code>matlab
+opt = CaliAli_parameters();   % Default parameter initialization
+opt = CaliAli_parameters(existing_opt);   % Use existing parameter structure
+opt = CaliAli_parameters('sf',20);   % Set sampling frequency to 20 fps.</code></p>
 <h4 id="notes">Notes:</h4>
 <ul>
 <li>Each processing module (downsampling, preprocessing, motion correction, inter-session alignment, and CNMF-E) has its own sub-structure with configurable parameters.</li>

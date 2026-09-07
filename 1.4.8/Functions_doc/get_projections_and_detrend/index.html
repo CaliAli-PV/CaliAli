@@ -739,8 +739,8 @@
   <h1>Get projections and detrend</h1>
 
 <h3 id="get_projections_and_detrend">get_projections_and_detrend</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">[Y, p, R, CaliAli_options] = get_projections_and_detrend</span><span class="p">(</span>Y, CaliAli_options<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options)</code></p>
 <h4 id="description">Description</h4>
 <p>Process session data by detrending and computing projections.</p>
 <p>This function processes video session data by applying detrending, removing background noise, and calculating projections such as blood vessels, neuron activity, peak-to-noise ratio (PNR), and correlation images. Prior to saving, the detrended stack is clipped to <code>uint16</code>; if more than 1% of the pixels saturate the ceiling, a coloured warning appears in the MATLAB console so you can revisit preprocessing settings.</p>
@@ -799,8 +799,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">get_projections_and_detrend</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+[Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options);</code></p>
 
 
 

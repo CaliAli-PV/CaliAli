@@ -739,8 +739,8 @@
   <h1>update background CaliAli</h1>
 
 <h3 id="update_background_CaliAli">update_background_CaliAli</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>obj<span class="p">=</span><span class="nf">update_background_CaliAli</span><span class="p">(</span>obj, use_parallel,F<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function obj=update_background_CaliAli(obj, use_parallel,F)</code></p>
 <h4 id="description">Description</h4>
 <p><code>update_background_CaliAli</code> - Updates background estimation in multiple batches.</p>
 <p>This function refines the background estimation in a CNMF pipeline by processing the data in multiple batches. It ensures efficient memory usage and robust background modeling by iteratively aggregating and normalizing results from each batch. The final background components are used to improve neuronal activity extraction.</p>
@@ -789,8 +789,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">obj</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">update_background_CaliAli</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+obj = update_background_CaliAli(obj, true);</code></p>
 
 
 

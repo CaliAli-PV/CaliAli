@@ -740,8 +740,8 @@
 
 <h3 id="CaliAli_load">CaliAli_load</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>data<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">CaliAli_load</span><span class="p">(</span>filename, varname<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function data = CaliAli_load(filename, varname)</code></p>
 <h4 id="description">Description</h4>
 <p>CaliAli_load: Load a specific variable or all variables from a .mat file.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -784,10 +784,10 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">data</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_load</span><span class="p">(</span><span class="s">&#39;data.mat&#39;</span><span class="p">);</span><span class="w">               </span><span class="c">% Load all variables</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">var</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_load</span><span class="p">(</span><span class="s">&#39;data.mat&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;varname&#39;</span><span class="p">);</span><span class="w">    </span><span class="c">% Load a specific variable</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">elem</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_load</span><span class="p">(</span><span class="s">&#39;data.mat&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;Struct.elem1&#39;</span><span class="p">);</span><span class="w">  </span><span class="c">% Load nested structure element</span>
-</code></pre></div>
+<p><code>matlab
+data = CaliAli_load('data.mat');               % Load all variables
+var  = CaliAli_load('data.mat', 'varname');    % Load a specific variable
+elem = CaliAli_load('data.mat', 'Struct.elem1');  % Load nested structure element</code></p>
 
 
 

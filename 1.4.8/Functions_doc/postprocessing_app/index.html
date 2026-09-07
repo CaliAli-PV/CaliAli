@@ -740,8 +740,8 @@
 
 <h3 id="postprocessing_app">postprocessing_app</h3>
 <h4 id="syntac">Syntac</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>ix<span class="p">=</span><span class="nf">postprocessing_app</span><span class="p">(</span>neuron,thr<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function ix=postprocessing_app(neuron,thr)</code></p>
 <h4 id="description">Description</h4>
 <p>Interactive labeling and classification of CNMF-E components.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -784,8 +784,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">postprocessing_app</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+ix = postprocessing_app(neuron, 0.8);</code></p>
 <p>The post-processing app will display the correlation image with overlaid contours of the detected neurons. Clicking on these contours will show the corresponding extracted calcium transients:</p>
 <p><img alt="select_component_app" src="../../files/select_component_app.gif" /></p>
 <p>You can hold you mouse to zoom:</p>

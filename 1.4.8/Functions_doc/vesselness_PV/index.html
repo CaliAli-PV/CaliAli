@@ -739,8 +739,8 @@
   <h1>vesselness PV</h1>
 
 <h3 id="vesselness_PV">vesselness_PV</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>vid<span class="p">=</span><span class="nf">vesselness_PV</span><span class="p">(</span>vid,use_parallel,sz,norm<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function vid=vesselness_PV(vid,use_parallel,sz,norm)</code></p>
 <h4 id="description">Description</h4>
 <p>This function enhances blood vessels in an input image or video using frangi filtering. It supports both sequential and parallel processing.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -793,9 +793,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">vid_filtered</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">vesselness_PV</span><span class="p">(</span><span class="n">vid</span><span class="p">);</span><span class="w">   </span><span class="c">% Default parameters with parallel processing</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">vid_filtered</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">vesselness_PV</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">:</span><span class="mf">0.5</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">   </span><span class="c">% Sequential processing with normalization</span>
-</code></pre></div>
+<p><code>matlab
+vid_filtered = vesselness_PV(vid);   % Default parameters with parallel processing
+vid_filtered = vesselness_PV(vid, 0, 0.5:0.5:2, 1);   % Sequential processing with normalization</code></p>
 <h4 id="notes">Notes:</h4>
 <ul>
 <li>Uses vesselness filtering to enhance tubular structures in images.</li>

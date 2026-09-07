@@ -739,8 +739,8 @@
   <h1>Manually update residuals</h1>
 
 <h3 id="manually_update_residuals">manually_update_residuals</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>neuron<span class="p">=</span><span class="nf">manually_update_residuals</span><span class="p">(</span>neuron,use_parallel<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function neuron=manually_update_residuals(neuron,use_parallel)</code></p>
 <h4 id="description">Description</h4>
 <p>manually_update_residuals: Iteratively refines residuals in CNMF-E extracted components.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -783,8 +783,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<p class="annotate"><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">neuron</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">manually_update_residuals</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
-</code></pre></div>
+<p class="annotate"><code>matlab
+neuron = manually_update_residuals(neuron, true);</code>
 This will open a GUI displaying the PNR, Corr., and PNR*Corr. images(1). These images will be shown in their original form (top panels) and also after subtracting the current neuron detections from the video (Residual video) (bottom panels).</p>
 <ol>
 <li>Refer to <a href="../../extraction/#gui">Select Extraction Parameters</a> for a description of the PNR, Corr. and PNR*Corr images.</li>

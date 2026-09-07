@@ -776,9 +776,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">r</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">BV_app</span><span class="p">();</span><span class="w">           </span><span class="c">% Use default vessel size range</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">r</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">BV_app</span><span class="p">(</span><span class="mf">0.2</span><span class="p">:</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5</span><span class="p">);</span><span class="w">  </span><span class="c">% Custom range for fine vessel selection</span>
-</code></pre></div>
+<p><code>matlab
+r = BV_app();           % Use default vessel size range
+r = BV_app(0.2:0.1:5);  % Custom range for fine vessel selection</code>
 <img alt="BV_app" src="../../files/BV_app.gif" /></p>
 <div class="admonition info">
 <p class="admonition-title">The median frame is used for vessel extraction if motion correction has already been applied.</p>
@@ -797,8 +797,8 @@ The frame used for vessel detection depends on whether the file is motion-correc
 - The panel updates interactively to reflect the vessel masks detected at each size.</p>
 <p>Once satisfied, press <code>Ok!</code> to confirm your selection.<br />
 The selected range will be printed in the MATLAB console:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">The</span><span class="w"> </span><span class="s">chosen</span><span class="w"> </span><span class="s">Blood</span><span class="w"> </span><span class="s">vessels</span><span class="w"> </span><span class="s">sizes</span><span class="w"> </span><span class="s">are</span><span class="w"> </span><span class="s">[0.60,</span><span class="w"> </span><span class="s">2.00]</span>
-</code></pre></div>
+<p><code>matlab
+The chosen Blood vessels sizes are [0.60, 2.00]</code></p>
 <details class="bug" open="open">
 <summary>Bug</summary>
 <p>This function requires <strong>MATLAB R2023b</strong> or later due to its use of the <strong>dual-slider</strong> component in App Designer. This UI feature is not available in earlier versions of MATLAB.</p>

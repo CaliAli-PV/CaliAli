@@ -740,8 +740,8 @@
 
 <h3 id="apply_crop_on_disk_backward_compatibility">apply_crop_on_disk_backward_compatibility</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">apply_crop_on_disk_backward_compatibility</span><span class="p">(</span>file_list<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function apply_crop_on_disk_backward_compatibility(file_list)</code></p>
 <h4 id="description">Description</h4>
 <p><code>apply_crop_on_disk_backward_compatibility</code> ensures legacy motion-corrected files gain the cropping mask required by the new chunking pipeline. For each input MAT-file it computes the mask (if missing), updates <code>CaliAli_options.motion_correction.Mask</code>, and then calls <code>apply_crop_on_disk</code> so the stored video is cropped consistently.</p>
 <h5 id="function-inputs">Function Inputs</h5>
@@ -768,8 +768,8 @@
 <li>Invoked automatically before detrending/projection calculations to keep historical datasets compatible with the batched workflow.</li>
 </ul>
 <h5 id="example-usage">Example Usage</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">apply_crop_on_disk_backward_compatibility</span><span class="p">(</span><span class="n">opt</span><span class="p">.</span><span class="n">input_files</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+apply_crop_on_disk_backward_compatibility(opt.input_files);</code></p>
 
 
 

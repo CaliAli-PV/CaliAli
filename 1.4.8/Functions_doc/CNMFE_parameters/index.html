@@ -739,8 +739,8 @@
   <h1>CNMFE parameters</h1>
 
 <h3 id="CNMFE_parameters">CNMFE_parameters</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>pars<span class="p">=</span><span class="nf">CNMFE_parameters</span><span class="p">(</span>varargin<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function pars=CNMFE_parameters(varargin)</code></p>
 <h4 id="description">Description</h4>
 <p>CNMFE_parameters: Define and configure parameters for CNMF-E processing.</p>
 <p>This function initializes and returns a structured set of parameters for
@@ -781,9 +781,9 @@ temporal, background, and merging constraints for neuronal extraction.</p>
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">pars</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CNMFE_parameters</span><span class="p">();</span><span class="w">   </span><span class="c">% Default parameter initialization</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">pars</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CNMFE_parameters</span><span class="p">(</span><span class="n">existing_pars</span><span class="p">);</span><span class="w">   </span><span class="c">% Use existing parameter structure</span>
-</code></pre></div>
+<p><code>matlab
+pars = CNMFE_parameters();   % Default parameter initialization
+pars = CNMFE_parameters(existing_pars);   % Use existing parameter structure</code></p>
 
 
 

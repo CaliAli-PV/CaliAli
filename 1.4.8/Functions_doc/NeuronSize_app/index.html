@@ -776,9 +776,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">r</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NeuronSize_app</span><span class="p">();</span><span class="w">          </span><span class="c">% Use default neuron size range</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">r</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NeuronSize_app</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mf">0.5</span><span class="p">:</span><span class="mi">10</span><span class="p">);</span><span class="w">   </span><span class="c">% Custom size range</span>
-</code></pre></div>
+<p><code>matlab
+r = NeuronSize_app();          % Use default neuron size range
+r = NeuronSize_app(1:0.5:10);   % Custom size range</code></p>
 <div class="admonition info">
 <p class="admonition-title">The selected frame is chosen to highlight neuron contrast.</p>
 <ul>
@@ -794,8 +794,8 @@ In the interface:
 - The images update interactively to reflect the enhancement level at each size.</p>
 <p>Once satisfied, press <code>Ok!</code> to confirm your selection.<br />
 The chosen value will be printed in the MATLAB console:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">The</span><span class="w"> </span><span class="s">chosen</span><span class="w"> </span><span class="s">Neuron</span><span class="w"> </span><span class="s">size</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">[2.50]</span>
-</code></pre></div>
+<p><code>matlab
+The chosen Neuron size is [2.50]</code></p>
 <h5 id="internally-the-function-performs-the-following">Internally, the function performs the following:</h5>
 <ul>
 <li>Loads the video using <code>CaliAli_load</code>.</li>

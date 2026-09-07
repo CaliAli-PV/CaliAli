@@ -740,8 +740,8 @@
 
 <h3 id="CaliAli_concatenate_files">CaliAli_concatenate_files</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>out<span class="p">=</span><span class="nf">CaliAli_concatenate_files</span><span class="p">(</span>outpath,inputh,CaliAli_options<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function out=CaliAli_concatenate_files(outpath,inputh,CaliAli_options)</code></p>
 <h4 id="description">Description</h4>
 <p>Concatenate multiple video files into a single file.</p>
 <p>This function merges multiple .mat video files into a single output file. The resulting concatenated video is saved in the specified output path.</p>
@@ -790,9 +790,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_concatenate_files</span><span class="p">();</span><span class="w">   </span><span class="c">% Interactive file selection</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_concatenate_files</span><span class="p">(</span><span class="n">outpath</span><span class="p">,</span><span class="w"> </span><span class="n">inputh</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">);</span><span class="w">   </span><span class="c">% Using predefined parameters</span>
-</code></pre></div>
+<p><code>matlab
+out = CaliAli_concatenate_files();   % Interactive file selection
+out = CaliAli_concatenate_files(outpath, inputh, CaliAli_options);   % Using predefined parameters</code></p>
 
 
 

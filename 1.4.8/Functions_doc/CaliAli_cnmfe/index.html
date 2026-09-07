@@ -740,8 +740,8 @@
 
 <h3 id="CaliAli_cnmfe">CaliAli_cnmfe</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>file_path<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">CaliAli_cnmfe</span><span class="p">(</span>input_files<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function file_path = CaliAli_cnmfe(input_files)</code></p>
 <h4 id="description">Description</h4>
 <p>CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -755,10 +755,10 @@
 <li><code>file_path</code>: Cell array with the processed file paths.</li>
 </ul>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CaliAli_cnmfe</span><span class="p">();</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">file_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_cnmfe</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">out_aligned_sessions</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_cnmfe();</code></p>
+<p><code>matlab
+file_path = CaliAli_cnmfe(CaliAli_options.inter_session_alignment.out_aligned_sessions);</code></p>
 
 
 

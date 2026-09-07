@@ -739,8 +739,8 @@
   <h1>Motion metrics</h1>
 
 <h3 id="motion_metrics">motion_metrics</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>[cY,mY,ng]<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">motion_metrics</span><span class="p">(</span>Y,bnd,batch_size,var_name<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function [cY,mY,ng] = motion_metrics(Y,bnd,batch_size,var_name)</code></p>
 <h4 id="description">Description</h4>
 <p><code>motion_metrics</code>: Compute correlation and gradient metrics for motion assessment.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -803,9 +803,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="n">cY</span><span class="p">,</span><span class="w"> </span><span class="n">mY</span><span class="p">,</span><span class="w"> </span><span class="n">ng</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">motion_metrics</span><span class="p">(</span><span class="n">Y</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">[</span><span class="n">cY</span><span class="p">,</span><span class="w"> </span><span class="n">mY</span><span class="p">,</span><span class="w"> </span><span class="n">ng</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">motion_metrics</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="mi">500</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+[cY, mY, ng] = motion_metrics(Y);
+[cY, mY, ng] = motion_metrics(Y, [10,10,10,10,0,0], 500);</code></p>
 
 
 

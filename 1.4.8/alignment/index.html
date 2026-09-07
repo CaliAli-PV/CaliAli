@@ -797,8 +797,8 @@
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CaliAli_align_sessions</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_align_sessions(CaliAli_options);</code></p>
 <div class="admonition success">
 <p class="admonition-title">Output File</p>
 <p>This step creates one <code>*_Aligned.mat</code> file plus per-session <code>*_det.mat</code> files. For naming and save-location details, see <a href="../FAQ/#output-files">FAQ output naming</a>.</p>
@@ -806,8 +806,8 @@
 </div>
 <div class="tabbed-block">
 <p>If you do not need inter-session alignment, you can still calculate detrended projections for each file:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">detrend_batch_and_calculate_projections</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+detrend_batch_and_calculate_projections(CaliAli_options);</code></p>
 <div class="admonition success">
 <p class="admonition-title">Output File</p>
 <p>This step creates <code>*_det.mat</code> files.</p>
@@ -822,13 +822,13 @@
 <li><strong>Spatial correlation after alignment</strong></li>
 </ol>
 <p>Quick post-alignment check:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;BV Score: %.4f\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">BV_score</span><span class="p">);</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Alignment_metrics</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">alignment_metrics</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">plot_alignment_scores</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">P</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">P</span><span class="p">;</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">frame</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">plot_P</span><span class="p">(</span><span class="n">P</span><span class="p">);</span>
-</code></pre></div>
+<p>```matlab
+fprintf('BV Score: %.4f\n', CaliAli_options.inter_session_alignment.BV_score);
+Alignment_metrics = CaliAli_options.inter_session_alignment.alignment_metrics
+plot_alignment_scores(CaliAli_options)</p>
+<p>P = CaliAli_options.inter_session_alignment.P;
+frame = plot_P(P);
+```</p>
 <p><img alt="BV+Neurons" src="../files/align_demo.gif" /></p>
 <details class="danger" open="open">
 <summary>Important</summary>

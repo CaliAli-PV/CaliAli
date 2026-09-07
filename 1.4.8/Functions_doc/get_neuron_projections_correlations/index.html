@@ -740,8 +740,8 @@
 
 <h3 id="get_neuron_projections_correlations">get_neuron_projections_correlations</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>[out,W]<span class="p">=</span><span class="nf">get_neuron_projections_correlations</span><span class="p">(</span>P,k<span class="p">)</span><span class="w"> </span>
-</code></pre></div>
+<p><code>matlab
+function [out,W]=get_neuron_projections_correlations(P,k)</code></p>
 <h4 id="description">Description</h4>
 <p>Compute correlation metrics for neuron projections.</p>
 <h4 id="inputs">Inputs:</h4>
@@ -789,9 +789,9 @@
 </tbody>
 </table>
 <h4 id="example-usage">Example usage:</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">get_neuron_projections_correlations</span><span class="p">(</span><span class="n">P</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">[</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">get_neuron_projections_correlations</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+[out, W] = get_neuron_projections_correlations(P);
+[out, W] = get_neuron_projections_correlations(P, 2);</code></p>
 <p>Notes:
 - Uses normalized cross-correlation to compare neuron projections across sessions.
 - Computes mean and standard deviation of correlation within a limited region.

@@ -796,10 +796,10 @@
 <hr />
 <h2 id="recommended-setup">Recommended Setup</h2>
 <p>Set <code>batch_sz</code> in your parameter file (<code>CaliAli_demo_parameters.m</code>) and then regenerate options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c">% Edit CaliAli_demo_parameters.m:</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c">% params.batch_sz = &#39;auto&#39;;    % or a numeric frame count</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_demo_parameters</span><span class="p">();</span>
-</code></pre></div>
+<p><code>matlab
+% Edit CaliAli_demo_parameters.m:
+% params.batch_sz = 'auto';    % or a numeric frame count
+CaliAli_options = CaliAli_demo_parameters();</code></p>
 <p>For details on how CaliAli expects parameters to be defined and parsed, see <a href="../Parameters/#parameter-workflow">Recommended Parameter Workflow</a>.</p>
 <p><code>'auto'</code> estimates a chunk size from available memory. If needed, override with a numeric value.</p>
 <p>Select <code>batch_sz</code> based on available system memory and video dimensions. For 512×512 pixel videos:</p>

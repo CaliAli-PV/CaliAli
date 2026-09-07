@@ -740,8 +740,8 @@
 
 <h3 id="create_batch_list">create_batch_list</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">[modified_input_files, F] = create_batch_list</span><span class="p">(</span>input_files, batch_sz, tag<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function [modified_input_files, F] = create_batch_list(input_files, batch_sz, tag)</code></p>
 <h4 id="description">Description</h4>
 <p><code>create_batch_list</code> prepares an input file list for chunk-aware processing. It inspects each session file, computes the number of frames, and emits either the original filename (when no batching is needed) or a cell array describing each chunk. The helper also reports per-session frame counts so downstream code can size outputs correctly. Frame counts are derived straight from file metadata—no data loading is required—and filenames are sorted using natural ordering so numbered segments (e.g. <code>0.avi</code>, <code>10.avi</code>, <code>2.avi</code>) stay in sequence.</p>
 <h5 id="function-inputs">Function Inputs</h5>
@@ -794,16 +794,16 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example Usage</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c">% Split motion-correction inputs into 3000-frame batches.</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">[</span><span class="n">batches</span><span class="p">,</span><span class="w"> </span><span class="n">frames</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">create_batch_list</span><span class="p">(</span><span class="n">opt</span><span class="p">.</span><span class="n">input_files</span><span class="p">,</span><span class="w"> </span><span class="mi">3000</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;_mc&#39;</span><span class="p">);</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c">% Process each returned element with CaliAli_load / CaliAli_save.</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="nb">numel</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">Y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_load</span><span class="p">(</span><span class="n">batches</span><span class="p">{</span><span class="n">k</span><span class="p">},</span><span class="w"> </span><span class="s">&#39;Y&#39;</span><span class="p">);</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="c">% ... process chunk ...</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">CaliAli_save</span><span class="p">(</span><span class="n">batches</span><span class="p">{</span><span class="n">k</span><span class="p">}(:),</span><span class="w"> </span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">);</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">end</span>
-</code></pre></div>
+<p>```matlab
+% Split motion-correction inputs into 3000-frame batches.
+[batches, frames] = create_batch_list(opt.input_files, 3000, '_mc');</p>
+<p>% Process each returned element with CaliAli_load / CaliAli_save.
+for k = 1:numel(batches)
+    Y = CaliAli_load(batches{k}, 'Y');
+    % ... process chunk ...
+    CaliAli_save(batches{k}(:), Y, CaliAli_options);
+end
+```</p>
 
 
 

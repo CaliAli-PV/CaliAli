@@ -853,21 +853,21 @@
 <li><strong>CNMF-E</strong> (Calcium  signal extraction and demixing)</li>
 </ul>
 <p>The parameters utilized by each submodule is determine on a <code>CaliAli_options</code> structure:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>◼<span class="w"> </span><span class="n">CaliAli_options</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├─<span class="w"> </span><span class="n">downsampling</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│<span class="w">  </span>├─<span class="w"> </span><span class="n">BVsize</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│<span class="w">  </span>│<span class="w">  </span><span class="n">Value</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1.5</span><span class="w"> </span><span class="mf">2.25</span><span class="p">]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│<span class="w">  </span>├─<span class="w"> </span><span class="n">file_extension</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│<span class="w">  </span>│<span class="w">  </span><span class="n">Value</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;avi&#39;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│<span class="w">  </span>└─<span class="w"> </span><span class="k">...</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├─<span class="w"> </span><span class="n">preprocessing</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│<span class="w">  </span>├─<span class="w"> </span><span class="n">dendrite_filter_size</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│<span class="w">  </span>│<span class="w">  </span><span class="n">Value</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.5</span><span class="w"> </span><span class="mf">0.6</span><span class="w"> </span><span class="mf">0.7</span><span class="w"> </span><span class="mf">0.8</span><span class="p">]</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│<span class="w">  </span>├─<span class="w"> </span><span class="n">dendrite_theta</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│<span class="w">  </span>│<span class="w">  </span><span class="n">Value</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│<span class="w">  </span>└─<span class="w"> </span><span class="k">...</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>└─<span class="w"> </span><span class="k">...</span>
-</code></pre></div>
+<p><code>matlab
+◼ CaliAli_options
+├─ downsampling
+│  ├─ BVsize
+│  │  Value: [1.5 2.25]
+│  ├─ file_extension
+│  │  Value: 'avi'
+│  └─ ...
+├─ preprocessing
+│  ├─ dendrite_filter_size
+│  │  Value: [0.5 0.6 0.7 0.8]
+│  ├─ dendrite_theta
+│  │  Value: 30
+│  └─ ...
+└─ ...</code></p>
 <p>The default set of parameters can be obtained with <code>CaliAli_demo_parameters();</code> function.</p>
 <hr />
 <h4 id="recommended-parameter-workflow">Recommended Parameter Workflow <a id="parameter-workflow"></a></h4>
@@ -885,22 +885,22 @@
 <li>
 <p><strong>Default Initialization:</strong><br />
        If no inputs are provided, default parameters are loaded:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">();</span>
-</code></pre></div>
+<p><code>matlab
+   CaliAli_options = CaliAli_parameters();</code></p>
 </li>
 <li>
 <p><strong>Custom Parameter Structure:</strong><br />
        Users can provide an existing structure to modify specific parameters:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">param</span><span class="p">.</span><span class="n">sf</span><span class="p">=</span><span class="mi">20</span><span class="w"> </span><span class="c">% custom sample frequency</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">param</span><span class="p">.</span><span class="n">gSig</span><span class="p">=</span><span class="mi">3</span><span class="w">  </span><span class="c">%custom neuron filter size</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">CaliAli_options</span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">(</span><span class="n">param</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+   param.sf=20 % custom sample frequency
+   param.gSig=3  %custom neuron filter size
+   CaliAli_options= CaliAli_parameters(param);</code></p>
 </li>
 <li>
 <p><strong>Custom name-value pairs :</strong><br />
        Users can provide name-value pairs </p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_parameters</span><span class="p">(</span><span class="s">&#39;sf&#39;</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span><span class="w"> </span><span class="c">% set sampling frequency to 20</span>
-</code></pre></div>
+<p><code>matlab
+   CaliAli_options = CaliAli_parameters('sf',20); % set sampling frequency to 20</code></p>
 </li>
 </ol>
 <p>The function <a href="../Functions_doc/CaliAli_demo_parameters/#CaliAli_demo_parameters">CaliAli_demo_parameters()</a> demonstrates how to create this structure. The recommended approach for analyzing your own data is to modify and duplicate this code to suit your needs: <code>open CaliAli_demo_parameters.m</code></p>
@@ -913,8 +913,8 @@
 <li>Blood vessel size: : <code>BVsize</code> which correspond to the size of blood vessels in pixels [min, max]</li>
 </ol>
 <p>Follow the Demo <code>Parameter_selection_demo.mlx</code> to learn how to define these parameters interactively using the <a href="../Functions_doc/BV_app/">BV_app</a> and <a href="../Functions_doc/NeuronSize_app/">NeuronSize_app</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">    </span><span class="n">open</span><span class="w"> </span><span class="s">Parameter_selection_demo.mlx</span>
-</code></pre></div>
+<p><code>matlab 
+    open Parameter_selection_demo.mlx</code></p>
 <p>For advanced users, a detailed description of other parameters and methods for setting them can be found in: <a href="../Parameters_index/">Parameter Index</a></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Next</label></div>
 <div class="tabbed-content">

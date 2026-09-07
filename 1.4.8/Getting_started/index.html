@@ -821,8 +821,8 @@
 <p>First follow the CaliAli installation notes <a href="../Installation/">Installation and System Requirements</a></p>
 <h4 id="caliali-processing-steps-overview">CaliAli Processing Steps Overview <a id="ps"></a></h4>
 <p>This guide is based on <code>Demo_pipeline.mlx</code>. In MATLAB, run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">open</span><span class="w"> </span><span class="n">Demo_pipeline</span><span class="p">.</span><span class="n">mlx</span>
-</code></pre></div>
+<p><code>matlab
+open Demo_pipeline.mlx</code></p>
 <details class="info">
 <summary>How long it takes to process the Demo data?</summary>
 <p>Processing the demo data is expected to take approximately 5 minutes on a standard desktop computer.</p>
@@ -868,14 +868,14 @@
 <details class="question">
 <summary>Can I automate this process without manually selecting files?</summary>
 <p>Yes. If you pass file lists through <code>CaliAli_options</code>, you can run the pipeline without file-selection popups:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_demo_parameters</span><span class="p">();</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_downsample_batch</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">motion_correction</span><span class="p">.</span><span class="n">input_files</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">downsampling</span><span class="p">.</span><span class="n">output_files</span><span class="p">;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_motion_correction</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">input_files</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">motion_correction</span><span class="p">.</span><span class="n">output_files</span><span class="p">;</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_align_sessions</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">File_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_cnmfe</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">.</span><span class="n">inter_session_alignment</span><span class="p">.</span><span class="n">out_aligned_sessions</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_options = CaliAli_demo_parameters();
+CaliAli_options = CaliAli_downsample_batch(CaliAli_options);
+CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;
+CaliAli_options = CaliAli_motion_correction(CaliAli_options);
+CaliAli_options.inter_session_alignment.input_files = CaliAli_options.motion_correction.output_files;
+CaliAli_options = CaliAli_align_sessions(CaliAli_options);
+File_path = CaliAli_cnmfe(CaliAli_options.inter_session_alignment.out_aligned_sessions);</code></p>
 </details>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">We will now navigate into each of the main steps in the CaliAli pipeline</label></div>
 <div class="tabbed-content">

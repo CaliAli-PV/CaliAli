@@ -739,8 +739,8 @@
   <h1>Scale to noise</h1>
 
 <h3 id="scale_to_noise">scale_to_noise</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">scale_to_noise</span><span class="p">(</span>neuron<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function scale_to_noise(neuron)</code></p>
 <h4 id="description">Description</h4>
 <p><code>scale_to_noise</code>: Normalizes raw calcium traces based on estimated noise levels.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -778,8 +778,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">scale_to_noise</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+scale_to_noise(neuron);</code></p>
 <ul>
 <li>This function estimates the noise level by computing the residual between the raw calcium trace (<code>C_raw</code>) and the deconvolved signal.</li>
 <li>A moving window approach is used to handle large datasets.</li>

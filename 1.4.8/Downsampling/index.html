@@ -755,11 +755,11 @@
 <h1 id="downsampling-and-conversion-to-mat-format">Downsampling and Conversion to MAT Format <a id="downsampling"></a></h1>
 <p>The first step is converting raw videos into the <code>.mat</code> format used by CaliAli, with optional spatial and temporal downsampling.</p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_downsample</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_options = CaliAli_downsample(CaliAli_options);</code></p>
 <p>For large videos, use batch downsampling:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_downsample_batch</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_options = CaliAli_downsample_batch(CaliAli_options);</code></p>
 <p><code>CaliAli_downsample_batch()</code> creates the same <code>*_ds.mat</code> output format but processes in chunks, which is usually safer for long recordings. See <a href="../FAQ/#downsample-functions">FAQ</a> for when to use each downsampling function.</p>
 <div class="admonition success">
 <p class="admonition-title">Output File</p>

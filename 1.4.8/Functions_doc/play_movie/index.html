@@ -739,8 +739,8 @@
   <h1>Play movie</h1>
 
 <h3 id="play_movie">play_movie</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>Mov<span class="p">=</span><span class="nf">play_movie</span><span class="p">(</span>neuron,batch_num<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function Mov=play_movie(neuron,batch_num)</code></p>
 <h4 id="description">Description</h4>
 <p><code>play_movie</code> builds and plays a diagnostic movie from a CNMF-E <code>neuron</code> object. It loads a block of frames (default frames 1–1000), reconstructs the denoised signal and background (optionally on GPU), overlays colorized spatial components, and concatenates raw, background, background-subtracted, component, and residual views for side-by-side inspection.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -783,8 +783,8 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Mov</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">play_movie</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span><span class="w">      </span><span class="c">% review first 1000 frames</span>
-</code></pre></div>
+<p><code>matlab
+Mov = play_movie(neuron);      % review first 1000 frames</code></p>
 <h5 id="notes">Notes:</h5>
 <ul>
 <li>Automatically uses GPU computation when a compatible device is available.</li>

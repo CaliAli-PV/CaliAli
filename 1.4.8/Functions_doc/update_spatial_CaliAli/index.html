@@ -739,8 +739,8 @@
   <h1>update spatial CaliAli</h1>
 
 <h3 id="update_spatial_CaliAli">update_spatial_CaliAli</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>obj<span class="p">=</span><span class="nf">update_spatial_CaliAli</span><span class="p">(</span>obj, use_parallel,F<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function obj=update_spatial_CaliAli(obj, use_parallel,F)</code></p>
 <h4 id="description">Description</h4>
 <p><code>update_spatial_CaliAli</code> - Updates the spatial components of extracted neuronal signals.</p>
 <p>This function refines the spatial footprints of detected neurons by processing data in multiple batches. It updates the spatial maps (A) based on activity levels while accounting for spatial variability, ensuring robust separation of overlapping components.</p>
@@ -789,9 +789,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">neuron</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">update_spatial_CaliAli</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">neuron</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">update_spatial_CaliAli</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">batch_frames</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+neuron = update_spatial_CaliAli(neuron, true);
+neuron = update_spatial_CaliAli(neuron, false, batch_frames);</code></p>
 
 
 

@@ -739,8 +739,8 @@
   <h1>postprocessDeconvolvedTraces</h1>
 
 <h3 id="postprocessDeconvolvedTraces">postprocessDeconvolvedTraces</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>neuron<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">postprocessDeconvolvedTraces</span><span class="p">(</span>neuron, method, type, smin<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function neuron = postprocessDeconvolvedTraces(neuron, method, type, smin)</code></p>
 <h4 id="description">Description</h4>
 <p>This function applies deconvolution to calcium traces and performs post-processing to denoise the traces based on specified options. It allows users to change the autoregressive model (<code>ar1</code>, <code>ar2</code>, etc.) at the end of CNMF iterations for refined neuronal activity estimation.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -793,9 +793,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">neuron</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">postprocessDeconvolvedTraces</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">neuron</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">postprocessDeconvolvedTraces</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;thresholded&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;ar1&#39;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">3</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+neuron = postprocessDeconvolvedTraces(neuron);
+neuron = postprocessDeconvolvedTraces(neuron, 'thresholded', 'ar1', -3);</code></p>
 <ul>
 <li>It allows users to change the autoregressive model (<code>ar1</code>, <code>ar2</code>, etc.) at the end of CNMF iterations for refined neuronal activity estimation.</li>
 <li>This is particularly useful if a fast deconvolution method (e.g., <code>foopsi</code>) was used during CNMF iterations, and a more precise but slower thresholded method is desired  for final processing.</li>

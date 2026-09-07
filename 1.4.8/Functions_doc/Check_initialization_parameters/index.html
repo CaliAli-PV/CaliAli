@@ -739,8 +739,8 @@
   <h1>Check initialization parameters</h1>
 
 <h3 id="Check_initialization_parameters">Check_initialization_parameters</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">Check_initialization_parameters</span><span class="p">(</span>CaliAli_options<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function Check_initialization_parameters(CaliAli_options)</code></p>
 <h4 id="description">Description</h4>
 <p><code>Check_initialization_parameters</code> previews how many neurons will be seeded before running CNMF-E. It inspects the stored correlation (<code>Cn</code>) and peak-to-noise (<code>PNR</code>) projections, applies the current <code>min_corr</code>, <code>min_pnr</code>, and <code>seed_mask</code> thresholds, and reports the total count while overlaying the candidate locations on the correlation image. Use this helper after alignment to decide whether initialization parameters need adjustment.</p>
 <h4 id="function-inputs">Function Inputs</h4>
@@ -768,9 +768,9 @@
 <li>Reminds you to re-run <a href="../CaliAli_set_initialization_parameters/#CaliAli_set_initialization_parameters"><code>CaliAli_set_initialization_parameters</code></a> if the count looks too high or too low.</li>
 </ul>
 <h4 id="example-usage">Example Usage</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c">% After running CaliAli_align_sessions, preview initialization density</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Check_initialization_parameters</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+% After running CaliAli_align_sessions, preview initialization density
+Check_initialization_parameters(CaliAli_options);</code></p>
 
 
 

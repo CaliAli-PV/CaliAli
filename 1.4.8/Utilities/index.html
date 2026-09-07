@@ -741,8 +741,8 @@
 <h2 id="separate-data-from-different-sessions">Separate Data from Different Sessions <a id="separate"></a></h2>
 <p>Separates data into sessions based on frame information and optionally bins the data.</p>
 <h3 id="syntax">Syntax:</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">S</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">separate_sessions</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">,</span><span class="w"> </span><span class="n">sf</span><span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+S = separate_sessions(data, F, bin, sf)</code></p>
 <h3 id="description">Description:</h3>
 <p>This function separates data into sessions based on provided frame information (F). If F is not provided, the function prompts the user to select a file containing frame data. The data can be optionally binned using the specified bin size (bin) and sampling frequency (sf).</p>
 <h3 id="inputs">Inputs:</h3>
@@ -765,15 +765,14 @@
 <li><strong><em>S</em></strong>: Cell array containing separated session data.</li>
 </ul>
 <h3 id="example-usage">Example Usage:</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c">% Separate spike data with default bin size and sampling frequency (no binning)</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">S</span><span class="p">=</span><span class="n">separate_sessions</span><span class="p">(</span><span class="n">neuron</span><span class="p">.</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">CaliAli_opt</span><span class="p">.</span><span class="n">F</span><span class="p">);</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c">% Separate spike data with 1s bin considering Sampling frequency of 10.</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">S</span><span class="p">=</span><span class="n">separate_sessions</span><span class="p">(</span><span class="n">neuron</span><span class="p">.</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">CaliAli_opt</span><span class="p">.</span><span class="n">F</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c">% Separate raw Calcim traces data with default bin size and sampling frequency (no binning)</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">S</span><span class="p">=</span><span class="n">separate_sessions</span><span class="p">(</span><span class="n">neuron</span><span class="p">.</span><span class="n">C_raw</span><span class="p">,</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">CaliAli_opt</span><span class="p">.</span><span class="n">F</span><span class="p">);</span>
-</code></pre></div>
+<p>```matlab
+% Separate spike data with default bin size and sampling frequency (no binning)
+S=separate_sessions(neuron.S, neuron.CaliAli_opt.F);</p>
+<p>% Separate spike data with 1s bin considering Sampling frequency of 10.
+S=separate_sessions(neuron.S, neuron.CaliAli_opt.F,1,10);</p>
+<p>% Separate raw Calcim traces data with default bin size and sampling frequency (no binning)
+S=separate_sessions(neuron.C_raw, neuron.CaliAli_opt.F);
+```</p>
 <h2 id="simulate-calcium-imaging-videos">Simulate Calcium Imaging Videos <a id="simulate"></a></h2>
 <p>Use the open-source <a href="https://github.com/vergaloy/Simulate_Ca_Imaging_video">Simulate_Ca_Imaging_video</a> toolbox to generate synthetic datasets that mimic one-photon miniscope recordings. With a single configuration file you can specify:</p>
 <ul>
@@ -785,30 +784,27 @@
 <p>Exported videos share the same layout as CaliAli demo sessions, making them ideal for benchmarking new parameter presets, testing automatic batch sizing, or teaching the workflow without sharing animal data. Refer to the repository README for installation instructions and example scenarios (<code>low_memory</code>, <code>high_density</code>, <code>drift_only</code>, etc.).</p>
 <h2 id="other-functions">Other Functions <a id="of"></a></h2>
 <h3 id="save-workspace">Save Workspace</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">save_workspace</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+save_workspace(neuron);</code></p>
 <h3 id="updating-paths-for-video-and-mat-files">Updating Paths for Video and MAT Files <a id="update_path"></a></h3>
 <p>If you've changed the location of the videos and files generated during the analysis, you'll need to run the following function and select the new 'source_extraction' folder.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w"> </span><span class="n">neuron</span><span class="p">=</span><span class="n">update_folder_path</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">save_workspace</span><span class="p">(</span><span class="n">neuron</span><span class="p">);</span>
-</code></pre></div>
+<p><code>matlab
+ neuron=update_folder_path(neuron);
+save_workspace(neuron);</code></p>
 <h3 id="plot-neuron-contours">Plot Neuron Contours <a id="coor"></a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c">%% To visualize neurons contours:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">neuron</span><span class="p">.</span><span class="n">Coor</span><span class="p">=[]</span><span class="w">  </span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c">%% Plot over PNR image:</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">   </span><span class="n">neuron</span><span class="p">.</span><span class="n">show_contours</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">PNR</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c">%PNR</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c">%% Plot over correlation image:</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">   </span><span class="n">neuron</span><span class="p">.</span><span class="n">show_contours</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">Cn</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c">%CORR</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c">%% Plot over PNR.Corr image:</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="n">neuron</span><span class="p">.</span><span class="n">show_contours</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">Cn</span><span class="o">.*</span><span class="n">neuron</span><span class="p">.</span><span class="n">PNR</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c">%PNR*CORR</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="c">%% Plot over neuron footprints:</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w"> </span><span class="n">A</span><span class="p">=</span><span class="n">neuron</span><span class="p">.</span><span class="n">A</span><span class="p">;</span><span class="n">A</span><span class="p">=</span><span class="nb">full</span><span class="p">(</span><span class="n">A</span><span class="o">./</span><span class="nb">max</span><span class="p">(</span><span class="n">A</span><span class="p">,[],</span><span class="mi">1</span><span class="p">));</span><span class="w"> </span><span class="n">A</span><span class="p">=</span><span class="nb">reshape</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">A</span><span class="p">,[],</span><span class="mi">2</span><span class="p">),[</span><span class="nb">size</span><span class="p">(</span><span class="n">neuron</span><span class="p">.</span><span class="n">Cn</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="nb">size</span><span class="p">(</span><span class="n">neuron</span><span class="p">.</span><span class="n">Cn</span><span class="p">,</span><span class="mi">2</span><span class="p">)]);</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w"> </span><span class="n">neuron</span><span class="p">.</span><span class="n">show_contours</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-</code></pre></div>
+<p>```matlab
+%% To visualize neurons contours:
+neuron.Coor=[]  </p>
+<p>%% Plot over PNR image:
+   neuron.show_contours(0.9, [], neuron.PNR, 0);  %PNR</p>
+<p>%% Plot over correlation image:
+   neuron.show_contours(0.6, [], neuron.Cn,0);   %CORR</p>
+<p>%% Plot over PNR.Corr image:
+  neuron.show_contours(0.6, [], neuron.Cn.<em>neuron.PNR,0); %PNR</em>CORR</p>
+<p>%% Plot over neuron footprints:
+ A=neuron.A;A=full(A./max(A,[],1)); A=reshape(max(A,[],2),[size(neuron.Cn,1),size(neuron.Cn,2)]);
+ neuron.show_contours(0.6, [], A, 0);
+```</p>
 
 
 

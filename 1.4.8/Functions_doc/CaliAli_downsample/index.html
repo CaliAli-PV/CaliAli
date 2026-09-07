@@ -740,8 +740,8 @@
 
 <h3 id="CaliAli_downsample">CaliAli_downsample</h3>
 <h4 id="syntax">Syntax</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span>CaliAli_options<span class="p">=</span><span class="nf">CaliAli_downsample</span><span class="p">(</span>varargin<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function CaliAli_options=CaliAli_downsample(varargin)</code></p>
 <h4 id="description">Description</h4>
 <p>This function performs temporal and spatial downsampling on selected video files. 
 Supported formats include .avi, .m4v, .mp4, .tif, .tiff, .isxd, and .h5.</p>
@@ -780,9 +780,9 @@ Supported formats include .avi, .m4v, .mp4, .tif, .tiff, .isxd, and .h5.</p>
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_downsample</span><span class="p">();</span><span class="w">   </span><span class="c">% Interactive file selection</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">CaliAli_options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CaliAli_downsample</span><span class="p">(</span><span class="n">CaliAli_options</span><span class="p">);</span><span class="w">   </span><span class="c">% Using predefined options</span>
-</code></pre></div>
+<p><code>matlab
+CaliAli_options = CaliAli_downsample();   % Interactive file selection
+CaliAli_options = CaliAli_downsample(CaliAli_options);   % Using predefined options</code></p>
 
 
 

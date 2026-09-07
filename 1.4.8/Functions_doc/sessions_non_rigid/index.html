@@ -739,8 +739,8 @@
   <h1>Sessions non rigid</h1>
 
 <h3 id="sessions_non_rigid">sessions_non_rigid</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">function</span><span class="w"> </span><span class="nf">[P, CaliAli_options] = sessions_non_rigid</span><span class="p">(</span>P, CaliAli_options, neurons_only<span class="p">)</span>
-</code></pre></div>
+<p><code>matlab
+function [P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options, neurons_only)</code></p>
 <h4 id="description">Description</h4>
 <p><code>sessions_non_rigid</code>: Perform non-rigid alignment for session data.</p>
 <h5 id="function-inputs">Function Inputs:</h5>
@@ -793,9 +793,9 @@
 </tbody>
 </table>
 <h5 id="example-usage">Example usage:</h5>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sessions_non_rigid</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">[</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">sessions_non_rigid</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">CaliAli_options</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w">  </span><span class="c">% Align utilizing only neurons projections</span>
-</code></pre></div>
+<p><code>matlab
+[P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options);
+[P, CaliAli_options] = sessions_non_rigid(P, CaliAli_options, true);  % Align utilizing only neurons projections</code></p>
 
 
 
