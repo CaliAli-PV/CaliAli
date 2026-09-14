@@ -4,17 +4,17 @@
     Yes. Use the scripted workflow shown in [Getting Started](Getting_started.md#no-gui-workflow).
 
 <a id="downsample-functions"></a>
-??? Question "What is the difference between `CaliAli_downsample()` and `CaliAli_downsample_batch()`?"
-    `CaliAli_downsample()` is the older, more established implementation.
-    `CaliAli_downsample_batch()` is the newer implementation and is designed to handle both chunked and non-chunked processing automatically.
+??? Question "What happened to `CaliAli_downsample_batch()`?"
 
-    The long-term plan is to use the batch implementation as the default downsampling path. Both functions are currently kept in the codebase while `CaliAli_downsample_batch()` continues to be validated across more datasets.
+    There used to be two downsamplers. `CaliAli_downsample()` loaded a whole
+    recording and cast it to `uint8`, which clipped `uint16` and floating-point
+    data: every value above 254 became 255. `CaliAli_downsample_batch()` read in
+    chunks and preserved the source datatype.
 
-    Practical recommendation:
-
-    1. Prefer `CaliAli_downsample_batch()` (especially for large recordings).
-    2. If you hit unexpected behavior, fall back to `CaliAli_downsample()` and report the issue.
-
+    The clipping version has been removed, and the batch implementation is now
+    `CaliAli_downsample()`. It handles both chunked and non-chunked processing,
+    so there is nothing to choose between. Existing calls to
+    `CaliAli_downsample_batch()` still work and print a deprecation warning.
 
 ??? Question "What if my video sessions are split into multiple video files (common for UCLA recordings)?"
     Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos—select the entire folder instead of individual files.
@@ -29,7 +29,7 @@
     First checks:
 
     1. Confirm downsampling, motion correction, and alignment completed successfully.
-    2. Use the chunked workflow (`CaliAli_downsample_batch`) and set `batch_sz` following [Recommended Parameter Workflow](Parameters.md#parameter-workflow).
+    2. Use `CaliAli_downsample` and set `batch_sz` following [Recommended Parameter Workflow](Parameters.md#parameter-workflow).
     3. Try a smaller numeric `batch_sz`.
     4. Test a shorter subset to isolate which step fails.
 

@@ -11,10 +11,10 @@ CaliAli_options = CaliAli_downsample(CaliAli_options);
 For large videos, use batch downsampling:
 
 ```matlab
-CaliAli_options = CaliAli_downsample_batch(CaliAli_options);
+CaliAli_options = CaliAli_downsample(CaliAli_options);
 ```
 
-`CaliAli_downsample_batch()` creates the same `*_ds.mat` output format but processes in chunks, which is usually safer for long recordings. See [FAQ](FAQ.md#downsample-functions) for when to use each downsampling function.
+`CaliAli_downsample()` reads in chunks, so memory use does not grow with recording length, and preserves the source datatype of the recording.
 
 !!! success "Output File"
     This step creates `*_ds.mat` files. For naming and save-location details, see [FAQ output naming](FAQ.md#output-files).

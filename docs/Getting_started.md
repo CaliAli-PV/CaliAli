@@ -59,7 +59,7 @@ sequenceDiagram
 
 	```matlab
 	CaliAli_options = CaliAli_demo_parameters();
-	CaliAli_options = CaliAli_downsample_batch(CaliAli_options);
+	CaliAli_options = CaliAli_downsample(CaliAli_options);
 	CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;
 	CaliAli_options = CaliAli_motion_correction(CaliAli_options);
 	CaliAli_options.inter_session_alignment.input_files = CaliAli_options.motion_correction.output_files;
