@@ -200,12 +200,15 @@ classdef Sources2D < handle
 
         %% load the patched file into the memory
         function map_data_to_memory(obj)
+            % Cached in mat_data_cache, not in the base workspace. It used to
+            % be created there as mat_data_<hash>, which put several gigabytes
+            % into the user's own workspace and could only be released by
+            % clearing that workspace -- which is not this pipeline's to clear.
             mat_file = obj.P.mat_file;
             if exist(mat_file, 'file')
                 data_nam = sprintf('mat_data_%d', string2hash(mat_file));
-                if isempty(evalin('base', sprintf('whos(''%s'')', data_nam)))
-                    % the data has not been mapped yet
-                    evalin('base', sprintf('%s=load(''%s''); ', data_nam, mat_file));
+                if ~mat_data_cache('has', data_nam)
+                    mat_data_cache('set', data_nam, load(mat_file));
                 end
             end
         end

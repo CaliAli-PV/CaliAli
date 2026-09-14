@@ -58,10 +58,11 @@ cprintf('*Magenta','%1.0f neurons will be initialized.\n', numel(seed_all));
 pause(1) % so users dont miss this message. delete
 neuron.select_data(in);
 neuron.getReady();
-% Clear only the temporaries this pipeline creates. The previous form,
-% clearvars -except parin theFiles, deleted everything else in the user's base
-% workspace as a side effect of running an extraction.
-evalin( 'base', 'clearvars  filePath fileName mat_*' );
+% The base workspace is deliberately left alone. It used to be cleared here,
+% with clearvars -except parin theFiles, because the patched data was cached
+% there and had to be released; the cache now lives in mat_data_cache, so there
+% is nothing of ours in the user's workspace to clear -- and nothing of theirs
+% for us to destroy.
 %% Load parameters stored in .mat file
 
 %% initialize neurons from the video data

@@ -19,15 +19,15 @@ catch
     isOnWorker = false;
 end
 
-%% check whether the mat_data has been loaded into the base space 
+%% is the patched data already held in memory?
 mat_file = mat_data.Properties.Source();
 data_nam = sprintf('mat_data_%d', string2hash(mat_file));
-if isOnWorker || isempty(evalin('base', sprintf('whos(''%s'')', data_nam)))
-    ws = 'caller';   % use the current workspace
-    data_nam = 'mat_data'; % load data from mat file
-    isOnWorker = true; 
+cached = [];
+if isOnWorker || ~mat_data_cache('has', data_nam)
+    % Nothing cached in this process: read the blocks from the file instead.
+    isOnWorker = true;
 else
-    ws = 'base';
+    cached = mat_data_cache('get', data_nam);
 end
 
 dims = mat_data.dims;
@@ -81,8 +81,11 @@ for m=1:nr_block
         if isOnWorker
             Y((r0:r1)-block_rstart, (c0:c1)-block_cstart, :) =  eval(sprintf('mat_data.Y_%d_%d_%d_%d(1:nr, 1:nc, %d:%d);', r0, r1, c0, c1, frame_range(1), frame_range(2)));
         else
-            tmp_str = sprintf('%s.Y_%d_%d_%d_%d(1:%d, 1:%d, %d:%d);', data_nam, r0, r1, c0, c1, nr, nc, frame_range(1), frame_range(2));
-            Y((r0:r1)-block_rstart, (c0:c1)-block_cstart, :) = evalin(ws, tmp_str);
+            % Dynamic field access on the cached struct, in place of building a
+            % string and evaluating it in another workspace.
+            blk_nam = sprintf('Y_%d_%d_%d_%d', r0, r1, c0, c1);
+            Y((r0:r1)-block_rstart, (c0:c1)-block_cstart, :) = ...
+                cached.(blk_nam)(1:nr, 1:nc, frame_range(1):frame_range(2));
         end
     end
 end
