@@ -7,6 +7,10 @@ function CaliAli_align_sessions(varargin)
 #### Description
 This function processes input files, performs inter-session alignment, calculates projections, and saves the transformed data.
 
+For a detailed walk-through of the preprocessing cache, projection calculation,
+alignment stages, integrity checks, and saved outputs, see
+[How `CaliAli_align_sessions` Works](CaliAli_align_sessions_how_it_works.md).
+
 ##### Function Inputs:
 | Parameter Name | Type         | Description                                      |
 |----------------|--------------|--------------------------------------------------|
@@ -23,6 +27,5 @@ This function processes input files, performs inter-session alignment, calculate
 CaliAli_options = CaliAli_demo_parameters();
 CaliAli_align_sessions(CaliAli_options);
 ```
-
 
 

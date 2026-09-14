@@ -1,4 +1,4 @@
-function view_Ca_video()
+function view_Ca_video(V)
 %% view_Ca_video: Interactive visualization of calcium imaging video with playback controls.
 %
 % Inputs:
@@ -11,11 +11,11 @@ function view_Ca_video()
 %   view_Ca_video();
 %
 % Description:
-%   - This function allows users to browse and visualize calcium imaging 
+%   - This function allows users to browse and visualize calcium imaging
 %     videos stored in a .mat file.
 %   - The user is prompted to select a .mat file containing the variable `Y`,
 %     which represents the video frames.
-%   - The function then loads the video and plays it interactively using 
+%   - The function then loads the video and plays it interactively using
 %     the `videofig` function.
 %   - `videofig` provides a figure with a horizontal scrollbar and keyboard
 %     shortcuts for navigation and playback.
@@ -41,13 +41,16 @@ function view_Ca_video()
 %   - Requires `CaliAli_load` to load video data from the selected file.
 %   - Utilizes `videofig` for an enhanced interactive experience.
 %
-% Author: Pablo Vergara  
-% Contact: pablo.vergara.g@ug.uchile.cl  
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
+
 warning off
-[file,path] =uigetfile('*.mat');
-in=[path,file];
-V=CaliAli_load(in,'Y');
+if ~exist('V', 'var') || isempty(V)
+    [file,path] =uigetfile('*.mat');
+    in=[path,file];
+    V=CaliAli_load(in,'Y');
+end
 videofig(size(V,3), @(frm,c) redraw(frm,c,V));
 redraw(1,[],V);

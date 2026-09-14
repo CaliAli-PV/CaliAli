@@ -44,7 +44,7 @@ if ~exist('input_files','var') || isempty(input_files)
 input_files = uipickfiles('FilterSpec', '*.mat', 'REFilter', '_Aligned*\.mat$|_det*\.mat$');
 end
 
-
+cn_tic= tic;
 if isstring(input_files) || ischar(input_files)
    input_files={input_files};
 end
@@ -58,5 +58,8 @@ for i=1:size(input_files,1)
         fprintf(['fail to process ',m,'\n'])
         rethrow(ME)
     end
-    clearvars -except file_path i input_files
+    clearvars -except file_path i input_files cn_tic
+end
+
+cprintf('*blue','Processing completed in %.2f minutes.\n', toc(cn_tic)/60);
 end

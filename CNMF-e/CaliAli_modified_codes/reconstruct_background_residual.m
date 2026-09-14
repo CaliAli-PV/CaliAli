@@ -6,6 +6,30 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             %% email: zhoupc1988@gmail.com
             
             %% process parameters
+            % The ring background indexes C_prev by A_prev's columns, so the two
+            % must describe the same component set. Every background refit
+            % re-syncs them; when the background is only fitted first and last,
+            % merging, false-positive removal and residual seeding change the
+            % component count in between and this function -- which runs after
+            % the loop -- is reached with the pair inconsistent. Same policy as
+            % the guards in update_spatial_CaliAli and update_temporal_CaliAli:
+            % a snapshot of the wrong size is unusable, so refresh both.
+            % A_prev/C_prev must describe the SAME components as A/C, not merely
+            % agree with each other: merging and false-positive removal shrink
+            % A and C, and a snapshot left at the old count makes the background
+            % remove signal for components that no longer exist. Comparing the
+            % pair only against itself misses that, because both keep the old
+            % count together.
+            if isempty(obj.A_prev) || size(obj.A_prev,2)~=size(obj.C_prev,1) ...
+                    || size(obj.A_prev,2)~=size(obj.A,2) ...
+                    || size(obj.C_prev,1)~=size(obj.C,1)
+                obj.A_prev = obj.A;
+                obj.C_prev = obj.C;
+            end
+            % The ring model is fitted against the movie, so the traces removed
+            % before fitting it have to be in movie units. After scale_to_noise
+            % they are in noise units. See trace_noise_scale.
+            C_prev_mu = trace_noise_scale(obj, 'apply', obj.C_prev);
             
             try
                 % map data
@@ -73,7 +97,7 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
                     ind = (reshape(mask(:), 1, [])* obj.A_prev>0);
                     
                     A_patch = obj.A_prev(logical(mask), ind);
-                    C_patch = obj.C_prev(ind,frame_range(1):frame_range(2));
+                    C_patch = C_prev_mu(ind,frame_range(1):frame_range(2));
                     
                     % reconstruct background
                     %                     Cmean = mean(C_patch , 2);

@@ -42,16 +42,61 @@ if isempty(outpath)
     outpath=strcat(filepath,filesep,name,'_con','.mat');
 end
 out=outpath;
-vid=[];
-if ~isfile(outpath)
-    for k=progress(1:length(inputh))
-        fullFileName = inputh{k};
-        vid{k}=CaliAli_load(fullFileName,'Y');     
+
+% --- Expected frame count = sum over input segments (metadata only, cheap) ---
+% This is the authoritative length of the concatenated recording. Counting it
+% up front lets us both validate a cached output and verify the rebuild.
+segment_F = zeros(1,numel(inputh));
+for k=1:numel(inputh)
+    segment_F(k) = safe_count_frames(inputh{k});
+    if segment_F(k) <= 0
+        error('CaliAli:concatenate:badInput', ...
+            ['Input segment "%s" has no readable frames (likely an interrupted ' ...
+            'downsample). Re-run downsampling for this session before concatenating.'], ...
+            inputh{k});
     end
-    Y=cat(3,vid{:});
-    CaliAli_save(outpath(:),Y,CaliAli_options);
-else
-    fprintf(1, 'File %s already exist in destination folder!\n', out);
 end
+expected_frames = sum(segment_F);
+
+% --- Reuse an existing output ONLY if it is complete AND matches the inputs ---
+% Guards against the stale/partial-concatenation failure mode: if a previous
+% run was interrupted, or was run before all split .avi segments were present,
+% the cached _con.mat has the wrong frame count and must be rebuilt rather than
+% silently reused.
+if isfile(outpath)
+    existing_frames = safe_count_frames(outpath);
+    last_zero = last_frame_is_zero(outpath);
+    if existing_frames == expected_frames && ~last_zero
+        fprintf(1, 'File %s already exists and matches its %d input segments (%d frames). Skipping.\n', ...
+            out, numel(inputh), expected_frames);
+        return
+    end
+    if existing_frames ~= expected_frames
+        fprintf(2, ['Existing file %s has %d frames but its %d input segments sum to %d. ' ...
+            'It is stale or incomplete and will be rebuilt.\n'], ...
+            out, existing_frames, numel(inputh), expected_frames);
+    else
+        fprintf(2, 'Existing file %s appears incomplete (empty last frame). Rebuilding.\n', out);
+    end
+    delete(outpath);
+end
+
+% --- Build the concatenated file ---
+vid=cell(1,numel(inputh));
+for k=progress(1:numel(inputh))
+    vid{k}=CaliAli_load(inputh{k},'Y');
+end
+Y=cat(3,vid{:});
+
+% --- Guard: the assembled stack must contain every input frame ---
+if size(Y,3) ~= expected_frames
+    error('CaliAli:concatenate:frameMismatch', ...
+        'Concatenated frame count (%d) does not match the sum of inputs (%d).', ...
+        size(Y,3), expected_frames);
+end
+
+CaliAli_save(outpath(:),Y,CaliAli_options);
+fprintf(1, 'Saved concatenated file %s (%d frames from %d segments).\n', ...
+    out, expected_frames, numel(inputh));
 
 

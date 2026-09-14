@@ -1,0 +1,78 @@
+{
+  "_schemaVersion": "1.0.0",
+  "CaliAli_parameters": {
+    "outputs": [
+      {
+        "name": "opt",
+        "type": ["struct"],
+        "purpose": "Initialized CaliAli options structure"
+      }
+    ],
+    "inputs": [
+      {
+        "name": "options",
+        "kind": "ordered",
+        "type": ["struct"],
+        "purpose": "Existing CaliAli options structure"
+      },
+      {
+        "name": "input_files",
+        "kind": "namevalue",
+        "type": ["cell"],
+        "purpose": "Cell array of input video file paths"
+      },
+      {
+        "name": "output_files",
+        "kind": "namevalue",
+        "type": ["cell"],
+        "purpose": "Cell array of output video file paths"
+      },
+      {
+        "name": "gSig",
+        "kind": "namevalue",
+        "type": ["numeric"],
+        "purpose": "Neuron filter size"
+      },
+      {
+        "name": "sf",
+        "kind": "namevalue",
+        "type": ["numeric", "scalar", ">0"],
+        "purpose": "Frame rate in frames per second"
+      },
+      {
+        "name": "BVsize",
+        "kind": "namevalue",
+        "type": ["numeric"],
+        "purpose": "Blood vessel diameter range [min max]"
+      },
+      {
+        "name": "spatial_ds",
+        "kind": "namevalue",
+        "type": ["numeric", "scalar", ">0"],
+        "purpose": "Spatial downsampling factor"
+      },
+      {
+        "name": "temporal_ds",
+        "kind": "namevalue",
+        "type": ["numeric", "scalar", ">0"],
+        "purpose": "Temporal downsampling factor"
+      },
+      {
+        "name": "batch_sz",
+        "kind": "namevalue",
+        "type": [
+          ["numeric", "scalar", ">=0"],
+          ["char", "choices={'auto'}"],
+          ["string", "choices={'auto'}"]
+        ],
+        "purpose": "Batch size or auto mode"
+      },
+      {
+        "name": "file_extension",
+        "kind": "namevalue",
+        "type": ["char", "string"],
+        "purpose": "File extension to concatenate when a folder is selected"
+      }
+    ]
+  }
+}
