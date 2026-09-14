@@ -1,20 +1,24 @@
+# MATLAB autosave
+*.asv
 
-*.asv
-"site/" 
-/site
-*.asv
-CLAUDE.md
+# macOS directory metadata. Written by a Mac touching the share; harmless on
+# disk, but they were tracked for a long time, and gitignore does nothing for a
+# file git already tracks -- which is why they kept being committed.
+.DS_Store
 *.DS_Store
 
+# Editor and build state
 .vs/
 .vscode/
 .cache/
+*.code-workspace
+/site
+site/
+
+# Local AI-assistant tooling: never part of the released pipeline
+CLAUDE.md
+CLAUDE.local.md
 .claude/
-Other_codes/Utilities/.DS_Store
-Other_codes/.DS_Store
-Motion_Correction/.DS_Store
-docs/.DS_Store
-CNMF-e/ca_source_extraction/.DS_Store
-CNMF-e/.DS_Store
-.DS_Store
-*.asv
+.claude.json
+.claude.json.backup
+.mcp.json
