@@ -76,27 +76,33 @@ try
         end
         disp('Calculating translation shift...')
         % Perform rigid motion correction
+        % VALID is the region translation left holding real data. It is
+        % returned explicitly, so nothing downstream has to infer it from the
+        % pixel value -- which is what the +1 offset used to make possible.
         if intra_sess_tag
-            [Y, ref,template] = Rigid_mc(Y, opt,template);
+            [Y, ref,template,valid] = Rigid_mc(Y, opt,template);
         else
-            [Y, ref,template] = Rigid_mc(Y, opt);
+            [Y, ref,template,valid] = Rigid_mc(Y, opt);
         end
 
         % Perform non-rigid motion correction if enabled
         if opt.do_non_rigid
-            Y = Non_rigid_mc(Y, ref, opt);
+            % The warp fills its own borders, so its valid region has to be
+            % folded in or those borders would never be cropped away.
+            [Y, valid_nr] = Non_rigid_mc(Y, ref, opt);
+            valid = valid & valid_nr;
         end
 
         % Interpolate dropped frames
-        Y = interpolate_dropped_frames(Y);
+        Y = interpolate_dropped_frames(Y, valid);
 
         % Square the borders of the video
         if intra_sess_tag
             Y = apply_mask_square(Y, Mask);
-            [Y,m] = square_borders(Y, 0);
+            [Y,m] = square_borders(Y, [], valid & (Mask>0));
             Mask(Mask>0)=m(Mask>0);
         else
-            [Y,Mask] = square_borders(Y, 0);
+            [Y,Mask] = square_borders(Y, [], valid);
         end
         opt.Mask=Mask;
         % Save motion-corrected video (handles both string and batch inputs)

@@ -61,10 +61,12 @@ for k = 1:numel(opt.input_files)
     batch_size = resolve_batch_size(batch_sz, [d1, d2], Fds);
     reader = build_reader(fullFileName, ext, struct('batch_size', batch_size));
 
-    target_class = reader.src_class;
-    if isempty(target_class)
-        target_class = 'uint16';
-    end
+    % One class for the whole pipeline, from CaliAli_options. Keeping the source
+    % class here only moved the cast one stage later: pre_allocate_outputs
+    % creates its files in the same class, so a float recording was converted
+    % anyway, after having used four times the memory to get there.
+    target_class = resolve_output_class(opt);
+    warn_if_cast_destroys(first_frame, target_class, fullFileName);
     % Preallocate output dataset to full size for consistent appends
     m = matfile(outFile, 'Writable', true);
     m.Y = zeros(d1, d2, Fds, target_class);
@@ -424,5 +426,37 @@ if bitDepth > 8
     cls = 'uint16';
 else
     cls = 'uint8';
+end
+end
+
+
+function cls = resolve_output_class(opt)
+%% The datatype every stage stores the recording in.
+cls = 'uint16';
+if isfield(opt,'output_class') && ~isempty(opt.output_class)
+    cls = lower(char(opt.output_class));
+end
+end
+
+function warn_if_cast_destroys(sample, cls, fname)
+%% Say so when the conversion would throw away most of the range.
+% This is the failure reported in issue #35: uint8 saturates rather than
+% rescales, so a recording whose values exceed the target range loses
+% everything above it, irreversibly and silently. Casting is still performed --
+% the class is the user's choice -- but not quietly.
+if isempty(sample) || strcmpi(cls,'single') || strcmpi(cls,'double')
+    return
+end
+sample = double(sample(:));
+hi = max(sample);
+lim = double(intmax(cls));
+if hi > lim
+    cprintf('_red', ['%s: values reach %.3g but %s saturates at %.0f. Everything ' ...
+        'above that becomes %.0f. Set downsampling.output_class to a wider type.\n'], ...
+        fname, hi, cls, lim, lim);
+elseif isfloat(sample) && hi <= 1
+    cprintf('_red', ['%s: values only reach %.3g, so casting to %s leaves almost ' ...
+        'no levels. Scale the recording first, or set downsampling.output_class ' ...
+        'to single.\n'], fname, hi, cls);
 end
 end

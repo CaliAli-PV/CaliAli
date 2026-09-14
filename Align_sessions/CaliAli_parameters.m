@@ -97,6 +97,14 @@ addParameter(inp,'spatial_ds',1,valid_pos_scalar)      %Spatial Downsampling fac
 addParameter(inp,'temporal_ds',1,valid_pos_scalar)     %Temporal Downsampling factor
 addParameter(inp,'batch_sz','auto',@(x) (isnumeric(x)&&isscalar(x)&&isfinite(x)&&x>=0) || ...
     (ischar(x)&&strcmpi(x,'auto')) || (isstring(x)&&isscalar(x)&&strcmpi(x,'auto'))) % Batch size for downsampling (0=all at once, 'auto'=heuristic)
+% Datatype every stage stores the recording in. uint16 covers every scientific
+% camera's range at half the memory of single, and every stage downstream
+% preallocates in this class, so it has to be decided once and used everywhere.
+% The previous behaviour -- cast to uint8 -- clipped anything above 254; simply
+% keeping the source class instead meant a float recording used four times the
+% memory and was then silently cast back to uint16 at the next stage anyway.
+addParameter(inp,'output_class','uint16',@(x) any(strcmpi(char(x), ...
+    {'uint8','uint16','uint32','int16','int32','single','double'})))
 
 addParameter(inp,'file_extension','avi',valid_char)      % if a folder is selected instead of a single video file,
 % Concatenate all videos with the specified file extension

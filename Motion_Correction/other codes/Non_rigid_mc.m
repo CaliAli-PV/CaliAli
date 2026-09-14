@@ -1,4 +1,4 @@
-function V = Non_rigid_mc(V, ref, opt)
+function [V, valid] = Non_rigid_mc(V, ref, opt)
 %% Non_rigid_mc: Perform non-rigid motion correction using multi-level registration.
 %
 % This function applies non-rigid motion correction to an input video using a
@@ -31,11 +31,11 @@ cprintf('*red',['Non-rigid motion correction is not currenlty supported!. ', ...
 [X] = get_video_pyramid(V, ref, opt);
 
 % Perform non-rigid motion correction in parallel
-V = NR_motion_correction_parallel(X, V, opt);
+[V, valid] = NR_motion_correction_parallel(X, V, opt);
 end
 
 
-function V = NR_motion_correction_parallel(X, V, opt)
+function [V, valid] = NR_motion_correction_parallel(X, V, opt)
 % NR_motion_correction_parallel performs parallel non-rigid motion correction.
 %
 %   V = NR_motion_correction_parallel(X, V, opt)
@@ -58,7 +58,7 @@ function V = NR_motion_correction_parallel(X, V, opt)
 [MS, G, V] = distribute(X, V, ms1, opt.non_rigid_batch_size);
 
 % Perform motion correction on each batch in parallel
-V = MC_in(MS, G, V, opt.non_rigid_options);
+[V, valid] = MC_in(MS, G, V, opt.non_rigid_options);
 
 
 end
@@ -112,7 +112,7 @@ end
 end
 
 
-function V = MC_in(MS, G, V, opt)
+function [V, valid] = MC_in(MS, G, V, opt)
 % MC_in performs motion correction within each batch.
 %
 %   [V, G] = MC_in(MS, G, V, opt)
@@ -145,8 +145,13 @@ D(:,:,2,:) = imgaussfilt3(squeeze(D(:,:,2,:)),[0.5,0.5,2]);
 
 V=cat(3,V{:});
 
+% The warp fills pixels it has no source for. Warping a true mask alongside
+% records exactly which those are, so the border it creates can be cropped
+% without having to recognise the fill value in the data itself.
+valid = true(size(V,1), size(V,2));
 for i = progress(1:size(D,4),'Title','Applying shifts')
     V(:,:,i) = imwarp(V(:,:,i), D(:,:,:,i), 'FillValues', 0);
+    valid = valid & imwarp(true(size(V,1), size(V,2)), D(:,:,:,i), 'FillValues', false);
 end
 
 end

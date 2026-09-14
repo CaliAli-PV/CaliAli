@@ -70,6 +70,7 @@ for k = 1:length(input_files)
                             dims = get_data_dimension(input_files{j}{1});
                             d1 = dims(1);
                             d2 = dims(2);
+                            src_file = input_files{j}{1};
                         end
                     end
                 end
@@ -77,7 +78,13 @@ for k = 1:length(input_files)
                 % Pre-allocate the file
                 if total_frames > 0
                     m = matfile(output_file, 'Writable', true);
-                    m.Y(d1, d2, total_frames) = uint16(0);  % creates dataset on disk
+                    % Created in the class of the data being read, not a
+                    % hardcoded one. Hardcoding uint16 here silently undid
+                    % whatever datatype the previous stage chose: a recording
+                    % downsampled as single was cast back on the first write,
+                    % one stage after the effort of preserving it.
+                    out_cls = source_data_class(src_file);
+                    m.Y(d1, d2, total_frames) = cast(0, out_cls);  % creates dataset on disk
                     fprintf(1, 'Pre-allocated file with dimensions [%d, %d, %d]\n', d1, d2, total_frames);
                 end
 
@@ -131,4 +138,22 @@ output_file=unique(output_file);
 
 removed = remove_corrupted_output(output_file);
 
+end
+
+function cls = source_data_class(src_file)
+%% The class Y is stored in, read from the file's metadata.
+% Falls back to uint16, which is what this function used to assume
+% unconditionally, when the class cannot be determined.
+cls = 'uint16';
+if nargin < 1 || isempty(src_file), return; end
+try
+    if iscell(src_file), src_file = src_file{1}; end
+    m = matfile(char(src_file));
+    w = whos(m, 'Y');
+    if ~isempty(w) && ~isempty(w.class)
+        cls = w.class;
+    end
+catch
+    % leave the fallback
+end
 end

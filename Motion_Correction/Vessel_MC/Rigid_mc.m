@@ -1,4 +1,4 @@
-function [Mr,Ref,template]=Rigid_mc(Y,opt,template)
+function [Mr,Ref,template,valid]=Rigid_mc(Y,opt,template)
 %% Rigid_mc: Perform rigid motion correction using NoRMCorre.
 %
 % This function applies rigid motion correction to a 3D image volume using
@@ -53,8 +53,27 @@ end
 Ref=v2uint16(Ref); % Convert to uint16.
 
 % Apply shifts to each frame.
+%
+% THE +1 AND WHY IT IS UNDONE. Translating leaves empty pixels at the borders,
+% filled with 0. Those have to be told apart from real data, and the way that
+% was done was to add 1 to the whole recording first, so that 0 could only mean
+% "filled". That offset then travelled through the entire pipeline: nothing ever
+% subtracted it, and square_borders, apply_mask_square and the dropped-frame
+% test all came to depend on the value 0 carrying that meaning.
+%
+% The offset is still used to find the borders -- it is the cheapest way -- but
+% it is removed again on the same line, and the region it identified is returned
+% as VALID, a logical mask. Callers get the true pixel values and an explicit
+% mask, instead of shifted values and a convention.
+Mr = zeros(size(Y), 'like', Y);
+valid = false(size(Y));
 parfor i=1:size(Y,3)
-    Mr(:,:,i) = imtranslate(Y(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
-    Ref(:,:,i) = imtranslate(Ref(:,:,i)+1,flip(squeeze(shifts(i).shifts)'),'FillValues',0);
+    shift_i = flip(squeeze(shifts(i).shifts)');
+    frame = imtranslate(Y(:,:,i)+1, shift_i, 'FillValues', 0);
+    valid(:,:,i) = frame > 0;              % 0 here can only be a filled pixel
+    frame(frame > 0) = frame(frame > 0) - 1;   % put the real values back
+    Mr(:,:,i) = frame;
+    Ref(:,:,i) = imtranslate(Ref(:,:,i), shift_i, 'FillValues', 0);
 end
+valid = all(valid, 3);   % a pixel is usable only if it is present in EVERY frame
 end

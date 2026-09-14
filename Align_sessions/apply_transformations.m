@@ -246,7 +246,11 @@ function Vid = apply_NR_shifts(Vid, S, Mask)
 
 % Loop through each frame of the video and apply the non-rigid shift
 parfor i = 1:size(Vid, 3)
-    Vid(:,:,i) = imwarp(Vid(:,:,i) + 1, S, 'FillValues', 1);  % Apply the shift to each frame
+    % No offset. The fill value here equalled the offset, so 0 never carried
+    % any meaning in the result -- this was not a sentinel, just a permanent
+    % +1 added to every session whenever non-rigid alignment ran, which nothing
+    % ever subtracted. The valid region comes from Mask, below.
+    Vid(:,:,i) = imwarp(Vid(:,:,i), S, 'FillValues', 0);  % Apply the shift to each frame
 end
 
 % Find the maximum sum of the mask along each dimension (for reshaping)
