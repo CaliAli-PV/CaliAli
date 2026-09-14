@@ -311,7 +311,7 @@ if has(s.checks,'dtype'),       C = [C, check_dtype(opt, ds, mc, aligned)]; end
 if has(s.checks,'offset'),      C = [C, check_no_offset(ds, mc, opt)]; end
 if has(s.checks,'mask'),        C = [C, check_mask(opt)]; end
 if has(s.checks,'bookkeeping'), C = [C, check_bookkeeping(opt, aligned)]; end
-if has(s.checks,'alignment'),   C = [C, check_alignment(opt)]; end
+if has(s.checks,'alignment'),   C = [C, check_alignment(opt, aligned)]; end
 if has(s.checks,'workspace'),   C = [C, check_workspace(sentinel)]; end
 if has(s.checks,'patch'),       C = [C, check_patch(opt)]; end
 if has(s.checks,'dropped'),     C = [C, check_dropped(rec.dir, 10)]; end
@@ -414,7 +414,7 @@ catch
 end
 end
 
-function C = check_alignment(opt)
+function C = check_alignment(opt, aligned)
 %% The alignment metrics must improve, and the vessel score must clear its gate.
 C = {};
 isa_ = opt.inter_session_alignment;
@@ -437,9 +437,22 @@ try
 catch ME
     C{end+1} = chk_fail('BV_score', ME.message);
 end
+% Cn, Cn_scale, PNR and the per-session projections are written by
+% save_relevant_variables, which takes CaliAli_options BY VALUE and returns
+% nothing. They exist only in the saved file, never in the struct the caller
+% gets back -- so they have to be read from the file.
 try
-    n = numel(isa_.Cn_scale_per_session);
-    C{end+1} = chk_num('per-session projections recorded', n, numel(isa_.F), 0);
+    stored = CaliAli_load(aligned, 'CaliAli_options');
+    sa = stored.inter_session_alignment;
+    C{end+1} = chk_num('per-session projections recorded', ...
+        numel(sa.Cn_scale_per_session), numel(sa.F), 0);
+    C{end+1} = chk_num('per-session images recorded', ...
+        size(sa.Cn_per_session,3), numel(sa.F), 0);
+    C{end+1} = chk_true('projection method recorded', ...
+        ischar(sa.projection_method) && ~isempty(sa.projection_method), ...
+        char(sa.projection_method));
+    C{end+1} = chk_true('per-session peaks are positive', ...
+        all(sa.Cn_scale_per_session > 0), mat2str(sa.Cn_scale_per_session(:)',4));
 catch ME
     C{end+1} = chk_fail('per-session projections', ME.message);
 end
