@@ -95,6 +95,20 @@ pars = inp.Results;
 
 
 %% Calculate Dependent Parameters
+% Patch padding follows the patch size. Applied here as well as in
+% pars_envs_parse, because a caller can hand in a whole pars_envs struct and
+% that path never goes through the sub-parser.
+if isfield(pars, 'pars_envs') && isstruct(pars.pars_envs)
+    pe = pars.pars_envs;
+    if ~isfield(pe, 'w_overlap_fraction') || isempty(pe.w_overlap_fraction)
+        pe.w_overlap_fraction = 0.5;
+    end
+    if ~isfield(pe, 'w_overlap') || isempty(pe.w_overlap)
+        pe.w_overlap = round(pe.w_overlap_fraction * min(pe.patch_dims));
+    end
+    pars.pars_envs = pe;
+end
+
 pars.gSiz = min(pars.gSig) * 4;
 pars.ring_radius = round(pars.bg_neuron_factor * min(pars.gSiz));
 
@@ -136,7 +150,16 @@ end
 addParameter(inp,'memory_size_to_use', total_system_memory_GB, @isnumeric);  % GB, memory space you allow to use in MATLAB
 addParameter(inp,'memory_size_per_patch',total_system_memory_GB, @isnumeric);                    % GB, space for loading data within one patch
 addParameter(inp,'patch_dims', [64, 64], @isnumeric);                        % Patch dimensions
-addParameter(inp,'w_overlap', 32, @isnumeric); 
+% Padding added around each patch, as a FRACTION of the patch size rather than a
+% fixed pixel count, so it follows patch_dims instead of having to be reset by
+% hand. A patch owns patch_dims pixels and reads patch_dims + 2*overlap. At 0.5
+% the read window is twice the patch on each axis, so every pixel falls in four
+% windows and no patch owns most of any neuron. The default is unchanged:
+% 0.5 * 64 = 32.
+addParameter(inp,'w_overlap_fraction', 0.5, @(x) isnumeric(x) && isscalar(x) && x>=0);
+% Padding in pixels. Leave empty to take it from w_overlap_fraction, which is the
+% recommended way; set a number only to pin it regardless of patch size.
+addParameter(inp,'w_overlap', [], @isnumeric);
 
 
 varargin=varargin{:};
@@ -145,6 +168,9 @@ if isstruct(varargin)
 end
 parse(inp, varargin{:});
 pars = inp.Results;
+if isempty(pars.w_overlap)
+    pars.w_overlap = round(pars.w_overlap_fraction * min(pars.patch_dims));
+end
 end
 
 

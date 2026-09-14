@@ -135,8 +135,13 @@ ind_neurons = cell(nr_patch, nc_patch);
 
 AA = cell(nr_patch, nc_patch);   % save the ai^T*ai for each neuron
 
-if isempty(obj.A_prev)
+% The ring background indexes C_prev by A_prev's columns, so the two must
+% describe the same component set. A snapshot of the wrong size is as unusable
+% as an empty one, so both are refreshed the same way.
+if isempty(obj.A_prev) || size(obj.A_prev,2)~=size(obj.A,2) ...
+        || size(obj.C_prev,1)~=size(obj.C,1)
     obj.A_prev=obj.A;
+    obj.C_prev=obj.C;
 end
 for mpatch=1:(nr_patch*nc_patch)
     if strcmpi(bg_model, 'ring')
@@ -235,11 +240,13 @@ if use_parallel
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
+            f_patch = f{mpatch};
+            f_nmf = f_patch(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_svd = f{mpatch}(max_frame(1):max_frame(2));
+            f_patch = f{mpatch};
+            f_svd = f_patch(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end
@@ -312,11 +319,13 @@ else
             end
         elseif strcmpi(bg_model, 'nmf')
             b_nmf = b{mpatch};
-            f_nmf = f{mpatch}(max_frame(1):max_frame(2));
+            f_patch = f{mpatch};
+            f_nmf = f_patch(max_frame(1):max_frame(2));
             Ypatch = double(reshape(Ypatch, [], T))- b_nmf*f_nmf;
         else
             b_svd = b{mpatch};
-            f_svd = f{mpatch}(max_frame(1):max_frame(2));
+            f_patch = f{mpatch};
+            f_svd = f_patch(max_frame(1):max_frame(2));
             b0_svd = b0{mpatch};
             Ypatch = double(reshape(Ypatch, [], T)) - bsxfun(@plus, b_svd*f_svd, b0_svd);
         end

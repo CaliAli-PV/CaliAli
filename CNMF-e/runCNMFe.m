@@ -58,7 +58,10 @@ cprintf('*Magenta','%1.0f neurons will be initialized.\n', numel(seed_all));
 pause(1) % so users dont miss this message. delete
 neuron.select_data(in);
 neuron.getReady();
-evalin( 'base', 'clearvars -except parin theFiles' );
+% Clear only the temporaries this pipeline creates. The previous form,
+% clearvars -except parin theFiles, deleted everything else in the user's base
+% workspace as a side effect of running an extraction.
+evalin( 'base', 'clearvars  filePath fileName mat_*' );
 %% Load parameters stored in .mat file
 
 %% initialize neurons from the video data
@@ -69,10 +72,12 @@ toc
 % neuron.show_contours(0.8, [], neuron.Cn, 0); %
 save_workspace(neuron);
 %% Update components
+cnmf_it=tic;
 cprintf('*blue','----------------Beginning neuron refinement with CMNF----------------\n');
 A_temp=neuron.A;
 C_temp=neuron.C_raw;
 for loop=1:10
+    iteration_tic=tic;
     % estimate the background components
     neuron=CNMF_CaliAli_update('Background',neuron);
     neuron=CNMF_CaliAli_update('Spatial',neuron);
@@ -85,6 +90,8 @@ for loop=1:10
 
     dis=dissimilarity_previous(A_temp,neuron.A,C_temp,neuron.C_raw);
     cprintf('-comment','Disimilarity with previous iteration is %.3f\n', dis);
+    cprintf('-comment','CNMF iteration %1.0f completed in %.2f seconds (%1.0f neurons).\n', ...
+        loop, toc(iteration_tic), size(neuron.A,2));
 
     A_temp=neuron.A;
     C_temp=neuron.C_raw;
@@ -94,6 +101,7 @@ for loop=1:10
         break
     end
 end    %% save the workspace for future analysis
+cprintf( '*blue', 'Elepsed time for CNMF iterations: %.3f minutes.\n',  toc(cnmf_it)/60)
 neuron=update_residual_Cn_PNR_batch(neuron);
 save_workspace(neuron);
 

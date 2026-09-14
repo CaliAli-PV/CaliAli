@@ -263,7 +263,12 @@ if use_parallel
                 Ypatch = imresize(temp, 1./bg_ssub, 'nearest');
                 Ypatch = reshape(Ypatch, [], T_block);
 
-                [W{mpatch}, ~] = fit_ring_model(Ypatch, [], [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
+                % Pass the footprints, downsampled to match Ypatch, so
+                % fit_ring_model can skip pixels no component covers. C is
+                % empty, so no signal is removed here; A is used only to build
+                % that pixel mask. The rows it does fit are unchanged.
+                A_ds = ring_active_support(A_block, nr_block, nc_block, bg_ssub, size(Ypatch,1));
+                [W{mpatch}, ~] = fit_ring_model(Ypatch, A_ds, [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
                 %                 tmp_b0 = imresize(reshape(tmp_b0, size(sn_block)), [nr_block, nc_block]);
                 %                 b0{mpatch} = tmp_b0(ind_patch(:));
             end
@@ -321,7 +326,12 @@ else
                 Ypatch = imresize(temp, 1./bg_ssub, 'nearest');
                 Ypatch = reshape(Ypatch, [], T_block);
 
-                [W{mpatch}, ~] = fit_ring_model(Ypatch, [], [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
+                % Pass the footprints, downsampled to match Ypatch, so
+                % fit_ring_model can skip pixels no component covers. C is
+                % empty, so no signal is removed here; A is used only to build
+                % that pixel mask. The rows it does fit are unchanged.
+                A_ds = ring_active_support(A_block, nr_block, nc_block, bg_ssub, size(Ypatch,1));
+                [W{mpatch}, ~] = fit_ring_model(Ypatch, A_ds, [], W_old, thresh_outlier, sn_block(:), [],  with_projection);
                 %                 tmp_b0 = imresize(reshape(tmp_b0, size(sn_block)), [nr_block, nc_block]);
                 %                 b0{mpatch} = tmp_b0(ind_patch(:));
             end

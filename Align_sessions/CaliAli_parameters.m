@@ -39,8 +39,16 @@ if isstruct(varargin{1})
     varargin(1)=[];
 end
 NameValue_param={};
-if numel(varargin)>1
-    NameValue_param=[varargin(1:2:end), varargin(2:2:end)]';
+if ~(numel(varargin)==1 && isempty(varargin{1}))
+    if mod(numel(varargin),2) ~= 0
+        error('CaliAli:InvalidNameValuePair','Name-value inputs must come in pairs.');
+    end
+    % MATLAB passes varargin as a row cell array, so keep the name/value
+    % pairs in 2xN form: row 1 = names, row 2 = values. Concatenating
+    % horizontally and transposing gave an Nx1 column ordered n1;n2;v1;v2,
+    % which interleaves names and values as soon as there is more than one
+    % pair; the rest of this file indexes it as 2xN.
+    NameValue_param=[varargin(1:2:end); varargin(2:2:end)];
 end
 
 varargin=[struct_param,NameValue_param];
@@ -300,6 +308,18 @@ addParameter(inp,'shifts_n',[])          % Final neuron alignment non-rigid disp
 addParameter(inp,'BV_score',[])          % BV alignment score
 addParameter(inp,'range',[])             % Color-bit range of each session
 addParameter(inp,'Cn_scale',[])          % Scale of the coorelation image
+% Per-session projections, kept rather than collapsed into one image. Cn_scale is
+% the peak over EVERY session, so a stage that divides a single session's image
+% by it uses the wrong number whenever that session's own peak is lower. These
+% are declared here because the parser keeps only what addParameter names:
+% inp.KeepUnmatched is true but the struct is taken from inp.Results, so an
+% undeclared field is dropped silently on the next pass. See projection_session_stats.
+addParameter(inp,'Cn_per_session',[])          % Raw correlation image of each session, aligned grid
+addParameter(inp,'PNR_per_session',[])         % Raw peak-to-noise image of each session
+addParameter(inp,'Cn_scale_per_session',[])    % Peak correlation of each session on its own
+addParameter(inp,'PNR_scale_per_session',[])   % Peak peak-to-noise of each session on its own
+addParameter(inp,'projection_method',[])       % Which branch of get_projections_and_detrend produced them
+addParameter(inp,'projection_median_filtering',[]) % medfilt2 size applied to them, [] if none
 
 varargin=varargin{:};
 if isstruct(varargin)

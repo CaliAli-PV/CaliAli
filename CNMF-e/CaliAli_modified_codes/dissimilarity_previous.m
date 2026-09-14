@@ -13,7 +13,8 @@ function [dis,similarity_per_component,previous_index]=dissimilarity_previous(A1
 %                  with no counterpart are left as NaN, so a component that
 %                  appeared in this iteration is never reported as stable.
 %                  The vector is indexed by current component number, which is
-%                  the index space expected by normalize_retired_ids.
+%                  the CURRENT component index space, so it lines up with A
+%                  and C as they are after this call.
 %   previous_index - Column vector, one entry per component of A2/C2, giving
 %                  the index of the component in A1/C1 it was matched to, or
 %                  NaN if unmatched. Merging and false-positive removal

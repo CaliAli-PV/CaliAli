@@ -32,7 +32,8 @@ batch=[0,cumsum(F)];
 A=sparse(zeros(size(obj.A)));
 div=length(batch)-1;
 obj.A_prev=obj.A;
-Ca=0;
+obj.C_prev=obj.C;   % keep the pair consistent: the ring background indexes one by the other
+Ca=zeros(size(obj.A,2),1);
 for i=progress(1:div)
     out_A=update_spatial_in(obj,use_parallel,[batch(i)+1 batch(i+1)]);
     sc=mean(obj.S(:,batch(i)+1:batch(i+1)),2);
@@ -91,7 +92,7 @@ end
 % frames to be loaded
 frame_range = max_frame;
 T = diff(frame_range) + 1;
-if isempty(neuron.C_prev)
+if isempty(neuron.C_prev) || size(neuron.C_prev,1)~=size(neuron.C,1)
     neuron.C_prev=neuron.C;
 end
 
