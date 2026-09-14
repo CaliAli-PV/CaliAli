@@ -240,17 +240,27 @@ classdef Sources2D < handle
                 nam = obj.file;
             end
             % parameters for scaling things
+            % Patch padding is a FRACTION of the patch, not a pixel count, so
+            % that changing patch_dims does not silently change how much of a
+            % neuron a patch can own. These fallbacks used ring_radius, which is
+            % a property of the neurons rather than of the patch geometry: with
+            % a large ring and a small patch it produced a read window several
+            % times the patch itself.
             if ~exist('pars_env', 'var') || isempty(pars_env)
                 memory_size_to_use = 16.0;  %GB
                 memory_size_per_patch = 1.0;  % GB;
                 patch_dims = [64, 64];
-                w_overlap = obj.options.ring_radius;
+                w_overlap = patch_overlap_default(patch_dims);
             else
                 memory_size_to_use = pars_env.memory_size_to_use;
                 memory_size_per_patch = pars_env.memory_size_per_patch;
                 patch_dims = pars_env.patch_dims;
                 if ~isfield(pars_env,'w_overlap') || isempty(pars_env. w_overlap)
-                    w_overlap = obj.options.ring_radius;
+                    frac = [];
+                    if isfield(pars_env,'w_overlap_fraction')
+                        frac = pars_env.w_overlap_fraction;
+                    end
+                    w_overlap = patch_overlap_default(patch_dims, frac);
                 else
                     w_overlap = pars_env.w_overlap ;
                 end

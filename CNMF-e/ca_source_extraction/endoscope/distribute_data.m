@@ -10,11 +10,13 @@ if ~exist(nam, 'file')
 end
 file_name = get_fullname(nam);
 
-if ~exist('patch_dims', 'var')
-    patch_dims = [];
+if ~exist('patch_dims', 'var') || isempty(patch_dims)
+    patch_dims = [64, 64];
 end
 if ~exist('w_overlap', 'var') || isempty(w_overlap)
-    w_overlap = 10;
+    % A fraction of the patch, not a fixed pixel count. 10 px was meaningless
+    % against an unknown patch size; see patch_overlap_default.
+    w_overlap = patch_overlap_default(patch_dims);
 end
 if ~exist('memory_size_per_patch', 'var') || isempty(memory_size_per_patch)
     memory_size_per_patch = 10;
