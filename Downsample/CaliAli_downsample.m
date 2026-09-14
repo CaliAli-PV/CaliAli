@@ -43,6 +43,17 @@ for k = 1:length(opt.input_files)
     [filepath, name,ext] = fileparts(fullFileName);
     % Construct the output file path
     opt.output_files{k} = strcat(filepath, filesep, name, '_ds', '.mat');
+    % Discard an existing output if it is incomplete (e.g. an interrupted run
+    % left an empty trailing frame), so it is regenerated below instead of
+    % being silently reused with a wrong frame count.
+    if isfile(opt.output_files{k})
+        [last_zero, zmsg] = last_frame_is_zero(opt.output_files{k});
+        if last_zero
+            fprintf(2, 'Existing file %s is incomplete (%s). Re-running downsampling.\n', ...
+                opt.output_files{k}, zmsg);
+            delete(opt.output_files{k});
+        end
+    end
     % Check if the output file already exists
     if ~isfile(opt.output_files{k})
         [~,~,ext]=fileparts(fullFileName);

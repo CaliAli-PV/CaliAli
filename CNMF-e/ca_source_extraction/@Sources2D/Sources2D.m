@@ -828,6 +828,7 @@ classdef Sources2D < handle
                 end
                 fclose(flog);
             end
+            K_before = size(obj.A, 2);
             obj.A=full(obj.A);
             obj.A_del=sparse(squeeze(cat(2,obj.A_del,obj.A(:, ind,:))));
             obj.C_del=[obj.C_del;obj.C(ind, :)];
@@ -847,6 +848,18 @@ classdef Sources2D < handle
             end
             try  obj.ids(ind) = [];   catch;   end
             try obj.tags(ind) =[]; catch; end
+            % The ring background is fitted after removing A_prev*C_prev from
+            % the data, so that pair has to describe the SAME components as A
+            % and C. Deleting here without deleting there leaves the background
+            % removing signal for components that no longer exist, which makes
+            % the estimate anti-correlated with the data and peaked on the
+            % footprints instead of smooth between them.
+            % IND indexes the component list as it was before this deletion, so
+            % it only applies to A_prev/C_prev if they describe that same list.
+            if size(obj.A_prev,2) == K_before && size(obj.C_prev,1) == K_before
+                try obj.A_prev(:, ind) = []; catch; end
+                try obj.C_prev(ind, :) = []; catch; end
+            end
 
             % save the log
         end

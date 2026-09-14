@@ -111,7 +111,9 @@ if isempty(files)
     return
 end
 src_paths = cellfun(@(f) resolve_source_file(f), files, 'UniformOutput', false);
-remove_corrupted_output(src_paths);
+% These are alignment INPUTS. Nothing regenerates them, so report and let the
+% user rebuild rather than deleting their data.
+report_corrupted_files(src_paths);
 num_sessions = max(cellfun(@(idx) resolve_session_id(files{idx}, idx), num2cell(1:numel(files))));
 input_F = zeros(num_sessions, 1);
 labels = cell(num_sessions, 1);
@@ -305,6 +307,15 @@ CaliAli_options.inter_session_alignment.Cn = CaliAli_options.inter_session_align
 
 % Calculate non-rigid alignment projections
 CaliAli_options.inter_session_alignment.PNR = max(P.(size(P, 2))(1, :).(4){1, 1}, [], 3);
+
+% Keep what the collapse above throws away: each session's own images and peak,
+% and the settings that produced them. A later stage that works on one session
+% needs that session's peak, not the maximum over all of them.
+stats = projection_session_stats(P, CaliAli_options.preprocessing);
+fn = fieldnames(stats);
+for i = 1:numel(fn)
+    CaliAli_options.inter_session_alignment.(fn{i}) = stats.(fn{i});
+end
 
 % Save the data
 CaliAli_save(CaliAli_options.inter_session_alignment.out_aligned_sessions(:), CaliAli_options);

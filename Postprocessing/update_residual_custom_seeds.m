@@ -14,7 +14,10 @@ for i=progress(1:size(fn,2)-1)
     %% substract neurons
     A=full(neuron.A);
     Y=single(Y);
-    Y=Y-single(A*neuron.C_raw(:,fn(i)+1:fn(i+1)));
+% Traces are stored in noise units after scale_to_noise; a residual needs them
+% in movie units or the model subtracted is about six times too large.
+    C_mu = trace_noise_scale(neuron, 'apply', neuron.C_raw);
+    Y=Y-single(A*C_mu(:,fn(i)+1:fn(i+1)));
     Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
 
     Y=uint16(reshape(Y,d1,d2,[]));
@@ -59,61 +62,10 @@ for i=progress(1:size(fn,2)-1)
     % screen seeding pixels as center of the neuron
     Mask=neuron.options.Mask;
 
-    %% Intialize variables
-    A=[];
-    C=[];
-    C_raw=[];
-    S=[];
-    seed_all=seed_all_M;
-    while true
-        % fprintf('%2d seed remaining. \n', length(seed_all));
-        seed=get_far_neighbors(seed_all,neuron);
-        % [row,col] = ind2sub([d1,d2],seed);
-        % plot(col,row,'.r');drawnow;
-
-        seed_all(ismember(seed_all,seed))=[];
-        Mask(seed)=0;
-
-        [Y_box,HY_box,ind_nhood,center,sz]=get_mini_videos(Y,HY,seed,neuron);
-        if isempty(Y_box)
-            break
-        end
-         [a,c_raw]=estimate_components(Y_box,HY_box,center,sz,neuron,size(Y,2));
-        [c,s]=deconv_PV(c_raw,neuron.options.deconv_options);
-        %% Filter a
-        af=a;
-        if n_enhanced==0
-            parfor k=1:size(a,2)
-                if ~isempty(a{k})
-                    temp=imfilter(reshape(a{k}, sz{k}(1),sz{k}(2)), psf, 'replicate');
-                    af{1,k}=temp(:);
-                else
-                    af{1,k}=[];
-                end
-            end
-        end
-        a=expand_A(a,ind_nhood,d1*d2);
-        af=expand_A(af,ind_nhood,d1*d2);
-        af(af<0)=0;
-
-        %% update video;
-        if isa(Y,'uint8')
-            Y=Y-uint8(a*c);
-        else
-            Y=Y-uint16(a*c);
-        end
-
-        HY=HY-single(af*c);
-
-        A=cat(2,A,a);
-        C=cat(1,C,c);
-        C_raw=cat(1,C_raw,c_raw);
-        S=cat(1,S,s);
-
-        if isempty(seed_all)
-            break
-        end
-    end
+    %% Extract one component per seed, each removed from the data as it goes.
+    % The loop lives in extract_seeded_components so that seeding from the raw
+    % signal runs exactly the same procedure.
+    [A, C_raw, C, S] = extract_seeded_components(Y, HY, seed_all_M, neuron, psf, n_enhanced);
 
     A_T{i}=A;
     C_T{i}=C;
@@ -128,7 +80,10 @@ for i=1:size(I,2)
     A=A+A_T{1, i}.*I(:,i)';
 end
 
-A=mean(cat(3,A_T{:}),3);
+% The weighted merge above is the one to keep. Replacing it with a plain mean
+% gives every batch the same say, so a batch where the component is silent
+% contributes its noise on equal terms with a batch where it fires.
+% (This line used to overwrite the weighted result with mean(cat(3,A_T{:}),3).)
 C=cat(2,C_T{:});
 C_raw=cat(2,C_raw_T{:});
 S=cat(2,S_T{:});
@@ -143,6 +98,14 @@ neuron.A=cat(2,neuron.A,A);
 neuron.C=cat(1,neuron.C,C);
 neuron.C_raw=cat(1,neuron.C_raw,C_raw);
 neuron.S=cat(1,neuron.S,S);
-neuron.ids=cat(2,neuron.ids,max(neuron.ids):max(neuron.ids)+size(A,2));
+% One new id per added component, starting ABOVE the current maximum.
+% max(ids):max(ids)+n gives n+1 values and repeats the existing maximum, so the
+% list grew longer than the component count and two components shared a key.
+% Anything that looks a component up by id then takes the wrong one.
+next = max([neuron.ids(:)', 0]);
+neuron.ids = cat(2, neuron.ids, next + (1:size(A,2)));
+if numel(neuron.tags) < size(neuron.A,2)
+    neuron.tags = [neuron.tags(:); zeros(size(neuron.A,2)-numel(neuron.tags), 1, 'like', neuron.tags)];
+end
 
 end

@@ -6,15 +6,19 @@ Y = single(neuron.load_patch_data([],[fn(batch_num)+1,fn(batch_num+1)]));
 if ~ismatrix(Y), Y=reshape(Y,[],size(Y,3)); end
 Y(isnan(Y))=0;
 A=full(neuron.A);
+% Traces are in noise units after scale_to_noise; the movie is not. Without
+% this the residual panel shows the raw data with a far too large model taken
+% off it. See trace_noise_scale.
+C_mu = trace_noise_scale(neuron, 'apply', neuron.C);
 color_map=componentColorMap(reshape(A,d1,d2,[]),1:size(A,2),'Plot',false);
 
 useGPU = exist('gpuDeviceCount','builtin') && gpuDeviceCount>0;
 if useGPU
     A = gpuArray(A);
-    Cg = gpuArray(single(neuron.C(:,fn(batch_num)+1:fn(batch_num+1))));
+    Cg = gpuArray(single(C_mu(:,fn(batch_num)+1:fn(batch_num+1))));
     ns = gather(A * C_g);
 else
-    Cg = single(neuron.C(:,fn(batch_num)+1:fn(batch_num+1)));
+    Cg = single(C_mu(:,fn(batch_num)+1:fn(batch_num+1)));
     ns   = A * Cg;
 end
 

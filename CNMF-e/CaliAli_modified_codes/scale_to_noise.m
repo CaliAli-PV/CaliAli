@@ -41,11 +41,21 @@ else
     c=[neuron.frame_range(1),neuron.frame_range(2)];
 end
 
+% Keep the gain that is divided out. The traces have to stay in noise units --
+% the deconvolution downstream applies an absolute amplitude threshold -- but a
+% residual needs them back in movie units, and without the factor there is no
+% way to get there. See trace_noise_scale.
+sn_all = ones(size(neuron.C_raw,1), size(c,1));
 for i=1:size(c,1)
     temp=neuron.C_raw(:,c(i,1):c(i,2)); % 1) we susbtract the deconvolved signal from the raw calcium trace.
     temp=detrend(temp')';
-    temp=temp./GetSn(temp);   
+    sn = GetSn(temp);
+    sn = sn(:);
+    sn(~isfinite(sn) | sn<=0) = 1;
+    sn_all(:,i) = sn;
+    temp=temp./sn;
     neuron.C_raw(:,c(i,1):c(i,2))=temp;   % 3) we scale the raw signal. 
-end 
+end
+trace_noise_scale(neuron, 'record', c, sn_all);
 
 justdeconv(neuron,neuron.options.deconv_options.method,neuron.options.deconv_options.type,neuron.options.deconv_options.smin);

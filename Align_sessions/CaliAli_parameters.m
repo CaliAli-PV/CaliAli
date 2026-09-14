@@ -307,6 +307,18 @@ addParameter(inp,'shifts_n',[])          % Final neuron alignment non-rigid disp
 addParameter(inp,'BV_score',[])          % BV alignment score
 addParameter(inp,'range',[])             % Color-bit range of each session
 addParameter(inp,'Cn_scale',[])          % Scale of the coorelation image
+% Per-session projections, kept rather than collapsed into one image. Cn_scale is
+% the peak over EVERY session, so a stage that divides a single session's image
+% by it uses the wrong number whenever that session's own peak is lower. These
+% are declared here because the parser keeps only what addParameter names:
+% inp.KeepUnmatched is true but the struct is taken from inp.Results, so an
+% undeclared field is dropped silently on the next pass. See projection_session_stats.
+addParameter(inp,'Cn_per_session',[])          % Raw correlation image of each session, aligned grid
+addParameter(inp,'PNR_per_session',[])         % Raw peak-to-noise image of each session
+addParameter(inp,'Cn_scale_per_session',[])    % Peak correlation of each session on its own
+addParameter(inp,'PNR_scale_per_session',[])   % Peak peak-to-noise of each session on its own
+addParameter(inp,'projection_method',[])       % Which branch of get_projections_and_detrend produced them
+addParameter(inp,'projection_median_filtering',[]) % medfilt2 size applied to them, [] if none
 
 varargin=varargin{:};
 if isstruct(varargin)
