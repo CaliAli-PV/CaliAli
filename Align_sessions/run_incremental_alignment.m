@@ -67,10 +67,25 @@ CaliAli_options.inter_session_alignment = opt;
 CaliAli_options.inter_session_alignment.P = P;
 CaliAli_options.inter_session_alignment.alignment_metrics = get_alignment_metrics(P);
 CaliAli_options.inter_session_alignment.Cn = max(P.(size(P, 2))(1, :).(3){1, 1}, [], 3);
-CaliAli_options.inter_session_alignment.Cn_scale = max(CaliAli_options.inter_session_alignment.Cn, [], 'all');
+% Cn_scale is the peak raw correlation over the WHOLE video, which is what makes
+% min_corr an absolute threshold rather than one relative to whatever was
+% analysed. Appending sessions can only widen it, so take the largest of what
+% the earlier extraction used, what the new sessions reach on their own, and
+% what the combined projections show. Recomputing it from the combined
+% projections alone left it below the appended session's own peak.
+CaliAli_options.inter_session_alignment.Cn_scale = max_cn_scale( ...
+    max(CaliAli_options.inter_session_alignment.Cn, [], 'all'), ...
+    original_options, new_session_options);
 CaliAli_options.inter_session_alignment.Cn = CaliAli_options.inter_session_alignment.Cn ./ ...
     CaliAli_options.inter_session_alignment.Cn_scale;
 CaliAli_options.inter_session_alignment.PNR = max(P.(size(P, 2))(1, :).(4){1, 1}, [], 3);
+% As in CaliAli_align_sessions: keep the per-session projections. P spans every
+% session here too, including the appended one, so nothing has to be merged.
+stats = projection_session_stats(P, CaliAli_options.preprocessing);
+fn = fieldnames(stats);
+for i = 1:numel(fn)
+    CaliAli_options.inter_session_alignment.(fn{i}) = stats.(fn{i});
+end
 CaliAli_options.inter_session_alignment.incremental_alignment.new_det_range = new_det_ranges;
 
 CaliAli_options = apply_incremental_transformations(CaliAli_options, reference_file, ...
@@ -717,7 +732,9 @@ if isempty(files)
     return
 end
 src_paths = cellfun(@(f) resolve_source_file(f), files, 'UniformOutput', false);
-remove_corrupted_output(src_paths);
+% These are alignment INPUTS. Nothing regenerates them, so report and let the
+% user rebuild rather than deleting their data.
+report_corrupted_files(src_paths);
 
 num_sessions = max(cellfun(@(idx) resolve_session_id(files{idx}, idx), num2cell(1:numel(files))));
 input_F = zeros(num_sessions, 1);
@@ -856,10 +873,38 @@ end
 
 function save_relevant_variables(CaliAli_options)
 P = CaliAli_options.inter_session_alignment.P;
+prev_scale = [];
+if isfield(CaliAli_options.inter_session_alignment, 'Cn_scale')
+    prev_scale = CaliAli_options.inter_session_alignment.Cn_scale;
+end
 CaliAli_options.inter_session_alignment.Cn = max(P.(size(P, 2))(1, :).(3){1, 1}, [], 3);
-CaliAli_options.inter_session_alignment.Cn_scale = max(CaliAli_options.inter_session_alignment.Cn, [], 'all');
+% never shrink it: see the note where Cn_scale is set for the incremental case
+CaliAli_options.inter_session_alignment.Cn_scale = ...
+    max([max(CaliAli_options.inter_session_alignment.Cn, [], 'all'), prev_scale(:)']);
 CaliAli_options.inter_session_alignment.Cn = CaliAli_options.inter_session_alignment.Cn ./ ...
     CaliAli_options.inter_session_alignment.Cn_scale;
 CaliAli_options.inter_session_alignment.PNR = max(P.(size(P, 2))(1, :).(4){1, 1}, [], 3);
 CaliAli_save(CaliAli_options.inter_session_alignment.out_aligned_sessions(:), CaliAli_options);
+end
+
+function scale = max_cn_scale(combined_scale, original_options, new_session_options)
+%MAX_CN_SCALE  Largest peak raw correlation seen by any part of the recording.
+%
+%   min_corr is an absolute threshold, and it only means the same thing in every
+%   session if the correlation image is divided by the peak over the whole
+%   video. Appending sessions can raise that peak, so this takes the largest of
+%   the combined projections, whatever the earlier extraction used, and whatever
+%   the new sessions reach on their own.
+candidates = combined_scale;
+candidates = [candidates, stored_scale(original_options)];
+candidates = [candidates, stored_scale(new_session_options)];
+scale = max(candidates(isfinite(candidates)));
+end
+
+function v = stored_scale(options)
+v = [];
+if isstruct(options) && isfield(options, 'inter_session_alignment') && ...
+        isfield(options.inter_session_alignment, 'Cn_scale')
+    v = options.inter_session_alignment.Cn_scale(:)';
+end
 end

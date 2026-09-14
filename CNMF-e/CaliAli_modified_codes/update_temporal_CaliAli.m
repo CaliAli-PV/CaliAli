@@ -1,4 +1,4 @@
-function obj=update_temporal_CaliAli(obj, use_parallel,ret_id,F)
+function obj=update_temporal_CaliAli(obj, use_parallel,ret_id,F,frame_range)
 %% update_temporal_CaliAli - Updates the temporal components of extracted neuronal signals.
 %
 % This function refines the temporal dynamics of detected neuronal components
@@ -37,8 +37,19 @@ function obj=update_temporal_CaliAli(obj, use_parallel,ret_id,F)
 
 
 fprintf('\n-----------------UPDATE TEMPORAL---------------------------\n');
+% FRAME_RANGE limits the re-estimation to one interval of frames; traces outside
+% it are carried through untouched. Left empty it covers the whole recording and
+% this function behaves exactly as before. See update_temporal_CaliAli_targeted.
+if ~exist('frame_range','var') || isempty(frame_range)
+    frame_range=[1, size(obj.C,2)];
+end
+whole_recording = isequal(frame_range(:)', [1, size(obj.C,2)]);
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj);
+    if whole_recording
+        F=get_batch_size(obj);
+    else
+        F=temporal_batches_within(obj, frame_range);
+    end
 end
 if ~exist('ret_id','var')
     ret_id=[];
@@ -48,8 +59,8 @@ if ~isempty(ret_id) && isempty(active_id)
     fprintf('All neurons are retired. Temporal update skipped.\n');
     return;
 end
-batch=[0,cumsum(F)];
-if isempty(ret_id)
+batch=(frame_range(1)-1)+[0,cumsum(F)];
+if isempty(ret_id) && whole_recording
     C_raw=[];
 else
     C_raw=obj.C_raw;
@@ -63,7 +74,12 @@ for i=progress(1:div)
     frame_idx=batch(i)+1:batch(i+1);
     C_raw_temp =update_temporal_in(obj,use_parallel,[frame_idx(1) frame_idx(end)],i,[],active_id,ret_id);
     if isempty(ret_id)
-        C_raw=catpad(2,C_raw,C_raw_temp);
+        if whole_recording
+            C_raw=catpad(2,C_raw,C_raw_temp);
+        else
+            % Only this interval is re-estimated; the rest of C_raw stands.
+            C_raw(1:size(C_raw_temp,1),frame_idx)=C_raw_temp;
+        end
     else
         C_raw(active_id,frame_idx)=C_raw_temp(active_id,:);
     end
@@ -81,8 +97,18 @@ else
     if isempty(ret_id)
         obj.C_raw = bsxfun(@minus, obj.C_raw, min(obj.C_raw,[],2));
         obj.C = obj.C_raw;
+        % Every trace has just been re-estimated from the movie, so they are all
+        % back in movie units and the gain recorded by scale_to_noise no longer
+        % describes them. Clearing it is required, not tidiness: leaving it
+        % would make the next recording compose a stale factor onto a fresh one.
+        trace_noise_scale(obj, 'clear');
     else
         obj.C_raw(active_id,:) = bsxfun(@minus, obj.C_raw(active_id,:), min(obj.C_raw(active_id,:),[],2));
+        % Only the active components were re-estimated, so only their gain is
+        % stale. The frozen ones keep theirs -- they were not touched, and
+        % clearing the whole record would lose the factor that returns them to
+        % movie units.
+        trace_noise_scale(obj, 'reset', active_id);
         obj.C(active_id,:) = obj.C_raw(active_id,:);
     end
 end
@@ -90,6 +116,18 @@ fprintf('Done!\n');
 
 end
 
+
+function F = temporal_batches_within(obj, frame_range)
+%% Split a frame range into batches of the size the memory batching would use.
+[~, chunk] = get_batch_size(obj);
+len = frame_range(2) - frame_range(1) + 1;
+if ~isfinite(chunk) || chunk <= 0
+    n = 1;
+else
+    n = max(round(len / chunk), 1);
+end
+F = diff(round(linspace(0, len, n + 1)));
+end
 
 function C_raw=update_temporal_in(obj, use_parallel, max_frame,idx,use_c_hat,active_id,ret_id)
 %% update the the temporal components for all neurons

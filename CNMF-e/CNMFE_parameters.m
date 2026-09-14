@@ -85,6 +85,13 @@ addParameter(inp, 'center_psf', true, @islogical);  % set the value as true when
 addParameter(inp, 'seed_mask', []);  % Used internally
 % -------------------------  General CNMF  -------------------------  %
 addParameter(inp, 'retreat_neurons', false);  % Retire stable neurons from the CNMF iterations
+addParameter(inp, 'spatial_batch_by_session', false);  % Weight the spatial update by activity within each session instead of over memory batches. Only meaningful when sessions differ in which neurons are active, so the incremental path turns it on rather than changing every extraction.
+addParameter(inp, 'propagation_mode', 'reinitialize');  % How an extraction is carried onto more sessions: 'reinitialize' keeps only the footprints and rebuilds the background and traces from the whole recording, 'carry_background' keeps the background fitted on the earlier sessions.
+addParameter(inp, 'final_joint_passes', 0);  % Passes of background and temporal together, footprints held fixed, after the refinement loop. Lets the traces and the background settle against each other.
+addParameter(inp, 'residual_passes', 10);  % Refinement passes after a residual update. Fewer is better when components are initialized from the raw signal, because the starting set is already clean.
+addParameter(inp, 'residual_init_mode', 'raw');  % Where components added by a residual update come from: 'raw' initializes from the raw signal and rejects duplicates, 'residual' initializes from what the model does not explain.
+addParameter(inp, 'dedup_ring_gsig', 5);  % Radius, in neuron radii, of the ring used to measure how alike two distinct neurons are. Too small leaves too few pairs; too large includes neurons that could never be confused.
+addParameter(inp, 'dedup_percentile', 99);  % A candidate more similar to an existing component than this percentile of that ring is treated as the same neuron.
 addParameter(inp, 'fast_residual', true);  % During a residual update, refine only the newly added ROIs
 addParameter(inp, 'dissimilarity_threshold', 0.05);  % Stop the CNMF loop once dissimilarity with the previous iteration falls below this. 0 disables early stopping.
 addParameter(inp, 'max_cnmf_iterations', 10);  % Hard cap on CNMF refinement iterations

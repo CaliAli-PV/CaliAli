@@ -1,4 +1,4 @@
-function obj=update_background_CaliAli(obj, use_parallel,ret_id,F)
+function obj=update_background_CaliAli(obj, use_parallel,ret_id,F,frame_range)
 %% update_background_CaliAli - Updates background estimation in multiple batches.
 %
 % This function refines the background estimation in a CNMF pipeline by processing 
@@ -12,6 +12,11 @@ function obj=update_background_CaliAli(obj, use_parallel,ret_id,F)
 %   - use_parallel: Boolean flag indicating whether to use parallel processing.
 %   - F (optional): Array specifying batch sizes for processing. If not provided, 
 %     it is determined using get_batch_size(obj).
+%   - frame_range (optional): [first last] frames to fit the background on.
+%     Defaults to the whole recording, in which case this function behaves
+%     exactly as before. Supplying a sub-range restricts every batch to it, so
+%     the background is estimated from those frames only; see
+%     update_background_CaliAli_targeted.
 %
 % Outputs:
 %   - obj: Updated CNMF object with refined background components.
@@ -23,8 +28,15 @@ function obj=update_background_CaliAli(obj, use_parallel,ret_id,F)
 % Contact: pablo.vergara.g@ug.uchile.cl
 % Date: 2025
 
+if ~exist('frame_range','var') || isempty(frame_range)
+    frame_range=[1, size(obj.C,2)];
+end
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj);
+    if isequal(frame_range(:)', [1, size(obj.C,2)])
+        F=get_batch_size(obj);
+    else
+        F=batches_within(obj, frame_range);
+    end
 end
 if ~exist('ret_id','var')
     ret_id=[];
@@ -42,7 +54,9 @@ if ~isempty(ret_id) && isempty(active_id)
     return;
 end
 
-batch=[0,cumsum(F)];
+% Batch edges are offset by the start of the range, so a sub-range fits only
+% its own frames. With the default range this is [0,cumsum(F)] as before.
+batch=(frame_range(1)-1)+[0,cumsum(F)];
 div=length(batch)-1;
 fprintf('\n-----------------UPDATE BACKGROUND---------------------------\n');
 
@@ -127,6 +141,18 @@ obj.W=W;
 obj.C_prev=obj.C;
 
 end
+function F = batches_within(obj, frame_range)
+%% Split a frame range into batches of the size the memory batching would use.
+[~, chunk] = get_batch_size(obj);
+len = frame_range(2) - frame_range(1) + 1;
+if ~isfinite(chunk) || chunk <= 0
+    n = 1;
+else
+    n = max(round(len / chunk), 1);
+end
+F = diff(round(linspace(0, len, n + 1)));
+end
+
 function out=update_bg_in(in,use_parallel,f_range,active_id,ret_id)
 %% update the background related variables in CNMF framework
 % input:

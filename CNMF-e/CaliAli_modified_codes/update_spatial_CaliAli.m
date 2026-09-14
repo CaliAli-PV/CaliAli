@@ -26,7 +26,23 @@ function obj=update_spatial_CaliAli(obj, use_parallel,ret_id,F)
 
 fprintf('\n-----------------UPDATE SPATIAL---------------------------\n');
 if ~(exist('F','var') && ~isempty(F))
-    F=get_batch_size(obj);
+    % Batches are chosen by memory, as everywhere else in the pipeline.
+    %
+    % An extraction carried onto more sessions asks for something different.
+    % Each batch contributes to a footprint weighted by how active the
+    % component was within it, so batching by SESSION lets a neuron that fires
+    % in one session and is silent in another keep the footprint the active
+    % session supports. Under memory batching a recording that fits in one
+    % batch collapses to a single estimate over every frame, and a component
+    % active in one session out of three is fitted across two sessions of
+    % noise. That only matters when sessions differ in which neurons are
+    % active, so it is opt-in and set by the incremental path rather than
+    % changing what every extraction does.
+    if session_batching_requested(obj)
+        F=session_batches(obj);
+    else
+        F=get_batch_size(obj);
+    end
 end
 if ~exist('ret_id','var')
     ret_id=[];
@@ -50,8 +66,15 @@ for i=progress(1:div)
     A=sparse(A+out_A.*sc');
 end
 if isempty(ret_id)
-    A=A./Ca';
-    obj.A=sparse(A);
+    % A component that never fires has no weight in any session, so there is
+    % nothing to divide by and nothing to update: keep the footprint it has
+    % rather than turning it into NaN.
+    A_new=obj.A;
+    ok=Ca>0;
+    if any(ok)
+        A_new(:,ok)=A(:,ok)./Ca(ok)';
+    end
+    obj.A=sparse(A_new);
 else
     A_new=obj.A;
     ind_valid=active_id(Ca(active_id)>0);
@@ -452,4 +475,32 @@ end
 
 %% save the results to log
 fclose(flog);
+end
+
+function tf = session_batching_requested(obj)
+%% Whether the caller asked for the spatial update to be weighted per session.
+tf = false;
+try
+    tf = logical(obj.CaliAli_options.cnmf.spatial_batch_by_session);
+catch
+end
+end
+
+function F = session_batches(obj)
+%% Frames per session, falling back to the memory batching.
+F = [];
+try
+    F = obj.CaliAli_options.inter_session_alignment.F(:)';
+catch
+end
+T = size(obj.C, 2);
+if isempty(F) || abs(sum(F) - T) > 0
+    F = get_batch_size(obj);
+    return
+end
+% Never let a session batch exceed what the memory batching allows.
+lim = max(get_batch_size(obj));
+if any(F > lim)
+    F = get_batch_size(obj);
+end
 end
