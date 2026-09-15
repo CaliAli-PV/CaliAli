@@ -165,6 +165,17 @@ function Vid = apply_translations(Vid, T, Mask)
 f1 = max(sum(Mask, 1));
 f2 = max(sum(Mask, 2));
 
+% The mask must be a rectangle. Selecting its pixels in linear order and
+% reshaping to f1 by f2 only reconstructs a frame when nnz(Mask) == f1*f2; for
+% any other shape the reshape either errors or, worse, succeeds and scrambles
+% the frame. largest_valid_rectangle guarantees it, so this only fires if a mask
+% reached here from somewhere else.
+if nnz(Mask) ~= f1*f2
+    error('CaliAli:applyTransform:maskNotRectangular', ...
+        ['The valid-region mask is not a rectangle: %d pixels for a %dx%d ' ...
+         'crop. The frame cannot be rebuilt from it.'], nnz(Mask), f1, f2);
+end
+
 % Apply the translation using imtranslate
 Vid = imtranslate(Vid, T);
 
@@ -256,6 +267,17 @@ end
 % Find the maximum sum of the mask along each dimension (for reshaping)
 f1 = max(sum(Mask, 1));
 f2 = max(sum(Mask, 2));
+
+% The mask must be a rectangle. Selecting its pixels in linear order and
+% reshaping to f1 by f2 only reconstructs a frame when nnz(Mask) == f1*f2; for
+% any other shape the reshape either errors or, worse, succeeds and scrambles
+% the frame. largest_valid_rectangle guarantees it, so this only fires if a mask
+% reached here from somewhere else.
+if nnz(Mask) ~= f1*f2
+    error('CaliAli:applyTransform:maskNotRectangular', ...
+        ['The valid-region mask is not a rectangle: %d pixels for a %dx%d ' ...
+         'crop. The frame cannot be rebuilt from it.'], nnz(Mask), f1, f2);
+end
 
 % Reshape the video data to apply the mask
 Vid = reshape(Vid, size(Vid, 1) * size(Vid, 2), []);

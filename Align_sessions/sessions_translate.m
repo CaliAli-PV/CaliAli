@@ -57,20 +57,39 @@ for i = 1:size(shifts, 1)
     shifts(i).shifts_up = shifts(i).shifts_up - C2;
 end
 
-% Apply the computed shifts to the projections in P
-for i = 1:size(P, 2) - 1
-    temp = apply_shifts(cell2mat(P{1, i}), shifts, options_r);
-    [temp, Mask] = remove_borders(temp);  % Remove borders (optional step to improve alignment quality)
-    P{1, i} = {temp};  % Update the projection with the shifted data
-end
-
-% Apply scaling to the projections
-P = scale_Cn(P);
-
 % Store the calculated shifts in the transformation matrix (T)
 for i = 1:size(shifts, 1)
     T(i, :) = flip(squeeze(shifts(i).shifts)');
 end
+
+% THE VALID REGION, FROM THE SHIFTS RATHER THAN FROM THE PIXELS.
+%
+% This used to come from remove_borders, which fills the shifted projection with
+% NaN and then looks for the NaN. The shift is already known, so there is nothing
+% to look for: translating a mask of true by the same amount says exactly which
+% pixels are real, and no pixel value is ever consulted.
+%
+% imtranslate, not apply_shifts, and deliberately. apply_shifts moves the
+% PROJECTIONS with NoRMCorre's Fourier resampler, but apply_translations moves
+% the DATA with imtranslate. A mask taken from the projections therefore
+% described a slightly different border from the one the data actually gets. The
+% mask's job is to describe the data, so it is built the way the data is moved.
+valid = true(d1, d2);
+for i = 1:size(T, 1)
+    valid = valid & imtranslate(true(d1, d2), T(i, :), 'FillValues', 0);
+end
+[Mask, rows, cols] = largest_valid_rectangle(valid);
+
+% Apply the computed shifts to the projections in P, then cut them all to that
+% one rectangle -- previously each projection derived its own, which agreed only
+% because they happened to share a NaN pattern.
+for i = 1:size(P, 2) - 1
+    temp = apply_shifts(cell2mat(P{1, i}), shifts, options_r);
+    P{1, i} = {temp(rows, cols, :)};
+end
+
+% Apply scaling to the projections
+P = scale_Cn(P);
 
 % Update the CaliAli_options structure with the applied shifts and mask
 CaliAli_options.inter_session_alignment.T = T;

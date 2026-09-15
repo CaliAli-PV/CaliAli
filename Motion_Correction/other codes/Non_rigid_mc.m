@@ -151,7 +151,7 @@ V=cat(3,V{:});
 valid = true(size(V,1), size(V,2));
 for i = progress(1:size(D,4),'Title','Applying shifts')
     V(:,:,i) = imwarp(V(:,:,i), D(:,:,:,i), 'FillValues', 0);
-    valid = valid & imwarp(true(size(V,1), size(V,2)), D(:,:,:,i), 'FillValues', false);
+    valid = valid & imwarp(true(size(V,1), size(V,2)), D(:,:,:,i), 'FillValues', 0);   % imwarp rejects a logical fill value
 end
 
 end

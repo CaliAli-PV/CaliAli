@@ -67,21 +67,28 @@ end
 shifts(isnan(shifts)) = 0;
 shifts = shifts - mean(shifts, 4);
 
-% Apply the calculated shifts to the projections (P)
+% THE VALID REGION, FROM THE DISPLACEMENT FIELD RATHER THAN FROM THE PIXELS.
+%
+% The same field is applied to a mask of true, which says exactly which pixels
+% survive the warp. What this replaces built the mask by filling the projection
+% with NaN and then searching for it, which meant the answer depended on the
+% pixel values, and it read that answer off P.(k) with k left over from the loop
+% above -- so the mask came from whichever projection happened to be last. Every
+% projection is now cut to one rectangle, computed once.
+[pd1, pd2, ~] = size(cell2mat(P{1, 1}));
+valid = true(pd1, pd2);
+for i = 1:size(shifts, 4)
+    valid = valid & imwarp(true(pd1, pd2), shifts(:,:,:,i), 'FillValues', 0);
+end
+[Mask, rows, cols] = largest_valid_rectangle(valid);
+
+% Apply the calculated shifts to the projections (P), then cut them to it
 for k = 1:size(P, 2)
     temp = double(cell2mat(P{1, k}));
     parfor i = 1:size(shifts, 4)
         temp(:,:,i) = imwarp(temp(:,:,i), shifts(:,:,:,i), 'FillValues', nan); % Apply non-rigid shift to each projection
     end
-    P{1, k} = {temp};  % Store the shifted projection
-end
-
-% Remove black borders from projections after alignment
-Mask = 1 - max(isnan(P.(k){1, 1}), [], 3);  % Create mask to identify non-NaN areas
-[~, Mask] = remove_borders(Mask, 0);  % Remove borders from the mask
-for k = 1:size(P, 2)
-    temp = P.(k){1, 1};
-    P.(k){1, 1} = remove_borders(temp);  % Remove borders from each projection
+    P{1, k} = {temp(rows, cols, :)};  % Store the shifted projection
 end
 
 [P,shifts]=expand_P_from_same_session_batches(P,shifts,CaliAli_options.inter_session_alignment.same_ses_id);

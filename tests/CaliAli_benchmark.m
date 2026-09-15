@@ -183,13 +183,21 @@ scn(end+1) = mk('D2','datatype single', ...
     {'downsampling.batch_sz',0,'downsampling.output_class','single'}, ...
     {'dtype','bookkeeping'}, true);
 
-% Motion correction run per session outside CaliAli crops each session by its
-% own amount, so the sessions arrive at DIFFERENT SIZES. That is the real shape
-% of this case, and what alignment has to reconcile -- not merely a skipped
-% stage. One session is deliberately made smaller here.
-scn(end+1) = mk('E','external motion correction: sessions of different size', ...
+% Motion correction done OUTSIDE CaliAli. Each session is corrected on its own
+% and then stripped of every record of how, which is what a file coming back from
+% CaImAn or Suite2p looks like: corrected, cropped to its own valid region, and
+% carrying nothing that says where that region sat in the original frame. The
+% sessions therefore arrive at different sizes AND off centre from each other,
+% which is what alignment has to reconcile.
+%
+% This used to be spelled 'mc = false', which skipped motion correction without
+% substituting anything, so the scenario ran the whole pipeline on data with
+% 3-pixel jitter still in it. That dominated every number it produced -- crispness
+% 5.47 against A's 8.55, F1 0.498 against 0.730 -- and told us nothing about the
+% path it was meant to exercise.
+scn(end+1) = mk('E','motion correction done outside CaliAli', ...
     {'downsampling.batch_sz',0}, ...
-    {'dtype','bookkeeping','alignment','gt','sizes'}, false);
+    {'dtype','bookkeeping','alignment','gt','sizes'}, 'external');
 
 scn(end+1) = mk('F','non-rigid motion correction', ...
     {'downsampling.batch_sz',0,'motion_correction.do_non_rigid',true}, ...
@@ -256,9 +264,6 @@ files = copy_inputs(sim.files, rec.dir);
 if strcmp(s.id,'J')
     files = blank_one_frame(files);   % the dropped frame this scenario looks for
 end
-if strcmp(s.id,'E')
-    files = shrink_one_session(files, 12);   % sessions of unequal size
-end
 
 opt = CaliAli_demo_parameters();
 opt = apply_overrides(opt, s.opts);
@@ -291,14 +296,20 @@ T.downsample = toc(t);
 ds = opt.downsampling.output_files;
 rec.ds_files = ds;
 
-%% 2. motion correction, unless the scenario supplies it externally
+%% 2. motion correction
+% Three cases. true: CaliAli corrects all the sessions together, which is the
+% normal path. 'external': each session is corrected on its own and then stripped
+% of the record, standing in for a different tool. false: not corrected at all,
+% which is only ever right for a scenario that stops before extraction.
 t = tic;
-if s.mc
+if isequal(s.mc, true)
     opt.motion_correction.input_files = ds;
     opt = CaliAli_motion_correction(opt);
     mc = opt.motion_correction.output_files;
+elseif ischar(s.mc) && strcmp(s.mc,'external')
+    mc = correct_each_session_alone(ds, opt);
 else
-    mc = ds;   % straight into alignment; the value-based fallback recovers the mask
+    mc = ds;
 end
 T.motion_correction = toc(t);
 rec.mc_files = mc;
@@ -334,7 +345,7 @@ if has(s.checks,'alignment'),   C = [C, check_alignment(opt, aligned)]; end
 if has(s.checks,'workspace'),   C = [C, check_workspace(sentinel)]; end
 if has(s.checks,'patch'),       C = [C, check_patch(opt)]; end
 if has(s.checks,'dropped'),     C = [C, check_dropped(rec.dir, 10)]; end
-if has(s.checks,'sizes'),       C = [C, check_size_reconciliation(ds, aligned, opt)]; end
+if has(s.checks,'sizes'),       C = [C, check_size_reconciliation(mc, aligned, opt)]; end
 if has(s.checks,'propagation'), C = [C, check_propagation(opt, ds, aligned, sim)]; end
 if has(s.checks,'gt')
     [gt_checks, rec.score] = check_ground_truth(extraction, sim, opt);
@@ -871,14 +882,23 @@ end
 %  ========================================================================
 function sim = make_simulation(dir_, args)
 %% One recording, default neuron settings, with motion.
+%
 % session_motion_std must be non-zero: it is what makes translation happen, and
 % therefore what the valid-region mask is for. Note that setting it to zero also
 % makes the simulator append _mc to the filenames.
+%
+% A DIFFERENT AMPLITUDE PER SESSION. Motion correction crops each session to the
+% region that stayed valid through its own shaking, so the amount of shaking
+% decides how much is cropped. Give every session the same amplitude and they
+% come out within a pixel or two of each other, which never tests the case where
+% sessions reach alignment at genuinely different sizes and off centre -- the
+% case scenario E exists for. These three span a factor of four.
 if ~isfolder(dir_), mkdir(dir_); end
 here = pwd; c = onCleanup(@() cd(here)); %#ok<NASGU>
+motion = repmat([2 5 8], 1, ceil(args.sessions/3));
 files = Simulate_Ca_video('outpath', dir_, 'ses', args.sessions, 'F', args.frames, ...
     'seed', 20260915, 'save_GT', false, 'save_mat', true, 'save_avi', 1, ...
-    'session_motion_std', 3, 'translation_misalignment', 1);
+    'session_motion_std', motion(1:args.sessions), 'translation_misalignment', 1);
 cd(here);
 sim = load_simulation(dir_);
 sim.files = files;
@@ -1073,13 +1093,40 @@ catch ME
 end
 end
 
-function files = shrink_one_session(files, px)
-%% Crop the first session, so the sessions no longer share a frame size.
-v = VideoReader(files{1}); %#ok<TNMLP>
-F = read(v, [1 Inf]);
-F = F(px+1:end-px, px+1:end-px, :, :);
-w = VideoWriter(files{1}, 'Uncompressed AVI'); w.FrameRate = v.FrameRate;
-open(w); for k = 1:size(F,4), writeVideo(w, F(:,:,:,k)); end; close(w);
+function mc = correct_each_session_alone(ds, opt)
+%% Motion-correct every session on its own, then erase the record of how.
+%
+% Correcting them one at a time is what makes this different from the normal
+% path: each session is cropped to ITS OWN valid region, so the crop is a
+% different size and sits at a different place in the original frame. Stripping
+% motion_correction afterwards removes the only thing that says where -- the
+% Mask, which CaliAli keeps at the pre-crop size with the kept rectangle marked.
+% What reaches alignment is then exactly what an external tool hands over:
+% corrected sessions of different sizes, off centre from each other, with nothing
+% recorded about the padding.
+mc = cell(1, numel(ds));
+for i = 1:numel(ds)
+    o = opt;
+    o.motion_correction.input_files  = ds(i);
+    o.motion_correction.output_files = [];
+    o = CaliAli_motion_correction(o);
+    mc{i} = o.motion_correction.output_files{1};
+end
+forget_motion_record(mc);
+end
+
+
+function forget_motion_record(files)
+%% Reset motion_correction to its defaults, so no trace of the crop survives.
+% Not the whole CaliAli_options: a file with none of that is scenario K, and the
+% requirement there is that the pipeline REFUSES it. The file here is valid, it
+% simply has no history.
+fresh = CaliAli_parameters();
+for i = 1:numel(files)
+    o = CaliAli_load(files{i}, 'CaliAli_options');
+    o.motion_correction = fresh.motion_correction;
+    CaliAli_save(files{i}, 'CaliAli_options', o);
+end
 end
 
 function t = first_line(s)
