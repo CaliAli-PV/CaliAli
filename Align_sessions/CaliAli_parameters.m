@@ -33,15 +33,9 @@ if isempty(varargin)
     varargin={[]};
 end
 
-struct_param={};
+struct_param={}; given_struct = [];
 if isstruct(varargin{1})
-    % Parameters live in a FLAT namespace and are projected into one
-    % substructure per module. The projection is not editable: setting a value
-    % on one module and not the others is collapsed on the next parse, with the
-    % upstream module winning. That is correct -- the flat value is the source
-    % of truth -- but it used to happen silently, so a per-module edit looked
-    % like it had been accepted and was simply discarded. Say so instead.
-    warn_if_modules_disagree(varargin{1});
+    given_struct = varargin{1};
     struct_param = [fieldnames(varargin{1}), struct2cell(varargin{1})]';
     varargin(1)=[];
 end
@@ -59,6 +53,17 @@ if ~(numel(varargin)==1 && isempty(varargin{1}))
 end
 
 varargin=[struct_param,NameValue_param];
+
+% Parameters live in a FLAT namespace and are projected into one substructure
+% per module. The projection is not editable: a value set on one module and not
+% the others is collapsed on the next parse, with the flat value winning. That
+% is correct, but it used to happen silently, so the edit looked accepted and
+% was simply discarded. Anything supplied as a name/value pair in THIS call is
+% exempt -- the caller has just settled it, which is exactly the advice the
+% warning gives, and being warned for following it would be absurd.
+if ~isempty(given_struct)
+    warn_if_modules_disagree(given_struct, NameValue_param(1,:));
+end
 
 
 %% Downsampling Parameters
@@ -387,7 +392,7 @@ if ~isempty(input)
 end
 end
 
-function warn_if_modules_disagree(in)
+function warn_if_modules_disagree(in, settled)
 %% Report a parameter that has been given different values in different modules.
 %
 % Only the flat value survives, so a divergent one is about to be discarded. The
@@ -395,6 +400,8 @@ function warn_if_modules_disagree(in)
 % will be used, because the alternative is the user believing a setting took
 % effect when it did not.
 if ~isstruct(in), return; end
+if nargin < 2 || isempty(settled), settled = {}; end
+settled = lower(cellfun(@(x) char(string(x)), settled, 'UniformOutput', false));
 mods = fieldnames(in);
 mods = mods(cellfun(@(m) isstruct(in.(m)), mods));
 if numel(mods) < 2, return; end
@@ -421,6 +428,7 @@ k = keys(seen);
 for i = 1:numel(k)
     e = seen(k{i});
     if numel(e.vals) < 2, continue; end
+    if any(strcmp(lower(k{i}), settled)), continue; end   % settled by this call
     same = true;
     for j = 2:numel(e.vals)
         if ~isequaln(e.vals{1}, e.vals{j}), same = false; break; end
@@ -430,12 +438,26 @@ for i = 1:numel(k)
     for j = 1:numel(e.mods)
         parts{j} = sprintf('%s=%s', e.mods{j}, compact_value(e.vals{j}));
     end
+    % Name the value the user most likely wanted: the one that differs from
+    % the flat value they are about to be given.
+    wanted = '';
+    for j = 2:numel(e.vals)
+        if ~isequaln(e.vals{j}, e.vals{1})
+            wanted = compact_value(e.vals{j});
+            break
+        end
+    end
     warning('CaliAli:ParameterDiverges', ...
-        ['"%s" has different values in different modules (%s). Parameters are ' ...
-         'set once in a flat namespace and copied into every module that uses ' ...
-         'them, so only "%s" will be used and the others are discarded. To vary ' ...
-         'it per stage it needs its own parameter name.'], ...
-        k{i}, strjoin(parts, ', '), compact_value(e.vals{1}));
+        ['"%s" was set to different values in different modules (%s), so only ' ...
+         '"%s" will be used.\n' ...
+         'Parameters are set ONCE and copied into every module that uses them; ' ...
+         'the per-module fields are a copy, not a place to set them.\n' ...
+         'To use %s, do either of:\n' ...
+         '    CaliAli_options = CaliAli_parameters(CaliAli_options, ''%s'', %s);\n' ...
+         '    params.%s = %s;   %% then CaliAli_parameters(params)\n' ...
+         'To give a stage its own value, it needs its own parameter name.'], ...
+        k{i}, strjoin(parts, ', '), compact_value(e.vals{1}), ...
+        wanted, k{i}, wanted, k{i}, wanted);
 end
 end
 

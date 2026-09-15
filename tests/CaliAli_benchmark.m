@@ -673,6 +673,18 @@ try
         strcmp(id,'CaliAli:ParameterDiverges'), first_line(w));
     C{end+1} = chk_true('and the flat value is the one used', ...
         isequal(r.inter_session_alignment.batch_sz, r.downsampling.batch_sz), '');
+
+    % The message tells the user what to type. Typing it must work, and must
+    % not warn again -- being told off for following the advice would be worse
+    % than the original silence.
+    lastwarn('');
+    r2 = CaliAli_parameters(o, 'batch_sz', 250);
+    C{end+1} = chk_true('the advice in the message actually applies the value', ...
+        isequal(r2.downsampling.batch_sz, 250) && ...
+        isequal(r2.inter_session_alignment.batch_sz, 250), ...
+        num2str(r2.inter_session_alignment.batch_sz));
+    C{end+1} = chk_true('and following the advice does not warn again', ...
+        isempty(lastwarn), first_line(lastwarn));
 catch ME
     C{end+1} = chk_fail('parameter divergence', ME.message);
 end
