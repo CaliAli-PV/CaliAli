@@ -93,8 +93,13 @@ if ~isempty(args.scenarios)
     scn = scn(keep);
 end
 banner(sprintf('Scenarios (%d)', numel(scn)));
-results.scenarios = struct('id',{},'name',{},'ok',{},'error',{},'checks',{}, ...
-    'score',{},'metrics',{},'seconds',{},'dir',{});
+% Every field a scenario record can carry, declared once. run_scenario adds
+% fields as it goes, and a struct array will not accept an element whose fields
+% differ from the rest, so each record is normalised against this list before
+% being appended.
+rec_fields = {'id','name','ok','error','checks','score','metrics','timing', ...
+    'seconds','dir','ds_files','mc_files','aligned','extraction'};
+results.scenarios = [];
 
 for i = 1:numel(scn)
     s = scn(i);
@@ -112,7 +117,12 @@ for i = 1:numel(scn)
     end
     rec.seconds = toc(t0);
     cd(start_dir);
-    results.scenarios(end+1) = rec; %#ok<AGROW>
+    rec = normalize_rec(rec, rec_fields);
+    if isempty(results.scenarios)
+        results.scenarios = rec;
+    else
+        results.scenarios(end+1) = rec; %#ok<AGROW>
+    end
     fprintf('  %s in %.0f s\n', tern(rec.ok,'completed','FAILED'), rec.seconds);
 end
 
@@ -988,6 +998,10 @@ function C = check_batch_invariance(scenarios)
 % bit-identical. If they are not, chunking is losing or duplicating frames.
 C = {};
 ids = {'A','B','C'};
+if isempty(scenarios)
+    C{end+1} = chk_fail('batch invariance', 'no scenario completed');
+    return
+end
 have = cellfun(@(x) any(strcmp({scenarios.id},x) & [scenarios.ok]), ids);
 if sum(have) < 2
     C{end+1} = chk_fail('batch invariance', 'fewer than two of A, B, C completed');
@@ -1010,6 +1024,18 @@ try
 catch ME
     C{end+1} = chk_fail('batch invariance', ME.message);
 end
+end
+
+function rec = normalize_rec(rec, fields)
+%% Give every record the same fields, in the same order.
+for i = 1:numel(fields)
+    if ~isfield(rec, fields{i})
+        rec.(fields{i}) = [];
+    end
+end
+extra = setdiff(fieldnames(rec), fields);
+if ~isempty(extra), rec = rmfield(rec, extra); end
+rec = orderfields(rec, fields);
 end
 
 function v = getfield_or(s, name, dflt)
