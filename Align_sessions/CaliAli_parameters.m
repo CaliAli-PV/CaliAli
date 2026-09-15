@@ -305,10 +305,15 @@ addParameter(inp,'Mask',[])                   % Motion correction Mask
 addParameter(inp,'do_non_rigid',false,valid_bool_scalar)        %Do non-rigid registration
 addParameter(inp, ...
     'reference_projection_rigid','BV')     %Reference projections used for translation. Valid parameters are 'BV' or 'neurons'
+% DEPRECATED, kept only so older scripts still parse. Non-rigid correction is now
+% NoRMCorre's piecewise-rigid mode, run inside the same call as the rigid one:
+% the frame is split into patches and each gets its own shift, bounded by
+% max_dev. The pyramid of demons levels these described belonged to Non_rigid_mc,
+% which registered with a KLT tracker and needed the Computer Vision Toolbox.
+% Nothing reads them any more. See non_rigid_grid_default for what replaced them.
 addParameter(inp, ...
     'non_rigid_pyramid', ...
-    {'BV','BV','neuron'})    %Cell array with the projections used for non-rigid registration.
-%Each element in the cell array correspond to one level in the pyramid (ascending order).
+    {'BV','BV','neuron'})    % DEPRECATED, unused
 
 % Non-rigid multi-level registration options. This correspond to the
 % parameter used for each level in the pyramid
@@ -321,10 +326,16 @@ opt_nr{2,1} = struct('stop_criterium',0.001,'imagepad',1.5,'niter',25, 'sigma_fl
 opt_nr{3,1} = struct('stop_criterium',0.001,'imagepad',1.5,'niter',50, 'sigma_fluid',1,...
     'sigma_diffusion',3, 'sigma_i',1,...
     'sigma_x',1, 'do_display',0, 'do_plotenergy',0,'scale',1);
-addParameter(inp,'non_rigid_options',opt_nr)
+addParameter(inp,'non_rigid_options',opt_nr)   % DEPRECATED, unused
 
 addParameter(inp, ...
-    'non_rigid_batch_size',[20,60],@(x) isnumeric(x) && numel(x)==2 && all(x>0) && diff(x)>=0)             % Possible range of a batch for non-rigid correction. CaliAli while find the optimal size within this range.
+    'non_rigid_batch_size',[20,60],@(x) isnumeric(x) && numel(x)==2 && all(x>0) && diff(x)>=0)             % DEPRECATED, unused
+
+% Patch side for non-rigid correction, as a multiple of gSig. A patch has to hold
+% several neurons or there is nothing in it to register against; expressing it in
+% gSig keeps that true whatever spatial_ds was used. See non_rigid_grid_default,
+% which also clamps it so the frame is split into between two and eight patches.
+addParameter(inp,'non_rigid_patch_scale',16,valid_pos_scalar)
 varargin=varargin{:};
 if isstruct(varargin)
     varargin = [fieldnames(varargin), struct2cell(varargin)]';

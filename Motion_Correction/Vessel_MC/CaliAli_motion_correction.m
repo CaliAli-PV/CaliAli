@@ -101,13 +101,10 @@ try
             [Y, ref,template,valid] = Rigid_mc(Y, opt);
         end
 
-        % Perform non-rigid motion correction if enabled
-        if opt.do_non_rigid
-            % The warp fills its own borders, so its valid region has to be
-            % folded in or those borders would never be cropped away.
-            [Y, valid_nr] = Non_rigid_mc(Y, ref, opt);
-            valid = valid & valid_nr;
-        end
+        % Non-rigid correction is no longer a second pass. Rigid_mc does it in
+        % the same NoRMCorre call, as patches with their own shifts, so there is
+        % one registration instead of two and one valid region instead of the
+        % intersection of two.
 
         % Interpolate dropped frames
         Y = interpolate_dropped_frames(Y, valid);
