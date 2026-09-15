@@ -122,8 +122,7 @@ addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diamet
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'spatial_ds',1,valid_pos_scalar)      %Spatial Downsampling factor
 addParameter(inp,'temporal_ds',1,valid_pos_scalar)     %Temporal Downsampling factor
-addParameter(inp,'batch_sz','auto',@(x) (isnumeric(x)&&isscalar(x)&&isfinite(x)&&x>=0) || ...
-    (ischar(x)&&strcmpi(x,'auto')) || (isstring(x)&&isscalar(x)&&strcmpi(x,'auto'))) % Batch size for downsampling (0=all at once, 'auto'=heuristic)
+addParameter(inp,'batch_sz','auto',@valid_batch_setting) % Frames per batch. See valid_batch_setting for the named modes.
 % Datatype every stage stores the recording in. uint16 covers every scientific
 % camera's range at half the memory of single, and every stage downstream
 % preallocates in this class, so it has to be decided once and used everywhere.
@@ -159,6 +158,7 @@ end
 inp.KeepUnmatched = true;
 parse(inp,varargin{:});
 opt=inp.Results;
+opt.batch_sz = normalize_batch_setting(opt.batch_sz);
 
 if opt.spatial_ds <= 0
     error('CaliAli:InvalidSpatialDownsampling','spatial_ds must be positive.');
@@ -240,8 +240,7 @@ valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_nonneg_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0);
 valid_bool_scalar = @(x) (islogical(x) && isscalar(x)) || (isnumeric(x) && isscalar(x) && ismember(x,[0 1]));
-valid_batch_input = @(x) (isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0)) || ...
-    (ischar(x) && strcmpi(x,'auto')) || (isstring(x) && isscalar(x) && strcmpi(x,'auto'));
+valid_batch_input = @valid_batch_setting;
 %% General
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
@@ -250,7 +249,7 @@ addParameter(inp,'sf',[],valid_optional_pos_scalar)             %Frame rate. Def
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'preprocessing',[])
-addParameter(inp,'batch_sz','auto',valid_batch_input)                % Batch size for chunked processing. 0 = process entire files
+addParameter(inp,'batch_sz','auto',valid_batch_input)                % Frames per batch. 'auto', 'all_frames', 'per_session' or a number.
 addParameter(inp,'Mask',[])                   % Motion correction Mask
 %% Motion correction parameters
 addParameter(inp,'do_non_rigid',false,valid_bool_scalar)        %Do non-rigid registration
@@ -284,9 +283,7 @@ end
 inp.KeepUnmatched = true;
 parse(inp,varargin{:});
 opt=inp.Results;
-if isstring(opt.batch_sz)
-    opt.batch_sz = char(opt.batch_sz);
-end
+opt.batch_sz = normalize_batch_setting(opt.batch_sz);
 
 if ~isempty(opt.sf) && opt.sf <= 0
     error('CaliAli:InvalidFrameRate','motion_correction.sf must be positive.');
@@ -306,8 +303,7 @@ valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_nonneg_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0);
 valid_bool_scalar = @(x) (islogical(x) && isscalar(x)) || (isnumeric(x) && isscalar(x) && ismember(x,[0 1]));
-valid_batch_input = @(x) (isnumeric(x) && isscalar(x) && isfinite(x) && (x >= 0)) || ...
-    (ischar(x) && strcmpi(x,'auto')) || (isstring(x) && isscalar(x) && strcmpi(x,'auto'));
+valid_batch_input = @valid_batch_setting;
 %% General variables
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
@@ -325,7 +321,13 @@ addParameter(inp,'projections', ...
     'BV+neuron')          % Projeciton used for alignment
 addParameter(inp,'final_neurons',0)             % Add an extra alignment iteration utilizing only neuron shapes after CaliAli
 addParameter(inp,'Force_BV',0)                  % Force the use of BVz for alignment, even if BVz stability score is low.
-addParameter(inp,'batch_sz',0,valid_batch_input)                  % Number of frames to use per batch. If batch_sz=0, then the number of frame per batch is equal to the number of frames per_session.
+% Frames per batch, for the steps that run after the sessions are concatenated.
+% 'per_session' keeps the batches aligned with the session boundaries, which is
+% what the legacy value 0 meant here; 'all_frames' takes the whole concatenated
+% recording in one batch; 'auto' sizes them against the free memory. The default
+% is 'auto' to match the value this module inherits from the one above it when
+% nothing is set, which is what has decided the batching in practice.
+addParameter(inp,'batch_sz','auto',valid_batch_input)
 
 
 %% Defening video batches corresponding to the same session
@@ -379,9 +381,7 @@ end
 inp.KeepUnmatched = true;
 parse(inp,varargin{:});
 opt=inp.Results;
-if isstring(opt.batch_sz)
-    opt.batch_sz = char(opt.batch_sz);
-end
+opt.batch_sz = normalize_batch_setting(opt.batch_sz);
 
 if ~isempty(opt.sf) && opt.sf <= 0
     error('CaliAli:InvalidFrameRate','inter_session_alignment.sf must be positive.');
@@ -527,4 +527,31 @@ for k = numel(names):-1:1
 end
 
 nv_out = [out_names; out_vals];
+end
+
+
+function tf = valid_batch_setting(x)
+%% Accept a frame count or one of the named batching modes.
+% The named modes exist because the number 0 used to carry two different
+% meanings depending on which module read it -- "the whole file at once" in
+% downsampling and motion correction, "one batch per session" after the sessions
+% are concatenated. 0 is still accepted so old scripts and saved option structs
+% keep working; resolve_batch_mode maps it to whichever of the two the reading
+% module has always used.
+tf = false;
+if isstring(x) && isscalar(x), x = char(x); end
+if ischar(x)
+    tf = any(strcmpi(strtrim(x), {'auto','all_frames','per_session'}));
+    return
+end
+if isnumeric(x) && isscalar(x) && (x >= 0) && (isfinite(x) || isinf(x))
+    tf = true;
+end
+end
+
+
+function x = normalize_batch_setting(x)
+%% Store the named modes in one spelling, so comparisons elsewhere are simple.
+if isstring(x) && isscalar(x), x = char(x); end
+if ischar(x), x = lower(strtrim(x)); end
 end

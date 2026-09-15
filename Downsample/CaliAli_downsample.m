@@ -13,8 +13,11 @@ function CaliAli_options=CaliAli_downsample(CaliAli_options)
 %   CaliAli_options = CaliAli_downsample(CaliAli_options);
 %
 % Notes:
-%   - batch_sz: number of downsampled frames per batch. Use a numeric value,
-%     0/Inf to process all at once, or 'auto' to pick a heuristic size.
+%   - batch_sz: number of downsampled frames per batch. Use a numeric value, or
+%     one of the named modes: 'auto' to size the batch against the free memory,
+%     'all_frames' to take the file in one piece. 'per_session' means the same as
+%     'all_frames' here, because one input file is one session at this stage.
+%     0 and Inf still work and still mean all frames.
 
 if nargin < 1 || isempty(CaliAli_options)
     CaliAli_options = CaliAli_parameters();
@@ -322,17 +325,16 @@ end
 
 
 function batch_size = resolve_batch_size(batch_sz, out_sz, Fds)
-if isnumeric(batch_sz)
-    if isinf(batch_sz) || batch_sz <= 0
+% One input file is one session at this stage, so 'per_session' and 'all_frames'
+% ask for the same thing: the whole file in one batch. A legacy 0 has always
+% meant that here too.
+[mode, n] = resolve_batch_mode(batch_sz, 'all_frames');
+switch mode
+    case 'fixed'
+        batch_size = min(Fds, n);
+    case {'all_frames', 'per_session'}
         batch_size = Fds;
-    else
-        batch_size = min(Fds, ceil(batch_sz));
-    end
-    return
-end
-
-if ischar(batch_sz) || (isstring(batch_sz) && isscalar(batch_sz))
-    if strcmpi(batch_sz, 'auto')
+    otherwise   % 'auto'
         try
             [batch_size, ~] = compute_auto_batch_size('auto', [], [out_sz(1), out_sz(2)]);
         catch
@@ -340,11 +342,7 @@ if ischar(batch_sz) || (isstring(batch_sz) && isscalar(batch_sz))
             batch_size = min(Fds, 30000);
         end
         batch_size = min(max(1, batch_size), Fds);
-        return
-    end
 end
-
-batch_size = min(Fds, 10000); % fallback default
 end
 
 

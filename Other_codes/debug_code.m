@@ -3,7 +3,7 @@ cd('test');
 
 %% Debug: normal (non-batch) processing
 files = Simulate_Ca_video('ses', 3, 'outpath', pwd, 'F', 500);  % Simulate 3 sessions, 500 frames each, write to current dir
-CaliAli_options = CaliAli_parameters('batch_sz', 0);            % Process everything in-memory (no batching)
+CaliAli_options = CaliAli_parameters('batch_sz', 'all_frames');  % Process everything in-memory (no batching)
 CaliAli_options.downsampling.input_files = files;               % Convert files
 
 CaliAli_options = CaliAli_downsample(CaliAli_options);          % Optional downsampling/preprocessing

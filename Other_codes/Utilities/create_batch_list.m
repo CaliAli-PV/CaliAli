@@ -3,7 +3,11 @@ function [modified_input_files,batch_sz,F] = create_batch_list(input_files, batc
 %
 % Inputs:
 %   input_files - Cell array of file paths to process
-%   batch_sz    - Maximum number of frames per batch (0 = no batching)
+%   batch_sz    - Maximum number of frames per batch. Accepts a number or one of
+%                 the named modes 'auto', 'all_frames', 'per_session'. One input
+%                 file is one session at this stage, so 'per_session' and
+%                 'all_frames' both mean one chunk per file, which is what the
+%                 legacy value 0 has always meant here.
 %
 % Outputs:
 %   modified_input_files - Cell array where each element is either:

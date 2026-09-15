@@ -35,6 +35,13 @@ end
 dims = get_data_dimension(file_name);
 d1 = dims(1); d2 = dims(2); T = dims(3);
 
+% BZ is only reported, not used to split anything here, but it arrives as the
+% raw setting and may be one of the named modes. Resolve it so the message shows
+% a frame count rather than the word 'auto' run through min().
+bz = compute_auto_batch_size(bz, [], [d1, d2]);
+if bz <= 0
+    bz = T;     % 'all_frames' / 'per_session' / legacy 0
+end
 bz=min([bz,T]);
 
 fprintf('\nEach batch has %d X %d pixels X %d frames. \nLoading each batch (double precision) requires %.3f GB RAM\n\n', d1, d2, bz, (d1*d2*bz)/(2^27)*2);

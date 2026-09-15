@@ -32,9 +32,15 @@ if isempty(opt.input_files)
     opt.input_files = uipickfiles('FilterSpec', '*_ds*.mat');
 end
 
-% Create batch list if batch_sz > 0
+% Split the inputs into batches, unless batch_sz asks for the whole file at once
 [opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
-CaliAli_options.motion_correction.batch_sz=opt.batch_sz;
+% create_batch_list returns the RESOLVED frame count. Writing that back over a
+% named mode would erase which mode it was: 'all_frames' and 'per_session' both
+% resolve to 0 at this stage, and the steps after concatenation still have to
+% tell them apart. Keep the mode, store the number only when a number was given.
+if ~ischar(CaliAli_options.motion_correction.batch_sz)
+    CaliAli_options.motion_correction.batch_sz=opt.batch_sz;
+end
 
 % Pre-allocate output files and get processing flags
 % One class for both the container and the data written into it; see

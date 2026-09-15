@@ -19,7 +19,14 @@ function params=CaliAli_demo_parameters()
 % Date: 2025
 
 % --- Data Preprocessing ---
-params.batch_sz = 'auto';        % Maximum frames to load at each time. Auto detect
+params.batch_sz = 'auto';        % Frames loaded at a time. Either a number of
+                                 %  frames or one of three named modes:
+                                 %   'auto'        size it from the free memory
+                                 %   'all_frames'  the whole recording at once
+                                 %   'per_session' one batch per session, so no
+                                 %                 batch crosses a session border
+                                 %  0 still works and is kept only so older
+                                 %  scripts keep running.
 params.gSig = [];                % Gaussian filter size for neurons (pixels)
 params.sf = 10;                  % Frame rate (fps)
 params.BVsize = [];              % Size of blood vessels (pixels), 

@@ -47,6 +47,7 @@ p.addParameter('frames', 500);
 p.addParameter('sessions', 3);
 p.addParameter('simulator', '/mnt/nasferatus/CaliAli/simulator/Simulate_Ca_Imaging_video_1.22/Simulate_Ca_Imaging_video');
 p.addParameter('metrics', '/mnt/nasferatus/CaliAli/benchmark/metrics');
+p.addParameter('unit_only', false);   % run the unit checks and stop: no simulation, no pipeline
 p.parse(varargin{:});
 args = p.Results;
 
@@ -76,6 +77,10 @@ results.started = datestr(now); %#ok<TNOW1,DATST>
 %% ---- unit checks: no pipeline, no simulation ---------------------------
 banner('Unit checks');
 results.unit = run_unit_checks();
+if args.unit_only
+    results.finished = datestr(now); %#ok<TNOW1,DATST>
+    return
+end
 
 %% ---- one simulated recording -------------------------------------------
 banner('Simulation');
@@ -577,6 +582,7 @@ C = {};
 C = [C, unit_check_mat_video()];
 C = [C, unit_parameters()];
 C = [C, unit_parameter_divergence()];
+C = [C, unit_batch_modes()];
 C = [C, unit_w_overlap()];
 C = [C, unit_mat_data_cache()];
 U = [C{:}];
@@ -709,6 +715,79 @@ try
         ~isequal(a.preprocessing.detrend, false), '');
 catch ME
     C{end+1} = chk_fail('parameter precedence', ME.message);
+end
+end
+
+function C = unit_batch_modes()
+%% batch_sz names what it wants instead of encoding it in the number 0.
+%
+% 0 used to mean two different things depending on who read it: "the whole file
+% at once" before the sessions are concatenated, "one batch per session" after.
+% The named modes say which. 0 is still accepted, and must still resolve to the
+% reading its own module has always used, or every saved option struct changes
+% behaviour silently.
+C = {};
+try
+    C{end+1} = chk_true('auto is a mode', ...
+        strcmp(resolve_batch_mode('auto'),'auto'), '');
+    C{end+1} = chk_true('all_frames is a mode', ...
+        strcmp(resolve_batch_mode('all_frames'),'all_frames'), '');
+    C{end+1} = chk_true('per_session is a mode', ...
+        strcmp(resolve_batch_mode('per_session'),'per_session'), '');
+    [m,n] = resolve_batch_mode(250);
+    C{end+1} = chk_true('a number is a fixed batch', ...
+        strcmp(m,'fixed') && n==250, sprintf('%s %d', m, n));
+
+    C{end+1} = chk_true('legacy 0 means all frames at file level', ...
+        strcmp(resolve_batch_mode(0),'all_frames'), '');
+    C{end+1} = chk_true('legacy 0 means per session after concatenation', ...
+        strcmp(resolve_batch_mode(0,'per_session'),'per_session'), '');
+
+    C{end+1} = chk_num('all_frames resolves to the no-split sentinel', ...
+        compute_auto_batch_size('all_frames',[],[64 64]), 0, 0);
+    C{end+1} = chk_num('per_session resolves to the no-split sentinel', ...
+        compute_auto_batch_size('per_session',[],[64 64]), 0, 0);
+    C{end+1} = chk_num('a number passes through untouched', ...
+        compute_auto_batch_size(250,[],[64 64]), 250, 0);
+catch ME
+    C{end+1} = chk_fail('batch mode vocabulary', ME.message);
+end
+
+try
+    resolve_batch_mode('per-session');
+    C{end+1} = chk_fail('a misspelled mode is rejected', 'no error raised');
+catch
+    C{end+1} = chk_true('a misspelled mode is rejected', true, '');
+end
+
+try
+    o = CaliAli_parameters('batch_sz','per_session');
+    C{end+1} = chk_true('a mode reaches every module', ...
+        strcmp(o.downsampling.batch_sz,'per_session') && ...
+        strcmp(o.motion_correction.batch_sz,'per_session') && ...
+        strcmp(o.inter_session_alignment.batch_sz,'per_session'), '');
+
+    o = CaliAli_parameters();
+    o.inter_session_alignment.batch_sz = 'per_session';
+    r = CaliAli_parameters(o);
+    C{end+1} = chk_true('a mode set on one module stays there', ...
+        strcmp(r.inter_session_alignment.batch_sz,'per_session') && ...
+        ~strcmp(r.motion_correction.batch_sz,'per_session'), '');
+    C{end+1} = chk_true('a mode survives re-parsing', ...
+        isequal(CaliAli_parameters(r), r), '');
+
+    C{end+1} = chk_true('case is normalised', ...
+        strcmp(CaliAli_parameters('batch_sz','PER_SESSION').downsampling.batch_sz, ...
+        'per_session'), '');
+catch ME
+    C{end+1} = chk_fail('batch mode through CaliAli_parameters', ME.message);
+end
+
+try
+    CaliAli_parameters('batch_sz','per-session');
+    C{end+1} = chk_fail('a misspelled mode is rejected at parse', 'no error raised');
+catch
+    C{end+1} = chk_true('a misspelled mode is rejected at parse', true, '');
 end
 end
 
@@ -1116,10 +1195,22 @@ end
 %  Plumbing
 %  ========================================================================
 function setup_paths(repo, simulator, metrics)
+%% Put the repo under test on the path, and nothing that could shadow it.
+%
+% This used to add genpath(fileparts(metrics)), the whole scratch tree the
+% benchmark writes into. The worktree of main that the A/B comparison checks out
+% lives in that tree, so on the SECOND run every function came from main
+% instead of from the branch under test -- addpath prepends, so the later
+% addpath wins. The unit checks failed with main's error messages while
+% reporting on this branch. Add the two helper folders by name instead.
 restoredefaultpath;
 addpath(genpath(repo));
 if isfolder(simulator), addpath(genpath(simulator)); end
-if isfolder(metrics),   addpath(genpath(fileparts(metrics))); end
+if isfolder(metrics),   addpath(metrics); end
+harness = fullfile(fileparts(metrics), 'harness');
+if isfolder(harness),   addpath(harness); end
+% The repo under test must win over anything added above it.
+addpath(genpath(repo));
 warning('off','MATLAB:rmpath:DirNotFound');
 end
 

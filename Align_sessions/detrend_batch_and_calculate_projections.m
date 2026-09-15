@@ -43,7 +43,13 @@ end
 apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 
 [opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
-CaliAli_options.inter_session_alignment.batch_sz=opt.batch_sz;
+% create_batch_list returns the RESOLVED frame count. Writing that back over a
+% named mode would erase which mode it was: 'all_frames' and 'per_session' both
+% resolve to 0 at this stage, and the steps after concatenation still have to
+% tell them apart. Keep the mode, store the number only when a number was given.
+if ~ischar(CaliAli_options.inter_session_alignment.batch_sz)
+    CaliAli_options.inter_session_alignment.batch_sz=opt.batch_sz;
+end
 
 % Detrending CREATES values outside the source range -- background removal adds
 % an offset before clipping -- so this stage may want more headroom than it was
