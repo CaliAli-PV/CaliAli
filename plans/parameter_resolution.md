@@ -1,6 +1,10 @@
-# Design: parameter resolution
+# Implementation plan: parameter resolution
 
 Status: **agreed, not built.** Nothing in this document is implemented yet.
+
+This lives in `plans/`, not `docs/`. Everything under `docs/` is built and
+published as the documentation site, including pages absent from the mkdocs nav.
+Implementation plans are for whoever works on the code, not for users.
 
 ## Why
 
