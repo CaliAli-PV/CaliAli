@@ -52,42 +52,57 @@ if ~(numel(varargin)==1 && isempty(varargin{1}))
     NameValue_param=[varargin(1:2:end); varargin(2:2:end)];
 end
 
-varargin=[struct_param,NameValue_param];
+% A supplied struct carries two different kinds of setting, and they must not
+% be treated alike:
+%   - a TOP-LEVEL field is a pipeline-wide value, the flat namespace
+%     (opt.batch_sz = 250 means "everywhere")
+%   - a field inside a MODULE substructure applies to that module only
+%     (opt.motion_correction.batch_sz = 250 means "here")
+% They were previously merged into one list, so one had to outrank the other
+% and per-module settings lost.
+[module_param, global_param] = split_by_scope(struct_param);
 
-% Parameters live in a FLAT namespace and are projected into one substructure
-% per module. The projection is not editable: a value set on one module and not
-% the others is collapsed on the next parse, with the flat value winning. That
-% is correct, but it used to happen silently, so the edit looked accepted and
-% was simply discarded. Anything supplied as a name/value pair in THIS call is
-% exempt -- the caller has just settled it, which is exactly the advice the
-% warning gives, and being warned for following it would be absurd.
-if ~isempty(given_struct)
-    warn_if_modules_disagree(given_struct, NameValue_param(1,:));
-end
+% PRECEDENCE, lowest to highest. uniqueNV keeps the last occurrence, so later
+% means higher priority:
+%   1. inherited from the module above     (appended by extend_var)
+%   2. the module's own stored value       (appended per module, below)
+%   3. a NON-EMPTY top-level field         (a pipeline-wide setting)
+%   4. a name/value pair in THIS call      (most explicit, appended last)
+%
+% Why "non-empty". A top-level field is two different things depending on its
+% value, and the struct records no provenance to tell them apart. An EMPTY one
+% is the seed a parameter started life with -- gSig arrives as [] and is derived
+% to 5/spatial_ds by downsampling -- and must lose to the resolved value, or
+% every derivation is undone. A NON-EMPTY one is a setting the user made, and
+% must win. Dropping the empties separates the two cases without needing to
+% track where a value came from.
+global_param = drop_empty(global_param);
+varargin={};
+
 
 
 %% Downsampling Parameters
 opt.downsampling=downsampling_parameters( ...
-    check_CaliAli_structure(varargin,'downsampling'));
+    assemble(varargin,module_param,'downsampling',global_param,NameValue_param));
 %% Preporcessing parameters (Detrending and background pre-processing)
 varargin = extend_var(varargin,opt.downsampling);
 opt.preprocessing=preprocessing_parameters( ...
-    check_CaliAli_structure(varargin,'preprocessing'));
+    assemble(varargin,module_param,'preprocessing',global_param,NameValue_param));
 %% Motion correction parameters
 varargin = extend_var(varargin,opt);
 opt.motion_correction=motion_correction_parameters( ...
-    check_CaliAli_structure(varargin,'motion_correction'));
+    assemble(varargin,module_param,'motion_correction',global_param,NameValue_param));
 opt.motion_correction.preprocessing=opt.preprocessing;
 opt.motion_correction.preprocessing.detrend=false;
 opt.motion_correction.preprocessing.noise_scale=0;
 %% Inter-session alignment parameters
 varargin = extend_var(varargin,opt.motion_correction);
 opt.inter_session_alignment=inter_session_alignment_parameters( ...
-    check_CaliAli_structure(varargin,'inter_session_alignment'));
+    assemble(varargin,module_param,'inter_session_alignment',global_param,NameValue_param));
 opt.inter_session_alignment.preprocessing=opt.preprocessing;
 %% CNMF-E parameters
 varargin = extend_var(varargin,opt.inter_session_alignment);
-opt.cnmf=CNMFE_parameters(check_CaliAli_structure(varargin,'cnmf'));
+opt.cnmf=CNMFE_parameters(assemble(varargin,module_param,'cnmf',global_param,NameValue_param));
 end
 
 
@@ -387,94 +402,58 @@ if ~isempty(input)
         struct_param = [fieldnames(struct_param), struct2cell(struct_param)]';
         NameValue_param=input;
         NameValue_param(:,index)=[];
-        input=[struct_param,NameValue_param];
+        % Left for callers that still route a module substructure through here.
+        % The per-module list is now assembled by `assemble`, which places the
+        % module's own values after the inherited ones deliberately.
+        input=[NameValue_param,struct_param];
     end
 end
 end
 
-function warn_if_modules_disagree(in, settled)
-%% Report a parameter that has been given different values in different modules.
-%
-% Only the flat value survives, so a divergent one is about to be discarded. The
-% message names the parameter, the modules and the values, and says which one
-% will be used, because the alternative is the user believing a setting took
-% effect when it did not.
-if ~isstruct(in), return; end
-if nargin < 2 || isempty(settled), settled = {}; end
-settled = lower(cellfun(@(x) char(string(x)), settled, 'UniformOutput', false));
-mods = fieldnames(in);
-mods = mods(cellfun(@(m) isstruct(in.(m)), mods));
-if numel(mods) < 2, return; end
 
-seen = containers.Map('KeyType','char','ValueType','any');
-for i = 1:numel(mods)
-    f = fieldnames(in.(mods{i}));
-    for j = 1:numel(f)
-        v = in.(mods{i}).(f{j});
-        if isstruct(v) || iscell(v), continue; end   % nested blocks and file lists
-        if any(strcmpi(f{j}, {'input_files','output_files','preprocessing'})), continue; end
-        key = f{j};
-        if isKey(seen, key)
-            e = seen(key);
-            e.mods{end+1} = mods{i}; e.vals{end+1} = v;
-            seen(key) = e;
-        else
-            seen(key) = struct('mods',{{mods{i}}},'vals',{{v}});
+
+function out = drop_empty(nv)
+%% Remove name/value columns whose value is empty. See the note on precedence.
+out = nv;
+if isempty(nv), return; end
+keep = ~cellfun(@isempty, nv(2,:));
+out = nv(:, keep);
+end
+
+
+function [module_param, global_param] = split_by_scope(struct_param)
+%% Separate per-module substructures from pipeline-wide top-level fields.
+% A value that is one of the module substructures is scoped to that module;
+% anything else at the top level is a flat, pipeline-wide setting.
+module_names = {'downsampling','preprocessing','motion_correction', ...
+    'inter_session_alignment','cnmf'};
+module_param = {}; global_param = {};
+if isempty(struct_param), return; end
+is_module = ismember(lower(struct_param(1,:)), module_names);
+module_param = struct_param(:, is_module);
+global_param = struct_param(:, ~is_module);
+end
+
+
+function out = assemble(base, module_param, name, glob, nv)
+%% Build one module's parameter list in precedence order, lowest first.
+% base          everything inherited from the modules above
+% module_param  the per-module substructures supplied by the caller
+% name          which module this is
+% glob          non-empty top-level fields, i.e. pipeline-wide settings
+% nv            name/value pairs given in this call
+own = {};
+if ~isempty(module_param)
+    idx = find(strcmpi(module_param(1,:), name), 1);
+    if ~isempty(idx)
+        sub = module_param{2, idx};
+        if isstruct(sub)
+            own = [fieldnames(sub), struct2cell(sub)]';
         end
     end
 end
-
-k = keys(seen);
-for i = 1:numel(k)
-    e = seen(k{i});
-    if numel(e.vals) < 2, continue; end
-    if any(strcmp(lower(k{i}), settled)), continue; end   % settled by this call
-    same = true;
-    for j = 2:numel(e.vals)
-        if ~isequaln(e.vals{1}, e.vals{j}), same = false; break; end
-    end
-    if same, continue; end
-    parts = cell(1, numel(e.mods));
-    for j = 1:numel(e.mods)
-        parts{j} = sprintf('%s=%s', e.mods{j}, compact_value(e.vals{j}));
-    end
-    % Name the value the user most likely wanted: the one that differs from
-    % the flat value they are about to be given.
-    wanted = '';
-    for j = 2:numel(e.vals)
-        if ~isequaln(e.vals{j}, e.vals{1})
-            wanted = compact_value(e.vals{j});
-            break
-        end
-    end
-    warning('CaliAli:ParameterDiverges', ...
-        ['"%s" was set to different values in different modules (%s), so only ' ...
-         '"%s" will be used.\n' ...
-         'Parameters are set ONCE and copied into every module that uses them; ' ...
-         'the per-module fields are a copy, not a place to set them.\n' ...
-         'To use %s, do either of:\n' ...
-         '    CaliAli_options = CaliAli_parameters(CaliAli_options, ''%s'', %s);\n' ...
-         '    params.%s = %s;   %% then CaliAli_parameters(params)\n' ...
-         'To give a stage its own value, it needs its own parameter name.'], ...
-        k{i}, strjoin(parts, ', '), compact_value(e.vals{1}), ...
-        wanted, k{i}, wanted, k{i}, wanted);
-end
-end
-
-function t = compact_value(v)
-%% A short, readable rendering of a parameter value for a message.
-try
-    if ischar(v), t = v;
-    elseif isstring(v) && isscalar(v), t = char(v);
-    elseif isempty(v), t = '[]';
-    elseif isnumeric(v) || islogical(v)
-        if numel(v) > 4, t = sprintf('<%s %s>', mat2str(size(v)), class(v));
-        else, t = mat2str(v, 4); end
-    else, t = ['<' class(v) '>'];
-    end
-catch
-    t = '<?>';
-end
+out = [base, own, glob, nv];
+if ~isempty(out), out = uniqueNV(out); end
 end
 
 

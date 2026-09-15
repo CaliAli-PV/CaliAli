@@ -653,40 +653,62 @@ end
 end
 
 function C = unit_parameter_divergence()
-%% A per-module value that will be discarded must say so.
-% Parameters live in a flat namespace and are copied into every module, so
-% editing one module's copy does nothing. It used to do nothing SILENTLY, which
-% is indistinguishable from it having worked.
+%% A value set on one module must be honoured, and a flat one must propagate.
+%
+% These used to be in conflict. Parameters live in a flat namespace that is
+% projected into one substructure per module, and the projection used to be
+% collapsed on every parse, so a per-module setting was silently discarded --
+% setting inter_session_alignment.batch_sz left it at 'auto' and said nothing.
+% Both now work, which needs four tiers of precedence and one rule: an EMPTY
+% top-level value is the seed a parameter started with, not a setting, so it
+% never overrides. gSig arrives as [] and is derived by downsampling; without
+% that rule the original [] would win and undo every derivation.
 C = {};
 try
-    o = CaliAli_parameters(CaliAli_demo_parameters());
-    lastwarn(''); warning('off','backtrace');
-    CaliAli_parameters(o);
-    C{end+1} = chk_true('consistent options parse without a warning', ...
-        isempty(lastwarn), lastwarn);
+    base = CaliAli_demo_parameters();
 
-    o.inter_session_alignment.batch_sz = 250;
-    lastwarn('');
+    o = base; o.motion_correction.batch_sz = 250;
     r = CaliAli_parameters(o);
-    [w, id] = lastwarn;
-    C{end+1} = chk_true('a diverging per-module value is reported', ...
-        strcmp(id,'CaliAli:ParameterDiverges'), first_line(w));
-    C{end+1} = chk_true('and the flat value is the one used', ...
-        isequal(r.inter_session_alignment.batch_sz, r.downsampling.batch_sz), '');
+    C{end+1} = chk_num('a per-module value is honoured', ...
+        r.motion_correction.batch_sz, 250, 0);
+    C{end+1} = chk_true('and does not leak to the other modules', ...
+        ~isequal(r.inter_session_alignment.batch_sz, 250), ...
+        num2str(r.inter_session_alignment.batch_sz));
 
-    % The message tells the user what to type. Typing it must work, and must
-    % not warn again -- being told off for following the advice would be worse
-    % than the original silence.
-    lastwarn('');
-    r2 = CaliAli_parameters(o, 'batch_sz', 250);
-    C{end+1} = chk_true('the advice in the message actually applies the value', ...
-        isequal(r2.downsampling.batch_sz, 250) && ...
-        isequal(r2.inter_session_alignment.batch_sz, 250), ...
-        num2str(r2.inter_session_alignment.batch_sz));
-    C{end+1} = chk_true('and following the advice does not warn again', ...
-        isempty(lastwarn), first_line(lastwarn));
+    o = base; o.batch_sz = 250;
+    r = CaliAli_parameters(o);
+    C{end+1} = chk_true('a top-level value still reaches every module', ...
+        isequal(r.downsampling.batch_sz,250) && ...
+        isequal(r.motion_correction.batch_sz,250) && ...
+        isequal(r.inter_session_alignment.batch_sz,250), '');
+
+    r = CaliAli_parameters(base, 'batch_sz', 700);
+    C{end+1} = chk_true('a name/value pair outranks a stored value', ...
+        isequal(r.downsampling.batch_sz,700) && ...
+        isequal(r.motion_correction.batch_sz,700), '');
+
+    o = base; o.downsampling.batch_sz = 0; o.inter_session_alignment.batch_sz = 250;
+    r = CaliAli_parameters(o);
+    C{end+1} = chk_true('two different per-module values both survive', ...
+        isequal(r.downsampling.batch_sz,0) && ...
+        isequal(r.inter_session_alignment.batch_sz,250), '');
+
+    % the empty-seed rule: derivation must still propagate
+    r = CaliAli_parameters(base);
+    C{end+1} = chk_true('derived values are not undone by the empty seed', ...
+        ~isempty(r.cnmf.gSiz) && ~isempty(r.cnmf.ring_radius) && ...
+        ~isempty(r.downsampling.BVsize), ...
+        sprintf('gSiz=%s ring=%s', mat2str(r.cnmf.gSiz), mat2str(r.cnmf.ring_radius)));
+
+    o = base; o.motion_correction.batch_sz = 250;
+    a = CaliAli_parameters(o); b = CaliAli_parameters(a);
+    C{end+1} = chk_true('repeated parsing is stable', isequal(a,b), '');
+
+    C{end+1} = chk_true('the deliberate preprocessing override survives', ...
+        isequal(a.motion_correction.preprocessing.detrend, false) && ...
+        ~isequal(a.preprocessing.detrend, false), '');
 catch ME
-    C{end+1} = chk_fail('parameter divergence', ME.message);
+    C{end+1} = chk_fail('parameter precedence', ME.message);
 end
 end
 

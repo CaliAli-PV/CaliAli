@@ -93,21 +93,33 @@ CaliAli_options.motion_correction.batch_sz        % 250
 CaliAli_options.inter_session_alignment.batch_sz  % 250
 ```
 
-The nested `CaliAli_options` is a **projection** of that flat namespace, not a
-place to edit. Setting a value on one module only does not work:
+A value can also be set for **one stage only**, by writing it into that stage's
+substructure:
 
 ```matlab
-CaliAli_options.inter_session_alignment.batch_sz = 250;   % has no effect
-CaliAli_options = CaliAli_parameters(CaliAli_options);    % collapsed back
+CaliAli_options.motion_correction.batch_sz = 250;   % motion correction only
 ```
 
-Every stage re-parses the options, and each re-parse restores the flat value.
-CaliAli warns when it sees a parameter with different values in different
-modules, naming the parameter and the value it will use, so this is never
-silent.
+That setting is kept, and the other modules are unaffected. Every stage
+re-parses the options as it runs, and a per-module value survives each re-parse.
 
-**If a value genuinely has to differ between stages, it needs its own parameter
-name** in the flat namespace, rather than an edit to the projection.
+When the same parameter is set in more than one place, the most specific wins:
+
+| | |
+|---|---|
+| lowest | inherited from the stage before |
+| | the value stored in that module |
+| | a top-level field, i.e. a pipeline-wide setting |
+| highest | a name/value pair passed to `CaliAli_parameters` |
+
+```matlab
+CaliAli_parameters(CaliAli_options, 'batch_sz', 250)   % every module
+```
+
+One detail worth knowing: an **empty** top-level value is treated as "not set"
+rather than as a setting. Several parameters start empty and are computed —
+`gSig` from `spatial_ds`, `BVsize` from `gSig` — and the computed value has to
+reach the later stages.
 
 ---
 
