@@ -113,6 +113,7 @@ inp.PartialMatching = false;
 valid_pos_scalar = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && (x > 0);
 valid_optional_pos_scalar = @(x) isempty(x) || valid_pos_scalar(x);
 valid_char = @(x) ischar(x) || (isstring(x) && isscalar(x));
+valid_bool_ds = @(x) (islogical(x) && isscalar(x)) || (isnumeric(x) && isscalar(x) && ismember(x,[0 1]));
 %% General variables
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
@@ -146,6 +147,23 @@ addParameter(inp,'batch_sz','auto',@valid_batch_setting) % Frames per batch. See
 % integers from the data during extraction.
 addParameter(inp,'output_class','uint16',@(x) any(strcmpi(char(x), ...
     {'uint8','uint16','uint32'})))
+
+% Sensor-defect repair. Dead pixels, dropped frames and leftover borders are all
+% structure that does NOT move with the tissue, and motion correction registers
+% against whatever does not move: three dead pixels were enough to collapse a
+% session's estimated shifts from a standard deviation of 2.8 pixels to 0.4.
+%
+% This normally runs inside CaliAli_downsample, on raw frames, because that is
+% the only point where a dead pixel is still one pixel. Motion correction,
+% alignment and detrending each call it again as a BACKUP, for recordings that
+% entered the pipeline late. Whether it has already been done is recorded in the
+% CaliAli_options saved inside each FILE, never here -- this struct is shared by
+% every file in a call, so a flag living here would mark a second batch as done
+% when only the first had been.
+addParameter(inp,'repair_defects',true,valid_bool_ds)   % run the repair at all
+addParameter(inp,'dead_pixel_factor',0.1,valid_pos_scalar)  % variance below this share of the local median counts as dead
+addParameter(inp,'repair_borders',true,valid_bool_ds)   % crop a constant region that reaches the frame edge
+addParameter(inp,'defects_repaired',[])                     % the record, written per file, never set by hand
 
 addParameter(inp,'file_extension','avi',valid_char)      % if a folder is selected instead of a single video file,
 % Concatenate all videos with the specified file extension
@@ -206,6 +224,22 @@ addParameter(inp,'force_non_negative',1,valid_nonneg_scalar)       %Remove negat
 addParameter(inp,'force_non_negative_tolerance',20,valid_nonneg_scalar)       %shifts the signal up by that amount before zero-clipping, preserving negative noise fluctuations within that range.
 
 %% Dendrite processing codes. This section is experimental. This is not used unless structure is set to 'dendrite'
+% Sensor-defect repair. Dead pixels, dropped frames and leftover borders are all
+% structure that does NOT move with the tissue, and motion correction registers
+% against whatever does not move: three dead pixels were enough to collapse a
+% session's estimated shifts from a standard deviation of 2.8 pixels to 0.4.
+%
+% This normally runs inside CaliAli_downsample, on raw frames, because that is
+% the only point where a dead pixel is still one pixel. Motion correction,
+% alignment and detrending each call it again as a BACKUP, for recordings that
+% entered the pipeline late. Whether it has already been done is recorded in the
+% CaliAli_options saved inside each FILE, never here -- this struct is shared by
+% every file in a call, so a flag living here would mark a second batch as done
+% when only the first had been.
+addParameter(inp,'repair_defects',true,valid_bool_scalar)   % run the repair at all
+addParameter(inp,'dead_pixel_factor',0.1,valid_pos_scalar)  % variance below this share of the local median counts as dead
+addParameter(inp,'repair_borders',true,valid_bool_scalar)   % crop a constant region that reaches the frame edge
+addParameter(inp,'defects_repaired',[])                     % the record, written per file, never set by hand
 addParameter(inp,'structure','neuron',valid_char)      % Set up this to 'dendrite' to extract dendrites instead of neurons
 addParameter(inp,'dendrite_filter_size',0.5:0.1:0.8,@(x)isnumeric(x)&&all(isfinite(x))&&all(x>0)) % Dendrites filtering size
 addParameter(inp, 'dendrite_theta', 30,@(x)isnumeric(x)&&isscalar(x)&&isfinite(x));    % Filter dendrites based on their orientation (degrees).
@@ -250,6 +284,22 @@ addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diamet
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
 addParameter(inp,'preprocessing',[])
 addParameter(inp,'batch_sz','auto',valid_batch_input)                % Frames per batch. 'auto', 'all_frames', 'per_session' or a number.
+% Sensor-defect repair. Dead pixels, dropped frames and leftover borders are all
+% structure that does NOT move with the tissue, and motion correction registers
+% against whatever does not move: three dead pixels were enough to collapse a
+% session's estimated shifts from a standard deviation of 2.8 pixels to 0.4.
+%
+% This normally runs inside CaliAli_downsample, on raw frames, because that is
+% the only point where a dead pixel is still one pixel. Motion correction,
+% alignment and detrending each call it again as a BACKUP, for recordings that
+% entered the pipeline late. Whether it has already been done is recorded in the
+% CaliAli_options saved inside each FILE, never here -- this struct is shared by
+% every file in a call, so a flag living here would mark a second batch as done
+% when only the first had been.
+addParameter(inp,'repair_defects',true,valid_bool_scalar)   % run the repair at all
+addParameter(inp,'dead_pixel_factor',0.1,valid_pos_scalar)  % variance below this share of the local median counts as dead
+addParameter(inp,'repair_borders',true,valid_bool_scalar)   % crop a constant region that reaches the frame edge
+addParameter(inp,'defects_repaired',[])                     % the record, written per file, never set by hand
 addParameter(inp,'Mask',[])                   % Motion correction Mask
 %% Motion correction parameters
 addParameter(inp,'do_non_rigid',false,valid_bool_scalar)        %Do non-rigid registration
@@ -342,6 +392,22 @@ addParameter(inp,'batch_sz','auto',valid_batch_input)
 % specify the session grouping as:
 % same_ses_id = [1, 1, 2, 2];
 
+% Sensor-defect repair. Dead pixels, dropped frames and leftover borders are all
+% structure that does NOT move with the tissue, and motion correction registers
+% against whatever does not move: three dead pixels were enough to collapse a
+% session's estimated shifts from a standard deviation of 2.8 pixels to 0.4.
+%
+% This normally runs inside CaliAli_downsample, on raw frames, because that is
+% the only point where a dead pixel is still one pixel. Motion correction,
+% alignment and detrending each call it again as a BACKUP, for recordings that
+% entered the pipeline late. Whether it has already been done is recorded in the
+% CaliAli_options saved inside each FILE, never here -- this struct is shared by
+% every file in a call, so a flag living here would mark a second batch as done
+% when only the first had been.
+addParameter(inp,'repair_defects',true,valid_bool_scalar)   % run the repair at all
+addParameter(inp,'dead_pixel_factor',0.1,valid_pos_scalar)  % variance below this share of the local median counts as dead
+addParameter(inp,'repair_borders',true,valid_bool_scalar)   % crop a constant region that reaches the frame edge
+addParameter(inp,'defects_repaired',[])                     % the record, written per file, never set by hand
 addParameter(inp,'same_ses_id',[])        % If [], all files will be considered as different sessions.
 
 %% Internal variables

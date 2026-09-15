@@ -40,6 +40,13 @@ if isempty(opt.input_files)
     opt.input_files = uipickfiles('FilterSpec','*.mat');
 end
 
+% Sensor defects, for a recording that entered the pipeline late. In the standard
+% path this already happened at downsampling, on raw frames, and the record kept
+% in each file makes this a no-op. A file motion-corrected outside CaliAli, or
+% downsampled by an older version, is caught here instead. It must run BEFORE the
+% output files are sized, because removing a border changes the frame.
+CaliAli_options = CaliAli_repair_defects(opt.input_files, CaliAli_options, 'detrending');
+
 apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 
 [opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_det');

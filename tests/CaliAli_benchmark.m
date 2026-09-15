@@ -134,7 +134,8 @@ end
 %% ---- checks that span scenarios -----------------------------------------
 banner('Cross-scenario checks');
 bi = check_batch_invariance(results.scenarios);
-results.cross = [bi{:}];
+dp = check_dark_pixel_costs_nothing(results.scenarios);
+results.cross = [bi{:}, dp{:}];
 print_checks(results.cross);
 
 %% ---- A/B against main ---------------------------------------------------
@@ -237,6 +238,17 @@ scn(end+1) = mk('J','dropped frame is detected and interpolated', ...
 scn(end+1) = mk('K','a file with no CaliAli_options must complain', ...
     {'downsampling.batch_sz',0}, {'missing_options'}, false);
 
+% A dark pixel in the middle of the field of view. Every border in this pipeline
+% used to be found by treating the value 0 as "filled by a translation", so a
+% pixel that is genuinely 0 was indistinguishable from one that is missing, and
+% got cropped away with everything between it and the frame edge. The valid
+% region now comes from the transform instead, so this must cost nothing: same
+% options as A, same simulation, and the aligned frame must come out the same
+% size. Anything smaller means a value is still being read as absence.
+scn(end+1) = mk('M','a dark pixel in the field of view costs nothing', ...
+    {'downsampling.batch_sz',0}, ...
+    {'dtype','bookkeeping','alignment','gt','darkpixel'}, true);
+
 % Settings must reach the stage that uses them, and be recorded in what it
 % writes. A parameter that is quietly ignored is indistinguishable from one that
 % was never set.
@@ -263,6 +275,9 @@ mkdir(rec.dir);
 files = copy_inputs(sim.files, rec.dir);
 if strcmp(s.id,'J')
     files = blank_one_frame(files);   % the dropped frame this scenario looks for
+end
+if strcmp(s.id,'M')
+    rec.dark = poke_dark_pixels(files);   % dead pixels in the RAW recording
 end
 
 opt = CaliAli_demo_parameters();
@@ -346,6 +361,7 @@ if has(s.checks,'workspace'),   C = [C, check_workspace(sentinel)]; end
 if has(s.checks,'patch'),       C = [C, check_patch(opt)]; end
 if has(s.checks,'dropped'),     C = [C, check_dropped(rec.dir, 10)]; end
 if has(s.checks,'sizes'),       C = [C, check_size_reconciliation(mc, aligned, opt)]; end
+if has(s.checks,'darkpixel'), C = [C, check_dark_pixels(ds, aligned, rec.dark)]; end
 if has(s.checks,'propagation'), C = [C, check_propagation(opt, ds, aligned, sim)]; end
 if has(s.checks,'gt')
     [gt_checks, rec.score] = check_ground_truth(extraction, sim, opt);
@@ -1093,6 +1109,79 @@ catch ME
 end
 end
 
+function dark = poke_dark_pixels(files)
+%% Kill a few sensor pixels in the RAW recording, before anything touches it.
+%
+% Raw, because that is where a dead pixel actually is. Poking the downsampled
+% file instead would be poking something the scan has already passed, and would
+% also be a defect the pipeline had no chance to see at full resolution -- which
+% is the only place a dead pixel is still one pixel.
+%
+% Well inside the frame: an edge zero IS what a translation border looks like,
+% and that is a different defect with a different repair.
+dark = struct('file', {}, 'rc', {});
+for i = 1:numel(files)
+    v = VideoReader(files{i}); %#ok<TNMLP>
+    F = read(v, [1 Inf]);
+    rc = [round(size(F,1)*[0.3 0.5 0.7])', round(size(F,2)*[0.4 0.5 0.6])'];
+    for k = 1:size(rc,1)
+        F(rc(k,1), rc(k,2), :, :) = 0;
+    end
+    w = VideoWriter(files{i}, 'Uncompressed AVI'); w.FrameRate = v.FrameRate;
+    open(w); for t = 1:size(F,4), writeVideo(w, F(:,:,:,t)); end; close(w);
+    dark(end+1) = struct('file', files{i}, 'rc', rc); %#ok<AGROW>
+end
+end
+
+
+function C = check_dark_pixels(ds, ~, dark)
+%% A dead sensor pixel must be found and repaired, and must cost nothing.
+%
+% It is not enough that the pipeline survives. A dead pixel does not move with
+% the tissue, and motion correction registers against whatever does not move:
+% three of them collapsed a session's estimated shifts from a standard deviation
+% of 2.8 pixels to 0.4, silently. So the assertions are that the scan SAW them,
+% and -- in check_dark_pixel_costs_nothing -- that the aligned frame comes out
+% the same size as the run without them.
+C = {};
+try
+    C{end+1} = chk_true('the dead pixels were written into the raw video', ...
+        ~isempty(dark), sprintf('%d per session', size(dark(1).rc,1)));
+
+    n_poked = size(dark(1).rc,1);
+    found = zeros(1, numel(ds));
+    all_hit = true; extras = zeros(1, numel(ds)); frame_px = 0;
+    for i = 1:numel(ds)
+        r = CaliAli_load(ds{i}, 'CaliAli_options.defects_repaired');
+        if isempty(r), all_hit = false; continue; end
+        found(i) = r.n_dead;
+        frame_px = numel(r.dead);
+        hit = arrayfun(@(k) r.dead(dark(i).rc(k,1), dark(i).rc(k,2)), 1:n_poked);
+        all_hit = all_hit && all(hit);
+        extras(i) = r.n_dead - sum(hit);
+    end
+    C{end+1} = chk_true('downsampling recorded the repair', ...
+        all(found > 0), sprintf('dead pixels found per session: %s', mat2str(found)));
+
+    % EVERY poked pixel must be found. Missing one is the failure that matters:
+    % a dead pixel left in place does not move with the tissue, and motion
+    % correction registers against whatever does not move.
+    C{end+1} = chk_true('every dead pixel was found', all_hit, ...
+        sprintf('%d poked per session, found %s', n_poked, mat2str(found)));
+
+    % Extras are not required to be zero. A real recording contains pixels that
+    % genuinely are anomalous, and interpolating a few isolated ones from their
+    % neighbours is harmless -- where missing a real defect is not. So the bias
+    % is deliberately permissive, and what is asserted is that it stays small.
+    C{end+1} = chk_true('it does not flag the whole sensor', ...
+        max(extras) <= max(10, 0.001*frame_px), ...
+        sprintf('extras per session %s, of %d pixels', mat2str(extras), frame_px));
+catch ME
+    C{end+1} = chk_fail('dead pixel', ME.message);
+end
+end
+
+
 function mc = correct_each_session_alone(ds, opt)
 %% Motion-correct every session on its own, then erase the record of how.
 %
@@ -1282,6 +1371,29 @@ catch ME
     C{end+1} = chk_fail('batch invariance', ME.message);
 end
 end
+
+function C = check_dark_pixel_costs_nothing(scenarios)
+%% M is A with a few genuinely dark pixels. The frames must come out identical.
+% If M's aligned frame is smaller, a zero is still being read as a missing pixel
+% somewhere, and everything between it and the frame edge went with it.
+C = {};
+try
+    have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);
+    if ~(have('A') && have('M'))
+        return   % nothing to compare; not a failure
+    end
+    a = scenarios(strcmp({scenarios.id},'A'));
+    m = scenarios(strcmp({scenarios.id},'M'));
+    da = get_data_dimension(a.aligned);
+    dm = get_data_dimension(m.aligned);
+    C{end+1} = chk_true('a dark pixel costs no frame area', ...
+        isequal(da(1:2), dm(1:2)), ...
+        sprintf('A %s vs M %s', mat2str(da(1:2)), mat2str(dm(1:2))));
+catch ME
+    C{end+1} = chk_fail('dark pixel cost', ME.message);
+end
+end
+
 
 function rec = normalize_rec(rec, fields)
 %% Give every record the same fields, in the same order.

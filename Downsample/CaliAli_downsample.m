@@ -59,7 +59,31 @@ for k = 1:numel(opt.input_files)
     Fds = numel(ds_frames);
 
     first_frame = reader.read_range(1, 1);
-    [d1, d2] = size(imresize(double(first_frame(:, :, 1)), 1/opt.spatial_ds, 'bilinear'));
+
+    % SENSOR DEFECTS, FOUND ON RAW FRAMES, ONCE FOR THE WHOLE RECORDING.
+    %
+    % This is the only point in the pipeline where a dead pixel is still a single
+    % pixel. Two lines below, imresize averages it with its neighbours: at
+    % spatial_ds = 2 a dead pixel leaves four output pixels at about three
+    % quarters of their true value, which is neither zero nor obviously
+    % low-variance, and the damage is already spread. Temporal downsampling does
+    % the same to a dropped frame.
+    %
+    % It matters because these defects do not move with the tissue, and motion
+    % correction registers against whatever does not move. Three dead pixels
+    % collapsed a session's estimated shifts from a standard deviation of 2.8
+    % pixels to 0.4 -- motion correction stopped working, silently.
+    %
+    % The scan runs once, before the loop, because the masks have to be the same
+    % for every chunk: a dead-pixel set decided per batch would put a seam where
+    % one batch ends, and a border decided per batch cannot work at all, since
+    % the output file is preallocated from these dimensions.
+    defects = scan_for_defects(reader, ds_frames, opt);
+
+    % Only the crop matters for sizing the output; the pixel repairs do not
+    % change the dimensions and a single frame is no basis for judging a drop.
+    fr = first_frame(defects.rows, defects.cols, 1);
+    [d1, d2] = size(imresize(double(fr), 1/opt.spatial_ds, 'bilinear'));
 
     batch_size = resolve_batch_size(batch_sz, [d1, d2], Fds);
     reader = build_reader(fullFileName, ext, struct('batch_size', batch_size));
@@ -85,12 +109,20 @@ for k = 1:numel(opt.input_files)
         keep_idx = ds_frames(startIdx:endIdx) - raw_start + 1;
         raw = raw(:, :, keep_idx);
 
+        % Repair before either resize, using the masks the scan already fixed.
+        raw = repair_frames(raw, defects);
+
         raw = apply_spatial_ds(raw, opt.spatial_ds, [d1, d2]);
         chunk = cast(raw, target_class);
 
         payload = {'Y', chunk};
         if startIdx == 1
-            payload = [payload, {'CaliAli_options', CaliAli_options}]; %#ok<AGROW>
+            % The record goes into the options saved in THIS file, so the later
+            % stages can see that this recording has been checked without
+            % consulting a struct that is shared by every file in the call.
+            file_options = CaliAli_options;
+            file_options.defects_repaired = defects;
+            payload = [payload, {'CaliAli_options', file_options}]; %#ok<AGROW>
         end
         CaliAli_save({fullFileName, k, startIdx, endIdx, outFile}, payload{:});
 
@@ -108,6 +140,43 @@ end
 opt.output_files = opt.output_files(:)';
 CaliAli_options.downsampling = opt;
 
+end
+
+
+function defects = scan_for_defects(reader, ds_frames, opt)
+%% Read a sample spread across the recording and decide the defect masks once.
+if ~isfield(opt,'repair_defects') || isempty(opt.repair_defects)
+    opt.repair_defects = true;
+end
+[d1r, d2r] = deal(reader.size(1), reader.size(2));
+defects = struct('dead', false(d1r,d2r), 'rows', 1:d1r, 'cols', 1:d2r, ...
+    'n_dead', 0, 'border_px', 0, 'frames_used', 0);
+if ~opt.repair_defects
+    return
+end
+
+% Spread across the recording, not the first frames: the start of a session is
+% the least representative part of it.
+n = min(numel(ds_frames), 120);
+pick = ds_frames(unique(round(linspace(1, numel(ds_frames), n))));
+sample = zeros(d1r, d2r, numel(pick));
+for k = 1:numel(pick)
+    f = reader.read_range(pick(k), pick(k));
+    sample(:,:,k) = double(f(:,:,1));
+end
+
+s = struct();
+if isfield(opt,'dead_pixel_factor'), s.dead_pixel_factor = opt.dead_pixel_factor; end
+if isfield(opt,'repair_borders'),    s.repair_borders    = opt.repair_borders;    end
+defects = find_frame_defects(sample, s);
+defects.stage = 'downsampling';
+defects.spatial_ds_applied = false;   % found on raw frames, the reliable case
+
+if defects.n_dead > 0 || defects.border_px > 0
+    cprintf('-comment', ...
+        '  sensor defects: %d dead pixels, border %d px\n', ...
+        defects.n_dead, defects.border_px);
+end
 end
 
 
