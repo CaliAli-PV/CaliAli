@@ -27,8 +27,9 @@ end
 % Normalize the reference image for alignment
 ref = mat2gray(ref);
 [d1, d2, d3] = size(ref);
-bound1 = 20;  % Boundary padding size in the first dimension
-bound2 = 20;  % Boundary padding size in the second dimension
+% Border ignored while estimating the shift, as a share of the frame rather than
+% a flat pixel count. See translation_bound_default for why the count was wrong.
+[bound1, bound2] = translation_bound_default([d1, d2]);
 
 % If alignment is not enabled, return a mask with no shifts
 if ~CaliAli_options.inter_session_alignment.do_alignment_translation || isscalar(unique(CaliAli_options.inter_session_alignment.same_ses_id))

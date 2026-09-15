@@ -334,7 +334,7 @@ if has(s.checks,'alignment'),   C = [C, check_alignment(opt, aligned)]; end
 if has(s.checks,'workspace'),   C = [C, check_workspace(sentinel)]; end
 if has(s.checks,'patch'),       C = [C, check_patch(opt)]; end
 if has(s.checks,'dropped'),     C = [C, check_dropped(rec.dir, 10)]; end
-if has(s.checks,'sizes'),       C = [C, check_size_reconciliation(ds, aligned)]; end
+if has(s.checks,'sizes'),       C = [C, check_size_reconciliation(ds, aligned, opt)]; end
 if has(s.checks,'propagation'), C = [C, check_propagation(opt, ds, aligned, sim)]; end
 if has(s.checks,'gt')
     [gt_checks, rec.score] = check_ground_truth(extraction, sim, opt);
@@ -583,6 +583,7 @@ C = [C, unit_check_mat_video()];
 C = [C, unit_parameters()];
 C = [C, unit_parameter_divergence()];
 C = [C, unit_batch_modes()];
+C = [C, unit_translation_bound()];
 C = [C, unit_w_overlap()];
 C = [C, unit_mat_data_cache()];
 U = [C{:}];
@@ -791,6 +792,42 @@ catch
 end
 end
 
+function C = unit_translation_bound()
+%% The border ignored while estimating the session shift must scale.
+%
+% It was a flat 20 pixels whatever the recording, which is 11% of a 180-row
+% frame and 26% of the same frame after spatial_ds=2 -- the smaller the frame,
+% the larger the share thrown away. The replacement is a share of the frame
+% capped at the old value, so it never trims MORE than before and only relaxes
+% the axes that were being over-trimmed.
+C = {};
+try
+    [b1,b2] = translation_bound_default([512 512]);
+    C{end+1} = chk_true('a large frame keeps the historical trim', ...
+        b1==20 && b2==20, sprintf('%d / %d', b1, b2));
+
+    [b1,b2] = translation_bound_default([78 118]);
+    C{end+1} = chk_true('a small frame is trimmed less', ...
+        b1 < 20 && b2 <= 20, sprintf('%d / %d', b1, b2));
+
+    over = false; grew = false;
+    for d = [8 16 32 64 90 128 180 256 512 1024]
+        [a,~] = translation_bound_default([d d]);
+        if a > 20, over = true; end            % never more than before
+        if a > 0.42*d, grew = true; end        % never most of the axis
+        if mod(a,2) ~= 0, grew = true; end     % must split evenly per side
+    end
+    C{end+1} = chk_true('never trims more than the flat 20 px it replaces', ~over, '');
+    C{end+1} = chk_true('never eats the frame, always even', ~grew, '');
+
+    [a,~] = translation_bound_default([100 100]);
+    [b,~] = translation_bound_default([200 200]);
+    C{end+1} = chk_true('monotone in frame size', a <= b, sprintf('%d <= %d', a, b));
+catch ME
+    C{end+1} = chk_fail('translation bound', ME.message);
+end
+end
+
 function C = unit_w_overlap()
 %% Padding follows the patch size instead of being a fixed 32 pixels.
 C = {};
@@ -907,12 +944,23 @@ end
 end
 
 
-function C = check_size_reconciliation(ds, aligned)
+function C = check_size_reconciliation(ds, aligned, opt)
 %% Sessions of different size must be reconciled, not silently truncated.
-% Motion correction run per session outside CaliAli crops each one differently.
-% match_video_size pads them to a common frame; what must NOT happen is frames
-% being dropped, or a session being cut to the smallest common area without
-% saying so.
+%
+% Motion correction run per session outside CaliAli crops each one differently,
+% so the sessions arrive at different sizes. match_video_size crops them all to
+% the region they share, and alignment then crops again to the region that is
+% still valid after the sessions have been shifted onto each other.
+%
+% The earlier version of this check asserted that the aligned frame is at least
+% as large as the smallest input. That can never hold, and the assertion was
+% wrong rather than the pipeline: cropping to the valid region is what alignment
+% is for. Scenario A loses 7 rows and 9 columns the same way and was only silent
+% about it because it does not enable this check.
+%
+% What is worth asserting is that the loss is ACCOUNTED FOR: no frame is
+% dropped, the result is no larger than the region the sessions share, and it is
+% smaller than that region by no more than the shifts can explain.
 C = {};
 try
     sizes = zeros(numel(ds),3);
@@ -922,12 +970,30 @@ try
     C{end+1} = chk_true('sessions really do differ in size', ...
         numel(unique(sizes(:,1))) > 1 || numel(unique(sizes(:,2))) > 1, ...
         mat2str(sizes(:,1:2)));
+
     d = get_data_dimension(aligned);
     C{end+1} = chk_num('no frame lost reconciling the sizes', ...
         d(3), sum(sizes(:,3)), 0);
-    C{end+1} = chk_true('aligned frame is at least as large as the smallest input', ...
-        d(1) >= min(sizes(:,1)) && d(2) >= min(sizes(:,2)), ...
-        sprintf('%dx%d vs min %dx%d', d(1), d(2), min(sizes(:,1)), min(sizes(:,2))));
+
+    % The shared region: every session centred on the others, so each axis is
+    % the smallest of the inputs.
+    shared = [min(sizes(:,1)), min(sizes(:,2))];
+    C{end+1} = chk_true('aligned frame does not exceed the shared region', ...
+        d(1) <= shared(1) && d(2) <= shared(2), ...
+        sprintf('%dx%d vs shared %dx%d', d(1), d(2), shared(1), shared(2)));
+
+    % What the alignment itself may cost. Each of the two registration passes,
+    % translation and non-rigid, can take a row and a column off each side, and
+    % a shift of s pixels costs ceil(s) more. Anything beyond that is a border
+    % being thrown away for no stated reason, which is the thing worth catching.
+    T = getfield_or(opt.inter_session_alignment, 'T', zeros(1,2));
+    if isempty(T), T = zeros(1,2); end
+    budget = 2*(2 + ceil(max(abs(T(:)))));
+    lost = shared - d(1:2);
+    C{end+1} = chk_true('border loss is no more than the shifts explain', ...
+        all(lost <= budget) && all(lost >= 0), ...
+        sprintf('lost %dx%d, budget %d (max |shift| %.2f)', ...
+        lost(1), lost(2), budget, max(abs(T(:)))));
 catch ME
     C{end+1} = chk_fail('size reconciliation', ME.message);
 end
