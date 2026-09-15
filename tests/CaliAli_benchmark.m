@@ -190,14 +190,18 @@ scn(end+1) = mk('F','non-rigid motion correction', ...
     {'downsampling.batch_sz',0,'motion_correction.do_non_rigid',true}, ...
     {'mask','bookkeeping','alignment'}, true);
 
+% batch_sz is set flat, not on inter_session_alignment alone: parameters live in
+% one namespace and are copied into every module, so a per-module value is
+% discarded. These two need more than one frame batch to reach the parfor path
+% in update_temporal_CaliAli, and only a flat value delivers that.
 scn(end+1) = mk('G1','background nmf, parallel (reaches the parfor fix)', ...
-    {'downsampling.batch_sz',0,'cnmf.background_model','nmf', ...
-     'cnmf.use_parallel',true,'inter_session_alignment.batch_sz',250}, ...
+    {'downsampling.batch_sz',250,'cnmf.background_model','nmf', ...
+     'cnmf.use_parallel',true}, ...
     {'bookkeeping','gt'}, true);
 
 scn(end+1) = mk('G2','background svd, parallel', ...
-    {'downsampling.batch_sz',0,'cnmf.background_model','svd', ...
-     'cnmf.use_parallel',true,'inter_session_alignment.batch_sz',250}, ...
+    {'downsampling.batch_sz',250,'cnmf.background_model','svd', ...
+     'cnmf.use_parallel',true}, ...
     {'bookkeeping','gt'}, true);
 
 scn(end+1) = mk('H','patch geometry 32x32 (w_overlap derived)', ...
@@ -572,6 +576,7 @@ function U = run_unit_checks()
 C = {};
 C = [C, unit_check_mat_video()];
 C = [C, unit_parameters()];
+C = [C, unit_parameter_divergence()];
 C = [C, unit_w_overlap()];
 C = [C, unit_mat_data_cache()];
 U = [C{:}];
@@ -644,6 +649,32 @@ try
         strcmp(o2.inter_session_alignment.projection_method,'greedy'), '');
 catch ME
     C{end+1} = chk_fail('projection fields round trip', ME.message);
+end
+end
+
+function C = unit_parameter_divergence()
+%% A per-module value that will be discarded must say so.
+% Parameters live in a flat namespace and are copied into every module, so
+% editing one module's copy does nothing. It used to do nothing SILENTLY, which
+% is indistinguishable from it having worked.
+C = {};
+try
+    o = CaliAli_parameters(CaliAli_demo_parameters());
+    lastwarn(''); warning('off','backtrace');
+    CaliAli_parameters(o);
+    C{end+1} = chk_true('consistent options parse without a warning', ...
+        isempty(lastwarn), lastwarn);
+
+    o.inter_session_alignment.batch_sz = 250;
+    lastwarn('');
+    r = CaliAli_parameters(o);
+    [w, id] = lastwarn;
+    C{end+1} = chk_true('a diverging per-module value is reported', ...
+        strcmp(id,'CaliAli:ParameterDiverges'), first_line(w));
+    C{end+1} = chk_true('and the flat value is the one used', ...
+        isequal(r.inter_session_alignment.batch_sz, r.downsampling.batch_sz), '');
+catch ME
+    C{end+1} = chk_fail('parameter divergence', ME.message);
 end
 end
 

@@ -45,7 +45,12 @@ apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 [opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
 CaliAli_options.inter_session_alignment.batch_sz=opt.batch_sz;
 
-[process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_det');
+% Detrending CREATES values outside the source range -- background removal adds
+% an offset before clipping -- so this stage may want more headroom than it was
+% given. resolve_stage_class honours output_class if set, otherwise keeps the
+% incoming class.
+det_class = resolve_stage_class(opt, first_det_input(opt.input_files));
+[process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_det',det_class);
 try
     % Initialize the options structure for further use
     opt_g = opt;
@@ -83,7 +88,7 @@ try
             % Load the data from the input file
             Y = CaliAli_load(opt_g.input_files{k}, 'Y');
             if intra_sess_tag
-                [Y, P2, R, opt] = get_projections_and_detrend(Y, opt_g);
+                [Y, P2, R, opt] = get_projections_and_detrend(Y, opt_g, det_class);
                 range(ses_ix)=max([range(ses_ix),R]);
                 F(ses_ix)=F(ses_ix)+size(Y, 3);
                 Cn_scale=max([Cn_scale,max(P2.(3){1, 1}, [], 'all')]);
@@ -92,7 +97,7 @@ try
                 P=add_P_inner_batches(P,P2);
             else
                 % Detrend the data and calculate projections
-                [Y, P, range(ses_ix), opt] = get_projections_and_detrend(Y, opt_g);
+                [Y, P, range(ses_ix), opt] = get_projections_and_detrend(Y, opt_g, det_class);
                 % Calculate the size of the data (number of frames)
                 F(ses_ix) = size(Y, 3);
                 % Calculate the maximum projections and scale them
@@ -161,4 +166,12 @@ for i=1:2
     P.(i){1, 1}=P.(i){1, 1}./max(P.(i){1, 1},[],'all');
 end
 
+end
+
+function f = first_det_input(files)
+%% The first readable input, used to inherit a class when none is declared.
+f = '';
+if isempty(files), return; end
+f = files{1};
+if iscell(f), f = f{1}; end
 end

@@ -35,6 +35,13 @@ end
 
 struct_param={};
 if isstruct(varargin{1})
+    % Parameters live in a FLAT namespace and are projected into one
+    % substructure per module. The projection is not editable: setting a value
+    % on one module and not the others is collapsed on the next parse, with the
+    % upstream module winning. That is correct -- the flat value is the source
+    % of truth -- but it used to happen silently, so a per-module edit looked
+    % like it had been accepted and was simply discarded. Say so instead.
+    warn_if_modules_disagree(varargin{1});
     struct_param = [fieldnames(varargin{1}), struct2cell(varargin{1})]';
     varargin(1)=[];
 end
@@ -103,8 +110,23 @@ addParameter(inp,'batch_sz','auto',@(x) (isnumeric(x)&&isscalar(x)&&isfinite(x)&
 % The previous behaviour -- cast to uint8 -- clipped anything above 254; simply
 % keeping the source class instead meant a float recording used four times the
 % memory and was then silently cast back to uint16 at the next stage anyway.
+% Datatype the pipeline stores the recording in, for EVERY stage.
+%
+% There is deliberately one of these rather than one per module. Parameters in
+% CaliAli live in a flat namespace and are projected into each module's
+% substructure; editing the projection does not work, because the next parse
+% flattens it back. So a value that needs to vary per stage has to be a distinct
+% flat name, and storage class does not need to vary: a stage that wants headroom
+% wants it because the data needs it, which is a property of the recording rather
+% than of the stage.
+%
+% uint16 by default. Sessions concatenated from different recordings can have
+% different dynamic ranges, and detrending creates values outside the source
+% range, so uint8 is usually too narrow even when the camera was 8-bit. Only
+% unsigned integers: the pipeline clips against integer maxima and subtracts
+% integers from the data during extraction.
 addParameter(inp,'output_class','uint16',@(x) any(strcmpi(char(x), ...
-    {'uint8','uint16','uint32','int16','int32','single','double'})))
+    {'uint8','uint16','uint32'})))
 
 addParameter(inp,'file_extension','avi',valid_char)      % if a folder is selected instead of a single video file,
 % Concatenate all videos with the specified file extension
@@ -364,6 +386,75 @@ if ~isempty(input)
     end
 end
 end
+
+function warn_if_modules_disagree(in)
+%% Report a parameter that has been given different values in different modules.
+%
+% Only the flat value survives, so a divergent one is about to be discarded. The
+% message names the parameter, the modules and the values, and says which one
+% will be used, because the alternative is the user believing a setting took
+% effect when it did not.
+if ~isstruct(in), return; end
+mods = fieldnames(in);
+mods = mods(cellfun(@(m) isstruct(in.(m)), mods));
+if numel(mods) < 2, return; end
+
+seen = containers.Map('KeyType','char','ValueType','any');
+for i = 1:numel(mods)
+    f = fieldnames(in.(mods{i}));
+    for j = 1:numel(f)
+        v = in.(mods{i}).(f{j});
+        if isstruct(v) || iscell(v), continue; end   % nested blocks and file lists
+        if any(strcmpi(f{j}, {'input_files','output_files','preprocessing'})), continue; end
+        key = f{j};
+        if isKey(seen, key)
+            e = seen(key);
+            e.mods{end+1} = mods{i}; e.vals{end+1} = v;
+            seen(key) = e;
+        else
+            seen(key) = struct('mods',{{mods{i}}},'vals',{{v}});
+        end
+    end
+end
+
+k = keys(seen);
+for i = 1:numel(k)
+    e = seen(k{i});
+    if numel(e.vals) < 2, continue; end
+    same = true;
+    for j = 2:numel(e.vals)
+        if ~isequaln(e.vals{1}, e.vals{j}), same = false; break; end
+    end
+    if same, continue; end
+    parts = cell(1, numel(e.mods));
+    for j = 1:numel(e.mods)
+        parts{j} = sprintf('%s=%s', e.mods{j}, compact_value(e.vals{j}));
+    end
+    warning('CaliAli:ParameterDiverges', ...
+        ['"%s" has different values in different modules (%s). Parameters are ' ...
+         'set once in a flat namespace and copied into every module that uses ' ...
+         'them, so only "%s" will be used and the others are discarded. To vary ' ...
+         'it per stage it needs its own parameter name.'], ...
+        k{i}, strjoin(parts, ', '), compact_value(e.vals{1}));
+end
+end
+
+function t = compact_value(v)
+%% A short, readable rendering of a parameter value for a message.
+try
+    if ischar(v), t = v;
+    elseif isstring(v) && isscalar(v), t = char(v);
+    elseif isempty(v), t = '[]';
+    elseif isnumeric(v) || islogical(v)
+        if numel(v) > 4, t = sprintf('<%s %s>', mat2str(size(v)), class(v));
+        else, t = mat2str(v, 4); end
+    else, t = ['<' class(v) '>'];
+    end
+catch
+    t = '<?>';
+end
+end
+
 
 function in = extend_var(in,opt)
 in=[in,reshape(struct2varargin(opt), 2, [])];

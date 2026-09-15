@@ -37,7 +37,10 @@ end
 CaliAli_options.motion_correction.batch_sz=opt.batch_sz;
 
 % Pre-allocate output files and get processing flags
-[process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_mc');
+% One class for both the container and the data written into it; see
+% resolve_stage_class. Empty output_class means "keep what we were given".
+mc_class = resolve_stage_class(opt, first_input_file(opt.input_files));
+[process_flags,out_pre] = pre_allocate_outputs(opt.input_files,'_mc',mc_class);
 try
     % Loop through each input file/batch for motion correction
     for k = 1:length(opt.input_files)
@@ -104,6 +107,9 @@ try
         else
             [Y,Mask] = square_borders(Y, [], valid);
         end
+        % Cast once, at the write boundary, to the class the file was
+        % preallocated in.
+        Y = cast(Y, mc_class);
         opt.Mask=Mask;
         % Save motion-corrected video (handles both string and batch inputs)
         CaliAli_options.motion_correction = opt;
@@ -123,4 +129,12 @@ catch ME
     cprintf('*red', 'Motion correction failed: %s\n', ME.message);
     rethrow(ME);
 end
+end
+
+function f = first_input_file(files)
+%% The first readable input, used to inherit a class when none is declared.
+f = '';
+if isempty(files), return; end
+f = files{1};
+if iscell(f), f = f{1}; end
 end

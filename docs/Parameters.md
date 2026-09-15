@@ -80,6 +80,37 @@ The function [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.m
 
 ---
 
+##### 3️⃣ One flat namespace, projected into each module
+
+Parameters are set **once**, in a flat structure, and `CaliAli_parameters` copies
+each one into every module that uses it:
+
+```matlab
+params.batch_sz = 250;                    % set once
+CaliAli_options = CaliAli_parameters(params);
+CaliAli_options.downsampling.batch_sz             % 250
+CaliAli_options.motion_correction.batch_sz        % 250
+CaliAli_options.inter_session_alignment.batch_sz  % 250
+```
+
+The nested `CaliAli_options` is a **projection** of that flat namespace, not a
+place to edit. Setting a value on one module only does not work:
+
+```matlab
+CaliAli_options.inter_session_alignment.batch_sz = 250;   % has no effect
+CaliAli_options = CaliAli_parameters(CaliAli_options);    % collapsed back
+```
+
+Every stage re-parses the options, and each re-parse restores the flat value.
+CaliAli warns when it sees a parameter with different values in different
+modules, naming the parameter and the value it will use, so this is never
+silent.
+
+**If a value genuinely has to differ between stages, it needs its own parameter
+name** in the flat namespace, rather than an edit to the projection.
+
+---
+
 #### Adjusting CaliAli Parameters.
 
 CaliAli requires setting 33 parameters. However, in practice you only need to strictly focus on three: 

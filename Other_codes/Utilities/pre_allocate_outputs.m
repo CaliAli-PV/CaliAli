@@ -1,4 +1,4 @@
-function [process_flags,out] = pre_allocate_outputs(input_files,tag)
+function [process_flags,out] = pre_allocate_outputs(input_files,tag,out_cls)
 %% pre_allocate_outputs: Pre-allocate output files and determine processing flags.
 %
 % Inputs:
@@ -78,13 +78,18 @@ for k = 1:length(input_files)
                 % Pre-allocate the file
                 if total_frames > 0
                     m = matfile(output_file, 'Writable', true);
-                    % Created in the class of the data being read, not a
-                    % hardcoded one. Hardcoding uint16 here silently undid
-                    % whatever datatype the previous stage chose: a recording
-                    % downsampled as single was cast back on the first write,
-                    % one stage after the effort of preserving it.
-                    out_cls = source_data_class(src_file);
-                    m.Y(d1, d2, total_frames) = cast(0, out_cls);  % creates dataset on disk
+                    % The class comes from the CALLER -- the stage that is
+                    % about to write this file -- so that the container and the
+                    % data written into it cannot disagree. A v7.3 partial write
+                    % of a mismatched class fails outright rather than
+                    % converting. When the caller says nothing, the class of the
+                    % data being read is kept.
+                    if nargin < 3 || isempty(out_cls)
+                        cls_here = source_data_class(src_file);
+                    else
+                        cls_here = lower(char(out_cls));
+                    end
+                    m.Y(d1, d2, total_frames) = cast(0, cls_here);  % creates dataset on disk
                     fprintf(1, 'Pre-allocated file with dimensions [%d, %d, %d]\n', d1, d2, total_frames);
                 end
 

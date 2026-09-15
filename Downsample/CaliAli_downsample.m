@@ -431,11 +431,9 @@ end
 
 
 function cls = resolve_output_class(opt)
-%% The datatype every stage stores the recording in.
-cls = 'uint16';
-if isfield(opt,'output_class') && ~isempty(opt.output_class)
-    cls = lower(char(opt.output_class));
-end
+%% The datatype this stage writes. Shared with every other writing stage so the
+% allowed set and the validation are defined in one place.
+cls = resolve_stage_class(opt);
 end
 
 function warn_if_cast_destroys(sample, cls, fname)

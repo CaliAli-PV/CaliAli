@@ -1,4 +1,4 @@
-function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options)
+function [Y, p, R, CaliAli_options] = get_projections_and_detrend(Y, CaliAli_options, target_class)
 %% get_projections_and_detrend: Process session data by detrending and computing projections.
 %
 % This function processes video session data by applying detrending, removing 
@@ -67,18 +67,34 @@ if ~isempty(CaliAli_options.preprocessing.median_filtering)
     PNR = medfilt2(PNR, CaliAli_options.preprocessing.median_filtering); % Apply median filter to PNR
 end
 
-% Calculate the range of the session data (for normalization) and clip to uint16
+% Calculate the range of the session data (for normalization) and clip to the
+% class this stage writes.
+%
+% The ceiling used to be a hardcoded 65535 regardless of the class the file was
+% actually created in. With a uint8 output that clips at the wrong value and then
+% truncates on write, losing everything above 255 without saying so -- the same
+% silent clipping this pipeline was reported for. The ceiling now follows the
+% class, so the warning fires against the limit that will really be applied.
 R = max(Y, [], 'all');
-clipped_pixels = nnz(Y > 65535);
+% Supplied by the stage that preallocated the file it will be written into, so
+% the clip, the cast and the container all agree.
+if nargin < 3 || isempty(target_class)
+    out_cls = 'uint16';
+else
+    out_cls = lower(char(target_class));
+end
+ceiling = double(intmax(out_cls));
+clipped_pixels = nnz(Y > ceiling);
 if clipped_pixels > 0
     clipped_ratio = clipped_pixels / numel(Y);
     if clipped_ratio >= 0.01
-        cprintf('*red', ['Warning: %.2f%% of pixels saturated at uint16 ceiling. ' ...
-            'Consider revisiting preprocessing parameters.\n'], clipped_ratio * 100);
+        cprintf('*red', ['Warning: %.2f%% of pixels saturated at the %s ceiling ' ...
+            '(%.0f). Consider revisiting preprocessing parameters, or storing ' ...
+            'this stage in a wider class.\n'], clipped_ratio * 100, out_cls, ceiling);
     end
 end
-Y(Y > 65535) = 65535;
-Y = uint16(Y);
+Y(Y > ceiling) = ceiling;
+Y = cast(Y, out_cls);
 
 
 % Fuse the blood vessel projections with the neuron projections for visual comparison
