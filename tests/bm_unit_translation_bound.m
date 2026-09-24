@@ -1,11 +1,19 @@
 function C = bm_unit_translation_bound()
-%% The border ignored while estimating the session shift must scale.
+%% bm_unit_translation_bound: The border ignored while estimating the session shift must scale.
 %
-% It was a flat 20 pixels whatever the recording, which is 11% of a 180-row
-% frame and 26% of the same frame after spatial_ds=2 -- the smaller the frame,
-% the larger the share thrown away. The replacement is a share of the frame
-% capped at the old value, so it never trims MORE than before and only relaxes
-% the axes that were being over-trimmed.
+% A flat pixel count is a different share of a small frame than of a large one, and
+% the frame size depends on spatial_ds.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     [b1,b2] = translation_bound_default([512 512]);

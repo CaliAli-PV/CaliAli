@@ -1,5 +1,12 @@
 function results = bm_finish(results)
-%% Stamp the record and write it out.
+%% bm_finish: Stamp the record and write it to disk.
+%
+% Inputs:
+%   results - The record so far.
+%
+% Outputs:
+%   results - The same record with its finish time.
+
 results.finished = datestr(now); %#ok<TNOW1,DATST>
 if isfield(results,'out_dir') && ~isempty(results.out_dir)
     f = fullfile(results.out_dir,'benchmark_results.mat');

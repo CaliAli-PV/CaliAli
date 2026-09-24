@@ -1,14 +1,12 @@
 function mc = bm_correct_each_session_alone(ds, opt)
-%% Motion-correct every session on its own, then erase the record of how.
+%% bm_correct_each_session_alone: Motion-correct each session on its own, then erase the record.
 %
-% Correcting them one at a time is what makes this different from the normal
-% path: each session is cropped to ITS OWN valid region, so the crop is a
-% different size and sits at a different place in the original frame. Stripping
-% motion_correction afterwards removes the only thing that says where -- the
-% Mask, which CaliAli keeps at the pre-crop size with the kept rectangle marked.
-% What reaches alignment is then exactly what an external tool hands over:
-% corrected sessions of different sizes, off centre from each other, with nothing
-% recorded about the padding.
+% Inputs:
+%   ds, opt - The downsampled files and the options.
+%
+% Outputs:
+%   mc - The corrected files.
+
 mc = cell(1, numel(ds));
 for i = 1:numel(ds)
     o = opt;

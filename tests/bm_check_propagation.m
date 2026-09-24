@@ -1,5 +1,18 @@
 function C = bm_check_propagation(opt, ds, aligned, sim)
-%% A setting must reach the stage that uses it, and be recorded in its output.
+%% bm_check_propagation: A setting must reach the stage that uses it and be recorded in what it writes.
+%
+% A parameter that is quietly ignored cannot be told apart from one never set.
+%
+% Inputs:
+%   opt, ds, aligned, sim - Options, the files written, and the ground truth.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     % spatial downsampling actually applied

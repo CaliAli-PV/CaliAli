@@ -1,10 +1,20 @@
 function C = bm_check_missing_options(files, dir_)
-%% A file with no CaliAli_options must complain, not proceed on defaults.
+%% bm_check_missing_options: A file with no CaliAli_options must complain, not proceed on defaults.
 %
-% Silently substituting defaults is the worst outcome: the run completes and
-% every number downstream is computed under settings the user never chose. The
-% assertion is therefore about NOISE, not success -- an error or a warning, but
-% not silence.
+% Silently substituting defaults is the worst outcome: the run completes and every
+% number downstream is computed under settings nobody chose. The assertion is
+% therefore about noise, not success.
+%
+% Inputs:
+%   files, dir_ - The inputs and the scenario folder.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     opt = CaliAli_demo_parameters();

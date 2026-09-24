@@ -1,5 +1,12 @@
 function C = bm_check_bookkeeping(opt, aligned)
-%% Frames must be conserved, and alignment must declare itself finished.
+%% bm_check_bookkeeping: Frames must be conserved, and alignment must declare how many it has.
+%
+% Inputs:
+%   opt, aligned - Options and the aligned recording.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 isa_ = opt.inter_session_alignment;
 try

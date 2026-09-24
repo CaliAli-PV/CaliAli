@@ -1,7 +1,16 @@
 function s = bm_mk(id,name,opts,checks,mc,sim)
-%% SIM names which simulated recording the scenario runs on. Almost everything
-% uses the default one; the non-rigid scenarios need a recording that actually
-% deforms, which the default deliberately does not.
+%% bm_mk: Build one scenario entry.
+%
+% Inputs:
+%   id, name - Identifier and description.
+%   opts     - Option overrides, as name/value pairs.
+%   checks   - Names of the checks this scenario enables.
+%   mc       - true, false, or 'external' for motion correction.
+%   sim      - Which simulated recording to use. Defaults to the shared one.
+%
+% Outputs:
+%   s - One scenario entry.
+
 if nargin < 6 || isempty(sim), sim = 'default'; end
 s = struct('id',id,'name',name,'opts',{opts},'checks',{checks},'mc',mc,'sim',sim);
 end

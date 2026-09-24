@@ -1,7 +1,19 @@
 function C = bm_check_batch_invariance(scenarios)
-%% Chunking must not change the numbers, only the memory used to get them.
-% A, B and C differ only in batch size, so their downsampled outputs must be
-% bit-identical. If they are not, chunking is losing or duplicating frames.
+%% bm_check_batch_invariance: Chunking must change the memory used, not the numbers.
+%
+% A, B and C differ only in batch size, so their downsampled output must be
+% bit-identical.
+%
+% Inputs:
+%   scenarios - The records from bm_run_scenarios.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 ids = {'A','B','C'};
 if isempty(scenarios)

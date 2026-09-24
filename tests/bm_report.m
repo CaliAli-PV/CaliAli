@@ -1,4 +1,13 @@
 function bm_report(r, args) %#ok<INUSD>
+%% bm_report: Print what failed and what moved.
+%
+% Inputs:
+%   r    - The finished record.
+%   args - From bm_args.
+%
+% Outputs:
+%   None.
+
 bm_banner('Summary');
 np = @(C) sum([C.pass]);
 fprintf('unit checks      : %d of %d passed\n', np(r.unit), numel(r.unit));

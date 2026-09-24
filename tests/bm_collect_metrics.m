@@ -1,9 +1,18 @@
 function m = bm_collect_metrics(opt, score, timing)
-%% Every number worth putting side by side with the other arm.
+%% bm_collect_metrics: Gather every number worth comparing against the other arm.
 %
-% These changes are procedural, so the expectation is EQUALITY, not improvement.
-% A difference in any of these is the finding: it means a change that was only
-% supposed to move files around also moved a number.
+% Inputs:
+%   opt    - The options the run finished with.
+%   score  - The ground-truth scoring.
+%   timing - Per-stage times.
+%
+% Outputs:
+%   m - Flat structure of scalar metrics.
+%
+% Notes:
+%   - These changes are meant to be procedural, so the expectation is equality, not
+%   improvement. A metric that moves is the finding.
+
 m = struct();
 isa_ = opt.inter_session_alignment;
 

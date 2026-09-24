@@ -1,11 +1,19 @@
 function C = bm_unit_batch_modes()
-%% batch_sz names what it wants instead of encoding it in the number 0.
+%% bm_unit_batch_modes: batch_sz must name what it wants instead of encoding it in a number.
 %
-% 0 used to mean two different things depending on who read it: "the whole file
-% at once" before the sessions are concatenated, "one batch per session" after.
-% The named modes say which. 0 is still accepted, and must still resolve to the
-% reading its own module has always used, or every saved option struct changes
-% behaviour silently.
+% Zero once meant two different things depending on which module read it. The named
+% modes say which, and zero still resolves to the reading its own module used.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     C{end+1} = bm_chk_true('auto is a mode', ...

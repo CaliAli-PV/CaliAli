@@ -1,5 +1,12 @@
 function U = bm_cross_checks(scenarios)
-%% Checks that only mean something when scenarios are compared with each other.
+%% bm_cross_checks: Run the checks that compare scenarios with each other.
+%
+% Inputs:
+%   scenarios - The records from bm_run_scenarios.
+%
+% Outputs:
+%   U - Structure array of check results.
+
 C = {};
 C = [C, bm_check_batch_invariance(scenarios)];
 C = [C, bm_check_dark_pixel_costs_nothing(scenarios)];

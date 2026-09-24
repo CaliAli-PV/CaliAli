@@ -1,4 +1,24 @@
 function bm_setup_paths(args)
+%% bm_setup_paths: Put the repository under test on the path, and nothing else.
+%
+% Clears the path and rebuilds it from the repository, the simulator and the two
+% helper folders, in that order, so nothing can shadow the code being measured.
+%
+% Inputs:
+%   args - From bm_args, supplying repo, simulator and metrics.
+%
+% Outputs:
+%   None.
+%
+% Notes:
+%   - The helper folders are added by name. Adding their parent would sweep in the
+%   worktree of main that the A/B comparison checks out, and every function would
+%   then come from main instead of from the branch under test.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 repo = args.repo; simulator = args.simulator; metrics = args.metrics;
 %% Put the repo under test on the path, and nothing that could shadow it.
 %

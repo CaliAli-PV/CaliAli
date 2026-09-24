@@ -1,5 +1,12 @@
 function C = bm_unit_w_overlap()
-%% Padding follows the patch size instead of being a fixed 32 pixels.
+%% bm_unit_w_overlap: Patch padding must follow the patch size.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 try
     d = CNMFE_parameters(struct('gSig',3));

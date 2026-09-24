@@ -1,5 +1,20 @@
 function results = bm_compare_main(results, args)
-%% Run the same scenarios against a worktree of main and compare.
+%% bm_compare_main: Run the same scenarios against a worktree of main.
+%
+% A worktree rather than a branch switch, so the working tree is left alone.
+%
+% Inputs:
+%   results - The record so far.
+%   args    - From bm_args.
+%
+% Outputs:
+%   results - The same record with the other arm, the metric comparison and the
+%                checks that changed state.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 out = run_against_main_in(args, results.sim);
 results.main = out;
 if out.ok

@@ -1,5 +1,12 @@
 function [C, score] = bm_check_ground_truth(extraction, sim, opt)
-%% Score the extraction against what was simulated.
+%% bm_check_ground_truth: Score the extraction against what was simulated.
+%
+% Inputs:
+%   extraction, sim, opt - The result, the ground truth and the options.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {}; score = [];
 try
     L = load(extraction,'neuron');

@@ -1,5 +1,12 @@
 function files = bm_blank_one_frame(files)
-%% Make frame 10 of the first video a dropped frame, as a camera would.
+%% bm_blank_one_frame: Blank one frame, as a dropped frame would be.
+%
+% Inputs:
+%   files - The input videos.
+%
+% Outputs:
+%   files - The same list, one video modified.
+
 v = VideoReader(files{1}); %#ok<TNMLP>
 F = read(v, [1 Inf]);
 F(:,:,:,10) = 0;

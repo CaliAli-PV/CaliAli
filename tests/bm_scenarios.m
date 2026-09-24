@@ -1,6 +1,19 @@
 function scn = bm_scenarios()
-%% Each scenario is a set of option overrides plus the checks it enables.
-% The point of each is a CODE PATH, not a parameter value.
+%% bm_scenarios: Declare every scenario the benchmark runs.
+%
+% A scenario is a set of option overrides plus the checks it enables. Each one
+% exists for a CODE PATH, not for a parameter value.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   scn - Structure array, one element per scenario.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 scn = struct('id',{},'name',{},'opts',{},'checks',{},'mc',{},'sim',{});
 
 scn(end+1) = bm_mk('A','baseline, whole recording in one batch', ...

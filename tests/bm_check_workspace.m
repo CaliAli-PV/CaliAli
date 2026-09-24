@@ -1,5 +1,12 @@
 function C = bm_check_workspace(sentinel)
-%% The pipeline must not create or destroy variables in the base workspace.
+%% bm_check_workspace: The pipeline must not create or destroy variables in the base workspace.
+%
+% Inputs:
+%   sentinel - A value placed in the base workspace before the run.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 try
     still = evalin('base','exist(''caliali_benchmark_sentinel'',''var'')');

@@ -1,5 +1,12 @@
 function rec = bm_normalize_rec(rec, fields)
-%% Give every record the same fields, in the same order.
+%% bm_normalize_rec: Give every record the same fields in the same order.
+%
+% Inputs:
+%   rec, fields - A record and the full field list.
+%
+% Outputs:
+%   rec - The record with every field present.
+
 for i = 1:numel(fields)
     if ~isfield(rec, fields{i})
         rec.(fields{i}) = [];

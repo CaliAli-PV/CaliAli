@@ -1,7 +1,12 @@
 function C = bm_check_dtype(opt, ds, mc, aligned)
-%% The configured class must survive every stage.
-% Except the detrended file: get_projections_and_detrend deliberately forces
-% uint16 there, so that one is asserted to BE uint16 rather than to match.
+%% bm_check_dtype: The configured datatype must survive every stage.
+%
+% Inputs:
+%   opt, ds, mc, aligned - Options and the files each stage wrote.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 want = 'uint16';
 try want = lower(char(opt.downsampling.output_class)); catch; end
 C = {};

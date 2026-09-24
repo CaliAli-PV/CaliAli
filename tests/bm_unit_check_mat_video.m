@@ -1,7 +1,18 @@
 function C = bm_unit_check_mat_video()
-%% The file-integrity test decides whether a file gets DELETED, so a false
-% positive loses data. The old rule was a size threshold, which deleted a valid
-% small recording and kept a large truncated one.
+%% bm_unit_check_mat_video: The file-integrity test decides whether a file is DELETED.
+%
+% A false positive loses data, so the rule must be about content and not size.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 d = tempname; mkdir(d);
 try

@@ -1,14 +1,12 @@
 function C = bm_check_dropped(scn_dir, blanked_idx)
-%% A frame the camera never delivered must be found and interpolated.
+%% bm_check_dropped: A frame the camera never delivered must be found and interpolated.
 %
-% The test has to DISCRIMINATE between the two arms, which an "is any frame all
-% zero" test does not: on main the offset turned a dropped frame into a frame of
-% ones, so no all-zero frame survives there either and such a test passes for the
-% wrong reason.
+% Inputs:
+%   scn_dir, blanked_idx - The scenario folder and which frame was blanked.
 %
-% An untouched dropped frame is CONSTANT, whatever constant it holds. An
-% interpolated one carries the structure of its neighbours. So the discriminating
-% measurement is the spatial variance of that one frame.
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 f = dir(fullfile(scn_dir,'*_mc.mat'));
 if isempty(f)

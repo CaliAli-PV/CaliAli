@@ -1,13 +1,12 @@
 function dark = bm_poke_dark_pixels(files)
-%% Kill a few sensor pixels in the RAW recording, before anything touches it.
+%% bm_poke_dark_pixels: Kill a few sensor pixels in the raw recording.
 %
-% Raw, because that is where a dead pixel actually is. Poking the downsampled
-% file instead would be poking something the scan has already passed, and would
-% also be a defect the pipeline had no chance to see at full resolution -- which
-% is the only place a dead pixel is still one pixel.
+% Inputs:
+%   files - The input videos.
 %
-% Well inside the frame: an edge zero IS what a translation border looks like,
-% and that is a different defect with a different repair.
+% Outputs:
+%   dark - Where each pixel was killed.
+
 dark = struct('file', {}, 'rc', {});
 for i = 1:numel(files)
     v = VideoReader(files{i}); %#ok<TNMLP>

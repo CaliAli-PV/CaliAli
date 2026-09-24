@@ -1,7 +1,20 @@
 function C = bm_check_dark_pixel_costs_nothing(scenarios)
-%% M is A with a few genuinely dark pixels. The frames must come out identical.
-% If M's aligned frame is smaller, a zero is still being read as a missing pixel
-% somewhere, and everything between it and the frame edge went with it.
+%% bm_check_dark_pixel_costs_nothing: A dead pixel must cost no frame area.
+%
+% M is A with a few genuinely dark pixels. If M's aligned frame is smaller, a zero
+% is still being read as a missing pixel somewhere, and everything between it and
+% the frame edge went with it.
+%
+% Inputs:
+%   scenarios - The records from bm_run_scenarios.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);

@@ -1,17 +1,20 @@
 function C = bm_check_non_rigid_does_no_harm(scenarios)
-%% Switching non-rigid correction on must not cost anything when there is
-%% nothing for it to correct.
+%% bm_check_non_rigid_does_no_harm: Non-rigid correction must cost nothing when there is nothing to correct.
 %
-% A and F are the same recording and the same options apart from do_non_rigid,
-% and that recording's within-session motion is pure translation. So a correctly
-% parameterised patch correction has nothing to find, should estimate almost
-% nothing, and should land where rigid alone lands. Any real loss here is the
-% patches warping the frame on no evidence -- which is a parameter problem, most
-% often an overlap or a max_dev that did not scale with the patch size.
+% A and F are the same recording and the same options apart from do_non_rigid, and
+% that recording only translates. A correctly configured patch correction has
+% nothing to find and should land where rigid alone lands.
 %
-% The tolerances are deliberately loose. This is not asking the correction to be
-% good, only to be harmless: an extra resampling pass over every pixel costs a
-% little blur whatever the field is, and that much is unavoidable.
+% Inputs:
+%   scenarios - The records from bm_run_scenarios.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);

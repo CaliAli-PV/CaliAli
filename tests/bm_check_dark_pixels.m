@@ -1,12 +1,19 @@
 function C = bm_check_dark_pixels(ds, ~, dark)
-%% A dead sensor pixel must be found and repaired, and must cost nothing.
+%% bm_check_dark_pixels: A dead sensor pixel must be found and repaired.
 %
-% It is not enough that the pipeline survives. A dead pixel does not move with
-% the tissue, and motion correction registers against whatever does not move:
-% three of them collapsed a session's estimated shifts from a standard deviation
-% of 2.8 pixels to 0.4, silently. So the assertions are that the scan SAW them,
-% and -- in check_dark_pixel_costs_nothing -- that the aligned frame comes out
-% the same size as the run without them.
+% It is not enough that the pipeline survives one. A dead pixel does not move with
+% the tissue, and motion correction registers against whatever does not move.
+%
+% Inputs:
+%   ds, ~, dark - The downsampled files and where the pixels were poked.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     C{end+1} = bm_chk_true('the dead pixels were written into the raw video', ...

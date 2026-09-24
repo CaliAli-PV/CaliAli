@@ -1,16 +1,19 @@
 function C = bm_check_non_rigid_helps(scenarios)
-%% On a recording that deforms, correcting the deformation must be worth doing.
+%% bm_check_non_rigid_helps: On a recording that deforms, correcting the deformation must be worth doing.
 %
-% F1 and F2 are the same simulation and the same options apart from
-% do_non_rigid, so any difference between them is the non-rigid pass and nothing
-% else. This is the check the old scenario F could never make: it ran on a
-% recording whose within-session motion was pure translation, where the non-rigid
-% pass has nothing to find and can only lose.
+% F1 and F2 are the same simulation and the same options apart from do_non_rigid,
+% so any difference between them is the non-rigid pass and nothing else.
 %
-% Crispness is the measure, not correlation between sessions. Deformation is a
-% WITHIN-session defect: it blurs each session's own projections, and crispness
-% is what reads that directly. A correction that undoes it sharpens the
-% projections it is handed.
+% Inputs:
+%   scenarios - The records from bm_run_scenarios.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);

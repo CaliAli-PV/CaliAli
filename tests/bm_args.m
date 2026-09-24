@@ -1,5 +1,25 @@
 function args = bm_args(varargin)
-%% Every option the benchmark takes, with its default, in one place.
+%% bm_args: Parse the benchmark options and prepare the output folder.
+%
+% Every option the benchmark accepts is declared here with its default, so this
+% is the one place to look for what can be set and what it does.
+%
+% Inputs:
+%   varargin - Name/value pairs.
+%
+% Outputs:
+%   args - Structure with every option resolved, including the repository root
+%             and the output folder, both created if not given.
+%
+% Notes:
+%   - repo defaults to the parent of this folder. It must not reach higher: the
+%   path setup runs genpath on it, and a wider root puts neighbouring checkouts
+%   on the path where they shadow the code under test.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 p = inputParser;
 p.addParameter('out_dir', '');
 p.addParameter('scenarios', {});

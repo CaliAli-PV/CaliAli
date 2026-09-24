@@ -1,5 +1,12 @@
 function C = bm_check_mask(opt)
-%% The valid region must be a real rectangle that excludes something.
+%% bm_check_mask: The valid region must be a rectangle that excludes the translated border.
+%
+% Inputs:
+%   opt - The options the run finished with.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 m = [];
 try m = opt.motion_correction.Mask; catch; end

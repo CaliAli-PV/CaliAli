@@ -1,5 +1,12 @@
 function C = bm_unit_mat_data_cache()
-%% The patched data is cached outside the base workspace.
+%% bm_unit_mat_data_cache: The patched data must be cached outside the base workspace.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 try
     mat_data_cache('clear');

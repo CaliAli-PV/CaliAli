@@ -1,5 +1,12 @@
 function files = bm_copy_inputs(src, dst)
-%% Each scenario gets its own copy, so nothing is shared or reused.
+%% bm_copy_inputs: Give a scenario its own copy of the input videos.
+%
+% Inputs:
+%   src, dst - Source files and destination folder.
+%
+% Outputs:
+%   files - The copies.
+
 files = cell(size(src));
 for i = 1:numel(src)
     [~,n,e] = fileparts(src{i});

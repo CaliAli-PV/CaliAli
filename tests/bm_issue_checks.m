@@ -1,15 +1,23 @@
 function U = bm_issue_checks()
-%% One regression per bug reported on GitHub, so none of them comes back.
+%% bm_issue_checks: Run one regression per bug reported on GitHub.
 %
-% Each check names its issue. They are grouped here rather than spread through
-% the unit checks because they answer a different question: not "is this
-% component correct" but "is this specific thing that once broke for a user
-% still fixed". A failure here means a regression on something somebody hit.
+% These answer a different question from the unit checks: not whether a component
+% is correct, but whether a specific thing that once broke for a user is still
+% fixed. A failure here is a regression on something somebody hit.
 %
-% Issues that are questions, feature requests or performance reports are not
-% represented: #29, #24, #21, #17, #16, #14, #13, #1 and #33.
+% Inputs:
+%   None.
+%
+% Outputs:
+%   U - Structure array of check results.
+%
+% Notes:
+%   - Issues that were questions, feature requests or performance reports are not
+%   represented here.
 %
 % Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
 
 C = {};
 C = [C, issue_32_natural_order()];

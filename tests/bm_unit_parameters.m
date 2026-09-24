@@ -1,7 +1,12 @@
 function C = bm_unit_parameters()
-%% Name/value pairs were flattened into a column, so with two or more pairs the
-% names and values interleaved. One pair happened to work, which is why it
-% survived: a single-pair test proves nothing.
+%% bm_unit_parameters: Name/value pairs must survive being parsed.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 try
     o = CaliAli_parameters('batch_sz', 250, 'spatial_ds', 2);

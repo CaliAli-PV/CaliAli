@@ -1,7 +1,12 @@
 function C = bm_check_no_offset(ds, mc, opt)
-%% No stage may shift the whole recording by a constant.
-% The pipeline used to add 1 in two places so that 0 could mean "border fill".
-% Nothing subtracted it, so the data carried a permanent offset.
+%% bm_check_no_offset: No stage may shift the whole recording by a constant.
+%
+% Inputs:
+%   ds, mc, opt - The files before and after motion correction.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 if isequal(ds, mc), return; end
 try

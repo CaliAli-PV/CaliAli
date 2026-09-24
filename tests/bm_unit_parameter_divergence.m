@@ -1,14 +1,20 @@
 function C = bm_unit_parameter_divergence()
-%% A value set on one module must be honoured, and a flat one must propagate.
+%% bm_unit_parameter_divergence: A per-module setting must be honoured and a flat one must propagate.
 %
-% These used to be in conflict. Parameters live in a flat namespace that is
-% projected into one substructure per module, and the projection used to be
-% collapsed on every parse, so a per-module setting was silently discarded --
-% setting inter_session_alignment.batch_sz left it at 'auto' and said nothing.
-% Both now work, which needs four tiers of precedence and one rule: an EMPTY
-% top-level value is the seed a parameter started with, not a setting, so it
-% never overrides. gSig arrives as [] and is derived by downsampling; without
-% that rule the original [] would win and undo every derivation.
+% Both must work at once, which needs four tiers of precedence and one rule: an
+% empty top-level value is the seed a parameter started with, not a setting, so it
+% never overrides a value derived from it.
+%
+% Inputs:
+%   None.
+%
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     base = CaliAli_demo_parameters();

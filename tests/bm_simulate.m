@@ -1,7 +1,27 @@
 function sim = bm_simulate(dir_, args, nonrigid_std)
-%% NONRIGID_STD is the within-session deformation amplitude, in pixels. Zero --
-% the default, and what every scenario but the non-rigid pair uses -- leaves the
-% within-session motion purely translational, as it has always been.
+%% bm_simulate: Simulate one recording with known neurons, traces and motion.
+%
+% Produces the data every scenario runs on. What was put into it is recorded in
+% the meta file, so what comes out can be scored against it.
+%
+% Inputs:
+%   dir_         - Where to write the recording.
+%   args         - From bm_args, supplying the session and frame counts.
+%   nonrigid_std - Deformation amplitude in pixels. Zero leaves the motion
+%                  purely translational.
+%
+% Outputs:
+%   sim - Structure with the file list and the path to the ground truth.
+%
+% Notes:
+%   - Each session is given a different motion amplitude. Equal amplitudes make
+%   every session crop to almost the same size, which never exercises the case
+%   where sessions reach alignment at genuinely different sizes.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 if nargin < 3 || isempty(nonrigid_std), nonrigid_std = 0; end
 %% One recording, default neuron settings, with motion.
 %

@@ -1,10 +1,27 @@
 function rec = bm_run_scenario(s, sim, rec, args)
-%% One scenario: its own directory, its own copy of the inputs, its own options.
-% A fresh directory per scenario is not tidiness. detrend_batch_and_calculate_
-% projections reuses a cached _det.mat AND READS THE OPTIONS BACK OUT OF IT, so
-% two scenarios sharing a folder silently inherit each other's settings. And
-% CaliAli_motion_correction errors when every input is already processed, so a
-% second run over the same folder cannot work at all.
+%% bm_run_scenario: Run one scenario end to end and check what it produced.
+%
+% Gives the scenario its own folder and its own copy of the inputs, runs
+% downsampling, motion correction, alignment and extraction, then applies the
+% checks the scenario enabled.
+%
+% Inputs:
+%   s   - One entry from bm_scenarios.
+%   sim - The simulated recording to use.
+%   rec - The record to fill.
+%   args - From bm_args.
+%
+% Outputs:
+%   rec - The record, with checks, metrics and per-stage timings.
+%
+% Notes:
+%   - Every stage is timed. These changes are meant to move files around, so a
+%   stage becoming slower or faster is a result no correctness check would see.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 if isfolder(rec.dir), rmdir(rec.dir,'s'); end
 mkdir(rec.dir);
 

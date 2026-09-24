@@ -1,5 +1,15 @@
 function results = bm_new_results(args)
-%% The shape of the record every stage adds to.
+%% bm_new_results: Initialize the record that every stage adds to.
+%
+% Declares each field up front so a stage can be skipped without the fields it
+% would have filled going missing.
+%
+% Inputs:
+%   args - From bm_args.
+%
+% Outputs:
+%   results - Empty record, with the header already printed.
+
 results = struct();
 results.repo      = args.repo;
 results.out_dir   = args.out_dir;

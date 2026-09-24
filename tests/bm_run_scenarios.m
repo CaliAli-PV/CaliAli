@@ -1,9 +1,24 @@
 function results = bm_run_scenarios(results, args)
-%% Run every selected scenario, one after another, collecting its record.
+%% bm_run_scenarios: Run every selected scenario and collect its record.
 %
-% A scenario that throws is recorded as failed and the rest still run: the point
-% of the benchmark is to find out how many things are broken, not to stop at the
-% first.
+% Each scenario is timed and recorded whether it succeeds or fails.
+%
+% Inputs:
+%   results - The record so far.
+%   args    - From bm_args.
+%
+% Outputs:
+%   results - The same record with one entry per scenario.
+%
+% Notes:
+%   - A scenario that throws is recorded as failed and the rest still run. The
+%   point is to find how many things are broken, not to stop at the first.
+%   - The recording that deforms is built only if a scenario actually asks for it.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 scn = bm_scenarios();
 if ~isempty(args.scenarios)
     scn = scn(ismember({scn.id}, args.scenarios));

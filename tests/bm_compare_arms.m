@@ -1,9 +1,12 @@
 function cmp = bm_compare_arms(this_arm, other_arm)
-%% Join the two arms by scenario and report every metric that moved.
+%% bm_compare_arms: Report every metric that moved between the two arms.
 %
-% TOLERANCES. Anything that is a count must match exactly -- a differing frame
-% or component count is never rounding. The continuous metrics get a small
-% tolerance for numerical noise, but not enough to hide a real change.
+% Inputs:
+%   this_arm, other_arm - The scenario records from each arm.
+%
+% Outputs:
+%   cmp - One entry per metric, with both values and whether it moved.
+
 tol = struct('BV_score',0.05,'corr_before',1e-3,'corr_after',1e-3, ...
     'crispness_before',1e-3,'crispness_after',1e-3, ...
     'auc_f1',0.01,'auc_precision',0.01,'auc_recall',0.01, ...

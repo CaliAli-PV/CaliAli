@@ -1,20 +1,21 @@
 function C = bm_check_size_reconciliation(ds, aligned, opt)
-%% Sessions of different size must be reconciled, not silently truncated.
+%% bm_check_size_reconciliation: Sessions of different size must be reconciled, not silently truncated.
 %
-% Motion correction run per session outside CaliAli crops each one differently,
-% so the sessions arrive at different sizes. match_video_size crops them all to
-% the region they share, and alignment then crops again to the region that is
-% still valid after the sessions have been shifted onto each other.
+% Cropping to the region every session shares is what alignment is for, so the
+% question is not whether the frame shrank but whether the loss is accounted for:
+% no frame dropped, nothing larger than the shared region, and nothing smaller
+% than the measured shifts can explain.
 %
-% The earlier version of this check asserted that the aligned frame is at least
-% as large as the smallest input. That can never hold, and the assertion was
-% wrong rather than the pipeline: cropping to the valid region is what alignment
-% is for. Scenario A loses 7 rows and 9 columns the same way and was only silent
-% about it because it does not enable this check.
+% Inputs:
+%   ds, aligned, opt - The inputs, the result and the options.
 %
-% What is worth asserting is that the loss is ACCOUNTED FOR: no frame is
-% dropped, the result is no larger than the region the sessions share, and it is
-% smaller than that region by no more than the shifts can explain.
+% Outputs:
+%   C - Cell array of check results.
+%
+% Author: Pablo Vergara
+% Contact: pablo.vergara.g@ug.uchile.cl
+% Date: 2026
+
 C = {};
 try
     sizes = zeros(numel(ds),3);

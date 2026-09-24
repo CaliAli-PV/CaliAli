@@ -1,5 +1,12 @@
 function C = bm_check_patch(opt)
-%% w_overlap follows patch_dims instead of being a fixed 32.
+%% bm_check_patch: Patch padding must follow the patch size.
+%
+% Inputs:
+%   opt - The options the run finished with.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 try
     pe = opt.cnmf.pars_envs;

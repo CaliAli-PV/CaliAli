@@ -1,5 +1,12 @@
 function C = bm_check_alignment(opt, aligned)
-%% The alignment metrics must improve, and the vessel score must clear its gate.
+%% bm_check_alignment: Alignment must improve the projections and record what it did.
+%
+% Inputs:
+%   opt, aligned - Options and the aligned recording.
+%
+% Outputs:
+%   C - Cell array of check results.
+
 C = {};
 isa_ = opt.inter_session_alignment;
 try
