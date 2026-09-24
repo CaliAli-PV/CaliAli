@@ -130,7 +130,19 @@ sn = cell(nr_patch, nc_patch);
 W = obj.W;
 b0 = obj.b0;
 b = obj.b;
+
+% THE TEMPORAL BACKGROUND, CUT TO THE FRAMES THIS CALL IS ABOUT. obj.f spans the
+% whole recording, while Ypatch below holds one batch, and the nmf and svd models
+% form b_old*f_old and compare it against the patch pixel by pixel. Passed whole,
+% that product has as many columns as the recording and the comparison fails with
+% "Non-singleton dimensions of the two input arrays must match each other". The
+% ring model never noticed because W carries no time axis at all, which is why
+% the only background CaliAli uses in practice is the only one that survived
+% being run in batches.
 f = obj.f;
+if ~isempty(f)
+    f = cellfun(@(x) slice_f(x, f_range), f, 'UniformOutput', false);
+end
 RSS = cell(nr_patch, nc_patch);
 
 %% check whether the bg_ssub was changed
@@ -276,12 +288,16 @@ if use_parallel
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
-            [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
+            % sn for the PATCH, not the whole block. It is compared against
+            % pixels selected by ind_patch, so a block-sized vector has the
+            % wrong number of rows. The serial branch below has always cut it
+            % correctly; only this parallel one did not.
+            [b{mpatch}, f{mpatch}] = fit_nmf_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_block(ind_patch), ind_patch);
         else
             b_old = b{mpatch};
             f_old = f{mpatch};
             Ypatch = reshape(Ypatch, [], T);
-            [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier,sn_block(:), ind_patch);
+            [b{mpatch}, f{mpatch}, b0{mpatch}] = fit_svd_model(Ypatch, nb, A_block, C_block, b_old, f_old, thresh_outlier, sn_block(ind_patch), ind_patch);
         end
         [r, c] = ind2sub([nr_patch, nc_patch], mpatch);
 
@@ -374,4 +390,16 @@ if obj.options.save_intermediate
     eval(sprintf('log_data.bg_%s = bg;', tmp_str));
 end
 fclose(flog);
+end
+
+
+function fs = slice_f(f, f_range)
+%% Take the columns of f belonging to this batch, when there are any to take.
+% f may be empty, or a zeroed placeholder shorter than the recording, on the
+% first pass. Those are left alone; there is nothing to cut.
+fs = f;
+if isempty(f) || size(f,2) < f_range(2)
+    return
+end
+fs = f(:, f_range(1):f_range(2));
 end

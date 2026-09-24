@@ -26,8 +26,18 @@ end
 
 Bf = Y - A*C;
 
-if exist('thresho_outlier', 'var')
-    Bf_old = b_old*f_old;
+% thresho_outlier, with the h in the wrong place, is a variable that has never
+% existed, so this block had never run on any recording. Suppressing outliers
+% against the previous background is the whole reason b_old and f_old are passed
+% in, and with the guard misspelled svd was quietly skipping it.
+% Only when there is a previous background to compare against, and only when it
+% covers the same frames as this patch. On the first pass there is no estimate
+% yet, and b_old*f_old is not commensurate with the batch -- comparing them is
+% what raised "Non-singleton dimensions of the two input arrays must match each
+% other". A single column broadcasts and is fine.
+Bf_old = [];
+if ~isempty(b_old) && ~isempty(f_old), Bf_old = b_old*f_old; end
+if exist('thresh_outlier','var') && ismember(size(Bf_old,2), [1, size(Bf,2)])
     tmp_Bf = Bf(ind_patch, :);
     ind_outlier = bsxfun(@gt, tmp_Bf, bsxfun(@plus, Bf_old, thresh_outlier*reshape(sn, [], 1)));
     tmp_Bf(ind_outlier) = Bf_old(ind_outlier);
