@@ -7,5 +7,9 @@ function c = bm_chk_true(name, cond, detail)
 % Outputs:
 %   c - The check result.
 
-c = struct('name',name,'pass',logical(cond),'detail',char(detail));
+% Forced to one value. A condition given as an array would otherwise make
+% [results.pass] longer than the array of results, and every later use of it as
+% a logical index fails somewhere far from here. Empty counts as failure.
+c = struct('name',name,'pass',~isempty(cond) && all(logical(cond(:))), ...
+    'detail',char(detail));
 end

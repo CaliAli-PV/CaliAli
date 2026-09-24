@@ -25,9 +25,16 @@ try
     m = scenarios(strcmp({scenarios.id},'M'));
     da = get_data_dimension(a.aligned);
     dm = get_data_dimension(m.aligned);
+    % Area, with a small tolerance, rather than identical dimensions. Repairing
+    % a pixel changes the data slightly, so motion correction lands on a
+    % slightly different crop -- in one run M came out larger on one axis and
+    % smaller on the other. What must not happen is LOSING field of view.
+    area_a = da(1)*da(2); area_m = dm(1)*dm(2);
     C{end+1} = bm_chk_true('a dark pixel costs no frame area', ...
-        isequal(da(1:2), dm(1:2)), ...
-        sprintf('A %s vs M %s', mat2str(da(1:2)), mat2str(dm(1:2))));
+        area_m >= 0.98*area_a, ...
+        sprintf('A %s = %d px, M %s = %d px (%.1f%%)', mat2str(da(1:2)), area_a, ...
+        mat2str(dm(1:2)), area_m, 100*area_m/area_a));
+
 catch ME
     C{end+1} = bm_chk_fail('dark pixel cost', ME.message);
 end

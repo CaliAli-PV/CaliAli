@@ -9,6 +9,13 @@ function opt = bm_apply_overrides(opt, pairs)
 
 for i = 1:2:numel(pairs)
     parts = strsplit(pairs{i}, '.');
-    opt.(parts{1}).(parts{2}) = pairs{i+1};
+    if numel(parts) == 1
+        % A flat name is a pipeline-wide setting and belongs at the top level.
+        % Only dotted names were handled before, so asking for one -- which is
+        % the only way to reach every module -- indexed past the end of parts.
+        opt.(parts{1}) = pairs{i+1};
+    else
+        opt.(parts{1}).(parts{2}) = pairs{i+1};
+    end
 end
 end
