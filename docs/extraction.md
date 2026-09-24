@@ -79,3 +79,15 @@ CaliAli performs final detrending and noise scaling automatically at the end of 
 === "CONGRATULATIONS!"
 You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`
 	
+
+
+??? Warning "Only the ring background model is supported"
+    CaliAli uses the **ring** background model, and it is the default. The `svd`
+    and `nmf` models are inherited from CNMF-E, where they were written for
+    two-photon recordings, and they were never implemented for the batched
+    extraction CaliAli runs.
+
+    Setting `background_model` to anything other than `'ring'` produces a
+    warning and falls back to ring, rather than stopping the run. A setting
+    carried over from a CNMF-E script therefore costs you a message, not an
+    analysis you did not ask for.

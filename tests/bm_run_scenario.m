@@ -52,6 +52,14 @@ if bm_has(s.checks,'missing_options')
     return
 end
 
+if bm_has(s.checks,'background_model')
+    kc = bm_check_background_model();
+    rec.checks = [kc{:}];
+    rec.metrics = struct();
+    bm_print_checks(rec.checks);
+    return
+end
+
 if bm_has(s.checks,'reject_float')
     kc = bm_check_reject_float();
     rec.checks = [kc{:}];

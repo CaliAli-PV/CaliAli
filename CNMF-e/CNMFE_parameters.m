@@ -60,7 +60,11 @@ addParameter(inp, 'nk', 1, @isnumeric);             % detrending the slow fluctu
 addParameter(inp, 'detrend_method', 'spline');  % compute the local minimum as an estimation of trend.
 
 % -------------------------     BACKGROUND    -------------------------  %
-addParameter(inp, 'background_model', 'ring', @ischar);  % model of the background {'ring', 'svd'(default), 'nmf'}
+% Background model. RING is the only one CaliAli supports. The svd and nmf models
+% are inherited from CNMF-E, were written for two-photon data, and were never
+% implemented for the batched extraction CaliAli runs: anything else set here is
+% warned about and replaced. See resolve_background_model.
+addParameter(inp, 'background_model', 'ring', @ischar);
 addParameter(inp, 'nb', 1, @isnumeric);             % number of background sources for each patch (only be used in SVD and NMF model)
 addParameter(inp, 'bg_neuron_factor', 1.5, @isnumeric);
 addParameter(inp, 'ring_radius', [], @isnumeric);     % This will be calculated later
@@ -92,7 +96,9 @@ end
 parse(inp, varargin{:});
 pars = inp.Results;
 
-
+% Only the ring background is supported; anything else is replaced, with a word
+% about why.
+pars.background_model = resolve_background_model(pars.background_model);
 
 %% Calculate Dependent Parameters
 % Patch padding follows the patch size. Applied here as well as in
@@ -170,6 +176,32 @@ parse(inp, varargin{:});
 pars = inp.Results;
 if isempty(pars.w_overlap)
     pars.w_overlap = round(pars.w_overlap_fraction * min(pars.patch_dims));
+end
+end
+
+
+function m = resolve_background_model(m)
+%% Only the ring model is supported. Anything else is warned about and replaced.
+%
+% svd and nmf come from CNMF-E, where they were written for two-photon
+% recordings. CaliAli is for one-photon imaging, where the out-of-focus
+% background is what the ring model exists to remove, so nothing here has ever
+% used them -- and they were never made to work with the batched extraction
+% CaliAli runs, which is where they fail.
+%
+% A warning rather than an error: a setting carried over from a CNMF-E script
+% should not stop a run, it should tell the user it is being ignored and what is
+% being used instead.
+if isempty(m), m = 'ring'; return, end
+m = lower(char(m));
+if ~strcmp(m, 'ring')
+    warning('CaliAli:backgroundModel:unsupported', ...
+        ['background_model "%s" is not supported by CaliAli and has been ' ...
+         'replaced with "ring". The svd and nmf models come from CNMF-E, were ' ...
+         'written for two-photon data, and do not work with the batched ' ...
+         'extraction this pipeline uses. Ring is what one-photon imaging ' ...
+         'needs, and is the default.'], m);
+    m = 'ring';
 end
 end
 

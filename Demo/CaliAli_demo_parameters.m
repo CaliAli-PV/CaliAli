@@ -74,7 +74,12 @@ params.deconv_options = struct(...    % Deconvolution options
     'optimize_b', true, ...          % Optimize baseline
     'max_tau', 100);                 % Max decay time (frames)
 
-params.background_model = 'ring';    % Background model
+params.background_model = 'ring';    % Background model. Ring is the only one
+                                     %  supported: the svd and nmf models come
+                                     %  from CNMF-E, were written for two-photon
+                                     %  data, and do not work with the batched
+                                     %  extraction CaliAli uses. Setting either
+                                     %  warns and falls back to ring.
 params.nb = 1;                       % Number of background components
 params.bg_neuron_factor = 1.5;       % 
 params.ring_radius = [];             % Will be calculated later
