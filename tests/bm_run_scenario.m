@@ -42,8 +42,18 @@ end
 
 C = {};   % checks accumulate here
 
-if strcmp(s.id,'K')
+% Two scenarios answer a question about the options alone and never need the
+% pipeline to run, so they report and stop here.
+if bm_has(s.checks,'missing_options')
     kc = bm_check_missing_options(files, rec.dir);
+    rec.checks = [kc{:}];
+    rec.metrics = struct();
+    bm_print_checks(rec.checks);
+    return
+end
+
+if bm_has(s.checks,'reject_float')
+    kc = bm_check_reject_float();
     rec.checks = [kc{:}];
     rec.metrics = struct();
     bm_print_checks(rec.checks);

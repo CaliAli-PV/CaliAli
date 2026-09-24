@@ -19,8 +19,8 @@ C = {};
 try
     have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);
     if ~(have('A') && have('F')), return; end
-    a = bm_scenarios(strcmp({scenarios.id},'A'));
-    f = bm_scenarios(strcmp({scenarios.id},'F'));
+    a = scenarios(strcmp({scenarios.id},'A'));
+    f = scenarios(strcmp({scenarios.id},'F'));
 
     C{end+1} = bm_chk_true('non-rigid does not blur a recording that does not deform', ...
         f.metrics.crispness_before >= 0.9*a.metrics.crispness_before, ...

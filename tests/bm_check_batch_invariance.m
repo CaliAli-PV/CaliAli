@@ -29,7 +29,7 @@ ids = ids(have);
 try
     ref = [];
     for i = 1:numel(ids)
-        r = bm_scenarios(strcmp({scenarios.id}, ids{i}));
+        r = scenarios(strcmp({scenarios.id}, ids{i}));
         m = matfile(r.ds_files{1});
         Y = m.Y;
         if isempty(ref)

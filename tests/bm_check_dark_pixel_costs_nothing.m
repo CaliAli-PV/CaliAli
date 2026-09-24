@@ -21,8 +21,8 @@ try
     if ~(have('A') && have('M'))
         return   % nothing to compare; not a failure
     end
-    a = bm_scenarios(strcmp({scenarios.id},'A'));
-    m = bm_scenarios(strcmp({scenarios.id},'M'));
+    a = scenarios(strcmp({scenarios.id},'A'));
+    m = scenarios(strcmp({scenarios.id},'M'));
     da = get_data_dimension(a.aligned);
     dm = get_data_dimension(m.aligned);
     C{end+1} = bm_chk_true('a dark pixel costs no frame area', ...

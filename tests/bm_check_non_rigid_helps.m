@@ -20,8 +20,8 @@ try
     if ~(have('F1') && have('F2'))
         return   % not both run; nothing to compare, and not a failure
     end
-    a = bm_scenarios(strcmp({scenarios.id},'F1'));
-    b = bm_scenarios(strcmp({scenarios.id},'F2'));
+    a = scenarios(strcmp({scenarios.id},'F1'));
+    b = scenarios(strcmp({scenarios.id},'F2'));
 
     C{end+1} = bm_chk_true('non-rigid correction sharpens a deforming recording', ...
         b.metrics.crispness_before >= a.metrics.crispness_before, ...

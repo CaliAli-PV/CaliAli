@@ -36,5 +36,12 @@ harness = fullfile(fileparts(metrics), 'harness');
 if isfolder(harness),   addpath(harness); end
 % The repo under test must win over anything added above it.
 addpath(genpath(repo));
+% The harness itself lives only on this branch. The A/B comparison runs this
+% same function with repo pointing at a worktree of main, which would otherwise
+% leave main's code on the path and this folder off it -- and every bm_ function
+% would vanish mid-run. Added last, so it has priority over anything the repo
+% under test may also provide.
+addpath(fileparts(mfilename('fullpath')));
+
 warning('off','MATLAB:rmpath:DirNotFound');
 end

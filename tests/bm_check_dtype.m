@@ -14,5 +14,7 @@ C{end+1} = bm_chk('dtype: _ds.mat', bm_mat_class(ds{1}), want);
 if ~isequal(ds, mc)
     C{end+1} = bm_chk('dtype: _mc.mat', bm_mat_class(mc{1}), want);
 end
-C{end+1} = bm_chk('dtype: _Aligned.mat is uint16 by design', bm_mat_class(aligned), 'uint16');
+% The configured class, not a fixed one. Asserting uint16 here failed scenario
+% D1, which asks for uint8 and correctly gets uint8 the whole way through.
+C{end+1} = bm_chk('dtype: _Aligned.mat', bm_mat_class(aligned), want);
 end
