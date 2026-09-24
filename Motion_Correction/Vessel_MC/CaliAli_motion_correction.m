@@ -77,10 +77,13 @@ try
             end
         end
 
-        % Generate output file name (same logic as original)
-        [filepath, name] = fileparts(fullFileName);
-        opt.output_file = strcat(filepath, filesep, name, '_mc', '.mat');
-        out{k} = opt.output_file;
+        % The output name comes from pre_allocate_outputs, which computed one
+        % for EVERY input whether it needed processing or not. Rebuilding it
+        % here was both redundant and subtly different: this line had no
+        % `~contains(name, tag)` guard, so a file already carrying _mc got the
+        % tag twice, where create_batch_list and pre_allocate_outputs both
+        % leave it alone.
+        opt.output_file = out_pre{k};
 
 
         % Load video data (handles both string and batch inputs)
@@ -129,10 +132,26 @@ try
         CaliAli_save(opt.input_files{k}(:), Y, CaliAli_options);
     end
 
-    % Store output file names in options structure
-    CaliAli_options.motion_correction.output_files = unique(out);
-    for i=1:length(CaliAli_options.motion_correction.output_files)
-        apply_crop_on_disk(CaliAli_options.motion_correction.output_files{i});
+    % Store output file names in options structure.
+    %
+    % From out_pre, not from a list the loop builds as it goes. The loop skips
+    % any input whose output already exists, so on a re-run over a finished
+    % folder it skips every one, that list is never created, and the line below
+    % failed with "Unrecognized function or variable 'out'" -- reported as issue
+    % 36. out_pre is filled for every input before the loop starts, so the
+    % re-run now returns the same file names it returned the first time.
+    CaliAli_options.motion_correction.output_files = unique(out_pre);
+
+    % Crop only what THIS run wrote. The crop is not idempotent: it trims a file
+    % to the bounding box of its Mask, and the Mask is deliberately kept at the
+    % PRE-crop size because it records where the kept rectangle sat in the
+    % original frame. Applied a second time to an already-cropped file, the
+    % sizes no longer agree and it fails with "Mask must be [d1 d2]" -- the
+    % second half of issue 36, reached only once the first half stopped masking
+    % it. An output that was skipped was cropped on the run that created it.
+    fresh = unique(out_pre(process_flags));
+    for i=1:numel(fresh)
+        apply_crop_on_disk(fresh{i});
     end
 
 catch ME
