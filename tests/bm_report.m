@@ -35,12 +35,14 @@ for i = 1:numel(r.scenarios)
     end
 end
 if isfield(r,'cross') && ~isempty(r.cross)
-    x = r.cross(~[r.cross.pass]);
+    x = r.cross(arrayfun(@(e) ~isscalar(e.pass) || ~e.pass, r.cross));
     for j = 1:numel(x)
         bad = true; fprintf(2,'cross-scenario check failed: %s (%s)\n', x(j).name, x(j).detail);
     end
 end
-u = r.unit(~[r.unit.pass]);
+% Selected one by one rather than with a logical index, so a single malformed
+% result cannot take the whole report down after a run that took an hour.
+u = r.unit(arrayfun(@(e) ~isscalar(e.pass) || ~e.pass, r.unit));
 for j = 1:numel(u)
     bad = true; fprintf(2,'unit check failed: %s (%s)\n', u(j).name, u(j).detail);
 end
