@@ -48,6 +48,7 @@ p.addParameter('sessions', 3);
 p.addParameter('simulator', '/mnt/nasferatus/CaliAli/simulator/Simulate_Ca_Imaging_video_1.22/Simulate_Ca_Imaging_video');
 p.addParameter('metrics', '/mnt/nasferatus/CaliAli/benchmark/metrics');
 p.addParameter('unit_only', false);   % run the unit checks and stop: no simulation, no pipeline
+p.addParameter('nonrigid_std', 3);    % deformation amplitude for the non-rigid scenarios, in pixels
 p.parse(varargin{:});
 args = p.Results;
 
@@ -114,7 +115,17 @@ for i = 1:numel(scn)
         'checks',struct([]),'score',[],'metrics',struct(),'seconds',0, ...
         'dir',fullfile(args.out_dir, ['scn_' s.id]));
     try
-        rec = run_scenario(s, results.sim, rec, args);
+        if strcmp(s.sim,'nonrigid')
+            if ~isfield(results,'sim_nonrigid') || isempty(results.sim_nonrigid)
+                banner('Simulation with non-rigid motion');
+                results.sim_nonrigid = make_simulation( ...
+                    fullfile(args.out_dir,'simulation_nonrigid'), args, args.nonrigid_std);
+            end
+            use_sim = results.sim_nonrigid;
+        else
+            use_sim = results.sim;
+        end
+        rec = run_scenario(s, use_sim, rec, args);
         rec.ok = true;
     catch ME
         rec.error = format_error(ME);
@@ -135,7 +146,9 @@ end
 banner('Cross-scenario checks');
 bi = check_batch_invariance(results.scenarios);
 dp = check_dark_pixel_costs_nothing(results.scenarios);
-results.cross = [bi{:}, dp{:}];
+nr = check_non_rigid_helps(results.scenarios);
+nh = check_non_rigid_does_no_harm(results.scenarios);
+results.cross = [bi{:}, dp{:}, nr{:}, nh{:}];
 print_checks(results.cross);
 
 %% ---- A/B against main ---------------------------------------------------
@@ -162,7 +175,7 @@ end
 function scn = scenario_table()
 %% Each scenario is a set of option overrides plus the checks it enables.
 % The point of each is a CODE PATH, not a parameter value.
-scn = struct('id',{},'name',{},'opts',{},'checks',{},'mc',{});
+scn = struct('id',{},'name',{},'opts',{},'checks',{},'mc',{},'sim',{});
 
 scn(end+1) = mk('A','baseline, whole recording in one batch', ...
     {'downsampling.batch_sz',0}, ...
@@ -200,9 +213,29 @@ scn(end+1) = mk('E','motion correction done outside CaliAli', ...
     {'downsampling.batch_sz',0}, ...
     {'dtype','bookkeeping','alignment','gt','sizes'}, 'external');
 
-scn(end+1) = mk('F','non-rigid motion correction', ...
+% Non-rigid correction, on a recording that actually deforms. These two are a
+% matched pair on the SAME simulation and differ only in do_non_rigid, which is
+% the only way to say whether the correction helps. Run against the default
+% recording, whose within-session motion is pure translation, the non-rigid pass
+% has nothing to find and every patch shift it estimates is noise -- it can only
+% lose. The comparison is made in check_non_rigid_helps.
+% THE NULL TEST, and the one that gates the others. This is scenario A with
+% do_non_rigid switched on, on the SAME recording, whose within-session motion is
+% pure translation. There is no deformation to correct, so a correctly
+% parameterised patch correction must estimate almost nothing and leave the
+% result where rigid alone left it. If it cannot do no harm here, no amount of
+% rescuing elsewhere makes it safe to enable.
+scn(end+1) = mk('F','non-rigid on a recording that does not deform', ...
     {'downsampling.batch_sz',0,'motion_correction.do_non_rigid',true}, ...
-    {'mask','bookkeeping','alignment'}, true);
+    {'mask','bookkeeping','alignment','gt'}, true);
+
+scn(end+1) = mk('F1','deforming recording, translation only', ...
+    {'downsampling.batch_sz',0,'motion_correction.do_non_rigid',false}, ...
+    {'mask','bookkeeping','alignment','gt'}, true, 'nonrigid');
+
+scn(end+1) = mk('F2','deforming recording, translation and non-rigid', ...
+    {'downsampling.batch_sz',0,'motion_correction.do_non_rigid',true}, ...
+    {'mask','bookkeeping','alignment','gt'}, true, 'nonrigid');
 
 % batch_sz is set flat, not on inter_session_alignment alone: parameters live in
 % one namespace and are copied into every module, so a per-module value is
@@ -257,8 +290,12 @@ scn(end+1) = mk('L','settings propagate into the files that stages write', ...
      'downsampling.output_class','uint8'}, {'propagation'}, true);
 end
 
-function s = mk(id,name,opts,checks,mc)
-s = struct('id',id,'name',name,'opts',{opts},'checks',{checks},'mc',mc);
+function s = mk(id,name,opts,checks,mc,sim)
+%% SIM names which simulated recording the scenario runs on. Almost everything
+% uses the default one; the non-rigid scenarios need a recording that actually
+% deforms, which the default deliberately does not.
+if nargin < 6 || isempty(sim), sim = 'default'; end
+s = struct('id',id,'name',name,'opts',{opts},'checks',{checks},'mc',mc,'sim',sim);
 end
 
 
@@ -896,7 +933,11 @@ end
 %% ========================================================================
 %  Simulation
 %  ========================================================================
-function sim = make_simulation(dir_, args)
+function sim = make_simulation(dir_, args, nonrigid_std)
+%% NONRIGID_STD is the within-session deformation amplitude, in pixels. Zero --
+% the default, and what every scenario but the non-rigid pair uses -- leaves the
+% within-session motion purely translational, as it has always been.
+if nargin < 3 || isempty(nonrigid_std), nonrigid_std = 0; end
 %% One recording, default neuron settings, with motion.
 %
 % session_motion_std must be non-zero: it is what makes translation happen, and
@@ -914,7 +955,8 @@ here = pwd; c = onCleanup(@() cd(here)); %#ok<NASGU>
 motion = repmat([2 5 8], 1, ceil(args.sessions/3));
 files = Simulate_Ca_video('outpath', dir_, 'ses', args.sessions, 'F', args.frames, ...
     'seed', 20260915, 'save_GT', false, 'save_mat', true, 'save_avi', 1, ...
-    'session_motion_std', motion(1:args.sessions), 'translation_misalignment', 1);
+    'session_motion_std', motion(1:args.sessions), ...
+    'session_nonrigid_std', nonrigid_std, 'translation_misalignment', 1);
 cd(here);
 sim = load_simulation(dir_);
 sim.files = files;
@@ -1391,6 +1433,77 @@ try
         sprintf('A %s vs M %s', mat2str(da(1:2)), mat2str(dm(1:2))));
 catch ME
     C{end+1} = chk_fail('dark pixel cost', ME.message);
+end
+end
+
+
+function C = check_non_rigid_does_no_harm(scenarios)
+%% Switching non-rigid correction on must not cost anything when there is
+%% nothing for it to correct.
+%
+% A and F are the same recording and the same options apart from do_non_rigid,
+% and that recording's within-session motion is pure translation. So a correctly
+% parameterised patch correction has nothing to find, should estimate almost
+% nothing, and should land where rigid alone lands. Any real loss here is the
+% patches warping the frame on no evidence -- which is a parameter problem, most
+% often an overlap or a max_dev that did not scale with the patch size.
+%
+% The tolerances are deliberately loose. This is not asking the correction to be
+% good, only to be harmless: an extra resampling pass over every pixel costs a
+% little blur whatever the field is, and that much is unavoidable.
+C = {};
+try
+    have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);
+    if ~(have('A') && have('F')), return; end
+    a = scenarios(strcmp({scenarios.id},'A'));
+    f = scenarios(strcmp({scenarios.id},'F'));
+
+    C{end+1} = chk_true('non-rigid does not blur a recording that does not deform', ...
+        f.metrics.crispness_before >= 0.9*a.metrics.crispness_before, ...
+        sprintf('crispness %.3f on, %.3f off', ...
+        f.metrics.crispness_before, a.metrics.crispness_before));
+
+    C{end+1} = chk_true('and does not cost extraction quality', ...
+        f.metrics.auc_f1 >= a.metrics.auc_f1 - 0.05, ...
+        sprintf('F1 area %.3f on, %.3f off', f.metrics.auc_f1, a.metrics.auc_f1));
+catch ME
+    C{end+1} = chk_fail('non-rigid no-harm', ME.message);
+end
+end
+
+
+function C = check_non_rigid_helps(scenarios)
+%% On a recording that deforms, correcting the deformation must be worth doing.
+%
+% F1 and F2 are the same simulation and the same options apart from
+% do_non_rigid, so any difference between them is the non-rigid pass and nothing
+% else. This is the check the old scenario F could never make: it ran on a
+% recording whose within-session motion was pure translation, where the non-rigid
+% pass has nothing to find and can only lose.
+%
+% Crispness is the measure, not correlation between sessions. Deformation is a
+% WITHIN-session defect: it blurs each session's own projections, and crispness
+% is what reads that directly. A correction that undoes it sharpens the
+% projections it is handed.
+C = {};
+try
+    have = @(x) any(strcmp({scenarios.id},x) & [scenarios.ok]);
+    if ~(have('F1') && have('F2'))
+        return   % not both run; nothing to compare, and not a failure
+    end
+    a = scenarios(strcmp({scenarios.id},'F1'));
+    b = scenarios(strcmp({scenarios.id},'F2'));
+
+    C{end+1} = chk_true('non-rigid correction sharpens a deforming recording', ...
+        b.metrics.crispness_before >= a.metrics.crispness_before, ...
+        sprintf('crispness %.3f with, %.3f without', ...
+        b.metrics.crispness_before, a.metrics.crispness_before));
+
+    C{end+1} = chk_true('and does not cost extraction quality', ...
+        b.metrics.auc_f1 >= a.metrics.auc_f1 - 0.02, ...
+        sprintf('F1 area %.3f with, %.3f without', b.metrics.auc_f1, a.metrics.auc_f1));
+catch ME
+    C{end+1} = chk_fail('non-rigid comparison', ME.message);
 end
 end
 

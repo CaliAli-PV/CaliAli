@@ -331,11 +331,20 @@ addParameter(inp,'non_rigid_options',opt_nr)   % DEPRECATED, unused
 addParameter(inp, ...
     'non_rigid_batch_size',[20,60],@(x) isnumeric(x) && numel(x)==2 && all(x>0) && diff(x)>=0)             % DEPRECATED, unused
 
-% Patch side for non-rigid correction, as a multiple of gSig. A patch has to hold
-% several neurons or there is nothing in it to register against; expressing it in
-% gSig keeps that true whatever spatial_ds was used. See non_rigid_grid_default,
-% which also clamps it so the frame is split into between two and eight patches.
-addParameter(inp,'non_rigid_patch_scale',16,valid_pos_scalar)
+% Non-rigid pyramid depth. Level 1 lays 3 patches across each axis, level 2 uses
+% 4, and so on, each level registering only the residual the one before it left.
+% One level by default: measured on a known 1.5 px deformation, a single 3x3
+% leaves 0.802 px while 4x4 alone leaves 0.850 and 5x5 alone 0.873 -- a finer
+% grid ON ITS OWN is worse, because each patch holds less signal. It only pays
+% inside a cascade, where the fine level has a small residual left to find:
+% 3x3 -> 4x4 -> 5x5 -> 6x6 reaches 0.713. Each level costs one more registration
+% pass, so the depth is yours to choose.
+addParameter(inp,'non_rigid_levels',1,valid_pos_scalar)
+
+% Everything slower than this is removed from the image the non-rigid levels
+% register on. See highpass_reference for why it is a high pass and not the
+% vessel map the rigid stage uses.
+addParameter(inp,'non_rigid_highpass_sigma',6,valid_pos_scalar)
 varargin=varargin{:};
 if isstruct(varargin)
     varargin = [fieldnames(varargin), struct2cell(varargin)]';

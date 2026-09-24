@@ -1,0 +1,18 @@
+[Warning: Function narginchk has the same name as a MATLAB built-in. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+In addpath>doPathAddition (line 126)
+In addpath (line 90)
+In add_paths (line 23)
+In run (line 112)] 
+[Warning: Function maxNumCompThreads has the same name as a MATLAB built-in. We
+suggest you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+In addpath>doPathAddition (line 126)
+In addpath (line 90)
+In add_paths (line 23)
+In run (line 112)] 
+Added 123 folders to the MATLAB path (excluding .git)
+Added 4 folders to the MATLAB path (excluding .git)
+{Unrecognized function or variable 'probeD'.
+} 
