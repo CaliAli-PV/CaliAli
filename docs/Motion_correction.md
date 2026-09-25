@@ -48,23 +48,23 @@ CaliAli_options = CaliAli_motion_correction(CaliAli_options);
     | `non_rigid_levels = 2` | 0.67 |
     | `non_rigid_levels = 4` | 0.55 |
 
-??? Warning "CaliAli modifies one NoRMCorre file"
-    `Motion_Correction/NoRMCorre-master/han.m` differs from the upstream
-    NoRMCorre release. It subtracts the patch mean before tapering and uses a
-    true Hann window instead of a Hamming one, so the taper actually reaches
-    zero at the patch edge.
+??? Info "CaliAli uses its own window function for non-rigid registration"
+    Non-rigid registration tapers each patch before transforming it, because the
+    correlation is circular: a patch's left edge sits next to its right edge, and
+    that seam produces a spurious peak at zero shift which biases every estimate
+    toward finding no motion.
 
-    The window exists to hide a discontinuity: the correlation is circular, so a
-    patch's left edge sits next to its right edge, and that seam produces a
-    spurious peak at zero shift which biases every estimate toward finding no
-    motion. A Hamming window bottoms out at 0.08, so on a patch with any offset
-    it left most of the seam in place. With the original file the non-rigid
-    module leaves 1.14 px where the modified one leaves 0.76 px, and the
-    original is also non-monotonic in the number of levels.
+    NoRMCorre's `han` applies a Hamming window to the raw patch. Hamming bottoms
+    out at 0.08 rather than 0, so on a patch carrying any offset most of the seam
+    survives. CaliAli uses `caliali_han` instead, which subtracts the patch mean
+    first and applies a true Hann taper. With NoRMCorre's version the non-rigid
+    module leaves 1.14 px of misalignment where this one leaves 0.76 px, and
+    NoRMCorre's is also non-monotonic in the number of levels.
 
-    `han` is called only from `normcorre_batch`, and only inside
-    `if use_windowing`. CaliAli enables that in one place, the non-rigid module,
-    so the change affects nothing else in the pipeline.
+    **The vendored NoRMCorre files are unmodified.** `caliali_han` has its own
+    name precisely so that a separate NoRMCorre installation on your path cannot
+    shadow it, and CaliAli cannot shadow that installation either. Which one runs
+    does not depend on the order your folders were added.
 
 	
 ??? Info "How long it takes to motion correct videos?"

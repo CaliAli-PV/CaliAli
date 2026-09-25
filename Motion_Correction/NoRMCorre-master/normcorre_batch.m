@@ -211,7 +211,7 @@ phase_flag = options.phase_flag;
 
 if use_windowing
     fftTemp = cellfun(@fftn,cellfun(@han,template,'un',0),'un',0);
-    fftTempMat = fftn(han(temp_mat));
+    fftTempMat = fftn(caliali_han(temp_mat));
 else
     fftTemp = cellfun(@fftn,template,'un',0);
     fftTempMat = fftn(temp_mat);
@@ -311,8 +311,8 @@ for it = 1:iter
             diff_temp = zeros(length(xx_s),length(yy_s),length(zz_s));
             if numel(M_fin) > 1      
                 if use_windowing
-                    if nd == 2; out_rig = dftregistration_min_max(fftTempMat,fftn(han(Yt)),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:4); ub = out_rig(3:4); end
-                    if nd == 3; out_rig = dftregistration_min_max_3d(fftTempMat,fftn(han(Yt)),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:5); ub = out_rig(3:5); end
+                    if nd == 2; out_rig = dftregistration_min_max(fftTempMat,fftn(caliali_han(Yt)),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:4); ub = out_rig(3:4); end
+                    if nd == 3; out_rig = dftregistration_min_max_3d(fftTempMat,fftn(caliali_han(Yt)),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:5); ub = out_rig(3:5); end
                 else
                     if nd == 2; out_rig = dftregistration_min_max(fftTempMat,fftn(Yt),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:4); ub = out_rig(3:4); end
                     if nd == 3; out_rig = dftregistration_min_max_3d(fftTempMat,fftn(Yt),us_fac,-max_shift,max_shift,phase_flag); lb = out_rig(3:5); ub = out_rig(3:5); end
@@ -477,7 +477,7 @@ for it = 1:iter
             temp_mat = cell2mat_ov(template,xx_s,xx_f,yy_s,yy_f,zz_s,zz_f,overlap_pre,sizY);
             if use_windowing
                 fftTemp = cellfun(@fftn, cellfun(@han,template, 'un',0),'un',0);            
-                fftTempMat = fftn(han(temp_mat));            
+                fftTempMat = fftn(caliali_han(temp_mat));            
             else
                 fftTemp = cellfun(@fftn, template, 'un',0);            
                 fftTempMat = fftn(temp_mat);

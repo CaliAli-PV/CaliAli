@@ -155,8 +155,33 @@ if ~opt.repair_defects
     return
 end
 
-% Spread across the recording, not the first frames: the start of a session is
-% the least representative part of it.
+% HOW MANY FRAMES THIS READS, AND WHY THAT NUMBER.
+%
+% At most 120, spread evenly from the first frame to the last, and each read
+% singly rather than as a block.
+%
+% WHY 120 AND NOT THE WHOLE RECORDING. What is being decided here is which
+% pixels never change and where the frame stops carrying data -- both properties
+% of the sensor and the field of view, not of any one moment. A pixel that is
+% dead is dead in every frame, so its variance is already zero in a hundred of
+% them, and reading a hundred thousand would say the same thing far more slowly.
+% The cost is bounded: 120 frames whatever the recording length, so a ten minute
+% session and a two hour one pay the same.
+%
+% WHY 120 AND NOT TEN. Variance estimated from a handful of frames is noisy
+% enough that quiet tissue starts to look dead. A hundred or so puts the
+% estimate well clear of that, and the difference between 120 and 1200 is not
+% worth the read.
+%
+% WHY SPREAD, NOT THE FIRST 120. The start of a recording is its least
+% representative part -- the lamp is still settling, the animal has usually just
+% been connected, and any border left by an earlier motion correction is at its
+% narrowest before the session has had time to drift. Sampling the whole span
+% costs the same and describes the whole recording.
+%
+% WHY FRAME BY FRAME. Reading 120 consecutive frames would be one fast block,
+% but they would all come from the same moment. These are scattered by
+% construction, so each is its own read; that is the price of the spread.
 n = min(numel(ds_frames), 120);
 pick = ds_frames(unique(round(linspace(1, numel(ds_frames), n))));
 sample = zeros(d1r, d2r, numel(pick));
