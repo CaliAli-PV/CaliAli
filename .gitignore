@@ -1,6 +1,12 @@
 # MATLAB autosave
 *.asv
 
+# The folder the file picker last opened, written by Sources2D on every run. It
+# is local state, it changes whenever anyone opens a file, and it was tracked --
+# so it rode along in commits and carried one machine's paths into the
+# repository.
+.dir.mat
+
 # macOS directory metadata. Written by a Mac touching the share; harmless on
 # disk, but they were tracked for a long time, and gitignore does nothing for a
 # file git already tracks -- which is why they kept being committed.

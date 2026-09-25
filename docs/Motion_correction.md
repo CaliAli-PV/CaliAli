@@ -38,7 +38,8 @@ CaliAli_options = CaliAli_motion_correction(CaliAli_options);
     own* is worse, because each patch holds less signal; it only pays inside a
     cascade. Each level costs another registration pass.
 
-    Misalignment left, on a simulation with a known 1.5 px rms deformation:
+    Residual misalignment, measured against the motion the simulator applied,
+    on **one** simulated recording with a known 1.5 px rms deformation:
 
     | | px rms |
     |---|---|
@@ -47,6 +48,16 @@ CaliAli_options = CaliAli_motion_correction(CaliAli_options);
     | `non_rigid_levels = 1` | 0.76 |
     | `non_rigid_levels = 2` | 0.67 |
     | `non_rigid_levels = 4` | 0.55 |
+
+    Those numbers say the module removes real deformation, and by how much. They
+    do **not** say it improves the neurons you get out. Scored against the
+    simulated ground truth, the effect on extraction quality changed sign
+    between two runs of the same code on different realisations of the same
+    simulation, so on this evidence any effect is smaller than the variation
+    between recordings. One recording is one sample.
+
+    That is why non-rigid correction is **off by default**. Turn it on if your
+    recording visibly deforms; the rigid stage handles everything else.
 
 ??? Info "CaliAli uses its own window function for non-rigid registration"
     Non-rigid registration tapers each patch before transforming it, because the

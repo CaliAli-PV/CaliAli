@@ -12,8 +12,8 @@ function y = caliali_han(x)
 % bottoms out at 0.08, so on a patch carrying any offset most of the seam
 % survived. Subtracting the mean first is what lets the taper finish the job.
 %
-% Measured on a simulation with a known 1.5 px rms deformation, reporting the
-% misalignment left behind:
+% Measured on ONE simulation with a known 1.5 px rms deformation, reporting the
+% residual misalignment left behind:
 %
 %                        NoRMCorre's han    this one
 %   one 3x3 level            1.141 px        0.757 px
@@ -21,7 +21,10 @@ function y = caliali_han(x)
 %   four levels              0.770           0.550
 %
 % NoRMCorre's version is also non-monotonic in the number of levels, which a
-% cascade refining its own residual should never be.
+% cascade refining its own residual should never be. That much is structural and
+% does not depend on the recording. The sizes above do: they are one sample, and
+% whether the improvement reaches the extracted neurons was not measurable above
+% the variation between recordings.
 %
 % WHY IT IS NOT CALLED han. It could have replaced the vendored file, and did at
 % first. But a user with their own NoRMCorre installation would then have two
