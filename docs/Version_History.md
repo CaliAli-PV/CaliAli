@@ -2,36 +2,17 @@
 
 ## CaliAli 1.5.0 Release Notes — September 2026
 
-**Changes that affect existing scripts**
+- **Recordings keep their full brightness range**: Videos are no longer flattened during conversion, so bright signals keep their real values.
+- **Automatic repair of camera problems**: Dead pixels, dropped frames, and black borders left by other software are now found and fixed before processing, instead of confusing motion correction later.
+- **Non-rigid motion correction works for everyone**: It no longer needs an extra MATLAB toolbox. It remains off by default; see [Motion Correction](Motion_correction.md) for when to turn it on.
+- **Sessions of different sizes align correctly**: Recordings already motion-corrected in other software can now be aligned together.
+- **Simpler downsampling**: One function handles recordings of any length. `CaliAli_downsample_batch()` still works and points to it.
+- **Safe to re-run**: Processing a folder that is already finished no longer stops with an error.
+- **Videos load in the right order**: Numbered files such as `2.avi` and `10.avi` are read in the order you would expect.
+- **Clearer memory settings**: `batch_sz` now accepts `'auto'`, `'all_frames'` and `'per_session'`, and a setting made for one step stays on that step.
 
-- **One downsampler.** `CaliAli_downsample()` is now the chunked implementation. The old one loaded a whole recording and cast it to `uint8`, which silently clipped every value above 254 in `uint16` and floating-point data. `CaliAli_downsample_batch()` still runs and warns.
-- **Ring is the only background model.** `background_model` set to `svd` or `nmf` now warns and uses `ring`. Those models came from CNMF-E, were written for two-photon data, and were never implemented for the batched extraction CaliAli runs.
-- **`output_class` accepts unsigned integers only.** `single` and `double` are refused when you set them, rather than failing several stages later.
-
-**Data no longer silently lost**
-
-- **Recordings keep their dynamic range.** `uint16` is the default; nothing is clipped to 255 on the way in.
-- **Dropped frames are actually detected.** The test for them could never fire, because a `+1` added upstream meant a blank frame never read as blank. Blank frames are now found and interpolated.
-- **Dead pixels and leftover borders are repaired** before anything registers against them. A pixel that never changes does not move with the tissue, and motion correction locks onto whatever does not move: three dead pixels were enough to stop it working. Controlled by `repair_defects`.
-- **Your workspace is left alone.** Extraction no longer clears variables from the base workspace.
-
-**Alignment and motion correction**
-
-- **Non-rigid correction works again.** It previously required the Computer Vision Toolbox, which not every licence includes; without it the stage failed with an error that pointed somewhere else entirely. It now uses NoRMCorre's grid mode. Still off by default — see [Motion Correction](Motion_correction.md) for when it is worth enabling.
-- **`non_rigid_levels`** sets how finely it corrects, one level by default.
-- **Sessions of different sizes align correctly**, including recordings motion-corrected outside CaliAli that carry no record of how they were cropped.
-
-**Settings**
-
-- **`batch_sz` says what it means**: `'auto'`, `'all_frames'` or `'per_session'`, instead of a `0` that meant different things in different stages. Numbers still work, and so does `0`.
-- **A setting on one module stays on that module.** `opt.motion_correction.batch_sz = 250` previously leaked to every stage or was discarded; it now applies where you put it.
-- **Patch padding follows the patch size** rather than a fixed 10 pixels.
-
-**Fixes**
-
-- Re-running the pipeline over a folder that is already processed no longer fails with `Unrecognized function or variable 'out'`.
-- Videos are read in natural order, so `2.avi` comes before `10.avi`.
-- `ISXD2h5` no longer fails on an undefined variable when reading Inscopix files.
+!!! warning "If you have existing scripts"
+    Two settings are stricter than before. `background_model` only accepts `'ring'`, the model used for one-photon imaging; `'svd'` and `'nmf'` now warn and fall back to it. `output_class` only accepts `'uint8'`, `'uint16'` or `'uint32'`. Both tell you at the moment you set them.
 
 ---
 
