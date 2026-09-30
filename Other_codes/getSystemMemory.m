@@ -1,4 +1,24 @@
 function [totalMemGB, freeMemGB] = getSystemMemory()
+%% getSystemMemory: Total and available RAM, in GiB.
+%
+% One branch per platform, because there is no portable way to ask. Windows has
+% MATLAB's own memory function; macOS and Linux are read by shelling out to
+% sysctl, vm_stat and /proc/meminfo.
+%
+% IT MUST THROW WHEN IT CANNOT TELL, which is what the validation at the bottom
+% is for. Every caller already wraps this in try/catch and substitutes a default
+% -- compute_auto_batch_size falls back to 18 GB, CNMFE_parameters to 120 -- but
+% a failed probe did not raise anything. str2double of an unmatched regexp is
+% NaN, so the function returned NaN and an empty free value, every catch block
+% was skipped, and batch_sz = 'auto' came out as NaN frames. A silently wrong
+% number is worse than an error the callers are already prepared for.
+%
+% Outputs:
+%   totalMemGB - total physical memory, GiB
+%   freeMemGB  - memory currently available, GiB
+%
+% Author: Pablo Vergara
+
 if ispc  % Windows
     % Retrieve memory details (Windows only)
     m = memory;
@@ -42,6 +62,17 @@ elseif isunix  % Linux
     totalMemGB = str2double(totalMem) / (1024^2); % Convert KB to GiB
     freeMemGB = str2double(freeMem) / (1024^2); % Convert KB to GiB
 else
-    error('Unsupported operating system');
+    error('CaliAli:getSystemMemory:unsupportedOS', ...
+        'Unsupported operating system: %s.', computer);
+end
+
+% The probe ran, but did it answer? A tool that is missing, or whose output
+% format has changed, leaves these NaN or empty rather than failing outright.
+if ~isscalar(totalMemGB) || ~isfinite(totalMemGB) || totalMemGB <= 0 || ...
+        ~isscalar(freeMemGB) || ~isfinite(freeMemGB) || freeMemGB < 0
+    error('CaliAli:getSystemMemory:probeFailed', ...
+        ['Could not read the system memory on %s: got total=%s, free=%s. ' ...
+         'The tool this platform is read with is missing or its output format ' ...
+         'changed.'], computer, mat2str(totalMemGB), mat2str(freeMemGB));
 end
 end

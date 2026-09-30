@@ -55,7 +55,12 @@ for k = 1:numel(opt.input_files)
     end
 
     reader = build_reader(fullFileName, ext);
-    ds_frames = int32(1:opt.temporal_ds:reader.nFrames);
+    % DOUBLE, NOT int32. These indices are handed to the readers, and one of
+    % them divides by the frame rate to seek. int32/double is integer
+    % division in MATLAB, so (999)/25 came back as 40 instead of 39.96 and
+    % the seek landed past the end of the video. Every read was rounded to
+    % whole seconds and the last one returned no frames at all.
+    ds_frames = 1:opt.temporal_ds:reader.nFrames;
     Fds = numel(ds_frames);
 
     first_frame = reader.read_range(1, 1);
@@ -380,7 +385,13 @@ end
 if nargin < 7 || isempty(bitDepth)
     bitDepth = 8;
 end
-start_sec = (start_idx - 1) / fps;
+% Double, not the caller's integer index: see frame_to_seek_seconds, where the
+% reason is written out. In short, an integer index makes the seek arithmetic
+% integer division, which rounded every seek to a whole second and returned no
+% frames at all at the end of a recording.
+start_idx = double(start_idx);
+end_idx   = double(end_idx);
+start_sec = frame_to_seek_seconds(start_idx, fps);
 n = end_idx - start_idx + 1;
 
 rawFile = [tempname '.raw'];
@@ -406,6 +417,15 @@ delete(rawFile);
 expected = vid_size(2) * vid_size(1) * n;
 if numel(rawData) < expected
     n = floor(numel(rawData) / (vid_size(1) * vid_size(2)));
+    % NOTHING CAME BACK. Every caller indexes the result, so returning an empty
+    % d1 x d2 x 0 array turns this into "Index in position 3 exceeds array
+    % bounds" somewhere else entirely. Say where it actually went wrong.
+    if n < 1
+        error('CaliAli:downsample:emptyRead', ...
+            ['FFmpeg returned no frames for %s at frame %d, seeking to ' ...
+             '%.6f s. The seek landed at or past the end of the video.'], ...
+            videoFile, start_idx, start_sec);
+    end
     rawData = rawData(1:vid_size(1) * vid_size(2) * n);
 end
 if numel(rawData) > expected
