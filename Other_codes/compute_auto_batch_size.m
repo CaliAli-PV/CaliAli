@@ -40,17 +40,32 @@ if ~exist("d","var") || isempty(d)
 end
 
 try
-    [total_system_memory_GB,~] = getSystemMemory;
+    [total_system_memory_GB, free_system_memory_GB] = getSystemMemory;
 catch
     cprintf('*red','Total physical memory could not be determined.\n');
     cprintf('red','Avilable memory was set to 18GB by default.\n');
     total_system_memory_GB = 18;
+    free_system_memory_GB = Inf;   % unknown: do not cap
 end
 
 if total_system_memory_GB <= 8
     cprintf('*red','Detected %.1f GB RAM. CaliAli recommends at least 16 GB for automatic batch sizing.\n', total_system_memory_GB);
 end
+% 2e7 pixels per GB of TOTAL memory, i.e. about 54 bytes per pixel.
 batch_sz = floor((total_system_memory_GB*2*10^7)/(d(1)*d(2))/100)*100;
+
+% That ignores what else is running, and the pool workers. Cap it at what FREE
+% memory holds at the measured cost: during alignment (get_projections_and_detrend)
+% this MATLAB plus its pool workers peak at 55-69 bytes per pixel above the
+% idle pool, at 4 and 16 workers and 1000-2000 frames. 20 bytes per pixel is
+% the main process alone. The cap only ever makes the batch smaller.
+fit = floor((free_system_memory_GB - 1.68)*2^30/(70*d(1)*d(2))/100)*100;
+if fit < batch_sz
+    batch_sz = fit;
+    cprintf('-comment','Batch size capped by the %.1f GB of free RAM.\n', free_system_memory_GB);
+end
+% 0 means "do not split", the opposite of what a machine short of memory needs.
+batch_sz = max(batch_sz, 100);
 cprintf('-comment','Automatically set batch size to %d frames based on %.1f GB RAM and (%dx%d ) frame size.\n', ...
     batch_sz, total_system_memory_GB,d(1),d(2));
 

@@ -21,11 +21,13 @@ function [totalMemGB, freeMemGB] = getSystemMemory()
 
 if ispc  % Windows
     % Retrieve memory details (Windows only)
-    m = memory;
+    [m, sys] = memory;
 
     % Convert the values from bytes to GiB (1 GiB = 1024^3 bytes)
     totalMemGB = m.MaxPossibleArrayBytes/ (1024^3);
-    freeMemGB  = m.MemAvailableAllArrays  / (1024^3);
+    % Free is PHYSICAL memory available. m.MemAvailableAllArrays counts the page
+    % file too, so it overstates what can be held without swapping.
+    freeMemGB  = sys.PhysicalMemory.Available / (1024^3);
 
 elseif ismac  % macOS
     % Get total system memory in bytes
@@ -43,12 +45,18 @@ elseif ismac  % macOS
     speculativePages = regexp(freeMem, 'Pages speculative:\s+(\d+)', 'tokens', 'once');
     speculativePages = str2double(speculativePages);
 
+    % Inactive pages are reclaimed on demand. macOS keeps "Pages free" near
+    % zero by filling RAM with cache, so without these a machine with most of
+    % its memory reclaimable reads as almost full.
+    inactivePages = regexp(freeMem, 'Pages inactive:\s+(\d+)', 'tokens', 'once');
+    inactivePages = str2double(inactivePages);
+
     % Get the page size (usually 4096 bytes)
     [~, pageSizeResult] = system('sysctl -n hw.pagesize');
     pageSize = str2double(pageSizeResult);
 
-    % Compute free memory in GiB (including speculative pages)
-    freeMemGB = ((freePages + speculativePages) * pageSize) / (1024^3);
+    % Compute free memory in GiB (free, speculative and inactive pages)
+    freeMemGB = ((freePages + speculativePages + inactivePages) * pageSize) / (1024^3);
 
 elseif isunix  % Linux
     [~, totalMem] = system('grep MemTotal /proc/meminfo');
