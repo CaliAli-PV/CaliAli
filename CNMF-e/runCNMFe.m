@@ -58,6 +58,7 @@ cprintf('*Magenta','%1.0f neurons will be initialized.\n', numel(seed_all));
 pause(1) % so users dont miss this message. delete
 neuron.select_data(in);
 neuron.getReady();
+fit_pool_to_memory(neuron, numel(seed_all));
 % The base workspace is deliberately left alone. It used to be cleared here,
 % with clearvars -except parin theFiles, because the patched data was cached
 % there and had to be released; the cache now lives in mat_data_cache, so there
