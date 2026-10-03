@@ -84,14 +84,21 @@ function Y=noise_scaling(Y)
 [d1,d2,d3]=size(Y);
 Y=double(reshape(Y,[d1*d2,d3]));
 Y=Y./max(Y,[],'all');
-Y=Y+randn(size(Y))./10000;
+% The dither only has to break ties, so it is drawn from a fixed-seed stream of
+% its own. From the global stream it made every run differ from the last --
+% including motion correction, whose reference frame comes through here, so two
+% runs on the same file cropped to different sizes -- and a run resumed after an
+% interruption could never reproduce an uninterrupted one. A local stream also
+% leaves the caller's random state alone.
+rs = RandStream('mt19937ar', 'Seed', 0);
+Y=Y+randn(rs, size(Y))./10000;
 if d3>1000
 Y=Y./GetSn_fast(Y,100,d1,d2);
 else
 Y=Y./GetSn(Y);
 end
-Y(isnan(Y))=randn(sum(isnan(Y),'all'),1);
-Y(isinf(Y))=randn(sum(isinf(Y),'all'),1);
+Y(isnan(Y))=randn(rs, sum(isnan(Y),'all'),1);
+Y(isinf(Y))=randn(rs, sum(isinf(Y),'all'),1);
 Y=reshape(Y,[d1,d2,d3]);
 end
 

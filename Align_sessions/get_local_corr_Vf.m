@@ -28,6 +28,7 @@ M=mean(M,3);
 
 % Generate all possible unique pairs of image frames
 b=nchoosek(1:d3,2);
+rs = RandStream('mt19937ar', 'Seed', 0);   % reproducible noise, global state untouched
 
 % Define a structuring element for morphological operations
 SE = strel("disk",3);
@@ -39,8 +40,8 @@ for i=1:size(b,1)
     im2=Vf(:,:,b(i,2));
     
     % Normalize images to [0,1] and add small noise for robustness
-    im1=mat2gray(im1)+randn(d1,d2)/1000;
-    im2=mat2gray(im2)+randn(d1,d2)/1000;
+    im1=mat2gray(im1)+randn(rs,d1,d2)/1000;
+    im2=mat2gray(im2)+randn(rs,d1,d2)/1000;
     
     % Perform histogram matching for better alignment
     im1 = imhistmatch(im1,max(cat(3,im1,im2),[],3));
