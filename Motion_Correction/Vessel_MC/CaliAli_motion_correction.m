@@ -142,16 +142,24 @@ try
     % re-run now returns the same file names it returned the first time.
     CaliAli_options.motion_correction.output_files = unique(out_pre);
 
-    % Crop only what THIS run wrote. The crop is not idempotent: it trims a file
-    % to the bounding box of its Mask, and the Mask is deliberately kept at the
-    % PRE-crop size because it records where the kept rectangle sat in the
-    % original frame. Applied a second time to an already-cropped file, the
-    % sizes no longer agree and it fails with "Mask must be [d1 d2]" -- the
-    % second half of issue 36, reached only once the first half stopped masking
-    % it. An output that was skipped was cropped on the run that created it.
-    fresh = unique(out_pre(process_flags));
-    for i=1:numel(fresh)
-        apply_crop_on_disk(fresh{i});
+    % Crop every output that is not cropped yet. The crop is not idempotent: it
+    % trims a file to the bounding box of its Mask, and the Mask is deliberately
+    % kept at the PRE-crop size because it records where the kept rectangle sat
+    % in the original frame. Applied a second time to an already-cropped file,
+    % the sizes no longer agree and it fails with "Mask must be [d1 d2]" -- the
+    % second half of issue 36.
+    %
+    % So the file itself says whether it still needs cropping: Y at the Mask's
+    % size means not yet. This used to be "crop only what this run wrote", on
+    % the assumption that a skipped output had been cropped by the run that
+    % wrote it. Not if that run was interrupted: the crop happens only after
+    % every session is written, so a session finished before the interruption
+    % was skipped on resume and kept its uncropped frame for good.
+    outs = unique(out_pre);
+    for i=1:numel(outs)
+        if crop_pending(outs{i})
+            apply_crop_on_disk(outs{i});
+        end
     end
 
 catch ME
@@ -169,4 +177,22 @@ f = '';
 if isempty(files), return; end
 f = files{1};
 if iscell(f), f = f{1}; end
+end
+
+
+function tf = crop_pending(f)
+%% Is F still at its pre-crop size, with a Mask that would trim it?
+tf = false;
+o = CaliAli_load(f, 'CaliAli_options');
+if ~isfield(o, 'motion_correction') || ~isfield(o.motion_correction, 'Mask') || ...
+        isempty(o.motion_correction.Mask)
+    return
+end
+Mask = o.motion_correction.Mask;
+sz = size(matfile(f), 'Y');
+if ~isequal(sz(1:2), size(Mask))
+    return                        % already cropped
+end
+[r, c] = find(Mask);
+tf = ~isempty(r) && (min(r) > 1 || max(r) < sz(1) || min(c) > 1 || max(c) < sz(2));
 end
