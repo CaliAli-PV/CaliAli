@@ -71,6 +71,7 @@
     Make sure split videos from the same session are not processed as independent sessions.
     See [Processing Split Data](Processing_split_data.md).
 
+<a id="external-mc"></a>
 ??? Question "Can I use CaImAn or Suite2p for motion correction instead of CaliAli?"
     Yes, you can.
 

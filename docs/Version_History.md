@@ -2,22 +2,22 @@
 
 ## CaliAli 1.5.0 Release Notes — September 2026
 
-- **Bright signals are no longer clipped**: Videos from 12- or 16-bit cameras could saturate during downsampling, so the brightest signals all ended up with the same value. CaliAli now keeps the original brightness range.
-- **Dead pixels and dropped frames are fixed automatically**: A few dead pixels on the camera sensor were enough to make motion correction fail without warning, and dropped frames were never detected. CaliAli now finds and repairs both before processing.
-- **Videos motion-corrected in other software**: These files can carry padded black borders, and each session may come out at a different size. Both corrupted the alignment; CaliAli now removes the borders and matches the session sizes automatically.
-- **Less field of view lost at the edges**: Dark pixels near the edge of the frame were mistaken for empty borders and cropped away. CaliAli now crops only the borders that motion correction creates.
-- **Non-rigid motion correction works without extra toolboxes**: It used to need the Computer Vision Toolbox and failed with an unrelated error without it. It is still off by default; see [Motion Correction](Motion_correction.md) for when to use it.
-- **Fewer out-of-memory crashes**: The automatic batch size now accounts for the memory that is actually free, and extraction uses fewer parallel workers when memory is short.
-- **Interrupted and repeated runs are handled**: Re-running a step on a folder that is already processed no longer stops with an error, and half-written files left by an interrupted run are recreated. Small output files are no longer deleted by mistake as if they were incomplete.
-- **Your MATLAB workspace is left alone**: Running extraction used to clear the variables in your workspace and leave large temporary data in it. It no longer touches your workspace.
-- **Correct residuals**: The residual movie in `play_movie` and the residual image used to look for missed neurons removed too much signal. Both are now correct.
-- **Settings go where you put them**: A value set for a single step, for example `CaliAli_options.motion_correction.batch_sz`, used to be silently overwritten; it is now respected. Passing several settings at once to `CaliAli_parameters` now works.
-- **One downsampling function**: `CaliAli_downsample()` now handles recordings of any length. Scripts that call `CaliAli_downsample_batch()` still work.
-- **Clearer memory settings**: `batch_sz` accepts `'auto'` (default), `'all_frames'` or `'per_session'`. The old value `0`, which meant different things in different steps, still works as before.
+- **Bright signals are no longer clipped**: Downsampling capped 12- and 16-bit videos at 8-bit, so all bright signals ended up with the same value. CaliAli now keeps the original brightness range; see [Bit depth](Downsampling.md#output-class).
+- **Dead pixels and dropped frames**: A few dead pixels on the camera could make motion correction fail without warning, and dropped frames were never detected. CaliAli now finds and repairs both automatically; see [Camera defects](Downsampling.md#defects).
+- **Videos motion-corrected in other software**: These files can carry padded borders and differ in size between sessions, which corrupted the alignment. CaliAli now removes the borders and matches the session sizes automatically; see the [FAQ](FAQ.md#external-mc).
+- **Less field of view lost**: Dark pixels near the edge of the frame were mistaken for empty borders and cropped away. CaliAli now crops only real borders.
+- **New non-rigid motion correction**: The previous non-rigid method was never fully validated and in many cases created alignment artifacts. It has been replaced by the NoRMCorre engine and is still off by default; see [Non-rigid motion correction](Motion_correction.md#non-rigid) for how to turn it on.
+- **Fewer out-of-memory crashes**: The automatic batch size and the number of parallel workers ignored how much memory was actually free. Both now adjust to the free memory; see [Low-Memory Processing](Low_memory.md).
+- **Interrupted and repeated runs**: Re-running a step on a finished folder crashed, resuming after an interruption skipped the final cropping step, and small output files could be deleted as if they were broken. All three are fixed.
+- **Your MATLAB workspace**: Running extraction erased the variables in your workspace. It no longer touches your workspace.
+- **Correct residuals**: The residual movie in `play_movie` and the residual image used to find missed neurons removed too much signal. Both are now correct.
+- **Settings go where you put them**: A setting made for a single step was silently overwritten, and passing several settings at once to `CaliAli_parameters` gave an error. Both now work; see [Setting CaliAli Parameters](Parameters.md#per-step).
+- **One downsampling function**: Two downsampling functions gave different results on the same video. `CaliAli_downsample()` now handles every case, and `CaliAli_downsample_batch()` still works; see [Downsampling](Downsampling.md).
+- **Clearer memory settings**: `batch_sz = 0` meant different things in different steps. You can now choose `'auto'`, `'all_frames'` or `'per_session'`, and `0` still works as before; see [Low-Memory Processing](Low_memory.md).
 
 !!! warning "If you have existing scripts"
-    - `background_model` only accepts `'ring'`, the model designed for one-photon imaging. Scripts that ask for `'svd'` or `'nmf'` still run, with a warning, using `'ring'`.
-    - `output_class` only accepts `'uint8'`, `'uint16'` or `'uint32'`. Any other value stops with an error when you set it.
+    - `background_model`: `'svd'` and `'nmf'` were built for two-photon data and crashed during extraction. CaliAli now warns you and uses `'ring'`; see [Extraction](extraction.md#background-model).
+    - `output_class`: values other than `'uint8'`, `'uint16'` or `'uint32'` crashed late in extraction. They are now rejected as soon as you set them; see [Bit depth](Downsampling.md#output-class).
 
 ---
 

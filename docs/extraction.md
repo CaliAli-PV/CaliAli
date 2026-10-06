@@ -81,6 +81,7 @@ You have successfully extracted neuronal signals using CaliAli. Don't forget to 
 	
 
 
+<a id="background-model"></a>
 ??? Warning "Only the ring background model is supported"
     CaliAli uses the **ring** background model, and it is the default. The `svd`
     and `nmf` models are inherited from CNMF-E, where they were written for

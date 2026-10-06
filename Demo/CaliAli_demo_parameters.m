@@ -47,6 +47,7 @@ params.force_non_negative_tolerance = 20;    % Allow pixel values to go negative
 
 % --- Motion Correction ---
 params.do_non_rigid = false;       % Perform non-rigid motion correction?
+params.non_rigid_levels = 1;       % Non-rigid grid levels: 1 = 3x3, each extra level adds a finer grid
 params.reference_projection_rigid = 'BV';  % Use blood vessels as reference for rigid correction
 
 

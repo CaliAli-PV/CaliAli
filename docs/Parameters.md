@@ -80,7 +80,7 @@ The function [CaliAli_demo_parameters()](Functions_doc/CaliAli_demo_parameters.m
 
 ---
 
-##### 3️⃣ One flat namespace, projected into each module
+##### 3️⃣ One flat namespace, projected into each module <a id="per-step"></a>
 
 Parameters are set **once**, in a flat structure, and `CaliAli_parameters` copies
 each one into every module that uses it:

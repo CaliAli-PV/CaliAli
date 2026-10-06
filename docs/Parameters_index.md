@@ -14,7 +14,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `sf`               | `10`         | Frame rate (fps) | Set to match the acquisition frame rate. |
 | `input_files`       | `[]`         | Paths to input video files | Leave empty to manually select files. |
 | `output_files`      | `[]`         | Paths to output video files | Leave empty for default naming (recommended). |
-| `batch_sz`         | `'auto'` (demo) / `0` | **Automatic chunking for large sessions** (frames per chunk, 0 = disable) | Auto-estimates chunk size from available RAM; set a numeric value or `0` to override. :material-information-outline:{ title="See the Low_memory guide for recommended overrides when the heuristic over- or under-allocates." } |
+| `batch_sz`         | `'auto'` | **Automatic chunking for large sessions**: `'auto'`, a number of frames, `'all_frames'` or `'per_session'` | Keep `'auto'`; see [Low-Memory Processing](Low_memory.md) for the other options. |
 
 ---
 
@@ -27,6 +27,10 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `file_extension`    | `'avi'`      | File extension for processed videos organized in folders | Used when sessions are split into multiple files. :material-information-outline:{ title="For example, data acquired with the UCLA Miniscope is often divided into multiple .avi videos. Instead of selecting individual .avi files, you can choose the entire folder so CaliAli finds matching files, treats them as one session, and concatenates them into a single .mat file." } |
 | `force_non_negative ` | `1 `| Enforce non-negative pixels during preprocessing | When enabled, values are lifted and clipped within `CaliAli_remove_background` after noise scaling. |
 | `force_non_negative_tolerance`  | `13` | Non-negative tolerance threshold | Gap added before clipping; increase only if you observe residual bias in dark regions. |
+| `output_class`     | `'uint16'`   | Datatype used to store the videos: `'uint8'`, `'uint16'` or `'uint32'` | Keep the default; see [Bit depth](Downsampling.md#output-class). |
+| `repair_defects`   | `true`       | Find and repair dead pixels, dropped frames and padded borders | Keep enabled; see [Camera defects](Downsampling.md#defects). |
+| `repair_borders`   | `true`       | Remove constant borders at the frame edge | Keep enabled unless the border is real data. |
+| `dead_pixel_factor` | `0.1`       | Sensitivity of the dead-pixel check | Raise if dead pixels are missed; lower if normal pixels are flagged. |
 
 ---
 
@@ -44,7 +48,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
 | `reference_projection_rigid` | `'BV'`  | Reference projection for rigid correction | Choose `neuron` if blood vessels are not suitable. |
-| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only if parts of the field of view still drift after rigid correction. |
+| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only if parts of the field of view still drift after rigid correction. See [Non-rigid motion correction](Motion_correction.md#non-rigid). |
 | `non_rigid_levels`  | `1`          | Number of non-rigid grid levels (3×3, then 4×4, 5×5, …) | Increase for finer correction; each level adds one registration pass. |
 
 ---
@@ -68,7 +72,7 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | `memory_size_to_use`     | `total_system_memory_GB` (auto) | Total available memory for computation | Override when you want MATLAB to use less than the detected RAM. |
 | `memory_size_per_patch`  | `total_system_memory_GB` (auto) | Memory allocated per patch | Defaults to the detected RAM so patching adapts to your hardware; reduce if you need smaller tiles. |
 | `patch_dims`            | `[64, 64]`   | Dimensions of patches | Larger patches improve accuracy but increase computation time and memory consumption. :material-information-outline:{ title="Using more or larger patches also increases memory usage, so scale cautiously." } |
-| `w_overlap`            | `32`         | Patch overlap width | Increase if you detect edge artifacts. |
+| `w_overlap`            | `[]` (half the patch size) | Patch overlap width | Increase if you detect edge artifacts. |
 
 ---
 

@@ -44,6 +44,7 @@ CaliAli_Options = CaliAli_demo_parameters();
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
 | `do_non_rigid` | `false` | Perform non-rigid motion correction? |
+| `non_rigid_levels` | `1` | Non-rigid grid levels: 1 = 3×3, each extra level adds a finer grid |
 | `reference_projection_rigid` | `'BV'` | Use blood vessels as reference for rigid correction |
 
 #### 📌 Inter-session Alignment Parameters
