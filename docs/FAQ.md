@@ -71,12 +71,10 @@
     Make sure split videos from the same session are not processed as independent sessions.
     See [Processing Split Data](Processing_split_data.md).
 
-??? Question "The non-rigid motion correction module in CaliAli is deprecated. Can I use CaImAn or Suite2p for motion correction?"
+??? Question "Can I use CaImAn or Suite2p for motion correction instead of CaliAli?"
     Yes, you can.
 
-    If you use external motion-correction tools, make sure the output videos do not contain black-border artifacts.
-    The CaliAli motion-correction module removes these automatically, but external workflows may leave them in place.
-    Black borders can negatively affect inter-session alignment.
+    External tools can leave padded black borders around the frame. CaliAli removes them automatically when you run the steps below, so you do not need to crop them yourself.
 
     After motion correction with another tool:
 

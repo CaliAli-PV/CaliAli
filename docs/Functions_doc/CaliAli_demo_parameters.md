@@ -45,8 +45,6 @@ CaliAli_Options = CaliAli_demo_parameters();
 |---------------|-------|-------------|
 | `do_non_rigid` | `false` | Perform non-rigid motion correction? |
 | `reference_projection_rigid` | `'BV'` | Use blood vessels as reference for rigid correction |
-| `non_rigid_pyramid` | `{'BV', 'BV', 'neuron'}` | Multi-level registration pyramid |
-| `non_rigid_batch_size` | `[20, 60]` | Frame range for parallel processing |
 
 #### 📌 Inter-session Alignment Parameters
 | Parameter Name | Value | Description |

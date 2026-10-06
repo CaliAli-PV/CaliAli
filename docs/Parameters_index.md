@@ -44,9 +44,8 @@ This table lists all **CaliAli parameters**, their **default values**, a brief *
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
 | `reference_projection_rigid` | `'BV'`  | Reference projection for rigid correction | Choose `neuron` if blood vessels are not suitable. |
-| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only after confirming rigid correction was insufficient. :material-information-outline:{ title="The current non-rigid module is experimental and may introduce field-of-view artifacts; an updated implementation is planned." } |
-| `non_rigid_pyramid` | `{'BV','neuron','neuron'}` | Multi-level registration pyramid for non-rigid correction | Use default unless BV is unavailable. |
-| `non_rigid_batch_size` | `[20,60]` | Batch size range for non-rigid correction, CaliAli will optimize within this range. | Set as `[2 x sf, 6 x sf]`. |
+| `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only if parts of the field of view still drift after rigid correction. |
+| `non_rigid_levels`  | `1`          | Number of non-rigid grid levels (3×3, then 4×4, 5×5, …) | Increase for finer correction; each level adds one registration pass. |
 
 ---
 
