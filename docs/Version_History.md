@@ -2,17 +2,22 @@
 
 ## CaliAli 1.5.0 Release Notes — September 2026
 
-- **Recordings keep their full brightness range**: Videos are no longer flattened during conversion, so bright signals keep their real values.
-- **Automatic repair of camera problems**: Dead pixels, dropped frames, and black borders left by other software are now found and fixed before processing, instead of confusing motion correction later.
-- **Non-rigid motion correction works for everyone**: It no longer needs an extra MATLAB toolbox. It remains off by default; see [Motion Correction](Motion_correction.md) for when to turn it on.
-- **Sessions of different sizes align correctly**: Recordings already motion-corrected in other software can now be aligned together.
-- **Simpler downsampling**: One function handles recordings of any length. `CaliAli_downsample_batch()` still works and points to it.
-- **Safe to re-run**: Processing a folder that is already finished no longer stops with an error.
-- **Videos load in the right order**: Numbered files such as `2.avi` and `10.avi` are read in the order you would expect.
-- **Clearer memory settings**: `batch_sz` now accepts `'auto'`, `'all_frames'` and `'per_session'`, and a setting made for one step stays on that step.
+- **Bright signals are no longer clipped**: Videos from 12- or 16-bit cameras could saturate during downsampling, so the brightest signals all ended up with the same value. CaliAli now keeps the original brightness range.
+- **Dead pixels and dropped frames are fixed automatically**: A few dead pixels on the camera sensor were enough to make motion correction fail without warning, and dropped frames were never detected. CaliAli now finds and repairs both before processing.
+- **Videos motion-corrected in other software**: These files can carry padded black borders, and each session may come out at a different size. Both corrupted the alignment; CaliAli now removes the borders and matches the session sizes automatically.
+- **Less field of view lost at the edges**: Dark pixels near the edge of the frame were mistaken for empty borders and cropped away. CaliAli now crops only the borders that motion correction creates.
+- **Non-rigid motion correction works without extra toolboxes**: It used to need the Computer Vision Toolbox and failed with an unrelated error without it. It is still off by default; see [Motion Correction](Motion_correction.md) for when to use it.
+- **Fewer out-of-memory crashes**: The automatic batch size now accounts for the memory that is actually free, and extraction uses fewer parallel workers when memory is short.
+- **Interrupted and repeated runs are handled**: Re-running a step on a folder that is already processed no longer stops with an error, and half-written files left by an interrupted run are recreated. Small output files are no longer deleted by mistake as if they were incomplete.
+- **Your MATLAB workspace is left alone**: Running extraction used to clear the variables in your workspace and leave large temporary data in it. It no longer touches your workspace.
+- **Correct residuals**: The residual movie in `play_movie` and the residual image used to look for missed neurons removed too much signal. Both are now correct.
+- **Settings go where you put them**: A value set for a single step, for example `CaliAli_options.motion_correction.batch_sz`, used to be silently overwritten; it is now respected. Passing several settings at once to `CaliAli_parameters` now works.
+- **One downsampling function**: `CaliAli_downsample()` now handles recordings of any length. Scripts that call `CaliAli_downsample_batch()` still work.
+- **Clearer memory settings**: `batch_sz` accepts `'auto'` (default), `'all_frames'` or `'per_session'`. The old value `0`, which meant different things in different steps, still works as before.
 
 !!! warning "If you have existing scripts"
-    Two settings are stricter than before. `background_model` only accepts `'ring'`, the model used for one-photon imaging; `'svd'` and `'nmf'` now warn and fall back to it. `output_class` only accepts `'uint8'`, `'uint16'` or `'uint32'`. Both tell you at the moment you set them.
+    - `background_model` only accepts `'ring'`, the model designed for one-photon imaging. Scripts that ask for `'svd'` or `'nmf'` still run, with a warning, using `'ring'`.
+    - `output_class` only accepts `'uint8'`, `'uint16'` or `'uint32'`. Any other value stops with an error when you set it.
 
 ---
 
