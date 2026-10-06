@@ -1,0 +1,12 @@
+# Python packages for building the documentation site (mkdocs.yml).
+# Install with:  pip install -r requirements-docs.txt
+# Then preview with `mkdocs serve`, or publish a version with `mike`.
+#
+# Pinned together on purpose: pymdown-extensions 10.8 fails on Pygments 2.20,
+# and every code block then renders as flat inline text. This set is tested.
+mkdocs==1.6.0
+mkdocs-material==9.5.25
+mike==2.1.3
+Markdown==3.6
+Pygments==2.20.0
+pymdown-extensions==10.21.3
