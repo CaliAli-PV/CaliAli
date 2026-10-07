@@ -29,7 +29,7 @@ opt = CaliAli_options.motion_correction;
 
 % Select input files if not specified
 if isempty(opt.input_files)
-    opt.input_files = uipickfiles('FilterSpec', '*_ds*.mat');
+    opt.input_files = uipickfiles('FilterSpec', '*.mat', 'REFilter', '_ds.*\.mat$|_con\.mat$');
 end
 
 % Sensor defects, for a recording that entered the pipeline late. In the standard
@@ -140,7 +140,9 @@ try
     % failed with "Unrecognized function or variable 'out'" -- reported as issue
     % 36. out_pre is filled for every input before the loop starts, so the
     % re-run now returns the same file names it returned the first time.
-    CaliAli_options.motion_correction.output_files = unique(out_pre);
+    % 'stable' keeps the sessions in the order they were given (batches of one
+    % session share an output name, hence unique at all).
+    CaliAli_options.motion_correction.output_files = unique(out_pre, 'stable');
 
     % Crop every output that is not cropped yet. The crop is not idempotent: it
     % trims a file to the bounding box of its Mask, and the Mask is deliberately

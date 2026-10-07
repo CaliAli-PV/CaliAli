@@ -6,15 +6,20 @@ function [Mr,Ref,template,valid]=Rigid_mc(Y,opt,template)
 % that can be computed using blood vessel extraction or background removal.
 %
 % Inputs:
-%   Y   - 3D image volume to be motion corrected.
-%   opt - Structure containing motion correction options.
+%   Y        - 3D image volume to be motion corrected.
+%   opt      - Structure containing motion correction options.
+%   template - (Optional) Template returned by a previous call, to register
+%              later chunks of the same session to the same image.
 %
 % Outputs:
-%   Mr  - Motion-corrected 3D image volume.
-%   Ref - Reference projection used for motion correction.
+%   Mr       - Motion-corrected 3D image volume.
+%   Ref      - Reference projection used for motion correction.
+%   template - Template the frames were registered to.
+%   valid    - Logical mask, true where every frame holds real data after shifting.
 %
 % Usage:
-%   [Mr, Ref] = Rigid_mc(Y, opt);
+%   [Mr, Ref, template, valid] = Rigid_mc(Y, opt);
+%   [Mr, Ref, template, valid] = Rigid_mc(Y, opt, template);
 %
 % Author: Written by Pablo Vergara utilizing the codes of Eftychios A. Pnevmatikakis
 %            Simons Foundation, 2016
@@ -27,6 +32,10 @@ if strcmp(opt.reference_projection_rigid,'BV')
     Ref=CaliAli_get_blood_vessels(Y,opt); % Correct for vignetting.
 elseif strcmp(opt.reference_projection_rigid,'neuron')
     Ref=CaliAli_remove_background(Y,opt); % Remove background.
+else
+    error('CaliAli:InvalidReferenceProjection', ...
+        'reference_projection_rigid must be ''BV'' or ''neuron'', not ''%s''.', ...
+        char(string(opt.reference_projection_rigid)));
 end
 
 [d1,d2,~] = size(Ref);
