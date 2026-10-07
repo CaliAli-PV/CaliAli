@@ -6,7 +6,7 @@ After [motion correction](Motion_correction.md), CaliAli calculates session proj
     Run:
 
     ```matlab
-    CaliAli_align_sessions(CaliAli_options);
+    CaliAli_options = CaliAli_align_sessions(CaliAli_options);
     ```
 
     !!! success "Output File"
@@ -16,7 +16,7 @@ After [motion correction](Motion_correction.md), CaliAli calculates session proj
     If you do not need inter-session alignment, you can still calculate detrended projections for each file:
 
     ```matlab
-    detrend_batch_and_calculate_projections(CaliAli_options);
+    CaliAli_options = detrend_batch_and_calculate_projections(CaliAli_options);
     ```
 
     !!! success "Output File"
@@ -39,6 +39,8 @@ plot_alignment_scores(CaliAli_options)
 P = CaliAli_options.inter_session_alignment.P;
 frame = plot_P(P);
 ```
+
+[plot_P()](Functions_doc/plot_P.md#plot_P) shows each session's projections before and after each alignment step, one session per frame.
 
 ![BV+Neurons](files/align_demo.gif)
 

@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide explains the CaliAli pipeline using the demo sessions in `Demos`, but the same workflow applies to your own data.
+This guide walks through the CaliAli pipeline with the demo script, but the same workflow applies to your own data.
 
 #### Installation
 
@@ -9,10 +9,10 @@ First follow the CaliAli installation notes [Installation and System Requirement
 	
 #### CaliAli Processing Steps Overview <a id="ps"></a>
 
-This guide is based on `Demo_pipeline.mlx`. In MATLAB, run:
+This guide is based on `Demo_pipeline.m`. The demo first downloads a calcium-imaging video simulator (this needs an internet connection) and uses it to generate four simulated sessions, which it then processes step by step. In MATLAB, run:
 
 ```matlab
-open Demo_pipeline.mlx
+open Demo_pipeline.m
 ```
 
 ??? Info "How long it takes to process the Demo data?"
@@ -59,6 +59,7 @@ sequenceDiagram
 
 	```matlab
 	CaliAli_options = CaliAli_demo_parameters();
+	CaliAli_options.downsampling.input_files = {'C:\data\session_1.avi', 'C:\data\session_2.avi'};   % your videos or session folders
 	CaliAli_options = CaliAli_downsample(CaliAli_options);
 	CaliAli_options.motion_correction.input_files = CaliAli_options.downsampling.output_files;
 	CaliAli_options = CaliAli_motion_correction(CaliAli_options);

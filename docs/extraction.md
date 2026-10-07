@@ -24,16 +24,16 @@ CaliAli_cnmfe()
 This opens a file selector and processes one file at a time. For scripted usage without a picker, see [FAQ](FAQ.md#cnmfe-no-picker).
 
 ??? question "How does CaliAli deconvolve calcium signals?"
-	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, a thresholded FOOPSI approach with an AR(2) model is utilized (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
+	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, FOOPSI is run again with an AR(2) model (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
 
 During extraction, CaliAli writes checkpoint files you can reload to continue analysis.
 
-The checkpoint files will be created as follows: <a id="chk"></a>
+The checkpoint files are created next to the file you extract from, as follows: <a id="chk"></a>
 
 ``` matlab
 .
-└─ <"file_name">_aligned_source_extraction/
-   └─ frames_<"xxx">/
+└─ <"input file name">_source_extraction/
+   └─ frames_1_<"number of frames">/
       └─ LOGS_<"DATE">/
          ├─ <"DATE-TIME">.mat "Checkpoint #1"
          ├─ <"DATE-TIME">.mat "Checkpoint #2"
@@ -45,14 +45,22 @@ The checkpoint files will be created as follows: <a id="chk"></a>
 		
 ## Post-processing detected components
 
-CaliAli includes a GUI to label false positives. After loading `neuron` from a checkpoint:
+CaliAli includes a GUI to label false positives. After loading `neuron` from a [checkpoint](#chk):
 
 ```matlab
-ix = postprocessing_app();
-neuron.delete(ix);
+ix = postprocessing_app(neuron, 0.6);   % 0.6: threshold for drawing the contours
 ```
 
-You can inspect flagged components with `neuron.viewNeurons(find(ix), neuron.C_raw);`.
+The app shows the correlation image with the contour of each detected component. Left-click a contour to see its calcium trace, and right-click it to label it as a false positive. The **Separate Spatial** button sorts all components by shape and lists the odd ones last, such as elongated components that are more likely neuropil than cell bodies, so you can move them to the false-positive list. Press `Done!` when finished: `ix` then marks the components you labeled. See [postprocessing_app()](Functions_doc/postprocessing_app.md#postprocessing_app) for a step-by-step walkthrough.
+
+![label_fp_app](files/label_fp_app.gif)
+
+Review the labeled components if you wish, then delete them:
+
+```matlab
+neuron.viewNeurons(find(ix), neuron.C_raw);   % optional: inspect them one by one
+neuron.delete(ix);
+```
 
 ## Merging components
 
@@ -66,7 +74,20 @@ neuron.merge_high_corr(1, [0.1, 0.3, -inf]);
 
 ## Picking Neurons from Residual <a id="residual"></a>
 
-Some neurons may remain un-extracted after the first pass. To recover candidates, run [`manually_update_residuals()`](Functions_doc/manually_update_residuals.md#manually_update_residuals).
+Some neurons may remain un-extracted after the first pass. To add them by hand, run [`manually_update_residuals()`](Functions_doc/manually_update_residuals.md#manually_update_residuals):
+
+```matlab
+neuron = manually_update_residuals(neuron, 0.6, true);   % contour threshold, use parallel processing
+```
+
+A window shows the peak-to-noise ratio (PNR), correlation, and PNR·correlation images of the video (top) and of the residual, what is left after removing the detected neurons (bottom). Bright spots in the residual are likely missed neurons: click them to place a seed, then press `Ok!`. CaliAli extracts the new neurons, updates the existing ones, and saves a new checkpoint.
+
+![pick_residuals](files/pick_residuals.gif)
+
+In most cases this step is not necessary. If you run it, consider repeating the post-processing above.
+
+!!! info "If you move your files"
+    If you move the videos or the files created during the analysis, run [update_folder_path()](Utilities.md#update_path) before continuing.
 
 ## Preparing extracted signals for analysis
 
@@ -77,7 +98,7 @@ CaliAli performs final detrending and noise scaling automatically at the end of 
 - [postprocessDeconvolvedTraces()](Functions_doc/postprocessDeconvolvedTraces.md#postprocessDeconvolvedTraces) 
 
 === "CONGRATULATIONS!"
-You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`
+You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`. For other useful functions, see [Utilities](Utilities.md).
 	
 
 

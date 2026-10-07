@@ -9,15 +9,17 @@
     There used to be two downsamplers. `CaliAli_downsample()` loaded a whole
     recording and cast it to `uint8`, which clipped `uint16` and floating-point
     data: every value above 254 became 255. `CaliAli_downsample_batch()` read in
-    chunks and preserved the source datatype.
+    chunks.
 
     The clipping version has been removed, and the batch implementation is now
     `CaliAli_downsample()`. It handles both chunked and non-chunked processing,
-    so there is nothing to choose between. Existing calls to
+    so there is nothing to choose between. It stores the video in the data type
+    set by `output_class` (`uint16` by default); see
+    [Bit depth](Downsampling.md#output-class). Existing calls to
     `CaliAli_downsample_batch()` still work and print a deprecation warning.
 
 ??? Question "What if my video sessions are split into multiple video files (common for UCLA recordings)?"
-    Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos—select the entire folder instead of individual files.
+    Data acquired with the UCLA Miniscope is often divided into multiple `.avi` videos—select each session's folder instead of individual files.
     CaliAli automatically finds every file matching the configured `file_extension`, treats them as segments from the same session, and concatenates them into a single `.mat` file for streamlined processing.
     Learn more in [Processing Split Data](Processing_split_data.md).
 
@@ -75,7 +77,7 @@
 ??? Question "Can I use CaImAn or Suite2p for motion correction instead of CaliAli?"
     Yes, you can.
 
-    External tools can leave padded black borders around the frame. CaliAli removes them automatically when you run the steps below, so you do not need to crop them yourself.
+    External tools can leave padded black borders around the frame. CaliAli removes borders that are the same in every frame when you run the steps below. If a border changes from frame to frame, CaliAli cannot tell it from dark tissue: it reports it in the command window (`Uncropped border in ...`), and you should crop it before alignment.
 
     After motion correction with another tool:
 
@@ -106,12 +108,14 @@
 
 <a id="output-files"></a>
 ??? Question "Where are outputs saved, and what do suffixes mean?"
-    Typical outputs are saved next to input files:
+    Each step saves its output next to its input file and adds a suffix to the name:
 
-    1. `_ds.mat`: downsampled
-    2. `_mc.mat`: motion-corrected
-    3. `_det.mat`: detrended/intermediate alignment products
-    4. `_Aligned.mat`: aligned/concatenated sessions
+    1. `_ds.mat`: downsampled, one per video.
+    2. `_con.mat`: one per session folder, when you select folders of [split videos](Processing_split_data.md). It joins that folder's `_ds.mat` files and is saved next to the session folder.
+    3. `_mc.mat`: motion-corrected.
+    4. `_det.mat`: detrended, with the projections used for alignment.
+    5. `_Aligned.mat`: all sessions aligned and concatenated in one file, named after the last session (for example `Session_3_ds_mc_Aligned.mat`).
+    6. `<file name>_source_extraction/`: a folder with the CNMF-E results and [checkpoints](extraction.md#chk), named after the file you extracted from.
 
 ??? Question "Do I still need to visually inspect outputs?"
     Yes. Always check motion correction and alignment quality before CNMF-E extraction.

@@ -31,9 +31,9 @@ If you set a number, choose it based on your memory and video size. For 512×512
 
 | System RAM | `'auto'` estimate (upper limit) | Manual override guidance |
 |------------|-------------------|--------------------------|
-| 8 GB       | ≈ 900 frames      | Stay ≤ 1000 if you see swapping |
-| 16 GB      | ≈ 1700 frames     | 1500–2500 works well     |
-| 32 GB      | ≈ 3300 frames     | 3000–5000 for faster runs |
-| 64 GB+     | ≥ 6500 frames     | Increase gradually if monitoring memory |
+| 8 GB       | ≈ 600 frames      | Stay ≤ 1000 if you see swapping |
+| 16 GB      | ≈ 1200 frames     | 1500–2500 works well     |
+| 32 GB      | ≈ 2400 frames     | 3000–5000 for faster runs |
+| 64 GB+     | ≥ 4800 frames     | Increase gradually if monitoring memory |
 
-`'auto'` can choose fewer frames than the table when other programs are using memory. During extraction, CaliAli also starts fewer parallel workers when memory is short, and tells you why.
+These are upper limits: `'auto'` chooses fewer frames when part of the memory is already in use, for example by other programs. During extraction, CaliAli also starts fewer parallel workers when memory is short, and tells you why.

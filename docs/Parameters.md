@@ -21,7 +21,7 @@ The parameters utilized by each submodule is determine on a `CaliAli_options` st
 ◼ CaliAli_options
 ├─ downsampling
 │  ├─ BVsize
-│  │  Value: [1.5 2.25]
+│  │  Value: [3 4.5]
 │  ├─ file_extension
 │  │  Value: 'avi'
 │  └─ ...
@@ -34,7 +34,7 @@ The parameters utilized by each submodule is determine on a `CaliAli_options` st
 └─ ...
 ```
 
-The default set of parameters can be obtained with `CaliAli_demo_parameters();` function.
+`CaliAli_parameters()` returns the default values. `CaliAli_demo_parameters()` returns the values used for the demo data, which differ from the defaults in three places: `spatial_ds = 2` (default 1), `min_corr = 0.2` (default 0.1) and `min_pnr = 4` (default 6).
 
 ---
 
@@ -43,7 +43,7 @@ The default set of parameters can be obtained with `CaliAli_demo_parameters();` 
 The recommended way to set parameters is:
 
 1. Edit `CaliAli_demo_parameters.m` to define or update `params`.
-2. Generate the nested `CaliAli_options` structure with `CaliAli_options = CaliAli_parameters(params);`.
+2. Generate the nested `CaliAli_options` structure with `CaliAli_options = CaliAli_demo_parameters();`.
 3. Use the generated `CaliAli_options` in each module.
 
 This keeps parameter updates consistent across the full pipeline.
@@ -125,7 +125,7 @@ reach the later stages.
 
 #### Adjusting CaliAli Parameters.
 
-CaliAli requires setting 33 parameters. However, in practice you only need to strictly focus on three: 
+CaliAli has many parameters, but in practice you only need to focus on three:
 
 1. Frame rate: `sf`
 2. Neuron filtering size: `gSig` which correspond to 1/5 of the average neuron size in pixels. If left empty, CaliAli now assigns `gSig = 5 / spatial_ds`, which matches the demo data and works well for non-downsampled videos.
