@@ -15,7 +15,7 @@ else
     M=V(:,:,I);
 end
 
-[M,~]=remove_borders(M,0);
+M = crop_to_valid(M, theFiles{1, 1});
 
 
 N=neuron_stack(M,lim);
@@ -46,4 +46,21 @@ for i=1:numel(lim)
     out(:,:,i) = mat2gray(bg_remove(Y, round(szad),1));
 end
 
+end
+
+
+function M = crop_to_valid(M, file)
+% Keep the region motion correction recorded as real data. A file whose crop is
+% still pending holds its Mask at the frame size; any other file is already
+% cropped, or was never shifted, and is used whole. The pixel value is not
+% consulted: a real pixel can be 0.
+try
+    Mask = CaliAli_load(file, 'CaliAli_options.motion_correction.Mask');
+catch
+    return
+end
+if isequal(size(Mask), size(M)) && any(Mask(:))
+    [r, c] = find(Mask);
+    M = M(min(r):max(r), min(c):max(c));
+end
 end
