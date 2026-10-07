@@ -1,8 +1,15 @@
 function Mov=play_movie(neuron,batch_num)
 if nargin<2, batch_num=1; end
 d1=neuron.options.d1; d2=neuron.options.d2;
-fn=[0,min(1000,neuron.frame_range(2))];
-Y = single(neuron.load_patch_data([],[fn(batch_num)+1,fn(batch_num+1)]));
+% The movie shows 1000 frames at a time; batch_num picks which 1000.
+win=1000;
+T=neuron.frame_range(2);
+n_win=ceil(T/win);
+if batch_num<1 || batch_num>n_win || batch_num~=round(batch_num)
+    error('batch_num must be a whole number from 1 to %d: the recording has %d frames, shown %d at a time.', n_win, T, win);
+end
+fn=[(batch_num-1)*win, min(batch_num*win,T)];
+Y = single(neuron.load_patch_data([],[fn(1)+1,fn(2)]));
 if ~ismatrix(Y), Y=reshape(Y,[],size(Y,3)); end
 Y(isnan(Y))=0;
 A=full(neuron.A);
@@ -15,14 +22,14 @@ color_map=componentColorMap(reshape(A,d1,d2,[]),1:size(A,2),'Plot',false);
 useGPU = canUseGPU();
 if useGPU
     A = gpuArray(A);
-    Cg = gpuArray(single(C_mu(:,fn(batch_num)+1:fn(batch_num+1))));
+    Cg = gpuArray(single(C_mu(:,fn(1)+1:fn(2))));
     ns = gather(A * Cg);
 else
-    Cg = single(C_mu(:,fn(batch_num)+1:fn(batch_num+1)));
+    Cg = single(C_mu(:,fn(1)+1:fn(2)));
     ns   = A * Cg;
 end
 
-bg = single(reconstruct_background_residual(neuron,[fn(batch_num)+1,fn(batch_num+1)]));
+bg = single(reconstruct_background_residual(neuron,[fn(1)+1,fn(2)]));
 res = Y - ns - reshape(bg,[],size(Y,2));
 
 Y = reshape(Y,d1,d2,[]);

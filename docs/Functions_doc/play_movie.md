@@ -5,13 +5,13 @@ function Mov=play_movie(neuron,batch_num)
 ```
 
 #### Description
-`play_movie` builds and plays a diagnostic movie from a CNMF-E `neuron` object. It loads the first 1000 frames (or the whole recording if it is shorter), reconstructs the denoised signal and background, overlays colorized spatial components, and concatenates raw, background, background-subtracted, component, and residual views for side-by-side inspection.
+`play_movie` builds and plays a diagnostic movie from a CNMF-E `neuron` object. It loads 1000 frames of the recording at a time, reconstructs the denoised signal and background, overlays colorized spatial components, and concatenates raw, background, background-subtracted, component, and residual views for side-by-side inspection.
 
 ##### Function Inputs:
 | Parameter Name | Type | Description |
 |---------------|------|-------------|
 | neuron | CNMF-E neuron object | Contains `options.d1/d2`, spatial footprints `A`, temporal traces `C`, `load_patch_data`, and background helpers. |
-| batch_num | Integer (optional) | Must be `1` (the default): the movie always covers the first 1000 frames. Other values give an error. |
+| batch_num | Integer (optional) | Which 1000 frames to show: `1` (default) for frames 1–1000, `2` for 1001–2000, and so on. The last part may be shorter. |
 
 ##### Function Outputs:
 | Parameter Name | Type | Description |
@@ -20,7 +20,8 @@ function Mov=play_movie(neuron,batch_num)
 
 ##### Example usage:
 ```matlab
-Mov = play_movie(neuron);      % review the first 1000 frames
+Mov = play_movie(neuron);      % frames 1-1000
+Mov = play_movie(neuron, 2);   % frames 1001-2000
 ```
 
 ##### Notes:
