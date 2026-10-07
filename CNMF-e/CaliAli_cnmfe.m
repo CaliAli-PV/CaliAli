@@ -1,28 +1,28 @@
 function file_path = CaliAli_cnmfe(input_files)
-%% CaliAli_cnmfe: Runs CNMF-E for source extraction in neuron or dendrite imaging data.
+%% CaliAli_cnmfe: Runs CNMF-E for source extraction.
 %
 % Inputs:
-%   This function prompts the user to select .mat files containing the imaging data
-%   and CNMF-E parameters. The selected files should follow the naming pattern "*_ds*.mat".
+%   input_files - (Optional) Path, or cell array of paths, of the .mat files to
+%                 process (typically "*_Aligned.mat" or "*_det.mat"). If omitted,
+%                 the user is prompted to select them.
 %
 % Outputs:
-%   This function does not return an output but processes each selected file
-%   and saves the extracted neuron or dendrite components to the workspace.
+%   file_path - Cell array with one entry per input file: the path of the .mat
+%               file where the extracted components (neuron) were saved.
 %
 % Usage:
 %   CaliAli_cnmfe();
+%   file_path = CaliAli_cnmfe(CaliAli_options.inter_session_alignment.out_aligned_sessions);
 %
 % Description:
 %   - Prompts the user to select input files for processing.
-%   - Loads the `CaliAli_options` structure from each selected file.
-%   - Determines whether the dataset corresponds to neuron or dendrite imaging.
-%   - Calls `runCNMFe` for neuron data or `runCNMFe_dendrite` for dendrite data.
+%   - Calls `runCNMFe` on each selected file, which loads the `CaliAli_options`
+%     structure stored in it.
 %   - Iterates through all selected files and processes them sequentially.
 %   - Catches and logs errors if any file fails to process.
 %   - Saves the processed results, including spatial and temporal components.
 %
 % Features:
-%   - Automatic selection of CNMF-E pipeline based on imaging structure.
 %   - Iterative CNMF-E optimization with stopping criteria.
 %   - Adaptive merging of highly correlated components.
 %   - Integration with CaliAli preprocessing for residual refinement.
@@ -30,8 +30,7 @@ function file_path = CaliAli_cnmfe(input_files)
 %
 % Notes:
 %   - The function uses helper functions including:
-%     - `runCNMFe` (for neuron imaging)
-%     - `runCNMFe_dendrite` (for dendrite imaging)
+%     - `runCNMFe`
 %     - `CaliAli_load` (to load preprocessing parameters)
 %   - For manual classification of components, use `postprocessing_app(neuron, 0.6)`.
 %   - To visualize extracted traces, use `view_traces(neuron)`.
@@ -48,8 +47,8 @@ cn_tic= tic;
 if isstring(input_files) || ischar(input_files)
    input_files={input_files};
 end
-file_path=cell(size(input_files,1),1);
-for i=1:size(input_files,1)
+file_path=cell(numel(input_files),1);
+for i=1:numel(input_files)
     try
         temp=input_files{i};
         file_path{i}=runCNMFe(temp);

@@ -21,7 +21,7 @@ Run:
 CaliAli_cnmfe()
 ```
 
-This opens a file selector and processes one file at a time. For scripted usage without a picker, see [FAQ](FAQ.md#cnmfe-no-picker).
+This opens a file selector; each selected file is processed in turn. For scripted usage without a picker, see [FAQ](FAQ.md#cnmfe-no-picker).
 
 ??? question "How does CaliAli deconvolve calcium signals?"
 	CaliAli employs the original FOOPSI method with an AR(1) autoregressive model for initialization and matrix factorization (which is faster). During the final post-processing of traces, FOOPSI is run again with an AR(2) model (which is slower but more accurate). Learn more in the [OASIS documentation](https://github.com/zhoupc/OASIS_matlab/blob/master/document/FOOPSI.md#brief-summary-of-the-deconvolution-problem).
