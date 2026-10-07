@@ -67,10 +67,10 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             
             bg_model = obj.options.background_model;
             bg_ssub = obj.options.bg_ssub;
-            % reconstruct the constant baseline
+            % reconstruct the constant baseline, one per batch: d1 x d2 x pieces,
+            % and the piece each requested frame belongs to
             if strcmpi(bg_model, 'ring')
-                b0_ = obj.reconstruct_b0();
-                b0_new_ = obj.reshape(obj.b0_new, 2);
+                [b0_, b0_new_, piece] = batch_baselines(obj, frame_range);
             end
             
             %% start updating the background
@@ -86,10 +86,10 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
                     Ypatch = reshape(Ypatch, [], T);
                     tmp_block = block_pos{mpatch};
                     tmp_patch = patch_pos{mpatch};
-                    b0_ring = b0_(tmp_block(1):tmp_block(2), tmp_block(3):tmp_block(4));
-                    b0_ring = reshape(b0_ring, [], 1);
+                    b0_ring = b0_(tmp_block(1):tmp_block(2), tmp_block(3):tmp_block(4), :);
+                    b0_ring = reshape(b0_ring, [], size(b0_, 3));
                     
-                    b0_patch = reshape(b0_new_(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4)), [], 1);
+                    b0_patch = reshape(b0_new_(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4), :), [], size(b0_new_, 3));
                     
                     % find the neurons that are within the block
                     mask = zeros(d1, d2);
@@ -101,13 +101,13 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
                     
                     % reconstruct background
                     %                     Cmean = mean(C_patch , 2);
-                    Ypatch = bsxfun(@minus, double(Ypatch), b0_ring);
+                    Ypatch = double(Ypatch) - b0_ring(:, piece);
                     %                     b0_ring = b0_(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4));
                     %                     b0_ring = reshape(b0_ring, [], 1);
                     %
                     if bg_ssub==1
                         Bf = W_ring*(double(Ypatch) - A_patch*C_patch);
-                        Ybg(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4),:) = reshape(bsxfun(@plus, Bf, b0_patch), diff(tmp_patch(1:2))+1, [], T);
+                        Ybg(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4),:) = reshape(Bf + b0_patch(:, piece), diff(tmp_patch(1:2))+1, [], T);
                     else
                         [d1s, d2s] = size(imresize(zeros(nr_block, nc_block), 1/bg_ssub));
                         temp = reshape(double(Ypatch)-A_patch*C_patch, nr_block, nc_block, []);
@@ -116,7 +116,7 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
                         Bf = imresize(Bf, [nr_block, nc_block], 'nearest');
                         Bf = Bf((tmp_patch(1):tmp_patch(2))-tmp_block(1)+1, (tmp_patch(3):tmp_patch(4))-tmp_block(3)+1, :);
                         Bf = reshape(Bf, [], T);
-                        Ybg(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4),:) = reshape(bsxfun(@plus, Bf, b0_patch), diff(tmp_patch(1:2))+1, [], T);
+                        Ybg(tmp_patch(1):tmp_patch(2), tmp_patch(3):tmp_patch(4),:) = reshape(Bf + b0_patch(:, piece), diff(tmp_patch(1:2))+1, [], T);
                     end
                 elseif strcmpi(bg_model, 'nmf')
                     b_nmf = obj.b{mpatch};
@@ -132,3 +132,48 @@ function Ybg = reconstruct_background_residual(obj, frame_range)
             end
             
         end
+
+
+function [b0_ring, b0_const, piece] = batch_baselines(obj, frame_range)
+%% The constant baseline of each batch the requested frames fall in.
+% b0_new held ONE baseline for the whole recording, the one the last temporal
+% step left: the median frame of the LAST batch minus the neurons. A batch
+% brighter or darker than that one got a residual offset by the difference --
+% -20 for a session 20 units darker than the last -- in play_movie and in the
+% residual that seeding reads. Each batch now gets its own, from the median
+% frame the initialization stored for it and the neurons' mean in that batch,
+% and a range that spans batches is split. The same baseline is taken off
+% before the ring weights are applied, so the ring term works on the batch's
+% fluctuations, as it does when it is fitted. Stored once per batch already
+% (P.Ymean), so nothing new is saved.
+%
+% Without a median per batch -- a neuron whose batches do not match its
+% medians -- this falls back to the single b0 and b0_new, as before.
+T = diff(frame_range) + 1;
+F = get_batch_size(obj);
+fn = [0, cumsum(F)];
+ym = [];
+try
+    ym = obj.P.Ymean;
+catch
+end
+if numel(ym) ~= numel(F)
+    b0_ring = obj.reconstruct_b0();
+    b0_const = obj.reshape(obj.b0_new, 2);
+    piece = ones(1, T);
+    return
+end
+in_range = find(fn(1:end-1) < frame_range(2) & fn(2:end) >= frame_range(1));
+C_mu = trace_noise_scale(obj, 'apply', obj.C);
+b0_const = zeros(obj.options.d1, obj.options.d2, numel(in_range));
+piece = zeros(1, T);
+for j = 1:numel(in_range)
+    i = in_range(j);
+    b0_const(:, :, j) = double(ym{i}) - obj.reshape(obj.A*mean(C_mu(:, fn(i)+1:fn(i+1)), 2), 2);
+    f1 = max(fn(i)+1, frame_range(1));
+    f2 = min(fn(i+1), frame_range(2));
+    piece((f1:f2) - frame_range(1) + 1) = j;
+end
+b0_ring = b0_const;
+end
+
