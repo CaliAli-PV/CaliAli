@@ -35,7 +35,7 @@ params.BVsize = [];              % Size of blood vessels (pixels),
 params.spatial_ds = 2;           % Spatial downsampling factor
 params.temporal_ds = 1;          % Temporal downsampling factor
 
-params.neuron_enhance = true;   % Enhance neurons using MIN1PIE background subtraction
+params.neuron_enhance = true;   % Enhance neurons using MIN1PIPE background subtraction
 params.noise_scale = true;      % Scale noise for each pixel
 params.detrend = 1;             % Detrending window (seconds). 0 = no detrending
 params.file_extension = 'avi';  % if a folder is selected instead of a single video file, 
@@ -80,7 +80,7 @@ params.background_model = 'ring';    % Background model. Ring is the only one
                                      %  extraction CaliAli uses. Setting either
                                      %  warns and falls back to ring.
 params.nb = 1;                       % Number of background components
-params.bg_neuron_factor = 1.5;       % 
+params.bg_neuron_factor = 1.5;       % Ring radius as a multiple of gSiz
 params.ring_radius = [];             % Will be calculated later
 params.num_neighbors = [];           % Number of neighbors for each neuron
 params.bg_ssub = 2;                  % Background downsampling factor

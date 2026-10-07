@@ -34,11 +34,13 @@ CaliAli_Options = CaliAli_demo_parameters();
 | `BVsize` | `[]` | Size of blood vessels (pixels) \[min diameter, max diameter\]. Default is calculated based on `gSig`. |
 | `spatial_ds` | `2` | Spatial downsampling factor |
 | `temporal_ds` | `1` | Temporal downsampling factor |
-| `neuron_enhance`   | `true` | Enhance neurons using MIN1PIE background subtraction |
+| `neuron_enhance`   | `true` | Enhance neurons using MIN1PIPE background subtraction |
 | `noise_scale` | `true` | Scale noise for each pixel |
 | `detrend` | `1` | Detrending window (seconds). `0` = no detrending |
 | `file_extension` | `'avi'` | If a folder is selected instead of a single video file, concatenate all videos with the specified file extension within that folder. |
-| `batch_sz` | `'auto'` | Estimate chunk size from available RAM |
+| `force_non_negative` | `1` | Clip negative pixel values after preprocessing |
+| `force_non_negative_tolerance` | `20` | Amount added before clipping, so negative noise down to `-20` is kept |
+| `batch_sz` | `'auto'` | Frames loaded at a time: `'auto'` sizes it from free memory, `'all_frames'` loads the whole recording, `'per_session'` uses one batch per session, or give a number of frames. See [Low-Memory Processing](../Low_memory.md). |
 
 ####📌 Motion Correction Parameters
 | Parameter Name | Value | Description |
@@ -51,15 +53,15 @@ CaliAli_Options = CaliAli_demo_parameters();
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
 | `projections` | `'BV+neuron'` | Use both blood vessels and neurons for alignment |
-| `final_neurons` | `0` | Perform an extra neuron alignment iteration? |
+| `final_neurons` | `false` | Perform an extra neuron alignment iteration? |
 | `Force_BV` | `false` | Force blood vessel use even if deemed unusable |
 
 #### 📌 Neuronal Extraction (CNMF-E) Parameters
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
-| `memory_size_to_use` | `total_system_memory_GB` | Auto-detected RAM budget (GB) |
-| `memory_size_per_patch` | `total_system_memory_GB` | Patch memory allowance (GB) |
-| `patch_dims` | `[64, 64]` | Patch dimensions |
+| `memory_size_to_use` | `total_system_memory_GB` | Auto-detected RAM budget (GB). *Default; not set by the demo.* |
+| `memory_size_per_patch` | `total_system_memory_GB` | Patch memory allowance (GB). *Default; not set by the demo.* |
+| `patch_dims` | `[64, 64]` | Patch dimensions. *Default; not set by the demo.* |
 | `with_dendrites` | `true` | Include dendrites in the model |
 | `search_method` | `'dilate'` | Search method (`'dilate'` or `'ellipse'`) |
 | `spatial_constraints` | `struct('connected', false, 'circular', false)` | Spatial constraints |
@@ -77,9 +79,9 @@ CaliAli_Options = CaliAli_demo_parameters();
 #### 📌 Background Modeling Parameters
 | Parameter Name | Value | Description |
 |---------------|-------|-------------|
-| `background_model` | `'ring'` | Background model |
-| `nb` | `1` | Number of background components |
-| `bg_neuron_factor` | `1.5` | Background-neuron interaction factor |
+| `background_model` | `'ring'` | Background model. Only `'ring'` is supported; other values are replaced by `'ring'` with a warning. |
+| `nb` | `1` | Number of background components. No effect with the ring model. |
+| `bg_neuron_factor` | `1.5` | Radius of the background ring, as a multiple of the neuron size `gSiz` (4 × `gSig`) |
 | `ring_radius` | `[]` | Will be calculated later |
 | `num_neighbors` | `[]` | Number of neighbors for each neuron |
 | `bg_ssub` | `2` | Background downsampling factor |

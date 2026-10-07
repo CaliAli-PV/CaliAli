@@ -10,7 +10,10 @@ function CaliAli_update_parameters(varargin)
 %
 % Usage:
 %   CaliAli_update_parameters('sf', 15, 'detrend', 2);
-%   CaliAli_update_parameters(CaliAli_options);
+%   CaliAli_update_parameters(struct('sf', 15));  % only the values to change
+%
+%   Do not pass a full CaliAli_options: a structure replaces whole fields, so
+%   it would overwrite the data the alignment saved in each file.
 %
 % Notes:
 %   - Uses `uipickfiles` to allow user selection of session files (*.mat).
