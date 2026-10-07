@@ -49,6 +49,12 @@ for i=progress(1:div)
     C_raw=catpad(2,C_raw,C_raw_temp);
 end
 obj.C_raw=C_raw;
+% Every trace was just re-estimated from the movie, so it is in movie units
+% again. A gain recorded by scale_to_noise no longer describes it, and keeping
+% it would apply that gain a second time when a residual is built.
+if trace_noise_scale(obj, 'has')
+    obj = trace_noise_scale(obj, 'clear');
+end
 
 fprintf('Deconvolve and denoise all temporal traces again...\n');
 if obj.options.deconv_flag
