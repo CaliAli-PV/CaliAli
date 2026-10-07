@@ -87,7 +87,9 @@ if nc_patch <= 1
 else
     patch_idx_c = ceil(linspace(1, d2, nc_patch+1));
     if diff(patch_idx_c(1:2))<min_patch_width
-        patch_idx_c = 1:min_patch_width:d2;
+        % A scalar step, as the row branch ends up using: a vector colon
+        % operand is an error in recent MATLAB. Both entries are equal.
+        patch_idx_c = 1:min_patch_width(2):d2;
         patch_idx_c(end) = d2;
     end
 end
