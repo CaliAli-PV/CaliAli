@@ -194,7 +194,7 @@ while m <= n2merge
     
     % update spatial/temporal components of the merged neuron
     if ~isempty(obj.A_batch)
-        F=get_batch_size(obj,0);
+        F=get_batch_size(obj);
         batch=[0,cumsum(F)];
         div=length(batch)-1;
         for i=1:div
