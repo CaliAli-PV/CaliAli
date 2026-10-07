@@ -28,3 +28,6 @@ CLAUDE.local.md
 .claude.json
 .claude.json.backup
 .mcp.json
+
+# Video simulator downloaded by Demo/Demo_pipeline.m
+Demo/Simulator/
