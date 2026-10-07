@@ -1,19 +1,19 @@
-function CaliAli_set_initialization_parameters(in)
+function CaliAli_set_initialization_parameters(varargin)
 %% CaliAli_set_initialization_parameters: Set initialization parameters for CNMF-E processing.
 %
+% Opens the app where the PNR and correlation thresholds, gSig and the seed mask
+% are chosen for each file. Press Load Data in the app to choose the _det or
+% _Aligned .mat files; Done saves the values to each file.
+%
 % Inputs:
-%   CaliAli_options - Structure containing preprocessing settings.
-%                     Details can be found in CaliAli_demo_parameters().
+%   None. An input given by older scripts (CaliAli_options) is accepted and
+%   ignored: the app reads the settings from the files it loads.
 %
 % Outputs:
-%   None (initializes CNMF-E application based on structure type).
+%   None (the settings are saved in the CaliAli_options of each file).
 %
 % Usage:
-%   CaliAli_set_initialization_parameters(CaliAli_options);
-%
-% Notes:
-%   - Calls `CNMFe_app_dendrite` if processing dendrites (in progress).
-%   - Calls `CNMFe_app` for neuron-based processing.
+%   CaliAli_set_initialization_parameters();
 %
 % Author: Pablo Vergara
 % Contact: pablo.vergara.g@ug.uchile.cl

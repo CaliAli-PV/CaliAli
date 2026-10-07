@@ -1,24 +1,25 @@
 ### CaliAli_set_initialization_parameters {#CaliAli_set_initialization_parameters}
 
 ```matlab
-function CaliAli_set_initialization_parameters(CaliAli_options)
+function CaliAli_set_initialization_parameters()
 ```
 
 #### Description
-Graphic user interface for setting initialization parameters for CNMF-E processing. Function will call a file selector windows to choose the files to process.
+Opens the app where you choose, for each file, the PNR and correlation thresholds, the neuron size `gSig` and an optional seed mask used to initialize CNMF-E. Press **Load Data** to choose the `_Aligned.mat` or `_det.mat` files; each file appears as a row of the table.
+
+- Edit a value directly in the table, or type it in a **Change all values** box and press Enter to apply it to every file.
+- Press `Get` on a row to set its thresholds visually (see below).
+- Press `Done!` to save the values shown in the table to each file. If `gSig` changed, the settings derived from it are updated too.
 
 ##### Function Inputs:
-| Parameter Name | Type    | Description                          |
-|---------------|---------|--------------------------------------|
-| CaliAli_options | Structure | Structure containing preprocessing settings. |
+None. An input passed by older scripts (such as `CaliAli_options`) is ignored: the app reads the settings from the files it loads.
 
 ##### Function Outputs:
-None: Initialization parameters are stored inside the CaliAli_options structure of each file
-
+None. The settings are saved in the `CaliAli_options` of each file.
 
 ##### Example usage:
 ```matlab
-CaliAli_set_initialization_parameters(CaliAli_options);
+CaliAli_set_initialization_parameters();
 ```
 
 !!! Info "You can process several files at the same time."
@@ -51,10 +52,9 @@ Additionally, you have the option to manually draw a mask to exclude specific re
 ???+ Danger "Important"
 	Please note that the initialization of neurons depends solely on the third panel, which is the point-wise product of the correlation and PNR (peak-to-noise ratio). Even if some seeds appear above non-neuronal structures in either the correlation or PNR images, this will not compromise the extraction process as long as those seeds do not appear in the point-wise product image
 	
-Once satisfied with the results press the `Ok!` button.
-This will automatically update the parameters for the chosen file with the new thresholds. 
+Once satisfied with the results press the `Ok!` button: the row of that file is updated with the new values. Closing the window without `Ok!` keeps the previous values.
 
-After setting the PNR, Corr, gSig, and Frame rate parameters press `Done!`
+When the table shows the values you want, press `Done!` to save them.
 
 !!! tip "Double-check neuron counts"
     Before launching [`CaliAli_cnmfe`](CaliAli_cnmfe.md#CaliAli_cnmfe), call [`Check_initialization_parameters`](Check_initialization_parameters.md#Check_initialization_parameters) to preview how many neurons will be seeded with the current thresholds. If the count looks unrealistic, reopen the app and adjust `min_corr`, `min_pnr`, or the seed mask.

@@ -85,7 +85,7 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 ### **🔹 Initialization Parameters**
 | Parameter Name  | Default Value | Description | How to Choose |
 |----------------|--------------|-------------|--------------|
-| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | Usually controlled via `CaliAli_set_initialization_parameters(CaliAli_options)`. :material-information-outline:{ title="Raise the threshold to suppress non-neuronal detections; lower it to recover dim neurons when configuring manually. Use Check_initialization_parameters(CaliAli_options) to preview how many seeds pass." } |
+| `min_corr`    | `0.1`        | Minimum correlation for neuron seeding | Usually controlled via `CaliAli_set_initialization_parameters()`. :material-information-outline:{ title="Raise the threshold to suppress non-neuronal detections; lower it to recover dim neurons when configuring manually. Use Check_initialization_parameters(CaliAli_options) to preview how many seeds pass." } |
 | `min_pnr`     | `6`          | Minimum peak-to-noise ratio for seeding | Same as `min_corr`. |
 | `min_pixel`   | `[]`         | Minimum pixel area for neurons | Automatically calculated based on gSig. |
 
@@ -114,9 +114,9 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 | Parameter Name    | Default Value | Description | How to Choose |
 |-------------------|--------------|-------------|--------------|
 | `background_model` | `'ring'`    | Background model | Only `'ring'` is supported; any other value is replaced by `'ring'` with a warning. |
-
 | `bg_neuron_factor` | `1.5`       | Radius of the background ring, as a multiple of the neuron size (`gSiz`) | Keep the default; adjust `gSig` instead. |
 | `bg_ssub`          | `2`         | Spatial downsampling of the background estimate, for speed | Keep the default. |
+
 ---
 
 ### **🔹 Merging Parameters**  

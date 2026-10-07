@@ -7,7 +7,7 @@ After confirming [alignment quality](alignment.md#eval), you can proceed to CNMF
 Use the initialization GUI to set `min_corr` and `min_pnr`:
 
 ```matlab
-CaliAli_set_initialization_parameters(CaliAli_options)
+CaliAli_set_initialization_parameters()
 Check_initialization_parameters(CaliAli_options)
 ```
 

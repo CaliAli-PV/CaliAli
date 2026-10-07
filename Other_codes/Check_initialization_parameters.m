@@ -57,6 +57,6 @@ cprintf('*magenta', 'The number of neurons to be initialized is ');
 cprintf('*red', '%d.\n', I);
 cprintf('magenta', 'This is the maximum number of neurons that can be extracted.\n');
 cprintf('blue', 'If this number does not seem correct, run:\n');
-cprintf('_comment', 'CaliAli_set_initialization_parameters(CaliAli_options);\n');
+cprintf('_comment', 'CaliAli_set_initialization_parameters();\n');
 
 end
