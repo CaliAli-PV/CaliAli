@@ -10,7 +10,7 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 
 | Parameter Name       | Default Value | Description | How to Choose |
 |----------------------|--------------|-------------|--------------|
-| `gSig`             | `[] (auto)`  | Neuron filter size in pixels | Defaults to `5 / spatial_ds`. Override when your data are anisotropic or when neuron diameters differ significantly from 5 px. Use [NeuronSize_app](Functions_doc/NeuronSize_app.md) for fine tuning.|
+| `gSig`             | `[] (auto)`  | Neuron filter size in pixels | Defaults to `5 / spatial_ds`. Override when neuron diameters differ significantly from 5 px. Use [NeuronSize_app](Functions_doc/NeuronSize_app.md) for fine tuning.|
 | `sf`               | `10`         | Frame rate (fps) | Set to match the acquisition frame rate. |
 | `input_files`       | `[]`         | Paths to input video files | Leave empty to manually select files. |
 | `output_files`      | `[]`         | Paths to output video files | Leave empty for default naming (recommended). |
@@ -42,6 +42,7 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 | `force_non_negative` | `1`        | Clip negative pixel values after preprocessing | Keep enabled. |
 | `force_non_negative_tolerance` | `20` | Amount added to every pixel before clipping, so small negative noise (down to minus this value) is kept | Increase only if you observe residual bias in dark regions. |
 | `remove_BV`        | `false`      | Mask out blood vessels in the preprocessed video and neuron projection | Enable only if blood vessels are picked up as neurons. |
+| `fastPNR`          | `false`      | Skip the correlation image when calculating projections (experimental) | Keep the default. |
 
 ---
 
@@ -51,6 +52,7 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 | `reference_projection_rigid` | `'BV'`  | Reference projection for rigid correction: `'BV'` or `'neuron'` | Choose `'neuron'` if blood vessels are not suitable. |
 | `do_non_rigid`      | `false`      | Perform non-rigid motion correction | Enable only if parts of the field of view still drift after rigid correction. See [Non-rigid motion correction](Motion_correction.md#non-rigid). |
 | `non_rigid_levels`  | `1`          | Number of non-rigid grid levels (3×3, then 4×4, 5×5, …) | Increase for finer correction; each level adds one registration pass. |
+| `non_rigid_highpass_sigma` | `6` | Size, in pixels, of the filter applied to the image that non-rigid correction registers on | Keep the default. |
 
 ---
 
@@ -112,6 +114,8 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 |-------------------|--------------|-------------|--------------|
 | `background_model` | `'ring'`    | Background model | Only `'ring'` is supported; any other value is replaced by `'ring'` with a warning. |
 
+| `bg_neuron_factor` | `1.5`       | Radius of the background ring, as a multiple of the neuron size (`gSiz`) | Keep the default; adjust `gSig` instead. |
+| `bg_ssub`          | `2`         | Spatial downsampling of the background estimate, for speed | Keep the default. |
 ---
 
 ### **🔹 Merging Parameters**  

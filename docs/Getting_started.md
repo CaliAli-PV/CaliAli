@@ -16,7 +16,7 @@ open Demo_pipeline.m
 ```
 
 ??? Info "How long it takes to process the Demo data?"
-	Processing the demo data is expected to take approximately 5 minutes on a standard desktop computer.
+	Processing the demo data takes about 5 minutes on a workstation, and longer on a laptop.
 
 CaliAli runs in five steps:
 

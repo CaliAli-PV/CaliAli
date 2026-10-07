@@ -12,7 +12,7 @@ CaliAli runs in `MATLAB` and requires:
 #### System Compatibility and Supported Formats <a id="supported-formats"></a><a id="compatibility"></a>
 
 ??? Question "Platform and format compatibility"
-	CaliAli supports `.avi / .m4v / .mp4 / .mkv / .tiff / .isxd (Inscopix)`, but requirements differ by operating system:
+	CaliAli supports `.avi / .m4v / .mp4 / .tif / .tiff / .h5 / .isxd (Inscopix)`, but requirements differ by operating system:
 		
 	=== "Windows"
 		CaliAli has been successfully tested on MATLAB versions 2022a and 2023a running on Windows 11.
