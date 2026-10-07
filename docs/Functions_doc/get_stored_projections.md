@@ -20,4 +20,6 @@ Retrieve and combine stored projections from session files.
 | T | Table | Contains the combined projections from all session files. |
 
 #### Example usage:
+```matlab
 T = get_stored_projections(CaliAli_options);
+```

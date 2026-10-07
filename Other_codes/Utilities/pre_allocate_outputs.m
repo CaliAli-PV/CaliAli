@@ -10,7 +10,7 @@ function [process_flags,out] = pre_allocate_outputs(input_files,tag,out_cls)
 %   process_flags - Logical array indicating which items need processing (true = process, false = skip)
 %
 % Usage:
-%   process_flags = pre_allocate_outputs(opt.input_files);
+%   [process_flags, out] = pre_allocate_outputs(opt.input_files, _mc);
 %
 % Author: Pablo Vergara
 % Contact: pablo.vergara.g@ug.uchile.cl

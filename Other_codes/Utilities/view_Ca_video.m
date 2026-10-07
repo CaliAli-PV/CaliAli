@@ -31,7 +31,7 @@ function view_Ca_video(V)
 %
 % Keyboard Shortcuts (via `videofig`):
 %   - Enter: Play/Pause at normal speed (default: 25 fps).
-%   - Backspace: Play/Pause at slower speed (5x slower).
+%   - Backspace: Play/Pause at faster speed (10x faster).
 %   - Left/Right Arrow: Move one frame backward/forward.
 %   - Page Up/Page Down: Jump 30 frames backward/forward.
 %   - Home/End: Jump to the first/last frame.

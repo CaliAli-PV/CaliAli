@@ -117,7 +117,7 @@ valid_bool_ds = @(x) (islogical(x) && isscalar(x)) || (isnumeric(x) && isscalar(
 %% General variables
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
-addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. 2.5 default.
+addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. Default 5/spatial_ds (2.5 when spatial_ds is 2).
 addParameter(inp,'sf',10,valid_pos_scalar)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
@@ -212,7 +212,7 @@ valid_char = @(x) ischar(x) || (isstring(x) && isscalar(x));
 %% Video pre-processing
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
-addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. 2.5 default.
+addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. Default 5/spatial_ds (2.5 when spatial_ds is 2).
 addParameter(inp,'sf',[],valid_optional_pos_scalar)             %Frame rate. Defualt 10 fps
 
 addParameter(inp,'neuron_enhance',true,valid_bool_scalar)       %MIN1PIE background substraciton. True is recommended. default True
@@ -278,7 +278,7 @@ valid_batch_input = @valid_batch_setting;
 %% General
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
-addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. 2.5 default.
+addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. Default 5/spatial_ds (2.5 when spatial_ds is 2).
 addParameter(inp,'sf',[],valid_optional_pos_scalar)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];
@@ -304,7 +304,7 @@ addParameter(inp,'Mask',[])                   % Motion correction Mask
 %% Motion correction parameters
 addParameter(inp,'do_non_rigid',false,valid_bool_scalar)        %Do non-rigid registration
 addParameter(inp, ...
-    'reference_projection_rigid','BV')     %Reference projections used for translation. Valid parameters are 'BV' or 'neurons'
+    'reference_projection_rigid','BV')     %Reference projections used for translation. Valid parameters are 'BV' or 'neuron'
 % DEPRECATED, kept only so older scripts still parse. Non-rigid correction is now
 % NoRMCorre's piecewise-rigid mode, run inside the same call as the rigid one:
 % the frame is split into patches and each gets its own shift, bounded by
@@ -378,7 +378,7 @@ valid_batch_input = @valid_batch_setting;
 addParameter(inp,'input_files',[])            %Cell array containing paths to the input video files
 addParameter(inp,'output_files',[])           %Cell array containing paths to the output video of individual sessions
 addParameter(inp,'out_aligned_sessions',[])                 %Path to store the aligned video
-addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. 2.5 default.
+addParameter(inp,'gSig',[],valid_optional_pos_scalar)          %Neuron Filter size. Default 5/spatial_ds (2.5 when spatial_ds is 2).
 addParameter(inp,'sf',[],valid_optional_pos_scalar)             %Frame rate. Defualt 10 fps
 addParameter(inp,'BVsize',[])                 %Size of blood vessels [min diameter max diameter] in pixels.
 % defaults is in the range range [0.6*opt.gSig,0.9*opt.gSig];

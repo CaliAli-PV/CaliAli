@@ -3,7 +3,7 @@
 
 #### Syntax
 ```matlab
-function process_flags = pre_allocate_outputs(input_files, tag)
+function [process_flags,out] = pre_allocate_outputs(input_files,tag,out_cls)
 ```
 
 #### Description
@@ -14,16 +14,21 @@ function process_flags = pre_allocate_outputs(input_files, tag)
 |----------------|------|-------------|
 | `input_files`  | cell | Elements are either raw filenames or chunk descriptors produced by `create_batch_list`. |
 | `tag`          | char | Suffix appended to output filenames (e.g. `'_mc'`, `'_det'`). |
+| `out_cls`      | char | (Optional) Data class of the pre-allocated video in chunked runs (e.g. `'uint16'`). If omitted or empty, the class of the input video is used. |
 
 ##### Function Outputs
 | Name | Type | Description |
 |------|------|-------------|
 | `process_flags` | logical array | Logical mask indicating which entries require processing (`true`) versus already-complete batches (`false`). |
+| `out` | cell | Output filename for each entry of `input_files`. |
+
+##### Notes
+- An existing output file that is incomplete (for example, left by an interrupted run) is deleted before the check, so it is processed again.
 
 ##### Example Usage
 ```matlab
 input_files = create_batch_list(opt.input_files, opt.batch_sz, '_det');
-process_flags = pre_allocate_outputs(input_files, '_det');
+[process_flags, out] = pre_allocate_outputs(input_files, '_det');
 
 for k = find(process_flags)
     Y = CaliAli_load(input_files{k}, 'Y');

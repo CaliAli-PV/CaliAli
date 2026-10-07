@@ -8,7 +8,8 @@ function vid=vesselness_PV(vid,use_parallel,sz,norm)
 %   vid         - Input image or video as a 2D or 3D array.
 %   use_parallel - (Optional) Boolean flag to enable parallel processing (default: 1).
 %   sz          - (Optional) Scale range for the vesselness filter (default: 0.5:0.5:2).
-%   norm        - (Optional) Normalization flag for vesselness filtering (default: 0).
+%   norm        - (Optional) How scales are combined: 0 sum, 1 maximum after
+%                 rescaling, 2 maximum (default: 0).
 %
 % Outputs:
 %   vid - Image or video with enhanced blood vessels.

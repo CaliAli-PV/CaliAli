@@ -8,14 +8,20 @@ function [modified_input_files,batch_sz,F] = create_batch_list(input_files, batc
 %                 file is one session at this stage, so 'per_session' and
 %                 'all_frames' both mean one chunk per file, which is what the
 %                 legacy value 0 has always meant here.
+%   tag         - Suffix added to the input name to form the output name
+%                 (e.g. '_mc', '_det'), unless the name already contains it.
 %
 % Outputs:
-%   modified_input_files - Cell array where each element is either:
-%                         - String (original filename) if no batching needed
-%                         - Cell array {filename, session_id, start_frame, end_frame, output_filename} if batching
+%   modified_input_files - Cell array with one element per chunk, each a cell
+%                          array {filename, session_id, start_frame, end_frame,
+%                          output_filename}. A file that fits in one batch gives
+%                          a single chunk covering all its frames.
+%   batch_sz             - The resolved number of frames per batch (0 means
+%                          one chunk per file).
+%   F                    - Number of frames in each input file.
 %
 % Usage:
-%   opt.input_files = create_batch_list(opt.input_files, 3000);
+%   [opt.input_files, opt.batch_sz] = create_batch_list(opt.input_files, 3000, '_mc');
 %
 % Author: Pablo Vergara
 % Contact: pablo.vergara.g@ug.uchile.cl

@@ -25,3 +25,4 @@ This function refines the temporal dynamics of detected neuronal components by p
 ```matlab
 neuron = update_temporal_CaliAli(neuron, true);
 neuron = update_temporal_CaliAli(neuron, false, batch_frames);
+```

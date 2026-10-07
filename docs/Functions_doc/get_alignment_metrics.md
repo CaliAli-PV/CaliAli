@@ -25,4 +25,3 @@ T = get_alignment_metrics(P);
 #### Notes:
 - Evaluates alignment quality using correlation and sharpness metrics.
 - Computes alignment metrics for neuron projections.
-- Supports additional metrics for blood vessel projections (commented in the cod

@@ -75,7 +75,7 @@ addParameter(inp, 'bg_ssub', 2, @isnumeric);        % downsample background for 
 addParameter(inp, 'merge_thr', 0.65, @isnumeric);     % thresholds for merging neurons; [spatial overlap ratio, temporal correlation of calcium traces, spike correlation]
 addParameter(inp, 'method_dist', 'max', @ischar);   % method for computing neuron distances {'mean', 'max'}
 addParameter(inp, 'dmin', 5, @isnumeric);       % minimum distances between two neurons. it is used together with merge_thr
-addParameter(inp, 'merge_thr_spatial', [0.8, 0.4, -inf], @isnumeric);  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
+addParameter(inp, 'merge_thr_spatial', [0.8, 0.4, -inf], @isnumeric);  % merge components with highly correlated spatial shapes (corr=0.8) and moderate temporal correlations (corr=0.4); spike correlation ignored (-inf)
 addParameter(inp, 'merge_thr_fiber', [30, 5,15,0.4], @isnumeric);  % merge close fiber with similar orientation. [distance, paralle distance,angle, temporal correlation].
 
 % -------------------------  INITIALIZATION   -------------------------  %

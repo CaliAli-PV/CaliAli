@@ -2,19 +2,24 @@ function CaliAli_save_chunk(out,fullFileName,F, Y,ix)
 %% CaliAli_save_chunk: Save or append video data to a .mat file in chunks.
 %
 % Inputs:
-%   filename - String specifying the file path to save or append data.
-%   Y        - 3D array containing the video data to be stored.
-%   Id       - Id of the sessions being saved
+%   out          - Path of the output .mat file.
+%   fullFileName - Chunk descriptor {filename, session_id, start_frame,
+%                  end_frame, output_filename}, as made by create_batch_list.
+%   F            - Number of frames in each session.
+%   Y            - 3D array with the video data of this chunk.
+%   ix           - Index of the session the chunk belongs to.
 %
 % Outputs:
 %   None (data is saved to the specified file).
 %
 % Usage:
-%   CaliAli_save_chunk('output.mat', Y);
+%   CaliAli_save_chunk(out_file, batch_entry, F, Y, session_index);
 %
 % Notes:
-%   - If the file exists, new data is appended along the third dimension.
-%   - If the file does not exist, a new file is created with '-v7.3' format.
+%   - If the file exists, Y is written at the frames of its session: after
+%     the frames of the sessions before it, from start_frame to end_frame.
+%   - If the file does not exist, a new file is created with '-v7.3' format
+%     holding Y.
 %   - No compression is used to optimize read/write speed.
 %
 % Author: Pablo Vergara

@@ -15,7 +15,7 @@ Calculate Cn and PNR neuron projections from the residual video.
 ##### Function Outputs:
 | Parameter Name | Type   | Description          |
 |---------------|--------|----------------------|
-| neuron        | struct | The updated neuron structure with CNr and PNRr (residual projections) |
+| neuron        | struct | The updated neuron structure with `Cnr` and `PNRr` (correlation and PNR images of the residual video) |
 
 ##### Example usage:
 ```matlab

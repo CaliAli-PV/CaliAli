@@ -22,7 +22,9 @@ function Y=detrend_vid(Y,CaliAli_options)
 %     product of the sampling frequency and the detrending factor.
 %   - A secondary moving minimum filter is applied to further refine background 
 %     fluctuations.
-%   - Negative values are clipped to zero after detrending.
+%   - Negative values are NOT clipped here; the output can be negative.
+%     CaliAli_remove_background clips them later in its own processing when
+%     preprocessing.force_non_negative is set.
 %
 % Author: Pablo Vergara
 

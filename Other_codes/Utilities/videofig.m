@@ -12,7 +12,7 @@ function [fig_handle, axes_handle, scroll_bar_handles, scroll_func] = ...
 %
 %   The keyboard shortcuts are:
 %     Enter (Return) -- play/pause video (25 frames-per-second default).
-%     Backspace -- play/pause video 5 times slower.
+%     Backspace -- play/pause video 10 times faster.
 %     Right/left arrow keys -- advance/go back one frame.
 %     Page down/page up -- advance/go back 30 frames.
 %     Home/end -- go to first/last frame of video.

@@ -7,7 +7,7 @@ function apply_crop_on_disk(mat_path, varname)
 ```
 
 #### Description
-`apply_crop_on_disk` trims zero-padded borders from a motion-corrected video directly on disk. It reads the stored `CaliAli_options.motion_correction.Mask`, crops `varname` (default `Y`) in streaming chunks that respect the configured `batch_sz`, and saves the result back into the same MAT-file.
+`apply_crop_on_disk` crops a motion-corrected video on disk to the bounding box of the valid region recorded in `CaliAli_options.motion_correction.Mask`. It crops `varname` (default `Y`) in chunks of the configured `batch_sz` and saves the result back into the same MAT-file. [CaliAli_motion_correction](CaliAli_motion_correction.md#CaliAli_motion_correction) calls it automatically, so you do not normally need to run it.
 
 ##### Function Inputs
 | Parameter Name | Type | Description |
@@ -18,7 +18,9 @@ function apply_crop_on_disk(mat_path, varname)
 ##### Notes
 - Requires `CaliAli_options.motion_correction.Mask` and `batch_sz` to be present inside the MAT-file.
 - Performs the copy in batches to avoid loading the full dataset into memory.
-- The original file is replaced atomically after the temporary cropped copy is written.
+- Run it only once per file: on a file that is already cropped it stops with a `Mask must be [...]` error.
+- The rewritten file keeps only `varname` and `CaliAli_options`.
+- The cropped copy is written to a temporary file, which then replaces the original.
 
 ##### Example Usage
 ```matlab
