@@ -27,13 +27,13 @@ For details on how CaliAli expects parameters to be defined and parsed, see [Rec
 
 `batch_sz = 0` from older scripts still works as before.
 
-If you set a number, choose it based on your memory and video size. For 512×512 pixel videos:
+For 512×512 pixel videos, `'auto'` picks about:
 
-| System RAM | `'auto'` estimate (upper limit) | Manual override guidance |
-|------------|-------------------|--------------------------|
-| 8 GB       | ≈ 600 frames      | Stay ≤ 1000 if you see swapping |
-| 16 GB      | ≈ 1200 frames     | 1500–2500 works well     |
-| 32 GB      | ≈ 2400 frames     | 3000–5000 for faster runs |
-| 64 GB+     | ≥ 4800 frames     | Increase gradually if monitoring memory |
+| System RAM | `'auto'` (frames) |
+|------------|-------------------|
+| 8 GB       | ≈ 600             |
+| 16 GB      | ≈ 1200            |
+| 32 GB      | ≈ 2400            |
+| 64 GB+     | ≥ 4800            |
 
-These are upper limits: `'auto'` chooses fewer frames when part of the memory is already in use, for example by other programs. During extraction, CaliAli also starts fewer parallel workers when memory is short, and tells you why.
+These are upper limits: `'auto'` picks the largest safe size, and fewer frames when part of the memory is already in use, for example by other programs. Set a smaller number only if MATLAB runs out of memory. During extraction, CaliAli also starts fewer parallel workers when memory is short, and tells you why.
