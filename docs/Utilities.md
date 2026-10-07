@@ -1,6 +1,6 @@
 ## Separate Data from Different Sessions <a id="separate"></a>
 
-Separates data into sessions based on frame information and optionally bins the data.
+Splits traces from a multi-session extraction back into one piece per session, and optionally bins them.
 
 ### Syntax:
 
@@ -9,34 +9,36 @@ S = separate_sessions(data, F, bin, sf)
 ```
 
 ### Description:
-This function separates data into sessions based on provided frame information (F). If F is not provided, the function prompts the user to select a file containing frame data. The data can be optionally binned using the specified bin size (bin) and sampling frequency (sf).
+CaliAli extracts all sessions as one concatenated recording. This function cuts `data` back into sessions using the number of frames in each session (`F`), which CaliAli stores in `neuron.CaliAli_options.inter_session_alignment.F`. If `F` is not provided, you are asked to select the `_Aligned.mat` file or the workspace saved after CNMF-E, and `F` is read from it. The data can be optionally binned using the specified bin size (bin) and sampling frequency (sf).
 
 ### Inputs:
 
--	***data:*** Matrix of data to be separated into sessions.
+-	***data:*** Matrix with one row per neuron and one column per frame, such as `neuron.S` or `neuron.C_raw`.
 
--	***F (optional)***: Frame information used to define intervals for separating sessions. If not provided, the user will be prompted to select a file.
+-	***F (optional)***: Number of frames in each session (`neuron.CaliAli_options.inter_session_alignment.F`). If not provided or empty (`[]`), the user will be prompted to select a file.
 
--	***bin (optional)***: Bin size for binning the data. If set to 0, no binning is applied. Default is 0 if not specified.
+-	***bin (optional)***: Bin size in seconds. The values within each bin are summed. If set to 0, no binning is applied. Default is 0 if not specified.
 
--	***sf (optional)***: Sampling frequency used when binning the data. Default is 1 if not specified.
+-	***sf (optional)***: Sampling frequency (frames per second) used when binning the data. Default is 1 if not specified.
 
 ### Outputs:
 
--	***S***: Cell array containing separated session data.
+-	***S***: Cell array with one cell per session, in recording order. Each cell has one row per neuron.
 
 ### Example Usage:
 
 ```matlab
 % Separate spike data with default bin size and sampling frequency (no binning)
-S=separate_sessions(neuron.S, neuron.CaliAli_opt.F);
+S=separate_sessions(neuron.S, neuron.CaliAli_options.inter_session_alignment.F);
 
 % Separate spike data with 1s bin considering Sampling frequency of 10.
-S=separate_sessions(neuron.S, neuron.CaliAli_opt.F,1,10);
+S=separate_sessions(neuron.S, neuron.CaliAli_options.inter_session_alignment.F,1,10);
 
 % Separate raw Calcim traces data with default bin size and sampling frequency (no binning)
-S=separate_sessions(neuron.C_raw, neuron.CaliAli_opt.F);
+S=separate_sessions(neuron.C_raw, neuron.CaliAli_options.inter_session_alignment.F);
 ```
+
+See also the [separate_sessions](Functions_doc/separate_sessions.md#separate_sessions) reference page.
 
 ## Simulate Calcium Imaging Videos <a id="simulate"></a>
 
