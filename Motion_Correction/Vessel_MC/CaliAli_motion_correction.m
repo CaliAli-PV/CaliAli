@@ -40,14 +40,12 @@ end
 CaliAli_options = CaliAli_repair_defects(opt.input_files, CaliAli_options, 'motion correction');
 
 % Split the inputs into batches, unless batch_sz asks for the whole file at once
-[opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
 % create_batch_list returns the RESOLVED frame count. Writing that back over a
 % named mode would erase which mode it was: 'all_frames' and 'per_session' both
 % resolve to 0 at this stage, and the steps after concatenation still have to
-% tell them apart. Keep the mode, store the number only when a number was given.
-if ~ischar(CaliAli_options.motion_correction.batch_sz)
-    CaliAli_options.motion_correction.batch_sz=opt.batch_sz;
-end
+% tell them apart. So the options this stage stores keep the setting as given.
+batch_setting = opt.batch_sz;
+[opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_mc');
 
 % Pre-allocate output files and get processing flags
 % One class for both the container and the data written into it; see
@@ -129,6 +127,7 @@ try
         opt.Mask=Mask;
         % Save motion-corrected video (handles both string and batch inputs)
         CaliAli_options.motion_correction = opt;
+        CaliAli_options.motion_correction.batch_sz = batch_setting;
         CaliAli_save(opt.input_files{k}(:), Y, CaliAli_options);
     end
 

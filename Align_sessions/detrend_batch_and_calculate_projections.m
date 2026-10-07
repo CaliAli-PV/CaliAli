@@ -49,14 +49,14 @@ CaliAli_options = CaliAli_repair_defects(opt.input_files, CaliAli_options, 'detr
 
 apply_crop_on_disk_backward_compatibility(opt.input_files,CaliAli_options);
 
+% create_batch_list returns the RESOLVED frame count, which this stage works
+% with. Writing that back over a named mode would erase which mode it was:
+% 'all_frames' and 'per_session' both resolve to 0 here, and 'auto' to whatever
+% the free memory allowed at this moment, while extraction, which reads the
+% setting from the aligned file, has to tell them apart and size its own
+% batches. So the options this stage stores keep the setting as given.
+batch_setting = opt.batch_sz;
 [opt.input_files,opt.batch_sz] = create_batch_list(opt.input_files, opt.batch_sz,'_det');
-% create_batch_list returns the RESOLVED frame count. Writing that back over a
-% named mode would erase which mode it was: 'all_frames' and 'per_session' both
-% resolve to 0 at this stage, and the steps after concatenation still have to
-% tell them apart. Keep the mode, store the number only when a number was given.
-if ~ischar(CaliAli_options.inter_session_alignment.batch_sz)
-    CaliAli_options.inter_session_alignment.batch_sz=opt.batch_sz;
-end
 
 % Detrending CREATES values outside the source range -- background removal adds
 % an offset before clipping -- so this stage may want more headroom than it was
@@ -130,6 +130,7 @@ try
             % Update the CaliAli_options structure with the modified options
             CaliAli_options=CaliAli_load(opt_g.input_files{k}, 'CaliAli_options');
             CaliAli_options.inter_session_alignment = opt;
+            CaliAli_options.inter_session_alignment.batch_sz = batch_setting;
             % Save the updated options to the output file
             CaliAli_save(opt_g.input_files{k}(:), Y, CaliAli_options);
         else
@@ -151,6 +152,7 @@ try
 
     % Update the CaliAli_options structure with the final options
     CaliAli_options.inter_session_alignment = opt;
+    CaliAli_options.inter_session_alignment.batch_sz = batch_setting;
 
 catch ME
     % Only the incomplete outputs: out_pre also lists the _det files that were
