@@ -61,6 +61,15 @@ if ~endsWith(filename(:)', '.mat')
     filename = [filename '.mat'];
 end
 
+% A frame range of Y is read directly from the file. Loading the whole variable
+% first, as this used to, read the entire video to return a few frames -- and the
+% callers that sample frames one at a time did that once per frame.
+if nargin == 3 && ~isempty(frame_range) && strcmp(varname, 'Y') && numel(frame_range) == 2
+    m = matfile(filename);
+    data = m.Y(:, :, frame_range(1):frame_range(2));
+    return
+end
+
 if nargin == 1
     % Load all variables if varname is not provided
     data = load(filename);
@@ -83,14 +92,8 @@ else
     end
 end
 
-% Handle frame range loading for 'Y' variable
-if nargin == 3 && exist('frame_range', 'var') && ~isempty(frame_range)
-    if strcmp(varname, 'Y') && length(frame_range) == 2
-        % Load specific frame range using matfile indexing
-        m = matfile(filename);
-        data = m.Y(:, :, frame_range(1):frame_range(2));
-    else
-        warning('Frame range only supported for Y variable');
-    end
+% A frame range was given for something other than Y
+if nargin == 3 && ~isempty(frame_range)
+    warning('Frame range only supported for Y variable');
 end
 end

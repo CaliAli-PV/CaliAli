@@ -144,6 +144,14 @@ try
     % session share an output name, hence unique at all).
     CaliAli_options.motion_correction.output_files = unique(out_pre, 'stable');
 
+    % Carry each input's sensor-defect record into its output. The options
+    % saved with every batch are the ones this call holds, which belong to no
+    % file in particular and so have no record; without this, the _mc file has
+    % none, and detrending checks it all over again.
+    for k = 1:numel(out_pre)
+        carry_defect_record(first_input_file(opt.input_files(k)), out_pre{k});
+    end
+
     % Crop every output that is not cropped yet. The crop is not idempotent: it
     % trims a file to the bounding box of its Mask, and the Mask is deliberately
     % kept at the PRE-crop size because it records where the kept rectangle sat
@@ -179,6 +187,23 @@ f = '';
 if isempty(files), return; end
 f = files{1};
 if iscell(f), f = f{1}; end
+end
+
+
+function carry_defect_record(src, dst)
+%% Copy SRC's sensor-defect record into DST's options, if SRC has one.
+try
+    rec = CaliAli_load(src, 'CaliAli_options.defects_repaired');
+catch
+    return                        % the input was not checked either
+end
+if isempty(rec), return; end
+o = CaliAli_load(dst, 'CaliAli_options');
+if isfield(o, 'defects_repaired') && isequal(o.defects_repaired, rec)
+    return                        % already there, e.g. on a re-run
+end
+o.defects_repaired = rec;
+CaliAli_save(dst, 'CaliAli_options', o);
 end
 
 
