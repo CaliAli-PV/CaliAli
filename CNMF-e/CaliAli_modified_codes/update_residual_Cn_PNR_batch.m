@@ -30,7 +30,11 @@ for i=progress(1:size(fn,2)-1)
     %  Y(labeledImage(:)>0,:)=0;
     Y=reshape(Y,d1,d2,[]);
 
-     Y=detrend_vid(Y,neuron.CaliAli_options);
+    % detrend = 0 means no detrending, as in CaliAli_remove_background, and
+    % detrend_vid cannot take a zero-length window.
+    if neuron.CaliAli_options.preprocessing.detrend>0
+        Y=detrend_vid(Y,neuron.CaliAli_options);
+    end
 
     if strcmp(neuron.CaliAli_options.preprocessing.structure,'neuron')
         [~,Cn_all(:,:,i),pnr_all(:,:,i)]=get_PNR_coor_greedy_PV(Y,gSig,[],[],n_enhanced);
