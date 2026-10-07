@@ -12,11 +12,11 @@ A=full(neuron.A);
 C_mu = trace_noise_scale(neuron, 'apply', neuron.C);
 color_map=componentColorMap(reshape(A,d1,d2,[]),1:size(A,2),'Plot',false);
 
-useGPU = exist('gpuDeviceCount','builtin') && gpuDeviceCount>0;
+useGPU = canUseGPU();
 if useGPU
     A = gpuArray(A);
     Cg = gpuArray(single(C_mu(:,fn(batch_num)+1:fn(batch_num+1))));
-    ns = gather(A * C_g);
+    ns = gather(A * Cg);
 else
     Cg = single(C_mu(:,fn(batch_num)+1:fn(batch_num+1)));
     ns   = A * Cg;
