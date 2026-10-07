@@ -89,10 +89,17 @@ function neuron = deconv_traces(neuron, deconv_options)
     c = [];
     s = [];
 
-    % Perform deconvolution for each trace using parallel processing
+    % Perform deconvolution for each trace using parallel processing.
+    % OASIS's estimate_time_constant nudges invalid AR roots with randn, so the
+    % same trace could deconvolve differently on every run. Each trace draws from
+    % a stream seeded with its own index: the result no longer depends on the run
+    % or on which worker takes the trace. The caller's random state is restored.
+    rng_caller = rng;
     parfor i = 1:size(cr, 1)
+        rng(i, 'twister');
         [c(i,:), s(i,:), ~] = deconvolveCa(cr(i,:), deconv_options, 'sn', 1);
     end
+    rng(rng_caller);
     % Denoise the deconvolved traces
     [c, s] = denoise_traces(cr, c, s, abs(deconv_options.smin), neuron.sf);
     
