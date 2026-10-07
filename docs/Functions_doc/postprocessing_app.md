@@ -1,6 +1,6 @@
 ### postprocessing_app {#postprocessing_app}
 
-#### Syntac
+#### Syntax
 ```matlab
 function ix=postprocessing_app(neuron,thr)
 ```
@@ -11,8 +11,8 @@ Interactive labeling and classification of CNMF-E components.
 ##### Function Inputs:
 | Parameter Name | Type   | Description                  |
 |----------------|--------|------------------------------|
-| neuron         | struct | CNMF-E neuron structure containing extracted components. |
-| thr            | double | Threshold for drawing neuron contours. |
+| neuron         | `Sources2D` object | CNMF-E neuron object containing the extracted components. |
+| thr            | double | (Optional) Threshold for drawing neuron contours; higher values draw larger contours. Default `0.6`. |
 
 ##### Function Outputs:
 | Parameter Name | Type    | Description                                      |
@@ -21,14 +21,15 @@ Interactive labeling and classification of CNMF-E components.
 
 ##### Example usage:
 ```matlab
-ix = postprocessing_app(neuron, 0.8);
+ix = postprocessing_app(neuron);        % contours drawn at the default threshold (0.6)
+ix = postprocessing_app(neuron, 0.8);   % larger contours
 ```
 
 The post-processing app will display the correlation image with overlaid contours of the detected neurons. Clicking on these contours will show the corresponding extracted calcium transients:
 
 ![select_component_app](../files/select_component_app.gif)
 
-You can hold you mouse to zoom:
+You can hold your mouse to zoom:
 
 ![zoom_app](../files/zoom_app.gif)
 
@@ -41,7 +42,7 @@ You can label false positives by right-clicking on the neuron contours:
 ![label_fp_app](../files/label_fp_app.gif)
 
 
-### Sort Spatial Components <a id="spatial_sort"></a> {#Sort_Spatial_Components_<a_id="spatial_sort"></a>}
+### Sort Spatial Components {#spatial_sort}
 
 CaliAli can label false positives based on the shape of the extracted spatial components. To accomplish this, CaliAli incorporates a tool that sorts spatial components by their spatial congruence. To utilize this function, press the 'Separate Spatial' button.
 

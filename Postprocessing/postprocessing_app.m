@@ -3,13 +3,14 @@ function ix=postprocessing_app(neuron,thr)
 %
 % Inputs:
 %   neuron - CNMF-E neuron structure containing extracted components.
-%   thr    - Threshold for drawing neuron contours.
+%   thr    - (Optional) Threshold for drawing neuron contours. Default 0.6.
 %
 % Outputs:
 %   ix - Logical index of selected components, where selected components
 %        are those labeled in all three projection views.
 %
 % Usage:
+%   ix = postprocessing_app(neuron);
 %   ix = postprocessing_app(neuron, 0.8);
 %
 % Description:
@@ -36,6 +37,9 @@ function ix=postprocessing_app(neuron,thr)
 % Author: Pablo Vergara  
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025                           
+if ~exist('thr','var')
+    thr=0.6; % Same default as View_components
+end
 app=View_components(neuron,thr);
 app.done=0;
 while app.done == 0  % polling
