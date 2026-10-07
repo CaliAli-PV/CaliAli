@@ -369,7 +369,13 @@ C_raw = bsxfun(@times, C_new, 1./aa);
 %% upadte b0
 if strcmpi(bg_model, 'ring')
     % fprintf('Update the constant baselines for all pixels..\n');
-    obj.b0_new = obj.P.Ymean{idx}-obj.reshape(obj.A*mean(obj.C,2), 2) -obj.reconstruct_b0();
+    % b0_new is the constant that centres the movie on the current model: the
+    % background reconstruction adds it to the ring part. Subtracting b0 here, as
+    % CNMF-E's update_temporal_parallel does, left only the change since the last
+    % background fit, so after this step -- the last of every iteration -- the
+    % reconstructed background had no constant baseline and every residual was
+    % offset by it. Same formula as the spatial update.
+    obj.b0_new = obj.P.Ymean{idx}-obj.reshape(obj.A*mean(obj.C,2), 2);
     % fprintf('Done!\n');
 end
 
