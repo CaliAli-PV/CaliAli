@@ -25,7 +25,7 @@ params.output_class = 'uint16';   % default; also 'uint8' or 'uint32'
 
 ## Camera defects <a id="defects"></a>
 
-While downsampling, CaliAli checks each recording for dead pixels, dropped frames and padded borders left by other software, and repairs them before motion correction. This is on by default and needs no setup; when something is found, the command window reports it (for example, `sensor defects: 3 dead pixels, border 0 px`).
+While downsampling, CaliAli checks each recording for dead pixels, dropped frames and borders that stay the same in every frame (for example, padding left by other software), and repairs them before motion correction. This is on by default and needs no setup; when something is found, the command window reports it (for example, `sensor defects: 3 dead pixels, border 0 px`).
 
 | Setting | Default | Use |
 |---------|---------|-----|
