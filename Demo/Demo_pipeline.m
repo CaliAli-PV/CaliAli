@@ -88,8 +88,8 @@ File_path = CaliAli_cnmfe(); % Select "**_ds_mc_Aligned.mat"
 %[text]  Save results in a new path (choose a new 'source\_extraction' folder)
 % neuron = update_folder_path(neuron);
 % cnmfe_path = neuron.save_workspace();
-
-
+%[text] Create a video of the extraction. Panels: raw, background, raw-bg, extraction, residual (raw-ext-bg)
+% play_movie(neuron,1);
 
 %[appendix]{"version":"1.0"}
 %---
