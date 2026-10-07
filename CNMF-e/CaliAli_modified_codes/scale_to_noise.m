@@ -58,4 +58,8 @@ for i=1:size(c,1)
 end
 trace_noise_scale(neuron, 'record', c, sn_all);
 
-justdeconv(neuron,neuron.options.deconv_options.method,neuron.options.deconv_options.type,neuron.options.deconv_options.smin);
+if neuron.options.deconv_flag
+    justdeconv(neuron,neuron.options.deconv_options.method,neuron.options.deconv_options.type,neuron.options.deconv_options.smin);
+else
+    neuron.C = neuron.C_raw;   % deconvolution is off: C follows the rescaled traces
+end

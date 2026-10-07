@@ -104,8 +104,9 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 ### **🔹 Temporal Parameters**
 | Parameter Name    | Default Value | Description | How to Choose |
 |-------------------|--------------|-------------|--------------|
-| `deconv_flag`    | `true`       | Enable deconvolution | Use default if unsure. Enable for better temporal resolution. |
-| `deconv_options` | `struct('type', 'ar1', 'method', 'foopsi', 'smin', -5, 'optimize_pars', true, 'optimize_b', true, 'max_tau', 100)` | Deconvolution settings | Use default parameters to minimize false-positives and computational stability |
+| `deconv_flag`    | `true`       | Enable deconvolution | Keep enabled. If `false`, the traces are not deconvolved, during the iterations or at the end. |
+| `deconv_options` | `struct('type', 'ar1', 'method', 'foopsi', 'smin', -5, 'optimize_pars', true, 'optimize_b', true, 'max_tau', 100)` | Deconvolution used during the CNMF iterations | Keep the default. |
+| `final_deconv_options` | `struct('method', 'foopsi', 'type', 'ar2', 'smin', -5)` | Deconvolution of the final traces, after the CNMF iterations and after [manually_update_residuals](Functions_doc/manually_update_residuals.md#manually_update_residuals) | Keep the default. `smin` is the minimum event size in noise units (−5 = 5 × noise). |
 
 ---
 

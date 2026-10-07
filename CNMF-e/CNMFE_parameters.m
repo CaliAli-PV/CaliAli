@@ -56,6 +56,11 @@ addParameter(inp, 'deconv_options', struct('type', 'ar1', ... % model of the cal
     'optimize_pars', true, ...  % optimize AR coefficients
     'optimize_b', true, ...% optimize the baseline);
     'max_tau', 100), @isstruct);    % maximum decay time (unit: frame);
+% The final traces are deconvolved once more after the CNMF iterations (and after
+% manually_update_residuals), on noise-scaled, detrended traces, with a slower but
+% more accurate model than deconv_options. Skipped when deconv_flag is false.
+addParameter(inp, 'final_deconv_options', struct('method', 'foopsi', ...
+    'type', 'ar2', 'smin', -5), @isstruct);
 addParameter(inp, 'nk', 1, @isnumeric);             % detrending the slow fluctuation. usually 1 is fine (no detrending)
 addParameter(inp, 'detrend_method', 'spline');  % compute the local minimum as an estimation of trend.
 

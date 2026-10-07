@@ -35,17 +35,29 @@ function neuron = postprocessDeconvolvedTraces(neuron, method, type, smin)
 % Contact: pablo.vergara.g@ug.uchile.cl  
 % Date: 2025
 
-    % Default values for optional parameters
+    % Default values for optional parameters: the final_deconv_options saved with
+    % the extraction, or foopsi / ar2 / -5 for results from older versions.
+    fo = struct('method', 'foopsi', 'type', 'ar2', 'smin', -5);
+    try
+        saved = neuron.CaliAli_options.cnmf.final_deconv_options;
+        for f = fieldnames(fo)'
+            if isfield(saved, f{1}) && ~isempty(saved.(f{1}))
+                fo.(f{1}) = saved.(f{1});
+            end
+        end
+    catch
+        % no saved settings: keep the defaults above
+    end
     if ~exist('method', 'var')
-        method = 'foopsi';
+        method = fo.method;
     end
 
     if ~exist('type', 'var')
-        type = 'ar2';
+        type = fo.type;
     end
 
     if ~exist('smin', 'var')
-        smin = -5;
+        smin = fo.smin;
     end
 
     % Set deconvolution options

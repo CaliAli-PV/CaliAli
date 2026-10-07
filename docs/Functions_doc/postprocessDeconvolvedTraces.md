@@ -11,9 +11,9 @@ This function applies deconvolution to calcium traces and performs post-processi
 | Parameter Name | Type    | Description                                                                 |
 |---------------|---------|-----------------------------------------------------------------------------|
 | neuron        | struct  | A struct containing the raw calcium traces (neuron.C_raw).                 |
-| method        | string  | The deconvolution method to use (default is 'foopsi').                    |
-| type          | string  | The type of deconvolution (default is 'ar2').                            |
-| smin          | double  | Minimum threshold for deconvolution (default is -5).                     |
+| method        | string  | The deconvolution method to use (default: `final_deconv_options.method`, 'foopsi'). |
+| type          | string  | The type of deconvolution (default: `final_deconv_options.type`, 'ar2'). |
+| smin          | double  | Minimum threshold for deconvolution (default: `final_deconv_options.smin`, -5). |
 
 ##### Function Outputs:
 | Parameter Name | Type    | Description                                         |

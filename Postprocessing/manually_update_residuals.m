@@ -109,7 +109,11 @@ neuron=update_residual_Cn_PNR_batch(neuron);
 %% Optional post-process
 scale_to_noise(neuron);
 neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
-neuron = postprocessDeconvolvedTraces(neuron, 'foopsi','ar2',-5);
+if neuron.options.deconv_flag
+    neuron = postprocessDeconvolvedTraces(neuron);   % settings: cnmf.final_deconv_options
+else
+    neuron.C = neuron.C_raw;   % deconvolution is off: keep the traces as they are
+end
 
 %% Save results
 neuron.orderROIs('snr');
