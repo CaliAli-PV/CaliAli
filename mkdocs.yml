@@ -1,5 +1,5 @@
 site_name: CaliAli
-site_url: https://www.biorxiv.org/content/10.1101/2023.05.19.540935v1
+site_url: https://caliali-pv.github.io/CaliAli/
 theme:
   name: material
   custom_dir: overrides
@@ -88,6 +88,7 @@ nav:
 
   - Pipeline:
     - Downsampling: Downsampling.md
+    - Sessions Split Into Multiple Files: Processing_split_data.md
     - Motion Correction: Motion_correction.md
     - Inter-session Alignment: alignment.md
     - Calcium Signal extraction with CaliAli: extraction.md
@@ -97,6 +98,7 @@ nav:
     - Frequently Asked Questions: FAQ.md
     - CaliAli Parameters Overview: Parameters_index.md
     - List of Relevant functions: function_index.md
+    - Utilities: Utilities.md
 
   - Project:
     - What's New?: Version_History.md
@@ -108,4 +110,4 @@ extra_css:
 
 
 copyright: |
-  &copy; 2025 <a href="License"  target="_blank" rel="noopener">CaliAli</a>
+  &copy; 2025 <a href="https://caliali-pv.github.io/CaliAli/latest/License/"  target="_blank" rel="noopener">CaliAli</a>
