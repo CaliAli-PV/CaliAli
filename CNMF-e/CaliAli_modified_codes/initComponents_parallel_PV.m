@@ -293,6 +293,11 @@ fprintf(flog, '[%s]\b', get_minute());
 fprintf(flog, 'Start initializing neurons from frame %d to frame %d\n\n', frame_range(1), frame_range(2));
 
 
+% A new initialization decides the batches again, and every later step reads the
+% list it decides (see get_batch_size). The medians are cleared with it: a list
+% is rebuilt from them only for neurons saved before the list was kept.
+neuron.P.batch_frames = [];
+neuron.P.Ymean = [];
 [A,C_raw,C,S,Ymean,Cn_update] = int_temp_batch(neuron);
 
 %% export the results
