@@ -11,6 +11,9 @@ function F=get_batch_size(neuron)
 %   'auto'         batches sized from the free memory and the frame size
 %   <number>       batches of that many frames
 %
+% Under 'auto' and a number, each session is split on its own, so a batch never
+% straddles two sessions either; a session shorter than the size is one batch.
+%
 % A legacy 0 means 'per_session' here, which is what it has always meant in this
 % function, so saved option structs keep behaving the way they did.
 %
@@ -115,16 +118,22 @@ switch mode
         F = gF;
     otherwise   % 'auto' or a fixed number of frames
         chunk = compute_auto_batch_size(bz,[],[dims(1),dims(2)]);
-        chunk = round(chunk*0.5); %to account for overlaping patches and other variables
+        chunk = max(round(chunk*0.5), 1); %to account for overlaping patches and other variables
 
-        if chunk>0
-            if gF<chunk
-                fprintf(1, 'The defined batch size (%d) is larger than the number of frames in the video (%d). Processing the entire video in a single batch.\n', ...
-                    chunk,gF);
-                chunk=gF;
-            end
-
-            F=diff( round(linspace(0,gF,round(gF/chunk)+1)  )  );
+        % Each session is split on its own, into equal pieces no longer than
+        % the chunk, so no batch holds the end of one session and the start
+        % of the next. Sessions recorded on different days need not share a
+        % baseline, and a step in baseline INSIDE a batch is something
+        % neither the ring background nor the trace update can remove: both
+        % take one constant per batch. With sessions 10 units apart, batches
+        % across the boundary dropped F1 from 0.82 to 0.16, and one batch
+        % over all sessions to 0.03.
+        S = F;
+        F = [];
+        for s = 1:numel(S)
+            n = ceil(S(s)/chunk);
+            F = [F, diff(round(linspace(0, S(s), n+1)))]; %#ok<AGROW>
         end
 end
+fprintf(1, 'Extraction runs in %d batches of %d to %d frames.\n', numel(F), min(F), max(F));
 end
