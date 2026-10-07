@@ -153,11 +153,12 @@ try
     CaliAli_options.inter_session_alignment = opt;
 
 catch ME
+    % Only the incomplete outputs: out_pre also lists the _det files that were
+    % finished, in this run or an earlier one, and those must survive the error.
     if exist(out_pre{1}, 'file') == 2
-        delete(out_pre{:});
-        fprintf(1, 'Deleted incomplete files due to error.\n');
+        remove_corrupted_output(out_pre);
     end
-    fprintf(1, 'Motion correction failed: %s\n', ME.message);
+    fprintf(1, 'Detrending and projection calculation failed: %s\n', ME.message);
     rethrow(ME);
 end
 end
