@@ -2,8 +2,10 @@ function CaliAli_options=CaliAli_downsample(CaliAli_options)
 %% CaliAli_downsample: Downsample input video files in time and space.
 %
 % Reads in chunks, so memory use does not grow with recording length, and
-% PRESERVES THE SOURCE DATATYPE. The previous implementation of this function
-% cast everything to uint8 and added 1, which silently clipped uint16 and
+% writes the datatype set in downsampling.output_class (uint16 by default), not
+% necessarily that of the source; it warns when that type cannot hold the
+% recording's values. The previous implementation of this function cast
+% everything to uint8 and added 1, which silently clipped uint16 and
 % floating-point recordings: values above 254 all became 255. That version has
 % been removed; this one replaces it. Calls to CaliAli_downsample_batch still
 % work through a shim, which warns.
@@ -503,6 +505,9 @@ files=files(index);
 
 opt_local = opt;
 opt_local.input_files = fullfile({files.folder}, {files.name})';
+% Start from an empty list: the sub-call writes its outputs by position, so any
+% names left from files earlier in this call would be concatenated too.
+opt_local.output_files = [];
 
 sub_options = CaliAli_options;
 sub_options.downsampling = opt_local;
@@ -517,9 +522,31 @@ if ~exist(parent_dir, 'dir')
     mkdir(parent_dir);
 end
 outpath = fullfile(parent_dir, [session_dir '_con.mat']);
-CaliAli_concatenate_files(outpath, sub_options.downsampling.output_files);
+CaliAli_concatenate_files(outpath, sub_options.downsampling.output_files, ...
+    concatenated_options(sub_options));
 
 opt.output_files = [opt.output_files, {outpath}];
+end
+
+
+function o = concatenated_options(sub_options)
+%% The options saved in a _con file: those the segments were downsampled with,
+% plus each segment's sensor-defect record. Every segment was checked on raw
+% frames, so the joined recording has been too, and the later stages need not
+% check it again. If any segment has no record, none is written and they will.
+files = sub_options.downsampling.output_files;
+records = cell(1, numel(files));
+for i = 1:numel(files)
+    try
+        records{i} = CaliAli_load(files{i}, 'CaliAli_options.defects_repaired');
+    catch
+        % no options, or no such field: this segment was not checked
+    end
+end
+o = sub_options;
+if ~any(cellfun(@isempty, records))
+    o.defects_repaired = records;   % one record per segment
+end
 end
 
 
