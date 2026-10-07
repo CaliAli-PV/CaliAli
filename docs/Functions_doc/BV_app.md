@@ -48,7 +48,7 @@ The chosen Blood vessels sizes are [0.60, 2.00]
 
 ##### Internally, the function performs the following:
 - Loads the video using `CaliAli_load`.
+- Crops the frame to the region motion correction recorded as valid, if that crop is still pending.
 - Applies **vignetting correction** with `remove_vignetting_video_adaptive_batches`.
-- Applies **border removal** via `remove_borders`.
 - Detects blood vessel candidates using `BV_stack`.
 - Launches an interactive GUI using `BV_app_in` for manual range selection.
