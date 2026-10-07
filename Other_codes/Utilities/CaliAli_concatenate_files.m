@@ -81,21 +81,42 @@ if isfile(outpath)
     delete(outpath);
 end
 
-% --- Build the concatenated file ---
-vid=cell(1,numel(inputh));
+% --- Build the concatenated file, one piece at a time ---
+% Only one chunk of one segment is held in memory, so a session split into many
+% files needs no more memory than one of its pieces. The output is preallocated:
+% if the run is interrupted its last frame is still empty, and the check above
+% rebuilds it next time.
+first = matfile(inputh{1});
+sz1 = size(first, 'Y');
+d1 = sz1(1); d2 = sz1(2);
+cls = class(first.Y(1, 1, 1));
+m = matfile(outpath, 'Writable', true);
+m.Y(d1, d2, expected_frames) = cast(0, cls);   % creates the dataset on disk
+chunk = 1000;   % frames read and written at a time
+written = 0;
 for k=progress(1:numel(inputh))
-    vid{k}=CaliAli_load(inputh{k},'Y');
+    seg = matfile(inputh{k});
+    sz = size(seg, 'Y');
+    if sz(1) ~= d1 || sz(2) ~= d2
+        error('CaliAli:concatenate:sizeMismatch', ...
+            'Segment "%s" is %dx%d pixels, but the first segment is %dx%d.', ...
+            inputh{k}, sz(1), sz(2), d1, d2);
+    end
+    for a = 1:chunk:segment_F(k)
+        b = min(a + chunk - 1, segment_F(k));
+        m.Y(:, :, written + (a:b)) = cast(seg.Y(:, :, a:b), cls);
+    end
+    written = written + segment_F(k);
 end
-Y=cat(3,vid{:});
 
 % --- Guard: the assembled stack must contain every input frame ---
-if size(Y,3) ~= expected_frames
+if written ~= expected_frames
     error('CaliAli:concatenate:frameMismatch', ...
         'Concatenated frame count (%d) does not match the sum of inputs (%d).', ...
-        size(Y,3), expected_frames);
+        written, expected_frames);
 end
 
-CaliAli_save(outpath(:),Y,CaliAli_options);
+CaliAli_save(outpath(:),CaliAli_options);
 fprintf(1, 'Saved concatenated file %s (%d frames from %d segments).\n', ...
     out, expected_frames, numel(inputh));
 
