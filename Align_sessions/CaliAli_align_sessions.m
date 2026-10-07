@@ -90,8 +90,9 @@ CaliAli_options.inter_session_alignment.alignment_metrics = get_alignment_metric
 % Apply final transformations to the data
 CaliAli_options = apply_transformations(CaliAli_options);
 
-% Save the relevant variables
-save_relevant_variables(CaliAli_options);
+% Save the relevant variables, and return them too: Check_initialization_parameters
+% reads Cn and PNR from the options the caller holds.
+CaliAli_options = save_relevant_variables(CaliAli_options);
 
 end
 
@@ -285,7 +286,7 @@ get_neuron_projections_correlations(P, 3);
 
 end
 
-function save_relevant_variables(CaliAli_options)
+function CaliAli_options = save_relevant_variables(CaliAli_options)
 % SAVE_RELEVANT_VARIABLES Saves relevant variables after the alignment process.
 %   This function saves the final projections and aligned session data to the specified output path.
 
