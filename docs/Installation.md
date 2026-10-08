@@ -13,6 +13,9 @@ CaliAli runs in `MATLAB` and requires:
 
 ??? Question "Platform and format compatibility"
 	CaliAli supports `.avi / .m4v / .mp4 / .tif / .tiff / .h5 / .isxd (Inscopix)`, but requirements differ by operating system:
+
+	!!! warning "Version 1.5.0 not yet tested on older MATLAB versions"
+		The tests listed below were made with earlier versions of CaliAli. Version 1.5.0 has so far been tested only on MATLAB 2024b on Ubuntu. It has not yet been tested on MATLAB 2022a, the oldest version CaliAli is meant to run on, or on Windows or macOS.
 		
 	=== "Windows"
 		CaliAli has been successfully tested on MATLAB versions 2022a and 2023a running on Windows 11.
