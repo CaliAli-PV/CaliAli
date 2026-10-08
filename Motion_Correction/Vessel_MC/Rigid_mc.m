@@ -53,6 +53,13 @@ end
 options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false);
 
 % Perform motion correction on cropped reference.
+% NoRMCorre picks the frames for its first template at random from MATLAB's
+% global stream (randperm in normcorre_batch), so the correction depended on
+% whatever had drawn random numbers earlier in the session: the same file came
+% out cropped to a different size from one run to the next. A fixed seed makes
+% it repeatable, and the caller's random state is put back afterwards.
+prev_rng = rng(0, 'twister');
+restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
 if exist('template','var')
     tic; [~,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r,template); toc
 else

@@ -77,6 +77,13 @@ W = single(V);                       % carried in floating point between levels,
 valid = true(d1, d2);                % so repeated warps do not requantise
 probe = ones(d1, d2, size(V,3), 'single');
 
+% NoRMCorre picks the frames for its first template at random from MATLAB's
+% global stream (randperm in normcorre_batch), so without a fixed seed the
+% correction depended on whatever had drawn random numbers earlier in the
+% session. Each level starts from the same seed; the caller's random state is
+% put back afterwards.
+prev_rng = rng;
+restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
 for k = 1:levels
     npatch = k + 2;                  % level 1 is 3x3, level 2 is 4x4, ...
     [grid_size, mot_uf, max_dev, overlap_pre] = non_rigid_grid_default([d1 d2], npatch);
@@ -100,6 +107,7 @@ for k = 1:levels
 
     fprintf('Non-rigid level %d of %d: %dx%d patches over a %dx%d frame...\n', ...
         k, levels, npatch, npatch, d1, d2);
+    rng(0, 'twister');
     tic; [~, shifts, ~] = normcorre_batch(R, options_nr); toc
 
     W     = apply_shifts(W, shifts, options_nr);

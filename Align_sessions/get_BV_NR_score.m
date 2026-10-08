@@ -29,8 +29,10 @@ v=P.(size(P,2))(1,:).(k){1,1};
 % W=mat2gray(imgaussfilt(neuron,15)).^0.5;
 % v=mat2gray(v.*W);
 [d1,d2,~]=size(v);
-rng(123);%% For reproducibility
+% For reproducibility. The caller's random state is put back: it is theirs.
+prev_rng = rng(123);
 seeds=randi(10000,1,100);
+rng(prev_rng);
 parfor i=1:100
     rng(seeds(i));
     [dM]=Add_NRmotion_reg(v);
