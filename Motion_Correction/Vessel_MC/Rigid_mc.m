@@ -80,16 +80,20 @@ Ref=v2uint16(Ref); % Convert to uint16.
 % and after that removal a genuine 0 is indistinguishable from a filled one.
 %
 % The shift is known, so the valid region does not have to be guessed from the
-% data at all. The SAME translation is applied to a mask of true, and what comes
-% back is exactly which pixels are real. It is logical, so imtranslate resamples
-% it nearest-neighbour, which matches how the data itself is treated: a pixel
-% interpolated partly from real data counts as real in both.
+% data at all. The SAME translation, with the same linear interpolation, is
+% applied to a frame of ones, and only pixels that come back whole are real.
+% This used to translate a LOGICAL mask, which imtranslate resamples
+% nearest-neighbour: a pixel that was 40% fill came back as valid while its data
+% was 60% of its value. The crop then kept an edge ring whose brightness
+% flickered with the motion, and that ring alone cost extraction 0.05 to 0.11
+% F1 on a simulated recording (removing it took F1 from 0.714 to 0.763, and
+% from 0.547 to 0.656 with a 3 px deformation).
 Mr = zeros(size(Y), 'like', Y);
 valid = true(size(Y,1), size(Y,2));
 parfor i=1:size(Y,3)
     shift_i = flip(squeeze(shifts(i).shifts)');
     Mr(:,:,i) = imtranslate(Y(:,:,i), shift_i, 'FillValues', 0);
-    valid = valid & imtranslate(true(size(Y,1),size(Y,2)), shift_i, 'FillValues', 0);
+    valid = valid & imtranslate(ones(size(Y,1),size(Y,2),'single'), shift_i, 'FillValues', 0) >= 1 - 1e-4;
     Ref(:,:,i) = imtranslate(Ref(:,:,i), shift_i, 'FillValues', 0);
 end
 % VALID is already the intersection over every frame: a pixel is usable only if
