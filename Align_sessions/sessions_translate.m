@@ -47,6 +47,14 @@ options_r = NoRMCorreSetParms('d1', d1-bound1, 'init_batch', 1, ...
     'iter', 5, 'correct_bidir', false, 'shifts_method', 'fft', 'boundary', 'NaN');
 
 % Perform the NoRMCorre batch alignment
+% NoRMCorre picks the frames of its first template at random from MATLAB's
+% global stream (randperm in normcorre_batch), and with init_batch = 1 that is
+% the single session every other session is aligned to. The alignment therefore
+% depended on whatever had drawn random numbers earlier: on one recording the
+% aligned frame came out 71x110 after rng(1) and 51x93 after rng(2). A fixed
+% seed makes it repeatable; the caller's random state is put back afterwards.
+prev_rng = rng(0, 'twister');
+restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
 [M, shifts, ~] = normcorre_batch(ref(bound1/2+1:end-bound1/2, bound2/2+1:end-bound2/2, :), options_r);
 
 % Adjust the shifts to center them around the mean shift for each session
