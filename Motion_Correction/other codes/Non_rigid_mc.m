@@ -1,4 +1,4 @@
-function [V, valid] = Non_rigid_mc(V, ref, opt)
+function [V, valid] = Non_rigid_mc(V, ref, opt, valid_in)
 %% Non_rigid_mc: Correct non-rigid motion with NoRMCorre, coarse to fine.
 %
 % Runs AFTER Rigid_mc, on data whose whole-frame translation has already been
@@ -37,11 +37,16 @@ function [V, valid] = Non_rigid_mc(V, ref, opt)
 % with nothing to do with the cause. NoRMCorre needs nothing beyond Image
 % Processing, which the pipeline already requires.
 %
-% NO BORDER TRIM. Rigid_mc trims a border before estimating, to keep a
-% whole-frame correlation off the frame edge. That cannot be done here: a
-% piecewise shift is a field laid out on a grid, and the grid it is estimated on
-% has to be the grid it is applied on. max_dev gives the same protection by
-% another route.
+% ONLY THE REGION VALID IN EVERY FRAME. Rigid_mc fills what its translation
+% shifts in with 0, and those edges move with every frame. 8 of the 9 patches
+% touch a border, so they registered the moving edge: on static frames with
+% borders moving by 4 px rms the patch shifts varied by 0.98 px rms where they
+% should not move at all, against 0.08 px without the borders, and the harm grew
+% with how much a session shook. Given the region Rigid_mc left valid, the warp
+% is now estimated AND applied inside the largest rectangle valid in every
+% frame, so the grid it is estimated on is the grid it is applied on, and the
+% same frames give 0.16 px. Everything outside that rectangle is marked invalid;
+% the crop that follows motion correction discards it anyway.
 %
 % Inputs:
 %   V   - the video, already translated by Rigid_mc
@@ -50,6 +55,8 @@ function [V, valid] = Non_rigid_mc(V, ref, opt)
 %         is the wrong image for a patch. See highpass_reference.
 %   opt - motion correction options. Reads non_rigid_levels and
 %         non_rigid_highpass_sigma.
+%   valid_in - optional logical [d1 d2], the region Rigid_mc left valid in
+%         every frame. Without it the whole frame is used, as before.
 %
 % Outputs:
 %   V     - the warped video, same class and size
@@ -58,6 +65,15 @@ function [V, valid] = Non_rigid_mc(V, ref, opt)
 %           to the data happens to the mask and no pixel value is inspected.
 %
 % Author: Pablo Vergara
+
+if nargin >= 4 && ~isempty(valid_in) && ~all(valid_in(:))
+    [~, rows, cols] = largest_valid_rectangle(valid_in);
+    [Vc, valid_c] = Non_rigid_mc(V(rows, cols, :), ref, opt);
+    V(rows, cols, :) = Vc;
+    valid = false(size(valid_in));
+    valid(rows, cols) = valid_c;
+    return
+end
 
 [d1, d2, ~] = size(V);
 orig_class = class(V);

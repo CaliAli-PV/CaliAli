@@ -106,7 +106,7 @@ try
         if opt.do_non_rigid
             % The warp fills its own borders, so its valid region has to be
             % folded in or those borders would never be cropped away.
-            [Y, valid_nr] = Non_rigid_mc(Y, ref, opt);
+            [Y, valid_nr] = Non_rigid_mc(Y, ref, opt, valid);
             valid = valid & valid_nr;
         end
 
