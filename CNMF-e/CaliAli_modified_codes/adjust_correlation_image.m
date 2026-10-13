@@ -17,7 +17,8 @@ function Cn = adjust_correlation_image(Cn)
 % Notes:
 %   - The background level is the highest point of a kernel density estimate
 %     of the pixel values. Its smoothing is set in units of correlation, so the
-%     level does not depend on the size of the frame.
+%     level does not depend on the size of the frame. Only the lower half of
+%     the range of values is searched.
 %   - The level used to be read from a histogram with one bin per 100 pixels,
 %     smoothed with a moving median 60 bins wide and searched only in its lower
 %     half. On a small frame that window covers most of the histogram: at
@@ -40,7 +41,15 @@ if min(values) == max(values)
     background = values(1);
 else
     [density, level] = ksdensity(values, linspace(min(values), max(values), 1000));
-    [~, I] = max(density);
+    % Only the lower half of the range can be background. A session with frames
+    % that motion correction got wrong has a correlation image that is high
+    % nearly everywhere (median 0.80 instead of 0.60), and its most common value
+    % is then that plateau (0.957): 80% of the pixels fell below the level and,
+    % squared, became the whole image, so the session came out inverted and
+    % correlated at -0.38 with the others. Searched below the middle, the level
+    % stays on the background.
+    lower = level <= (min(values) + max(values))/2;
+    [~, I] = max(density(lower));
     background = level(I);
 end
 
