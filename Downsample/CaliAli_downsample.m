@@ -447,7 +447,9 @@ function batch_size = resolve_batch_size(batch_sz, out_sz, Fds)
 [mode, n] = resolve_batch_mode(batch_sz, 'all_frames');
 switch mode
     case 'fixed'
-        batch_size = min(Fds, n);
+        % Through compute_auto_batch_size, so the minimum batch length and
+        % its warning are the same here as in every other stage.
+        batch_size = min(Fds, compute_auto_batch_size(n, [], [out_sz(1), out_sz(2)]));
     case {'all_frames', 'per_session'}
         batch_size = Fds;
     otherwise   % 'auto'

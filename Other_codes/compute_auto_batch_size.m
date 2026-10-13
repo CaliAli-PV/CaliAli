@@ -16,17 +16,35 @@ function [batch_sz, total_system_memory_GB] = compute_auto_batch_size(batch_sz,f
 %   d        - [d1 d2] frame size, to avoid touching the file
 %
 % Outputs:
-%   batch_sz               - frames per batch, 0 meaning "no splitting"
+%   batch_sz               - frames per batch, 0 meaning "no splitting". Never
+%                            below 1000 otherwise: see MIN_BATCH below.
 %   total_system_memory_GB - 0 unless 'auto' had to measure it
 %
 % Author: Pablo Vergara
 
 total_system_memory_GB=0;
 
+% THE SHORTEST BATCH ALLOWED. Every batch is processed on its own: detrended
+% over a window of 50 frames, scaled by a noise level estimated inside it,
+% given its own correlation image, its own template. A batch of a few dozen
+% frames holds too little for any of that. With 25-frame batches the
+% correlation images were mostly noise, the blood-vessel score fell under its
+% gate (2.50 against 2.91 to 3.01) and the neuron-based alignment that took
+% over shifted one session by about 20 px where the true offset was under 1.
+% A recording shorter than this is simply one batch.
+MIN_BATCH = 1000;
+
 [mode, n] = resolve_batch_mode(batch_sz);
 switch mode
     case 'fixed'
         batch_sz = n;
+        if batch_sz < MIN_BATCH
+            warning('CaliAli:BatchSize:tooSmall', ...
+                ['batch_sz = %d is below the minimum of %d frames. Using %d. ' ...
+                 'Shorter batches do not hold enough frames to detrend, scale and ' ...
+                 'align the recording reliably.'], batch_sz, MIN_BATCH, MIN_BATCH);
+            batch_sz = MIN_BATCH;
+        end
         return
     case {'all_frames','per_session'}
         batch_sz = 0;
@@ -65,7 +83,14 @@ if fit < batch_sz
     cprintf('-comment','Batch size capped by the %.1f GB of free RAM.\n', free_system_memory_GB);
 end
 % 0 means "do not split", the opposite of what a machine short of memory needs.
-batch_sz = max(batch_sz, 100);
+if batch_sz < MIN_BATCH
+    warning('CaliAli:BatchSize:tooSmall', ...
+        ['The free memory (%.1f GB) holds fewer than %d frames of this size per ' ...
+         'batch. Using %d, the minimum. If MATLAB runs out of memory, close ' ...
+         'other programs or reduce the number of parallel workers.'], ...
+        free_system_memory_GB, MIN_BATCH, MIN_BATCH);
+    batch_sz = MIN_BATCH;
+end
 cprintf('-comment','Automatically set batch size to %d frames based on %.1f GB RAM and (%dx%d ) frame size.\n', ...
     batch_sz, total_system_memory_GB,d(1),d(2));
 

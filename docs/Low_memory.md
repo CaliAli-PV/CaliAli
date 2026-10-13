@@ -21,7 +21,7 @@ For details on how CaliAli expects parameters to be defined and parsed, see [Rec
 | Value | What it does |
 |-------|--------------|
 | `'auto'` (default) | Picks a chunk size from your memory and frame size, and never asks for more memory than is currently free. |
-| a number, e.g. `1000` | Number of frames per chunk. |
+| a number, e.g. `2000` | Number of frames per chunk. The minimum is 1000; a smaller number is raised to 1000 with a warning. |
 | `'all_frames'` | No chunking: each step loads the whole recording at once. |
 | `'per_session'` | One chunk per session, so no chunk spans two sessions. |
 
@@ -33,7 +33,7 @@ For 512×512 pixel videos, `'auto'` picks about:
 
 | System RAM | `'auto'` (frames) |
 |------------|-------------------|
-| 8 GB       | ≈ 600             |
+| 8 GB       | 1000 (the minimum) |
 | 16 GB      | ≈ 1200            |
 | 32 GB      | ≈ 2400            |
 | 64 GB+     | ≥ 4800            |

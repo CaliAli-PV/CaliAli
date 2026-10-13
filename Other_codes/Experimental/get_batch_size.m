@@ -118,7 +118,9 @@ switch mode
         F = gF;
     otherwise   % 'auto' or a fixed number of frames
         chunk = compute_auto_batch_size(bz,[],[dims(1),dims(2)]);
-        chunk = max(round(chunk*0.5), 1); %to account for overlaping patches and other variables
+        % Halved to account for overlaping patches and other variables, but not
+        % below the shortest batch compute_auto_batch_size allows.
+        chunk = max(round(chunk*0.5), 1000);
 
         % Each session is split on its own, into equal pieces no longer than
         % the chunk, so no batch holds the end of one session and the start
