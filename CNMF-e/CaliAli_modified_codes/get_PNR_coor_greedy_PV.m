@@ -79,27 +79,8 @@ parfor i=1:size(Y_A,1)
     cn_all(:,:,i) = correlation_image(Y_A{i}, 8, d1,d2,[],[]);
 end
 
-cn=adjust_C(max(cn_all,[],3));
+cn=adjust_correlation_image(max(cn_all,[],3));
 cn=medfilt2(cn);
 pnr=medfilt2(pnr);
 
 end
-
-
-function Cn=adjust_C(Cn)
-temp=Cn(Cn~=0);
-N=round(numel(temp)/size(Cn,3)/100);
-[Y,X]=histcounts(temp(:),N);
-X=X(1:end-1);
-Y=Y./sum(Y);
-Y=movmedian(Y,60);
-
-[~,I]=max(Y(1:round(N/2)));
- Cn=Cn-X(I);
- Cn=Cn.^2;
-end
-
-
-
-
-
