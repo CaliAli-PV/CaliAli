@@ -60,9 +60,10 @@ function [V, valid] = Non_rigid_mc(V, ref, opt, valid_in)
 %
 % Outputs:
 %   V     - the warped video, same class and size
-%   valid - logical [d1 d2], true where every level left real data. Derived by
-%           putting a frame of ones through the SAME warps, so whatever happens
-%           to the data happens to the mask and no pixel value is inspected.
+%   valid - logical [d1 d2], true inside the rectangle every level left real
+%           data in. Derived by putting a frame of ones through the SAME warps,
+%           so whatever happens to the data happens to the mask and no pixel
+%           value is inspected. Outside it V keeps what it was given.
 %
 % Author: Pablo Vergara
 
@@ -90,8 +91,9 @@ end
 if size(V,3) < 200, binz = size(V,3); else, binz = 200; end
 
 W = single(V);                       % carried in floating point between levels,
-valid = true(d1, d2);                % so repeated warps do not requantise
-probe = ones(d1, d2, size(V,3), 'single');
+                                     % so repeated warps do not requantise
+rows = 1:d1;                         % the part of the frame W covers; it shrinks
+cols = 1:d2;                         % after every level, see the end of the loop
 
 % NoRMCorre picks the frames for its first template at random from MATLAB's
 % global stream (randperm in normcorre_batch), so without a fixed seed the
@@ -102,13 +104,14 @@ prev_rng = rng;
 restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
 for k = 1:levels
     npatch = k + 2;                  % level 1 is 3x3, level 2 is 4x4, ...
-    [grid_size, mot_uf, max_dev, overlap_pre] = non_rigid_grid_default([d1 d2], npatch);
+    [w1, w2, ~] = size(W);
+    [grid_size, mot_uf, max_dev, overlap_pre] = non_rigid_grid_default([w1 w2], npatch);
 
     % The reference is rebuilt from the CURRENT data, so a later level registers
     % what is left rather than re-estimating what an earlier one already removed.
     R = highpass_reference(W, sigma);
 
-    options_nr = NoRMCorreSetParms('d1',d1,'d2',d2,'bin_width',binz, ...
+    options_nr = NoRMCorreSetParms('d1',w1,'d2',w2,'bin_width',binz, ...
         'max_shift',20,'iter',1,'correct_bidir',false, ...
         'grid_size',grid_size,'mot_uf',mot_uf,'max_dev',max_dev, ...
         'overlap_pre',overlap_pre,'overlap_post',overlap_pre, ...
@@ -122,24 +125,29 @@ for k = 1:levels
     % the high pass is for.
 
     fprintf('Non-rigid level %d of %d: %dx%d patches over a %dx%d frame...\n', ...
-        k, levels, npatch, npatch, d1, d2);
+        k, levels, npatch, npatch, w1, w2);
     rng(0, 'twister');
     tic; [~, shifts, ~] = normcorre_batch(R, options_nr); toc
 
     W     = apply_shifts(W, shifts, options_nr);
-    probe = apply_shifts(probe, shifts, options_nr);
+    probe = apply_shifts(ones(w1, w2, size(W,3), 'single'), shifts, options_nr);
 
-    % The warp fills what it pushes out of frame with NaN, and a NaN anywhere
-    % makes the whole transform NaN at the next level -- the correlation peak
-    % search then finds nothing and returns empty, which fails deeper in
-    % dftregistration_min_max with a message about logical operands. The
-    % validity of those pixels is carried by PROBE, so the data itself is
-    % zeroed: after the high pass a constant region is exactly zero and
-    % contributes nothing to the correlation, which is what is wanted.
-    W(isnan(W)) = 0;
+    % KEEP ONLY WHAT EVERY FRAME STILL HOLDS. The warp fills what it pushes out
+    % of frame, and those edges move with every frame, exactly like the borders
+    % the rigid stage leaves. Left in, the next level registered them: on a
+    % recording with no deformation the 4x4 level's shifts varied by 0.79 to
+    % 0.86 px rms and the motion left rose from 0.14 to 0.49 px, and with a
+    % 1.5 px deformation the level failed inside dftregistration_min_max. So
+    % the data is cut to the largest rectangle that is real in every frame
+    % before the next level sees it. PROBE, a frame of ones put through the
+    % SAME warp, says which pixels those are, so no pixel value is inspected.
+    [~, r, c] = largest_valid_rectangle(all(probe >= 1 - 1e-4 & ~isnan(probe), 3));
+    W = W(r, c, :);
+    rows = rows(r);
+    cols = cols(c);
 end
 
-valid = all(probe >= 1 - 1e-4 & ~isnan(probe), 3);
-W(isnan(W)) = 0;
-V = cast(W, orig_class);
+valid = false(d1, d2);
+valid(rows, cols) = true;
+V(rows, cols, :) = cast(W, orig_class);
 end
