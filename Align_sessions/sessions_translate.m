@@ -82,9 +82,15 @@ end
 % the DATA with imtranslate. A mask taken from the projections therefore
 % described a slightly different border from the one the data actually gets. The
 % mask's job is to describe the data, so it is built the way the data is moved.
+%
+% And from a frame of ones, not of true. imtranslate moves a logical image by
+% nearest neighbour, so after a 0.3 px shift the edge column came back valid
+% while the data there was 70% pixel and 30% fill. That column then carried 70%
+% of the offset the preprocessing adds (14 of 20 units), a baseline step at the
+% frame edge between sessions. Only a pixel that is entirely data is valid.
 valid = true(d1, d2);
 for i = 1:size(T, 1)
-    valid = valid & imtranslate(true(d1, d2), T(i, :), 'FillValues', 0);
+    valid = valid & imtranslate(ones(d1, d2, 'single'), T(i, :), 'FillValues', 0) >= 1 - 1e-4;
 end
 [Mask, rows, cols] = largest_valid_rectangle(valid);
 

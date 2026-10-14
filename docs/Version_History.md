@@ -11,7 +11,7 @@
 - **Interrupted and repeated runs**: Re-running a step on a finished folder crashed, resuming after an interruption skipped the final cropping step, and small output files could be deleted as if they were broken. All three are fixed.
 - **Your MATLAB workspace**: Running extraction erased the variables in your workspace. It no longer touches your workspace.
 - **Correct residuals**: The residual movie in `play_movie` and the residual image used to find missed neurons removed too much signal. Both are now correct.
-- **Cleaner edges after motion correction**: The motion-corrected video kept a one-pixel border whose brightness changed with the motion, which made neuron extraction less accurate. That border is now cropped.
+- **Cleaner edges after motion correction and alignment**: The motion-corrected and aligned videos kept a one-pixel border whose brightness changed with the motion or differed between sessions, which made neuron extraction less accurate. That border is now cropped.
 - **Same correlation image whatever the frame size**: On small frames, the correlation image used to align sessions and to find neurons could change by a factor of two when the frame lost a single pixel at its border. It now stays the same.
 - **Memory settings reach neuron extraction**: With `batch_sz = 'all_frames'`, neuron extraction still ran one session at a time, and with `'auto'` its chunk size was decided during alignment. Extraction now uses the setting as you gave it, and fixes its chunks when it starts, so a change in free memory part way through cannot change them.
 - **Detrending off**: With `detrend = 0`, extraction stopped with an error after the main iterations. It now completes.
