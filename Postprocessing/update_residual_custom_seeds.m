@@ -20,7 +20,12 @@ for i=progress(1:size(fn,2)-1)
     Y=Y-single(A*C_mu(:,fn(i)+1:fn(i+1)));
     Y = Y-single(reshape(reconstruct_background_residual(neuron,[fn(i)+1,fn(i+1)]), [], size(Y,2)));
 
-    Y=uint16(reshape(Y,d1,d2,[]));
+    % Kept signed. The residual is centred on zero, and stored as an unsigned
+    % integer, as the initialization's raw movie is, every negative value became
+    % 0: half the noise flattened before new components were fitted to it.
+    % extract_ac fits an offset and the local background, so it needs no
+    % positive baseline.
+    Y=reshape(Y,d1,d2,[]);
 
 
     if ~ismatrix(Y); Y = reshape(Y, d1*d2, []); end % convert the 3D movie to a matrix

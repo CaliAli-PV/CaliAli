@@ -61,8 +61,10 @@ while true
     %% update video;
     if isa(Y, 'uint8')
         Y = Y - uint8(a * c);
-    else
+    elseif isinteger(Y)
         Y = Y - uint16(a * c);
+    else
+        Y = Y - cast(a * c, 'like', Y);   % a signed residual, see update_residual_custom_seeds
     end
     HY = HY - single(af * c);
 
