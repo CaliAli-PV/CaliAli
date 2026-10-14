@@ -27,7 +27,7 @@ params.do_non_rigid = true;    % off by default
 params.non_rigid_levels = 1;   % 1 = coarse 3×3 grid; each extra level adds a finer grid (4×4, 5×5, …)
 ```
 
-Start with `non_rigid_levels = 1`. Higher levels correct finer deformations, but each one adds another registration pass.
+Start with `non_rigid_levels = 1`. **If motion artifacts remain, `non_rigid_levels` is the first parameter to increase**: try 2, then 3. Each level corrects what the one before it left. On simulated recordings, 1, 2 and 3 levels removed about 28 %, 46 % and 54 % of the deformation. Going above 3 gains little, and each level trims about one pixel from every side of the field of view and adds another registration pass.
 
 To judge the result, compare it with the rigid-only output in [view_Ca_video()](Functions_doc/view_Ca_video.md#view_Ca_video). Keep non-rigid correction only if local drift is visibly reduced and the field of view is not warped.
 
