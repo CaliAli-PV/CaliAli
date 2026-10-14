@@ -20,7 +20,8 @@ function file_path=runCNMFe(in)
 %   - Updates residuals to refine extracted signals.
 %   - Applies optional post-processing steps, including:
 %       - False positive removal.
-%       - Noise scaling and trace detrending.
+%       - Noise scaling, trace detrending and final deconvolution, unless
+%         cnmf.postprocess_traces is false.
 %       - Ordering ROIs based on SNR.
 %   - Saves the updated neuron structure for future analysis.
 %
@@ -110,13 +111,17 @@ save_workspace(neuron);
 
 
 %% Optional post-process
-cprintf('*blue','----------------Post-processing extracted traces----------------\n');
-scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
-if neuron.options.deconv_flag
-    neuron = postprocessDeconvolvedTraces(neuron);   % settings: cnmf.final_deconv_options
+if postprocess_traces_enabled(neuron)   % settings: cnmf.postprocess_traces
+    cprintf('*blue','----------------Post-processing extracted traces----------------\n');
+    scale_to_noise(neuron);
+    neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
+    if neuron.options.deconv_flag
+        neuron = postprocessDeconvolvedTraces(neuron);   % settings: cnmf.final_deconv_options
+    else
+        neuron.C = neuron.C_raw;   % deconvolution is off: keep the traces as they are
+    end
 else
-    neuron.C = neuron.C_raw;   % deconvolution is off: keep the traces as they are
+    cprintf('*blue','Post-processing of the traces is off: they stay as the iterations left them, in movie units.\n');
 end
 
 

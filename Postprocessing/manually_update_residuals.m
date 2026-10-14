@@ -78,6 +78,9 @@ if trace_noise_scale(neuron, 'has')
     neuron.C_raw = trace_noise_scale(neuron, 'apply', neuron.C_raw);
     neuron.C     = trace_noise_scale(neuron, 'apply', neuron.C);
     trace_noise_scale(neuron, 'clear');   % they are in movie units now
+elseif ~postprocess_traces_enabled(neuron)
+    % The extraction skipped the post-processing, so the traces were never
+    % scaled: they are in movie units already.
 elseif update_temporal
     % No gain recorded: an extraction saved before it was kept. Fall back to
     % re-estimating, which is what put the traces on the movie scale before.
@@ -107,12 +110,14 @@ neuron.remove_false_positives();
 neuron=update_residual_Cn_PNR_batch(neuron);
 
 %% Optional post-process
-scale_to_noise(neuron);
-neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
-if neuron.options.deconv_flag
-    neuron = postprocessDeconvolvedTraces(neuron);   % settings: cnmf.final_deconv_options
-else
-    neuron.C = neuron.C_raw;   % deconvolution is off: keep the traces as they are
+if postprocess_traces_enabled(neuron)   % settings: cnmf.postprocess_traces
+    scale_to_noise(neuron);
+    neuron.C_raw=detrend_Ca_traces(neuron.sf*2,neuron.C_raw,get_batch_size(neuron));
+    if neuron.options.deconv_flag
+        neuron = postprocessDeconvolvedTraces(neuron);   % settings: cnmf.final_deconv_options
+    else
+        neuron.C = neuron.C_raw;   % deconvolution is off: keep the traces as they are
+    end
 end
 
 %% Save results

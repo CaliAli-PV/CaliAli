@@ -61,6 +61,13 @@ addParameter(inp, 'deconv_options', struct('type', 'ar1', ... % model of the cal
 % more accurate model than deconv_options. Skipped when deconv_flag is false.
 addParameter(inp, 'final_deconv_options', struct('method', 'foopsi', ...
     'type', 'ar2', 'smin', -5), @isstruct);
+% Post-processing of the final traces, after the CNMF iterations and after
+% manually_update_residuals: scale_to_noise (noise units, and a straight-line
+% trend removed per batch), detrend_Ca_traces (removes what stays up for longer
+% than about 100 s) and, with deconv_flag, the final deconvolution. False keeps
+% the traces as the iterations left them, in movie units, so slow calcium
+% signals survive. See postprocess_traces_enabled.
+addParameter(inp, 'postprocess_traces', true, @(x) isscalar(x) && (islogical(x) || isnumeric(x)));
 addParameter(inp, 'nk', 1, @isnumeric);             % detrending the slow fluctuation. usually 1 is fine (no detrending)
 addParameter(inp, 'detrend_method', 'spline');  % compute the local minimum as an estimation of trend.
 

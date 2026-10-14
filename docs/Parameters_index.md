@@ -107,6 +107,7 @@ This page lists the **CaliAli parameters** you are most likely to set, their **d
 | `deconv_flag`    | `true`       | Enable deconvolution | Keep enabled. If `false`, the traces are not deconvolved, during the iterations or at the end. |
 | `deconv_options` | `struct('type', 'ar1', 'method', 'foopsi', 'smin', -5, 'optimize_pars', true, 'optimize_b', true, 'max_tau', 100)` | Deconvolution used during the CNMF iterations | Keep the default. |
 | `final_deconv_options` | `struct('method', 'foopsi', 'type', 'ar2', 'smin', -5)` | Deconvolution of the final traces, after the CNMF iterations and after [manually_update_residuals](Functions_doc/manually_update_residuals.md#manually_update_residuals) | Keep the default. `smin` is the minimum event size in noise units (−5 = 5 × noise). |
+| `postprocess_traces` | `true` | After the CNMF iterations and after [manually_update_residuals](Functions_doc/manually_update_residuals.md#manually_update_residuals), scale the traces to noise units, detrend them and, with `deconv_flag`, deconvolve them once more | Keep `true`. Set `false` for slow calcium signals: the final detrending removes anything that stays up for longer than about 100 s. The traces then stay in movie units. |
 
 ---
 
