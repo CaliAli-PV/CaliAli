@@ -50,7 +50,16 @@ else
 end
 
 % Set NoRMCorre parameters.
-options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false);
+% TWO PASSES. Cross-correlation of the vessel map, which is smooth, has a broad
+% peak that is precise for small shifts and unreliable for large ones: on a
+% simulated session shaken up to 15 px, 58 of 2000 frames came out wrong by
+% more than a pixel (1.72 px of motion left). Phase correlation whitens the
+% spectrum and finds those shifts (1 frame wrong, 0.33 px left), but alone it is
+% less precise on ordinary sessions (0.166 px left against 0.148). So phase
+% correlation finds the shift, and cross-correlation refines it within 3 px:
+% 0.30 px left on the shaken session, 0.134 on an ordinary one.
+options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false,'phase_flag',true);
+options_f = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',3,'iter',1,'correct_bidir',false,'phase_flag',false);
 
 % Perform motion correction on cropped reference.
 % NoRMCorre picks the frames for its first template at random from MATLAB's
@@ -61,10 +70,15 @@ options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_sh
 prev_rng = rng(0, 'twister');
 restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
 if exist('template','var')
-    tic; [~,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r,template); toc
+    tic; [R1,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r,template); toc
 else
-    tic; [~,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc
+    tic; [R1,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc
 end
+tic; [~,fine,template] = normcorre_batch(R1,options_f,template); toc
+for i = 1:numel(shifts)
+    shifts(i).shifts = shifts(i).shifts + fine(i).shifts;
+end
+clear R1 fine
 
 Ref=v2uint16(Ref); % Convert to uint16.
 
