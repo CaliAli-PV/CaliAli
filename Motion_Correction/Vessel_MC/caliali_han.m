@@ -1,30 +1,31 @@
 function y = caliali_han(x)
-%% caliali_han: Taper a patch before its transform, so the seam does not show.
+%% caliali_han: Taper a whole frame before its transform, so the seam does not show.
 %
-% Replaces NoRMCorre's han for the calls CaliAli makes. Two changes: the patch
-% mean is subtracted first, and the taper is a true Hann window rather than a
-% Hamming one.
+% Used by normcorre_batch, with windowing on (non-rigid correction only), for the
+% whole-frame shift that centres the search of every patch. The PATCHES keep
+% NoRMCorre's own han. Two changes from han: the mean is subtracted first, and
+% the taper is a true Hann window rather than a Hamming one.
 %
-% WHY IT MATTERS. The correlation NoRMCorre maximises is circular, so a patch's
-% left edge sits next to its right edge and that seam produces a spurious peak
-% at zero shift -- the bias that pulls every estimate toward finding no motion.
-% A taper removes the seam, but only if the edges actually reach zero. Hamming
-% bottoms out at 0.08, so on a patch carrying any offset most of the seam
-% survived. Subtracting the mean first is what lets the taper finish the job.
+% WHY IT EXISTS. The correlation NoRMCorre maximises is circular, so the left
+% edge sits next to the right edge and that seam produces a spurious peak at
+% zero shift -- the bias that pulls every estimate toward finding no motion. A
+% taper removes the seam only if the edges actually reach zero. Hamming bottoms
+% out at 0.08, so on an image carrying any offset most of the seam survived.
 %
-% Measured on ONE simulation with a known 1.5 px rms deformation, reporting the
-% residual misalignment left behind:
+% NOT ON THE PATCHES. It was written for them, and measured better there before
+% the non-rigid correction registered a high-passed reference and cut its moving
+% borders between levels. With those, motion left after correction (px, levels
+% 1 / 2 / 3; rigid alone leaves 0.134, 0.432 and 0.826):
 %
-%                        NoRMCorre's han    this one
-%   one 3x3 level            1.141 px        0.757 px
-%   two levels               1.313           0.673
-%   four levels              0.770           0.550
+%                       han on the patches     caliali_han on the patches
+%   no deformation      0.134 / 0.144 / 0.159   0.223 / 0.297 / 0.333
+%   1.5 px deformation  0.319 / 0.262 / 0.243   0.279 / 0.314 / 0.347
+%   3 px deformation    0.603 / 0.454 / 0.386   0.418 / 0.344 / 0.363
 %
-% NoRMCorre's version is also non-monotonic in the number of levels, which a
-% cascade refining its own residual should never be. That much is structural and
-% does not depend on the recording. The sizes above do: they are one sample, and
-% whether the improvement reaches the extracted neurons was not measurable above
-% the variation between recordings.
+% On the patches it made a still recording worse than rigid correction alone,
+% and every added level worse again. With han, non-rigid correction never did
+% worse than rigid alone and each level helped, which is what the advice to
+% raise non_rigid_levels assumes.
 %
 % WHY IT IS NOT CALLED han. It could have replaced the vendored file, and did at
 % first. But a user with their own NoRMCorre installation would then have two

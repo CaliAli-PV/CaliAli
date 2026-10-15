@@ -210,7 +210,7 @@ use_windowing = options.use_windowing;
 phase_flag = options.phase_flag;
 
 if use_windowing
-    fftTemp = cellfun(@fftn,cellfun(@caliali_han,template,'un',0),'un',0);
+    fftTemp = cellfun(@fftn,cellfun(@han,template,'un',0),'un',0);
     fftTempMat = fftn(caliali_han(temp_mat));
 else
     fftTemp = cellfun(@fftn,template,'un',0);
@@ -301,7 +301,7 @@ for it = 1:iter
             maxY = max(Yt(:));
             Yc = mat2cell_ov(Yt,xx_s,xx_f,yy_s,yy_f,zz_s,zz_f,overlap_pre,sizY);
             if use_windowing
-                fftY = cellfun(@fftn, cellfun(@caliali_han,Yc, 'un',0),'un',0);
+                fftY = cellfun(@fftn, cellfun(@han,Yc, 'un',0),'un',0);
             else
                 fftY = cellfun(@fftn, Yc, 'un',0);
             end
@@ -476,7 +476,7 @@ for it = 1:iter
             end
             temp_mat = cell2mat_ov(template,xx_s,xx_f,yy_s,yy_f,zz_s,zz_f,overlap_pre,sizY);
             if use_windowing
-                fftTemp = cellfun(@fftn, cellfun(@caliali_han,template, 'un',0),'un',0);
+                fftTemp = cellfun(@fftn, cellfun(@han,template, 'un',0),'un',0);            
                 fftTempMat = fftn(caliali_han(temp_mat));            
             else
                 fftTemp = cellfun(@fftn, template, 'un',0);            
