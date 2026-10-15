@@ -123,6 +123,8 @@ for k = 1:levels
     % every estimate toward nothing. Tapering removes the seam, but only works
     % on an image that is already close to zero-mean, which is the other thing
     % the high pass is for.
+    options_nr.max_shift(1:2) = min(options_nr.max_shift(1:2), ...
+        patch_shift_limit(grid_size, mot_uf, overlap_pre, [w1 w2], options_nr.min_patch_size));
 
     fprintf('Non-rigid level %d of %d: %dx%d patches over a %dx%d frame...\n', ...
         k, levels, npatch, npatch, w1, w2);
@@ -150,4 +152,23 @@ end
 valid = false(d1, d2);
 valid(rows, cols) = true;
 V(rows, cols, :) = cast(W, orig_class);
+end
+
+
+function lim = patch_shift_limit(grid_size, mot_uf, overlap, frame_size, min_patch_size)
+%% The largest whole-frame shift every patch of this grid can still represent.
+%
+% NoRMCorre first registers the whole frame, within max_shift, and then searches
+% each patch within max_dev of that shift. A patch n pixels across represents
+% shifts of about n/2 at most. When the whole-frame shift lies beyond that, the
+% patch's search window holds nothing, the peak search comes back empty, and
+% normcorre_batch fails inside dftups ("Arrays have incompatible sizes"). It did
+% on a simulated recording with a 6 px deformation whose rigid correction had
+% left a few frames 20 to 30 px off. Capping max_shift at what the smallest
+% patch represents keeps every window non-empty; on a recording rigid correction
+% handled, the residual shift is far below the cap and nothing changes.
+[xs, xf, ys, yf] = construct_grid(grid_size, mot_uf, frame_size(1), frame_size(2), 1, min_patch_size);
+n1 = min(min(xf + overlap(1), frame_size(1)) - max(xs - overlap(1), 1) + 1);
+n2 = min(min(yf + overlap(2), frame_size(2)) - max(ys - overlap(2), 1) + 1);
+lim = max(1, floor([n1 n2]/2) - 1);
 end
