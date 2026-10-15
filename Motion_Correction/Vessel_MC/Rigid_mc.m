@@ -58,8 +58,17 @@ end
 % less precise on ordinary sessions (0.166 px left against 0.148). So phase
 % correlation finds the shift, and cross-correlation refines it within 3 px:
 % 0.30 px left on the shaken session, 0.134 on an ordinary one.
+%
+% AND CROSS-CORRELATION ALONE, FRAME BY FRAME. Phase correlation weights every
+% frequency equally, and on a deformed frame the fine ones no longer match: on a
+% simulated recording with a 6 px deformation it put 26 of 1500 frames more
+% than 5 px off (the worst 33 px), where cross-correlation alone put none, and
+% the refinement within 3 px cannot bring such a frame back. So cross-
+% correlation alone is run as well, and where the two disagree by more than a
+% pixel the frame takes whichever shift makes it match the template better.
 options_r = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false,'phase_flag',true);
 options_f = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',3,'iter',1,'correct_bidir',false,'phase_flag',false);
+options_x = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_shift',20,'iter',1,'correct_bidir',false,'phase_flag',false);
 
 % Perform motion correction on cropped reference.
 % NoRMCorre picks the frames for its first template at random from MATLAB's
@@ -69,16 +78,26 @@ options_f = NoRMCorreSetParms('d1',d1-b1*2,'d2',d2-b2*2,'bin_width',binz,'max_sh
 % it repeatable, and the caller's random state is put back afterwards.
 prev_rng = rng(0, 'twister');
 restore_rng = onCleanup(@() rng(prev_rng)); %#ok<NASGU>
+Rc = Ref(b1+1:d1-b1,b2+1:d2-b2,:);
 if exist('template','var')
-    tic; [R1,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r,template); toc
+    tic; [R1,shifts,template_p] = normcorre_batch(Rc,options_r,template); toc
+    tic; [~,cross] = normcorre_batch(Rc,options_x,template); toc
 else
-    tic; [R1,shifts,template] = normcorre_batch(Ref(b1+1:d1-b1,b2+1:d2-b2,:),options_r); toc
+    tic; [R1,shifts,template_p] = normcorre_batch(Rc,options_r); toc
+    rng(0, 'twister');
+    tic; [~,cross] = normcorre_batch(Rc,options_x); toc
 end
-tic; [~,fine,template] = normcorre_batch(R1,options_f,template); toc
+tic; [~,fine,template] = normcorre_batch(R1,options_f,template_p); toc
 for i = 1:numel(shifts)
     shifts(i).shifts = shifts(i).shifts + fine(i).shifts;
 end
-clear R1 fine
+clear R1 fine template_p
+[shifts, n_apart, n_cross] = keep_better_shift(Rc, shifts, cross, template);
+if n_apart > 0
+    fprintf('%d of %d frames: phase and cross-correlation disagreed by more than 1 px; %d took the cross-correlation shift.\n', ...
+        n_apart, numel(shifts), n_cross);
+end
+clear Rc cross
 
 Ref=v2uint16(Ref); % Convert to uint16.
 
@@ -112,4 +131,37 @@ parfor i=1:size(Y,3)
 end
 % VALID is already the intersection over every frame: a pixel is usable only if
 % it is present in all of them.
+end
+
+
+function [shifts, n_apart, n_cross] = keep_better_shift(R, shifts, cross, template)
+%% Per frame, the phase-then-refine shift or the cross-correlation one.
+% Frames whose two shifts are within a pixel keep the phase-then-refine shift.
+% The others are translated by each and compared with the template, inside the
+% border that neither translation reaches, and keep the shift that matches better.
+n_apart = 0;
+n_cross = 0;
+template = double(template);
+[h, w, ~] = size(R);
+for i = 1:numel(shifts)
+    p = squeeze(shifts(i).shifts)';
+    x = squeeze(cross(i).shifts)';
+    if norm(p - x) <= 1
+        continue
+    end
+    n_apart = n_apart + 1;
+    m = min(ceil(max(abs([p x]))) + 1, floor((min(h, w) - 2)/2));
+    f = double(R(:,:,i));
+    if template_match(imtranslate(f, flip(x), 'FillValues', 0), template, m) > ...
+            template_match(imtranslate(f, flip(p), 'FillValues', 0), template, m)
+        shifts(i).shifts = cross(i).shifts;
+        n_cross = n_cross + 1;
+    end
+end
+end
+
+
+function c = template_match(a, b, m)
+%% Correlation of two frames, leaving out m pixels at every edge.
+c = corr2(a(m+1:end-m, m+1:end-m), b(m+1:end-m, m+1:end-m));
 end
