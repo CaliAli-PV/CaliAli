@@ -52,6 +52,12 @@ C_thr = merge_thr(2);
 S_thr = merge_thr(3);
 [K, ~] = size(C_);   % number of neurons
 deconv_options_0 = obj.options.deconv_options;
+% With fewer than two neurons there is no pair to merge.
+if K < 2
+    fprintf('Fewer than two neurons: nothing to merge.\n\n');
+    merged_ROIs = {}; newIDs = []; obj_bk = obj;
+    return;
+end
 
 %% find neuron pairs to merge
 % compute spatial correlation

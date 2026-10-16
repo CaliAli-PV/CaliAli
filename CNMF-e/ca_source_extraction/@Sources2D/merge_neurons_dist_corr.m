@@ -49,6 +49,13 @@ if ~exist('method_dist', 'var') || isempty(method_dist)
 end
 [K, ~] = size(C_);   % number of neurons
 deconv_options_0 = obj.options.deconv_options;
+% With fewer than two neurons there is no pair, and corr below fails on an
+% empty matrix ("Requires a data matrix X") once every neuron has been deleted.
+if K < 2
+    fprintf('Fewer than two neurons: nothing to merge.\n\n');
+    merged_ROIs = {}; newIDs = []; obj_bk = obj;
+    return;
+end
 
 %% find neuron pairs to merge
 % compute spatial correlation

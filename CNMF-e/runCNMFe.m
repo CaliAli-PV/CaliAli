@@ -87,6 +87,13 @@ for loop=1:10
     neuron=CNMF_CaliAli_update('Temporal',neuron);
     %% post-process the results automatically
     neuron.remove_false_positives();
+    % Nothing can be extracted once every neuron is gone: the merges, the next
+    % spatial update and the post-processing all fail on an empty model, each
+    % with an error that says nothing about why.
+    if size(neuron.A, 2) == 0
+        error('CaliAli:cnmf:noNeurons', ['CNMF iteration %d removed every neuron as a ' ...
+            'false positive, so there is nothing to extract.'], loop);
+    end
     neuron.merge_neurons_dist_corr(neuron.show_merge);
     neuron.merge_high_corr(neuron.show_merge,neuron.CaliAli_options.cnmf.merge_thr_spatial);
     neuron.merge_high_corr(neuron.show_merge, [0.9, -inf, -inf]);
