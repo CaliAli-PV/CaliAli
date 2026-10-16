@@ -97,6 +97,21 @@ CaliAli performs final detrending and noise scaling automatically at the end of 
 - [scale_to_noise()](Functions_doc/scale_to_noise.md#scale_to_noise) 
 - [postprocessDeconvolvedTraces()](Functions_doc/postprocessDeconvolvedTraces.md#postprocessDeconvolvedTraces) 
 
+### Slow signals <a id="slow"></a>
+
+The extraction removes activity slower than a few seconds: the video is detrended before it, and the traces are detrended again at the end. If slow activity is what you want to study, such as a baseline that rises and falls over tens of seconds, keep the default settings and run [extract_slow_traces()](Functions_doc/extract_slow_traces.md#extract_slow_traces) on the result:
+
+```matlab
+slow = extract_slow_traces(neuron);
+```
+
+It reads the traces again from the motion-corrected videos, which were never detrended, using the neurons the extraction found. On a simulated recording it kept 82% of a slow cycle, against 1% in the extraction's own traces, with the same neurons.
+
+Changing the extraction settings instead keeps less, or finds the neurons worse:
+
+- `detrend` set so that 5 × `detrend` seconds is longer than the slowest event, with `postprocess_traces = false`: about half of a slow cycle survives.
+- `detrend = 0` with `neuron_enhance = false` (neuron enhancement does not work on a video that was not detrended), and `deconv_flag = false` if the signal is not made of calcium transients: up to 84% survives, but far fewer neurons are found correctly.
+
 === "CONGRATULATIONS!"
 You have successfully extracted neuronal signals using CaliAli. Don't forget to save the results with `save_workspace(neuron)`. For other useful functions, see [Utilities](Utilities.md).
 	

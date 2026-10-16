@@ -30,6 +30,7 @@
 | [detrend_Ca_traces()](Functions_doc/detrend_Ca_traces.md#detrend_Ca_traces) |
 | [detrend_vid()](Functions_doc/detrend_vid.md#detrend_vid) |
 | [dissimilarity_previous()](Functions_doc/dissimilarity_previous.md#dissimilarity_previous) |
+| [extract_slow_traces()](Functions_doc/extract_slow_traces.md#extract_slow_traces) |
 | [get_alignment_metrics()](Functions_doc/get_alignment_metrics.md#get_alignment_metrics) |
 | [get_BV_NR_score()](Functions_doc/get_BV_NR_score.md#get_BV_NR_score) |
 | [get_local_corr_Vf()](Functions_doc/get_local_corr_Vf.md#get_local_corr_Vf) |
