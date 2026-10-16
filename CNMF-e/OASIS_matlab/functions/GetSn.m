@@ -33,6 +33,14 @@ end
 Y(~isfinite(Y))=0; %PV
 Y(isnan(Y))=0;  %PV
 
+% The mean of each trace is taken out first. pwelch tapers each segment with a
+% Hamming window and does not remove the mean, so a constant leaks through the
+% window's sidelobes into the band measured here: a trace of unit noise read
+% 1.30 sitting at 100, and 7.3 at 1000. On a video that kept its baseline
+% (detrend = 0) the noise was overestimated pixel by pixel in proportion to it.
+if ~isfloat(Y), Y = double(Y); end
+Y = Y - mean(Y, 1);
+
 [psdx, ff] = pwelch(Y, [],[],[], 1);
 indf = and(ff>=range_ff(1), ff<=range_ff(2));
 switch method
