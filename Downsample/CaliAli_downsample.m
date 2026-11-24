@@ -430,6 +430,15 @@ if isempty(regexp(desc{1}, '\<(gray|ya|yuva?|gbra?p|rgba?|bgra?)\w*?(9|10|12|14|
 else
     info.class = 'uint16';
 end
+% A paletted video (pal8; MATLAB's own Grayscale AVI, for one) stores each
+% pixel as an index into a table of 256 colours, and an AVI file gives that
+% table only with its first frame. After a seek FFmpeg has lost the table and
+% decodes every pixel as black, with no error. So the table is read here once,
+% and read_video_range_ffmpeg looks the indices up in it.
+info.gray_of_index = [];
+if ~isempty(regexp(desc{1}, '\<pal8\>', 'once'))
+    info.gray_of_index = read_palette_ffmpeg(ffmpeg, file);
+end
 
 % Every packet of the video stream, copied without decoding:
 %   #tb 0: 1/10
@@ -463,6 +472,30 @@ cache(key) = info;
 end
 
 
+function gray = read_palette_ffmpeg(ffmpeg, file)
+%% The grey level of each of the 256 colours of a paletted video.
+% Frame 1, read without a seek so the table is the file's own. FFmpeg writes a
+% pal8 frame as its indices followed by the table: 4 bytes per colour, in the
+% order blue, green, red, alpha.
+raw = [tempname '.raw'];
+c = onCleanup(@() delete_if_present(raw));
+[st, msg] = run_ffmpeg(ffmpeg, sprintf(['-v error -nostdin -y -i "%s" -map 0:v:0 ' ...
+    '-frames:v 1 -f rawvideo -pix_fmt pal8 "%s"'], file, raw));
+if st ~= 0
+    error('CaliAli:downsample:ffmpegProbe', 'FFmpeg could not read the colour table of %s:\n%s', file, msg);
+end
+fid = fopen(raw, 'r');
+data = fread(fid, inf, '*uint8');
+fclose(fid);
+if numel(data) < 1024
+    error('CaliAli:downsample:ffmpegProbe', 'FFmpeg returned no colour table for %s.', file);
+end
+bgra = reshape(data(end - 1023:end), 4, 256);
+% The same conversion read_video_range applies to colour frames.
+gray = rgb2gray(reshape(bgra([3 2 1], :)', 256, 1, 3));
+end
+
+
 function frames = read_video_range_ffmpeg(ffmpeg, videoFile, start_idx, end_idx, info)
 % Frame numbers as doubles: an integer index makes MATLAB's arithmetic
 % integer arithmetic, which once rounded every seek to a whole second.
@@ -477,7 +510,15 @@ if start_idx > 1
     % base.
     seek = sprintf('-ss %.6f ', (info.times(start_idx - 1) + info.times(start_idx)) / 2);
 end
-if strcmp(info.class, 'uint16'), fmt = 'gray16le'; else, fmt = 'gray'; end
+paletted = ~isempty(info.gray_of_index);
+if paletted
+    % The indices, looked up below in the table probe_video_ffmpeg read.
+    fmt = 'pal8';
+elseif strcmp(info.class, 'uint16')
+    fmt = 'gray16le';
+else
+    fmt = 'gray';
+end
 raw = [tempname '.raw'];
 c = onCleanup(@() delete_if_present(raw));
 [st, msg] = run_ffmpeg(ffmpeg, sprintf(['-v error -nostdin -y %s-i "%s" -map 0:v:0 ' ...
@@ -490,12 +531,20 @@ fid = fopen(raw, 'r', 'l');
 data = fread(fid, inf, ['*' info.class]);
 fclose(fid);
 px = info.size(1) * info.size(2);
-if numel(data) < px * n
+step = px;
+if paletted
+    step = px + 1024;   % each pal8 frame is followed by its colour table
+end
+if numel(data) < step * n
     % Every caller uses all n frames; fewer would fail later, somewhere that
     % does not say why.
     error('CaliAli:downsample:emptyRead', ['FFmpeg returned %d of frames %d-%d ' ...
-        'of %s (the file lists %d frames).'], floor(numel(data) / px), ...
+        'of %s (the file lists %d frames).'], floor(numel(data) / step), ...
         start_idx, end_idx, videoFile, numel(info.times));
+end
+if paletted
+    data = reshape(data(1:step * n), step, n);
+    data = info.gray_of_index(double(data(1:px, :)) + 1);
 end
 frames = permute(reshape(data(1:px * n), info.size(2), info.size(1), n), [2, 1, 3]);
 end
