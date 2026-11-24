@@ -28,6 +28,7 @@ CaliAli_options = CaliAli_downsample(CaliAli_options);   % Using predefined opti
 ##### Notes
 - Each video is saved next to the original as `<name>_ds.mat`. A complete `_ds.mat` that already exists is skipped.
 - Data are stored in the class set by `output_class` (`'uint16'` by default). See [Bit depth](../Downsampling.md#output-class).
+- A video MATLAB cannot read is read with FFmpeg, which CaliAli downloads the first time if it is not installed. See [Videos MATLAB cannot read](../Installation.md#ffmpeg).
 - Dead pixels, dropped frames and constant borders are repaired before downsampling. See [Camera defects](../Downsampling.md#defects).
 - Selecting a folder instead of a file concatenates all its files of type `file_extension` into one `<folder>_con.mat`. See [Processing Split Data](../Processing_split_data.md).
 - Settings are passed only through the options structure; name/value pairs are not accepted.

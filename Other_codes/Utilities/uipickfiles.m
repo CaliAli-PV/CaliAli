@@ -114,6 +114,9 @@ function out = uipickfiles(varargin)
 % Email:   dmschwarz=ieee*org, dmschwarz=urgrad*rochester*edu
 % Real_email = regexprep(Email,{'=','*'},{'@','.'})
 
+% CaliAli: this window is built on Java, which MATLAB R2026b and later no
+% longer include. Sets Java up the first time it is missing.
+caliali_require_java();
 
 % Define properties and set default values.
 prop.filterspec = '*';

@@ -6,7 +6,7 @@ function batchConvertVideos(fileList, outputFolder)
 ```
 
 #### Description
-`batchConvertVideos` converts a list of videos into **lossless grayscale MP4 files** using the `ffmpeg` program bundled with CaliAli. If no list is given, a file picker opens. The converted videos are saved in `outputFolder` or, if none is given, in the folder of the first input file.
+`batchConvertVideos` converts a list of videos into **lossless grayscale MP4 files** using FFmpeg: the one installed on the computer, or one CaliAli downloads the first time (see [Videos MATLAB cannot read](../Installation.md#ffmpeg)). If no list is given, a file picker opens. The converted videos are saved in `outputFolder` or, if none is given, in the folder of the first input file.
 
 ##### Function Inputs
 | Parameter Name | Type | Description |
@@ -18,9 +18,8 @@ function batchConvertVideos(fileList, outputFolder)
 None. One `.mp4` file is written per input video, and a message is printed for each conversion.
 
 ##### Notes
-- Runs on macOS only: the bundled `ffmpeg` is a macOS build (it runs on Intel and Apple Silicon Macs). No Windows or Linux build is included.
+- Runs on Windows, macOS and Linux.
 - If a conversion fails, the function stops with FFmpeg's message and the remaining files are not converted.
-- Paths with spaces are not supported: the input files, the output folder and the CaliAli folder must not contain spaces.
 
 ##### Example Usage
 ```matlab

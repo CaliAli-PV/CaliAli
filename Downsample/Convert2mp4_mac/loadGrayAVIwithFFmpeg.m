@@ -12,18 +12,11 @@ function videoArray = loadGrayAVIwithFFmpeg(videoFile)
         error('File does not exist: %s', videoFile);
     end
 
-    % Get the directory of this function file to locate FFmpeg
-    scriptPath = fileparts(mfilename('fullpath'));
-    ffmpegPath = fullfile(scriptPath, 'ffmpeg');  % Adjust this if FFmpeg is elsewhere
+    % FFmpeg from the system, or downloaded the first time (caliali_tool)
+    ffmpegPath = caliali_tool('ffmpeg');
 
     % Use FFmpeg to extract video metadata
-    if ismac
-        system(sprintf('chmod +x "%s"', ffmpegPath));
-    end
-
-
-    infoCommand = sprintf('"%s" -i "%s" 2>&1', ffmpegPath, videoFile);
-    [~, ffmpegInfo] = system(infoCommand);
+    [~, ffmpegInfo] = run_quoted(sprintf('"%s" -nostdin -i "%s"', ffmpegPath, videoFile));
 
     % Extract video width and height
     resolutionPattern = 'Stream #.*: Video: .* (\d+)x(\d+)';
@@ -60,11 +53,11 @@ function videoArray = loadGrayAVIwithFFmpeg(videoFile)
     rawFile = tempname; 
 
     % FFmpeg command to extract raw grayscale frames
-    ffmpegCommand = sprintf('"%s" -i "%s" -vf format=gray -f rawvideo -pix_fmt gray "%s"', ...
+    ffmpegCommand = sprintf('"%s" -nostdin -y -i "%s" -vf format=gray -f rawvideo -pix_fmt gray "%s"', ...
                             ffmpegPath, videoFile, rawFile);
-    
+
     % Run FFmpeg
-    [status, cmdout] = system(ffmpegCommand);
+    [status, cmdout] = run_quoted(ffmpegCommand);
     if status ~= 0
         error('FFmpeg failed: %s', cmdout);
     end
@@ -87,4 +80,13 @@ function videoArray = loadGrayAVIwithFFmpeg(videoFile)
     videoArray = permute(videoArray, [2, 1, 3]);  % Adjust dimensions to match MATLAB convention
 
     disp('Video loaded successfully.');
+end
+
+
+function [status, out] = run_quoted(cmd)
+% cmd.exe drops the first and last quote of a line that starts with one.
+if ispc
+    cmd = ['"' cmd '"'];
+end
+[status, out] = system(cmd);
 end

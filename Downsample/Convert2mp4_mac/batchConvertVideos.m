@@ -1,8 +1,8 @@
 function batchConvertVideos(fileList, outputFolder)
 % Converts a list of AVI files to lossless grayscale MP4 files using FFmpeg.
-% This function assumes the 'ffmpeg' executable is in the same directory
-% as this function file. The output MP4 files will have a single
-% grayscale channel (not RGB).
+% FFmpeg comes from caliali_tool, which finds it on the system or downloads
+% it the first time. The output MP4 files will have a single grayscale
+% channel (not RGB).
 %
 % Arguments:
 %   fileList: A cell array of input AVI file paths.
@@ -10,9 +10,7 @@ function batchConvertVideos(fileList, outputFolder)
 if ~exist('fileList','var')
     fileList = uipickfiles('REFilter','\.avi$|\.m4v$|\.mp4$|\.tif$|\.tiff$|\.isxd$');
 end
-% Get the directory of this function file
-ffmpegPath = fileparts(mfilename('fullpath'));
-ffmpegPath = fullfile(ffmpegPath, 'ffmpeg'); % Construct the full path to ffmpeg
+ffmpegPath = caliali_tool('ffmpeg');
 
 % Create the output folder if it doesn't exist
 if exist('outputFolder','var')
@@ -35,7 +33,11 @@ for i = 1:length(fileList)
 
     % Construct the FFmpeg command (lossless MP4, single grayscale channel)
     outputPath = fullfile(outputFolder, [fileName, '.mp4']);
-    command = [ffmpegPath, ' -i ', filePath, ' -vcodec libx264 -crf 0 -vf format=gray -pix_fmt gray ', outputPath];
+    command = sprintf('"%s" -nostdin -y -i "%s" -vcodec libx264 -crf 0 -vf format=gray -pix_fmt gray "%s"', ...
+        ffmpegPath, filePath, outputPath);
+    if ispc
+        command = ['"' command '"'];   % cmd.exe drops the outer pair of quotes
+    end
 
     % Execute the command
     [status, output] = system(command);

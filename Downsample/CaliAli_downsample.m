@@ -216,28 +216,11 @@ function reader = build_reader(fullFileName, ext, opts)
 if nargin < 3 || isempty(opts)
     opts = struct();
 end
-if ~isfield(opts, 'prefer_ffmpeg'), opts.prefer_ffmpeg = true; end
 if ~isfield(opts, 'batch_size'), opts.batch_size = []; end
 ext = lower(ext);
 switch true
     case contains(ext, {'.avi', '.m4v', '.mp4'})
-        v = VideoReader(fullFileName);
-        reader.nFrames = v.NumFrames;
-        reader.size = [v.Height, v.Width];
-        reader.fps = v.FrameRate;
-        f0 = read(v, 1);
-        if size(f0, 3) == 3
-            f0 = rgb2gray(f0);
-        end
-        reader.src_class = class(f0);
-        reader.read_range = @(s, e) read_video_range(v, s, e);
-        if opts.prefer_ffmpeg && ismac
-            ffmpegPath = find_packaged_ffmpeg();
-            if ~isempty(ffmpegPath)
-                bitDepth = class_to_bitdepth(reader.src_class);
-                reader.read_range = @(s, e) read_video_range_ffmpeg(fullFileName, s, e, reader.size, reader.fps, ffmpegPath, bitDepth);
-            end
-        end
+        reader = video_reader(fullFileName);
     case contains(ext, '.isxd')
         movieObj = open_isxd_movie(fullFileName);
         reader.nFrames = movieObj.timing.num_samples;
@@ -361,82 +344,187 @@ end
 end
 
 
-function ffmpegPath = find_packaged_ffmpeg()
-ffmpegPath = '';
-if exist('loadGrayAVIwithFFmpeg', 'file') == 2
-    p = which('loadGrayAVIwithFFmpeg');
-    ffmpegPath = fullfile(fileparts(p), 'ffmpeg');
-    if exist(ffmpegPath, 'file') ~= 2
-        ffmpegPath = '';
-    else
-        if ismac
-            fileattrib(ffmpegPath, '+x');
-        end
-    end
+function reader = video_reader(fullFileName)
+%% MATLAB's VideoReader where it works; FFmpeg where it does not.
+%
+% VideoReader decodes with what the operating system provides -- Media
+% Foundation and any codec pack on Windows, Apple's AVFoundation on a Mac,
+% GStreamer on Linux -- so which videos it opens depends on the computer, not
+% on CaliAli. A Mac cannot decode GREY or FFV1, the formats the Miniscope
+% software writes, nor Xvid; a stock Linux fails on FFV1, Xvid and H.264.
+% FFmpeg decodes all of them, the same way everywhere.
+%
+% VideoReader is still tried first: it needs nothing installed and is what
+% CaliAli has always used. It is tried up to reading frame 1, because some
+% files open and only then fail to decode. When it fails, the file is read
+% with FFmpeg, which caliali_tool finds on the system or downloads the first
+% time it is needed.
+try
+    v = VideoReader(fullFileName);
+    f0 = read(v, 1);
+    reader.nFrames = v.NumFrames;
+    reader.size = [v.Height, v.Width];
+    reader.fps = v.FrameRate;
+catch ME
+    reader = ffmpeg_video_reader(fullFileName, ME.message);
+    return
 end
+if size(f0, 3) == 3
+    f0 = rgb2gray(f0);
+end
+reader.src_class = class(f0);
+reader.read_range = @(s, e) read_video_range(v, s, e);
 end
 
 
-function frames = read_video_range_ffmpeg(videoFile, start_idx, end_idx, vid_size, fps, ffmpegPath, bitDepth)
-if nargin < 6 || isempty(ffmpegPath)
-    error('FFmpeg path is required for ffmpeg-based reading.');
+function reader = ffmpeg_video_reader(fullFileName, why)
+ffmpeg = caliali_tool('ffmpeg');
+info = probe_video_ffmpeg(ffmpeg, fullFileName, why);
+reader.nFrames = numel(info.times);
+reader.size = info.size;
+reader.fps = info.fps;
+reader.src_class = info.class;
+reader.read_range = @(s, e) read_video_range_ffmpeg(ffmpeg, fullFileName, s, e, info);
 end
-if nargin < 5 || isempty(fps)
-    fps = 30;
+
+
+function info = probe_video_ffmpeg(ffmpeg, file, why)
+%% Size, sample type and the time of every frame, from FFmpeg.
+%
+% THE TIME OF EVERY FRAME, NOT THE FRAME RATE. FFmpeg seeks by time while the
+% pipeline counts frames, and the frame rate FFmpeg prints is rounded to four
+% digits: at 14.985 frames per second, printed as 14.99, a seek computed from
+% it is half a frame off by frame 1500. So the time of every packet is read
+% from the file instead (copied, not decoded: this pass costs one read of the
+% file), and a read seeks halfway between the frame before and the one it
+% wants. The number of packets is the number of frames.
+%
+% build_reader runs twice per file, so the result is kept for the session.
+% The file's size and date are part of the key, so a replaced file is looked
+% at again.
+persistent cache
+if isempty(cache), cache = containers.Map(); end
+d = dir(file);
+key = sprintf('%s|%d|%.10f', file, d.bytes, d.datenum);
+if isKey(cache, key)
+    info = cache(key);
+    return
 end
-if nargin < 7 || isempty(bitDepth)
-    bitDepth = 8;
+
+[~, name, ext] = fileparts(file);
+say_green('MATLAB cannot read %s%s (%s). Reading it with FFmpeg.\n', name, ext, why);
+
+% The video stream as FFmpeg describes it, for example
+%   Stream #0:0: Video: ffv1 (FFV1 / 0x31564646), gray16le, 128x96, 10 fps, ...
+[~, txt] = run_ffmpeg(ffmpeg, sprintf('-hide_banner -nostdin -i "%s"', file));
+desc = regexp(txt, 'Stream #[^\n]*?Video: ([^\n]*)', 'tokens', 'once');
+if isempty(desc)
+    error('CaliAli:downsample:ffmpegProbe', 'FFmpeg finds no video in %s:\n%s', file, txt);
 end
-% Double, not the caller's integer index: see frame_to_seek_seconds, where the
-% reason is written out. In short, an integer index makes the seek arithmetic
-% integer division, which rounded every seek to a whole second and returned no
-% frames at all at the end of a recording.
+sz = regexp(desc{1}, ', (\d+)x(\d+)', 'tokens', 'once');
+info.size = [str2double(sz{2}), str2double(sz{1})];
+% More than 8 bits per sample (gray16le, gray12le, yuv420p10le, rgb48le, ...)
+% is read as 16 bits, everything else as 8.
+if isempty(regexp(desc{1}, '\<(gray|ya|yuva?|gbra?p|rgba?|bgra?)\w*?(9|10|12|14|16|48|64)(le|be)\>', 'once'))
+    info.class = 'uint8';
+else
+    info.class = 'uint16';
+end
+
+% Every packet of the video stream, copied without decoding:
+%   #tb 0: 1/10
+%   0,          0,          0,        1,    12288, 0x2a8f3c5b
+% stream, decoding time, presentation time, duration, size, checksum.
+list = [tempname '.txt'];
+c = onCleanup(@() delete_if_present(list));
+[st, msg] = run_ffmpeg(ffmpeg, sprintf( ...
+    '-v error -nostdin -y -i "%s" -map 0:v:0 -c copy -f framecrc "%s"', file, list));
+if st ~= 0
+    error('CaliAli:downsample:ffmpegProbe', 'FFmpeg could not list the frames of %s:\n%s', file, msg);
+end
+txt = fileread(list);
+tb = regexp(txt, '#tb 0: (\d+)/(\d+)', 'tokens', 'once');
+p = textscan(txt, '%f %f %f %f %f %*[^\n]', 'Delimiter', ',', 'CommentStyle', '#');
+% A missing time is printed as the most negative 64-bit integer. AVI stores
+% no presentation times, so a file with B-frames (Xvid, for one) has none;
+% the decoding time stands in for it.
+pts = p{3};
+dts = p{2};
+missing = pts < -2^62;
+pts(missing) = dts(missing);
+% An empty packet is a frame the camera dropped; it decodes to nothing.
+pts = pts(p{5} > 0);
+if isempty(tb) || isempty(pts) || any(pts < -2^62)
+    error('CaliAli:downsample:ffmpegProbe', 'FFmpeg found no frames in %s.', file);
+end
+info.times = sort(pts) * str2double(tb{1}) / str2double(tb{2});
+info.fps = (numel(info.times) - 1) / max(info.times(end) - info.times(1), eps);
+cache(key) = info;
+end
+
+
+function frames = read_video_range_ffmpeg(ffmpeg, videoFile, start_idx, end_idx, info)
+% Frame numbers as doubles: an integer index makes MATLAB's arithmetic
+% integer arithmetic, which once rounded every seek to a whole second.
 start_idx = double(start_idx);
 end_idx   = double(end_idx);
-start_sec = frame_to_seek_seconds(start_idx, fps);
 n = end_idx - start_idx + 1;
-
-rawFile = [tempname '.raw'];
-if bitDepth > 8
-    pixFmt = 'gray16le';
-    readType = 'uint16';
-else
-    pixFmt = 'gray';
-    readType = 'uint8';
+seek = '';
+if start_idx > 1
+    % Halfway between the frame before and the one wanted. FFmpeg starts at
+    % the first frame at or after the time it is given, and a time exactly on
+    % a frame can land on either side of it once rounded to the file's time
+    % base.
+    seek = sprintf('-ss %.6f ', (info.times(start_idx - 1) + info.times(start_idx)) / 2);
 end
-cmd = sprintf('\"%s\" -v error -ss %.6f -i \"%s\" -vframes %d -vf format=%s -f rawvideo -pix_fmt %s \"%s\"', ...
-    ffmpegPath, start_sec, videoFile, n, pixFmt, pixFmt, rawFile);
-status = system(cmd);
-if status ~= 0
-    error('FFmpeg failed when reading %s (frames %d-%d).', videoFile, start_idx, end_idx);
+if strcmp(info.class, 'uint16'), fmt = 'gray16le'; else, fmt = 'gray'; end
+raw = [tempname '.raw'];
+c = onCleanup(@() delete_if_present(raw));
+[st, msg] = run_ffmpeg(ffmpeg, sprintf(['-v error -nostdin -y %s-i "%s" -map 0:v:0 ' ...
+    '-frames:v %d -vf format=%s -f rawvideo -pix_fmt %s "%s"'], seek, videoFile, n, fmt, fmt, raw));
+if st ~= 0
+    error('CaliAli:downsample:ffmpegRead', 'FFmpeg could not read frames %d-%d of %s:\n%s', ...
+        start_idx, end_idx, videoFile, msg);
 end
-
-fid = fopen(rawFile, 'rb');
-rawData = fread(fid, inf, readType);
+fid = fopen(raw, 'r', 'l');
+data = fread(fid, inf, ['*' info.class]);
 fclose(fid);
-delete(rawFile);
-
-expected = vid_size(2) * vid_size(1) * n;
-if numel(rawData) < expected
-    n = floor(numel(rawData) / (vid_size(1) * vid_size(2)));
-    % NOTHING CAME BACK. Every caller indexes the result, so returning an empty
-    % d1 x d2 x 0 array turns this into "Index in position 3 exceeds array
-    % bounds" somewhere else entirely. Say where it actually went wrong.
-    if n < 1
-        error('CaliAli:downsample:emptyRead', ...
-            ['FFmpeg returned no frames for %s at frame %d, seeking to ' ...
-             '%.6f s. The seek landed at or past the end of the video.'], ...
-            videoFile, start_idx, start_sec);
-    end
-    rawData = rawData(1:vid_size(1) * vid_size(2) * n);
+px = info.size(1) * info.size(2);
+if numel(data) < px * n
+    % Every caller uses all n frames; fewer would fail later, somewhere that
+    % does not say why.
+    error('CaliAli:downsample:emptyRead', ['FFmpeg returned %d of frames %d-%d ' ...
+        'of %s (the file lists %d frames).'], floor(numel(data) / px), ...
+        start_idx, end_idx, videoFile, numel(info.times));
 end
-if numel(rawData) > expected
-    rawData = rawData(1:expected);
+frames = permute(reshape(data(1:px * n), info.size(2), info.size(1), n), [2, 1, 3]);
 end
 
-frames = reshape(rawData, [vid_size(2), vid_size(1), n]);
-frames = permute(frames, [2, 1, 3]);
-frames = cast(frames, bitdepth_to_class(bitDepth));
+
+function [st, out] = run_ffmpeg(ffmpeg, args)
+cmd = sprintf('"%s" %s', ffmpeg, args);
+if ispc
+    % cmd.exe drops the first and last quote of a line that starts with one,
+    % which breaks a quoted program followed by quoted arguments.
+    cmd = ['"' cmd '"'];
+end
+[st, out] = system(cmd);
+end
+
+
+function delete_if_present(f)
+if isfile(f)
+    delete(f);
+end
+end
+
+
+function say_green(varargin)
+if exist('cprintf', 'file')
+    cprintf([0, 0.55, 0], varargin{:});
+else
+    fprintf(1, varargin{:});
+end
 end
 
 
@@ -548,16 +636,6 @@ end
 o = sub_options;
 if ~any(cellfun(@isempty, records))
     o.defects_repaired = records;   % one record per segment
-end
-end
-
-
-function bd = class_to_bitdepth(cls)
-switch cls
-    case {'uint16', 'int16'}
-        bd = 16;
-    otherwise
-        bd = 8;
 end
 end
 
