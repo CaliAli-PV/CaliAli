@@ -8,6 +8,9 @@ CaliAli runs in `MATLAB` and requires:
 -	Statistics and Machine Learning Toolbox
 -	Parallel Computing Toolbox
 ```
+
+!!! warning "MATLAB R2026b and later: install Java"
+    From R2026b, MATLAB no longer includes Java, and some functions CaliAli uses need it. Install **MATLAB Support for OpenJDK** from the Add-On Explorer, run `jenv -clear`, and restart MATLAB. Alternatively, install an OpenJDK from [Adoptium](https://adoptium.net) and run `jenv("system")`. `version -java` shows whether MATLAB found it; see [MathWorks' instructions](https://www.mathworks.com/help/matlab/matlab_external/configure-your-system-to-use-java.html).
 		
 #### System Compatibility and Supported Formats <a id="supported-formats"></a><a id="compatibility"></a>
 
