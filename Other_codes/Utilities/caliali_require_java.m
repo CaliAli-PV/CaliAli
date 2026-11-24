@@ -8,9 +8,9 @@ function caliali_require_java()
 %   1. downloads a Java runtime (caliali_tool('java'), about 50 MB, checked
 %      against a fixed checksum);
 %   2. tells MATLAB to use it (jenv), which MATLAB remembers;
-%   3. stops with a message to restart MATLAB, because MATLAB loads Java only
-%      when it starts.
-% After the restart, Java is there and this returns at once again.
+%   3. if MATLAB cannot load it at once, stops with a message to restart
+%      MATLAB.
+% After that, Java is there and this returns at once again.
 %
 % Without internet, install Java by hand: see "Machines without internet" in
 % docs/Installation.md.
@@ -42,9 +42,19 @@ catch ME
         'not be set to use it: %s\nRun jenv("%s") yourself, then restart MATLAB.'], ...
         home, ME.message, home);
 end
+if usejava('jvm')
+    % MATLAB loaded it at once; no restart needed.
+    say('Java is set up.');
+    return
+end
 msg = 'Java is set up. Restart MATLAB, then run this again (only needed once).';
+say(msg);
+error('CaliAli:java:restart', '%s', msg);
+end
+
+
+function say(msg)
 if exist('cprintf', 'file')
     cprintf([0, 0.55, 0], '%s\n', msg);
 end
-error('CaliAli:java:restart', '%s', msg);
 end
